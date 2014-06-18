@@ -1,4 +1,4 @@
-﻿// Assembly Magma_Patcher, Version 1.0.0.0
+﻿// Assembly Zumwalt_Patcher, Version 1.0.0.0
 
 [assembly: System.Reflection.AssemblyCopyright("Copyright \x00a9 EquiFox17 2014")]
 [assembly: System.Reflection.AssemblyDescription("")]

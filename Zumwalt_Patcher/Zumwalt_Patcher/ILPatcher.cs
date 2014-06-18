@@ -1,4 +1,4 @@
-﻿namespace Magma_Patcher
+﻿namespace Zumwalt_Patcher
 {
     using Mono.Cecil;
     using Mono.Cecil.Cil;
@@ -9,14 +9,14 @@
         private AssemblyDefinition cSharpASM;
         private AssemblyDefinition firstPassASM;
         private TypeDefinition HooksClass;
-        private AssemblyDefinition MagmaAsm;
+        private AssemblyDefinition ZumwaltAsm;
 
         public ILPatcher()
         {
             try
             {
-                this.MagmaAsm = AssemblyDefinition.ReadAssembly("Magma.dll");
-                this.HooksClass = this.MagmaAsm.MainModule.GetType("Magma.Hooks");
+                this.ZumwaltAsm = AssemblyDefinition.ReadAssembly("Zumwalt.dll");
+                this.HooksClass = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Hooks");
             }
             catch (Exception exception)
             {
@@ -101,7 +101,7 @@
 
         private bool BootstrapAttachPatch()
         {
-            TypeDefinition type = this.MagmaAsm.MainModule.GetType("Magma.Bootstrap");
+            TypeDefinition type = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Bootstrap");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("ServerInit");
             MethodDefinition method = null;
             MethodDefinition definition4 = null;
@@ -385,7 +385,7 @@
                 bool flag = true;
                 this.cSharpASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp.dll");
                 this.firstPassASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp-firstpass.dll");
-                if (this.cSharpASM.MainModule.GetType("Magma_Patched") != null)
+                if (this.cSharpASM.MainModule.GetType("Zumwalt_Patched") != null)
                 {
                     Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
                     return false;
@@ -443,13 +443,13 @@
                 try
                 {
                     TypeReference type = AssemblyDefinition.ReadAssembly("mscorlib.dll").MainModule.GetType("System.String");
-                    TypeDefinition item = new TypeDefinition("", "Magma_Patched", TypeAttributes.AnsiClass | TypeAttributes.Public);
+                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched", TypeAttributes.AnsiClass | TypeAttributes.Public);
                     this.cSharpASM.MainModule.Types.Add(item);
                     TypeReference fieldType = this.cSharpASM.MainModule.Import(type);
                     FieldDefinition definition3 = new FieldDefinition("Version", FieldAttributes.CompilerControlled | FieldAttributes.FamANDAssem | FieldAttributes.Family, fieldType);
                     definition3.HasConstant = true;
                     definition3.Constant = Program.Version;
-                    this.cSharpASM.MainModule.GetType("Magma_Patched").Fields.Add(definition3);
+                    this.cSharpASM.MainModule.GetType("Zumwalt_Patched").Fields.Add(definition3);
                     this.cSharpASM.Write("Assembly-CSharp.dll");
                 }
                 catch (Exception exception)

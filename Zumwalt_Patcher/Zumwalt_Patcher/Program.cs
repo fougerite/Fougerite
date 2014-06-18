@@ -1,4 +1,4 @@
-﻿namespace Magma_Patcher
+﻿namespace Zumwalt_Patcher
 {
     using System;
 

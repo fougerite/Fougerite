@@ -1,12 +1,12 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <PropertyGroup>
     <ProjectType>local</ProjectType>
     <ProjectVersion>7.10.377</ProjectVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>9619148b-4859-4288-9070-cd92c94f2e05</ProjectGuid>
+    <ProjectGuid>{935412BA-2118-488D-839A-AAB76E60BA8C}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <AssemblyName>Magma_Patcher</AssemblyName>
+    <AssemblyName>Zumwalt_Patcher</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
@@ -31,11 +31,13 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="Mono.Cecil" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Magma_Patcher\ILPatcher.cs" />
-    <Compile Include="Magma_Patcher\Logger.cs" />
-    <Compile Include="Magma_Patcher\Program.cs" />
+    <Compile Include="Zumwalt_Patcher\ILPatcher.cs" />
+    <Compile Include="Zumwalt_Patcher\Logger.cs" />
+    <Compile Include="Zumwalt_Patcher\Program.cs" />
   </ItemGroup>
 </Project>

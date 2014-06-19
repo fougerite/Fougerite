@@ -371,6 +371,47 @@
             return true;
         }
 
+        private bool PlayerGatherPatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("ResourceTarget");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DoGather")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "PlayerGather")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 82 - int amount = (int) Mathf.Abs(this.gatherProgress);
+                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldarg_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloca, type.Fields[1]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool EntityDeployedPatch_DeployableItemDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
@@ -782,6 +823,16 @@
                 if (!this.PlayerGatherWoodPatch())
                 {
                     Logger.Log("Error while applying 'PlayerGatherWood' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.PlayerGatherPatch())
+                {
+                    Logger.Log("Error while applying 'PlayerGather' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.PlayerSpawningSpawnedPatch())
+                {
+                    Logger.Log("Error while applying 'PlayerSpawningSpawned' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

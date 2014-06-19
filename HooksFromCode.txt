@@ -18,8 +18,8 @@ Hooks.PlayerHurt(ref damage); // +
 Hooks.PlayerKilled(ref damage); // +
 Hooks.ServerShutdown(); // ++
 Hooks.PlayerGatherWood(item, rt, ref byName, ref amount, ref name); // ++
-Hooks.PlayerGather(reciever, this, rg, ref amount);
+Hooks.PlayerGather(reciever, this, rg, ref amount); // ++
 Hooks.PlayerConnect(User); // +
-Hooks.PlayerSpawning(playerFor, zero, useCamp);
-Hooks.PlayerSpawned(playerFor, zero, useCamp);
+Hooks.PlayerSpawning(playerFor, zero, useCamp); // ++
+Hooks.PlayerSpawned(playerFor, zero, useCamp); // ++
 Hooks.ShowTalker(client2.netPlayer, client); // +

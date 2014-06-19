@@ -134,6 +134,44 @@
             return true;
         }
 
+        private bool NPCHurtPatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "OnHurt")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "NPCHurt")
+                {
+                    method = definition5;
+                }
+            }
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor();
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool ChatPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("chat");
@@ -172,7 +210,7 @@
             return true;
         }
 
-        private MethodDefinition CloneMethod(MethodDefinition orig)
+        private MethodDefinition CloneMethod(MethodDefinition orig) // Method Backuping
         {
             MethodDefinition definition = new MethodDefinition(orig.Name + "Original", orig.Attributes, orig.ReturnType);
             foreach (VariableDefinition definition2 in orig.Body.Variables)

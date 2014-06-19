@@ -319,7 +319,7 @@
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }
@@ -666,7 +666,7 @@
                         Notice.Inventory(player, "☎ " + p.netUser.displayName);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }

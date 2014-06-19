@@ -67,7 +67,7 @@
                     File.Delete(GetAbsoluteFilePath("bans.xml"));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw;
             }

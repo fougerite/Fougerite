@@ -66,7 +66,7 @@
                 {
                     client = EnumerableToArray.ToArray<PlayerClient>(PlayerClient.FindAllWithString(friend.GetUserID().ToString()))[0];
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     list2.Add(friend.GetDisplayName());
                     continue;

@@ -7,7 +7,7 @@
     public class ILPatcher
     {
         private AssemblyDefinition cSharpASM;
-        private AssemblyDefinition firstPassASM;
+        //private AssemblyDefinition firstPassASM;
         private TypeDefinition HooksClass;
         private AssemblyDefinition ZumwaltAsm;
 
@@ -18,9 +18,9 @@
                 this.ZumwaltAsm = AssemblyDefinition.ReadAssembly("Zumwalt.dll");
                 this.HooksClass = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Hooks");
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.Log(exception.ToString());
+                Logger.Log(ex);
             }
         }
 
@@ -44,8 +44,9 @@
                 definition2.Attributes = (MethodAttributes) ((ushort) (((int) definition2.Attributes) - 1));
                 definition2.IsPublic = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -92,8 +93,9 @@
                 iLProcessor.InsertBefore(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
                 iLProcessor.InsertAfter(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, definition4.Body.Instructions[definition4.Body.Instructions.Count - 1]));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -127,8 +129,9 @@
             {
                 definition4.Body.GetILProcessor().InsertAfter(definition4.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -181,15 +184,16 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 
                 iLProcessor = NPCKilled.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
+                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, NPCKilled.Parameters[0]));
+                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return false;
             }
             return true;
@@ -224,11 +228,12 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -283,8 +288,9 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Ldarg_2));
                 iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(SpawnedHook)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -321,8 +327,9 @@
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 5 - Shutdown();
                 iLProcessor.InsertBefore(orig.Body.Instructions[5], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -357,15 +364,16 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 184 - if (byName != null)
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, type.Fields[5]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, type.Fields[11]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[17]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[14]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[16]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[5]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[11]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[17]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[14]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[16]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -402,11 +410,12 @@
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 82 - int amount = (int) Mathf.Abs(this.gatherProgress);
                 iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldarg_0));
                 iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloca, type.Fields[1]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloca, orig.Body.Variables[1]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -441,11 +450,12 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -480,11 +490,12 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
-                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -522,8 +533,9 @@
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -560,8 +572,9 @@
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -620,8 +633,9 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Ldarg_0));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -659,8 +673,9 @@
                 definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -712,8 +727,9 @@
                 definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
                 definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -765,9 +781,9 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(definition4)));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Ldsfld, type.Fields[4]));
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.Log(exception.ToString());
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -779,7 +795,7 @@
             {
                 bool flag = true;
                 this.cSharpASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp.dll");
-                this.firstPassASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp-firstpass.dll");
+                //this.firstPassASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp-firstpass.dll");
                 if (this.cSharpASM.MainModule.GetType("Zumwalt_Patched") != null)
                 {
                     Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
@@ -892,16 +908,16 @@
                     this.cSharpASM.MainModule.GetType("Zumwalt_Patched").Fields.Add(definition3);
                     this.cSharpASM.Write("Assembly-CSharp.dll");
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
                     flag = false;
-                    Logger.Log(exception.ToString());
+                    Logger.Log(ex);
                 }
                 return flag;
             }
-            catch (Exception exception2)
+            catch (Exception ex)
             {
-                Logger.Log(exception2.ToString());
+                Logger.Log(ex);
                 return false;
             }
         }
@@ -936,8 +952,9 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_1));
                 iLProcessor.InsertAfter(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -995,8 +1012,9 @@
                 iLProcessor.InsertAfter(definition5.Body.Instructions[0x23], Instruction.Create(OpCodes.Ldloc_1));
                 iLProcessor.InsertAfter(definition5.Body.Instructions[0x24], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(definition6)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -1034,8 +1052,9 @@
                 iLProcessor.InsertAfter(orig.Body.Instructions[0x17], Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x2f]));
                 orig.Body.Instructions[0x11] = Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x16]);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Log(ex);
                 return false;
             }
             return true;
@@ -1083,9 +1102,9 @@
                 iLProcessor.InsertAfter(definition3.Body.Instructions[0x59], Instruction.Create(OpCodes.Ldloc_0));
                 iLProcessor.InsertAfter(definition3.Body.Instructions[90], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Logger.Log(exception.ToString());
+                Logger.Log(ex);
                 return false;
             }
             return true;

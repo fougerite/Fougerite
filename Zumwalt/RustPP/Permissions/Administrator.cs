@@ -128,7 +128,7 @@
                         Util.sayUser(user.networkPlayer, "Admins", msg);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }

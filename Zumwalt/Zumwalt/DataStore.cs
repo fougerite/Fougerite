@@ -129,7 +129,7 @@
                     this.datastore = hashtable;
                     Util.GetUtil().ConsoleLog("Zumwalt DataStore Loaded", false);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }

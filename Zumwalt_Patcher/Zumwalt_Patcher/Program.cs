@@ -15,13 +15,14 @@
             {
                 if (patcher.Patch())
                 {
-                    Logger.Log("The patch was applied successfully !");
+                    Logger.Log("The patch was applied successfully!");
                 }
             }
             catch (Exception exception)
             {
                 Logger.Log(exception.ToString());
             }
+            Console.ReadLine();
         }
     }
 }

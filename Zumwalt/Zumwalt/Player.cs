@@ -133,7 +133,7 @@
                     this.justDied = true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 this.invError = true;
             }

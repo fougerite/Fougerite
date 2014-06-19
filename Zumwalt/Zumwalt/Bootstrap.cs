@@ -20,7 +20,7 @@
                 new GameObject(bootstrap.GetType().FullName).AddComponent(bootstrap.GetType());
                 Debug.Log("Loaded: Zumwalt");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Debug.Log("Error while loading Zumwalt!");
             }

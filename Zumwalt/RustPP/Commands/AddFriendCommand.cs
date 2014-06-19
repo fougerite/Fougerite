@@ -23,7 +23,7 @@
                     {
                         client = EnumerableToArray.ToArray<PlayerClient>(PlayerClient.FindAllWithName(name, StringComparison.CurrentCultureIgnoreCase))[0];
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         client = null;
                     }

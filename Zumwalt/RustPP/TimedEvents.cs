@@ -36,7 +36,7 @@
                 ServerSaveManager.AutoSave();
                 Helper.CreateSaves();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 UnityEngine.Debug.Log("Error while auto-saving !");
             }
@@ -66,7 +66,7 @@
                     ServerSaveManager.AutoSave();
                     Helper.CreateSaves();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
                 Process.GetCurrentProcess().Kill();

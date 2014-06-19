@@ -37,7 +37,7 @@
                     this.GetObject<StructureComponent>().StartCoroutine("DelayedKill");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (this.IsDeployableObject())
                 {

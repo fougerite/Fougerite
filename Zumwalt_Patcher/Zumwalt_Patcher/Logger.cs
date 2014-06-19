@@ -15,7 +15,16 @@
 
         public static void Log(string msg)
         {
+            Console.WriteLine(msg);
             File.AppendAllText("patcherLog.txt", "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + msg + "\r\n");
+        }
+
+        public static void Log(Exception ex)
+        {
+            Console.WriteLine("\n======| EX INFO |======");
+            Console.WriteLine(ex);
+            Console.WriteLine("======| ======= |======\n");
+            File.AppendAllText("patcherLog.txt", "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + ex + "\r\n");
         }
     }
 }

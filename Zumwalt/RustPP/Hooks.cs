@@ -19,7 +19,7 @@
                     Util.sayAll(killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }
@@ -36,7 +36,7 @@
                 SleepingBag bag1 = (SleepingBag) obj;
                 flag = false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 try
                 {
@@ -52,7 +52,7 @@
                     }
                     flag = false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     flag = false;
                 }
@@ -66,7 +66,7 @@
             {
                 return (Core.config.GetSetting("Settings", "decay") == "false");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -83,7 +83,7 @@
                     {
                         Helper.Log("StructDestroyed.txt", string.Concat(new object[] { e.attacker.client.netUser.displayName, " [", e.attacker.client.netUser.userID, "] destroyed (InstaKO) ", NetUser.FindByUserID(dep.ownerID).displayName, "'s ", dep.gameObject.name.Replace("(Clone)", "") }));
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         if (Core.userCache.ContainsKey(dep.ownerID))
                         {
@@ -97,7 +97,7 @@
                     dep.UpdateClientHealth();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 dep.UpdateClientHealth();
             }
@@ -120,7 +120,7 @@
                 }
                 return (list.isFriendWith(e.victim.userID) || command.IsOn(e.victim.userID));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return command.IsOn(e.victim.userID);
             }
@@ -132,7 +132,7 @@
             {
                 return (Core.config.GetSetting("Settings", "keepitems") == "true");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -176,7 +176,7 @@
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
             return true;
@@ -201,7 +201,7 @@
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }
@@ -220,7 +220,7 @@
                     sc.UpdateClientHealth();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 sc.UpdateClientHealth();
             }

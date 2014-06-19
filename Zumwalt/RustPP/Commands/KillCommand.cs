@@ -32,7 +32,7 @@
                     Util.sayUser(Arguments.argUser.networkPlayer, "You killed " + client.netUser.displayName);
                     Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " killed you with his admin power.");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }

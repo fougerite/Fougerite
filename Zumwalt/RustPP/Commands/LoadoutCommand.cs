@@ -16,7 +16,7 @@
                     inv.give(ref Arguments);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
             Util.sayUser(Arguments.argUser.networkPlayer, "You have spawned an Admin Loadout!");

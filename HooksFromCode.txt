@@ -3,8 +3,8 @@
 // Nothing - not created
 
 Hooks.NPCHurt(ref damage); // ++
-Hooks.NPCKilled(ref damage);
-Hooks.BlueprintUse(item, this);
+Hooks.NPCKilled(ref damage); // ++
+Hooks.BlueprintUse(item, this); // ++
 Hooks.ChatReceived(ref arg); // +
 Hooks.PlayerDisconnect(user); // +
 Hooks.ConsoleReceived(ref arg); // +

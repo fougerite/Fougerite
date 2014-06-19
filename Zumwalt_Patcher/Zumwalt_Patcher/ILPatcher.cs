@@ -173,7 +173,7 @@
                 }
             }
 
-            if ((orig == null) || (method == null))
+            if ((orig == null) || (method == null) || (NPCKilled == null) || (NPCKilledHook == null))
             {
                 return false;
             }
@@ -189,6 +189,45 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool BlueprintUsePatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("BlueprintDataBlock");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "UseItem")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "BlueprintUse")
+                {
+                    method = definition5;
+                }
+            }
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                orig.Body.Instructions.Clear();
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
             catch (Exception)
             {
@@ -460,7 +499,12 @@
                 }
                 if (!this.NPCHurtKilledPatch())
                 {
-                    Logger.Log("Error while applying 'NPCHurt' Patch to Assembly-CSharp.dll");
+                    Logger.Log("Error while applying 'NPCHurtKilled' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.BlueprintUsePatch())
+                {
+                    Logger.Log("Error while applying 'BlueprintUse' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

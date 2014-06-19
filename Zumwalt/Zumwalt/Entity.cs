@@ -1,6 +1,8 @@
 ﻿namespace Zumwalt
 {
     using System;
+    using System.Collections.Generic;
+    using UnityEngine;
 
     public class Entity
     {
@@ -11,24 +13,72 @@
             this.Object = Obj;
         }
 
-        public void Destroy()
+        public void ChangeOwner(Zumwalt.Player p)
         {
             if (this.IsDeployableObject())
             {
-                this.GetObject<DeployableObject>().OnKilled();
+                this.GetObject<DeployableObject>().SetupCreator(p.PlayerClient.controllable);
             }
-            else if (this.IsStructure())
+        }
+
+        public void Destroy()
+        {
+            try
             {
-                StructureComponent comp = this.GetObject<StructureComponent>();
-                comp._master.RemoveComponent(comp);
-                comp._master = null;
-                this.GetObject<StructureComponent>().StartCoroutine("DelayedKill");
+                if (this.IsDeployableObject())
+                {
+                    this.GetObject<DeployableObject>().OnKilled();
+                }
+                else if (this.IsStructure())
+                {
+                    StructureComponent comp = this.GetObject<StructureComponent>();
+                    comp._master.RemoveComponent(comp);
+                    comp._master = null;
+                    this.GetObject<StructureComponent>().StartCoroutine("DelayedKill");
+                }
             }
+            catch (Exception)
+            {
+                if (this.IsDeployableObject())
+                {
+                    NetCull.Destroy(this.GetObject<DeployableObject>().networkViewID);
+                }
+                else if (this.IsStructure())
+                {
+                    NetCull.Destroy(this.GetObject<StructureComponent>().networkViewID);
+                }
+            }
+        }
+
+        public System.Collections.Generic.List<Entity> GetLinkedStructs()
+        {
+            System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
+            foreach (StructureComponent component in (this.Object as StructureComponent)._master._structureComponents)
+            {
+                if (component != this.Object)
+                {
+                    list.Add(new Entity(component));
+                }
+            }
+            return list;
         }
 
         private T GetObject<T>()
         {
             return (T) this.Object;
+        }
+
+        public TakeDamage GetTakeDamage()
+        {
+            if (this.IsDeployableObject())
+            {
+                return this.GetObject<DeployableObject>().GetComponent<TakeDamage>();
+            }
+            if (this.IsStructure())
+            {
+                return this.GetObject<StructureComponent>().GetComponent<TakeDamage>();
+            }
+            return null;
         }
 
         public bool IsDeployableObject()
@@ -46,6 +96,85 @@
             if (this.IsDeployableObject())
             {
                 this.GetObject<DeployableObject>().SetDecayEnabled(c);
+            }
+        }
+
+        public void UpdateHealth()
+        {
+            if (this.IsDeployableObject())
+            {
+                this.GetObject<DeployableObject>().UpdateClientHealth();
+            }
+            else if (this.IsStructure())
+            {
+                this.GetObject<StructureComponent>().UpdateClientHealth();
+            }
+        }
+
+        public Zumwalt.Player Creator
+        {
+            get
+            {
+                return Zumwalt.Player.FindByGameID(this.CreatorID.ToString());
+            }
+        }
+
+        public ulong CreatorID
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                {
+                    return this.GetObject<DeployableObject>().creatorID;
+                }
+                if (this.IsStructure())
+                {
+                    return this.GetObject<StructureComponent>()._master.creatorID;
+                }
+                return 0L;
+            }
+        }
+
+        public float Health
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                {
+                    return this.GetObject<DeployableObject>().GetComponent<TakeDamage>().health;
+                }
+                if (this.IsStructure())
+                {
+                    return this.GetObject<StructureComponent>().GetComponent<TakeDamage>().health;
+                }
+                return 0f;
+            }
+            set
+            {
+                if (this.IsDeployableObject())
+                {
+                    this.GetObject<DeployableObject>().GetComponent<TakeDamage>().health = value;
+                }
+                else if (this.IsStructure())
+                {
+                    this.GetObject<StructureComponent>().GetComponent<TakeDamage>().health = value;
+                }
+            }
+        }
+
+        public int InstanceID
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                {
+                    return this.GetObject<DeployableObject>().GetInstanceID();
+                }
+                if (this.IsStructure())
+                {
+                    return this.GetObject<StructureComponent>().GetInstanceID();
+                }
+                return 0;
             }
         }
 
@@ -77,6 +206,14 @@
             }
         }
 
+        public Zumwalt.Player Owner
+        {
+            get
+            {
+                return Zumwalt.Player.FindByGameID(this.OwnerID.ToString());
+            }
+        }
+
         public ulong OwnerID
         {
             get
@@ -87,9 +224,7 @@
                 }
                 if (this.IsStructure())
                 {
-                    PlayerClient client;
-                    PlayerClient.Find(this.GetObject<StructureComponent>().networkViewOwner, out client);
-                    return client.userID;
+                    return this.GetObject<StructureComponent>()._master.ownerID;
                 }
                 return 0L;
             }
@@ -113,11 +248,11 @@
             {
                 if (this.IsDeployableObject())
                 {
-                    this.GetObject<DeployableObject>().gameObject.transform.position.Set(value, this.Y, this.Z);
+                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(value, this.Y, this.Z);
                 }
                 else if (this.IsStructure())
                 {
-                    this.GetObject<StructureComponent>().gameObject.transform.position.Set(value, this.Y, this.Z);
+                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(value, this.Y, this.Z);
                 }
             }
         }
@@ -140,11 +275,11 @@
             {
                 if (this.IsDeployableObject())
                 {
-                    this.GetObject<DeployableObject>().gameObject.transform.position.Set(this.X, value, this.Z);
+                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(this.X, value, this.Z);
                 }
                 else if (this.IsStructure())
                 {
-                    this.GetObject<StructureComponent>().gameObject.transform.position.Set(this.X, value, this.Z);
+                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(this.X, value, this.Z);
                 }
             }
         }
@@ -167,11 +302,11 @@
             {
                 if (this.IsDeployableObject())
                 {
-                    this.GetObject<DeployableObject>().gameObject.transform.position.Set(this.X, this.Y, value);
+                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(this.X, this.Y, value);
                 }
                 else if (this.IsStructure())
                 {
-                    this.GetObject<StructureComponent>().gameObject.transform.position.Set(this.X, this.Y, value);
+                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(this.X, this.Y, value);
                 }
             }
         }

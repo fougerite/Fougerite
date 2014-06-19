@@ -14,55 +14,62 @@
     {
         public static void CreateSaves()
         {
-            ShareCommand command = (ShareCommand) ChatCommand.GetCommand("share");
-            FriendsCommand command2 = (FriendsCommand) ChatCommand.GetCommand("friends");
-            if (command.GetSharedDoors().Count != 0)
+            try
             {
-                ObjectToFile<Hashtable>(command.GetSharedDoors(), GetAbsoluteFilePath("doorsSave.rpp"));
+                ShareCommand command = (ShareCommand) ChatCommand.GetCommand("share");
+                FriendsCommand command2 = (FriendsCommand) ChatCommand.GetCommand("friends");
+                if (command.GetSharedDoors().Count != 0)
+                {
+                    ObjectToFile<Hashtable>(command.GetSharedDoors(), GetAbsoluteFilePath("doorsSave.rpp"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("doorsSave.rpp")))
+                {
+                    File.Delete(GetAbsoluteFilePath("doorsSave.rpp"));
+                }
+                if (command2.GetFriendsLists().Count != 0)
+                {
+                    ObjectToFile<Hashtable>(command2.GetFriendsLists(), GetAbsoluteFilePath("friendsSave.rpp"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("friendsSave.rpp")))
+                {
+                    File.Delete(GetAbsoluteFilePath("friendsSave.rpp"));
+                }
+                if (Administrator.AdminList.Count != 0)
+                {
+                    ObjectToXML<List<Administrator>>(Administrator.AdminList, GetAbsoluteFilePath("admins.xml"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("admins.xml")))
+                {
+                    File.Delete(GetAbsoluteFilePath("admins.xml"));
+                }
+                if (Core.userCache.Count != 0)
+                {
+                    ObjectToFile<Dictionary<ulong, string>>(Core.userCache, GetAbsoluteFilePath("cache.rpp"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("cache.rpp")))
+                {
+                    File.Delete(GetAbsoluteFilePath("cache.rpp"));
+                }
+                if (Core.whiteList.Count != 0)
+                {
+                    ObjectToXML<List<PList.Player>>(Core.whiteList.PlayerList, GetAbsoluteFilePath("whitelist.xml"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("whitelist.xml")))
+                {
+                    File.Delete(GetAbsoluteFilePath("whitelist.xml"));
+                }
+                if (Core.blackList.Count != 0)
+                {
+                    ObjectToXML<List<PList.Player>>(Core.blackList.PlayerList, GetAbsoluteFilePath("bans.xml"));
+                }
+                else if (File.Exists(GetAbsoluteFilePath("bans.xml")))
+                {
+                    File.Delete(GetAbsoluteFilePath("bans.xml"));
+                }
             }
-            else if (File.Exists(GetAbsoluteFilePath("doorsSave.rpp")))
+            catch (Exception)
             {
-                File.Delete(GetAbsoluteFilePath("doorsSave.rpp"));
-            }
-            if (command2.GetFriendsLists().Count != 0)
-            {
-                ObjectToFile<Hashtable>(command2.GetFriendsLists(), GetAbsoluteFilePath("friendsSave.rpp"));
-            }
-            else if (File.Exists(GetAbsoluteFilePath("friendsSave.rpp")))
-            {
-                File.Delete(GetAbsoluteFilePath("friendsSave.rpp"));
-            }
-            if (Administrator.AdminList.Count != 0)
-            {
-                ObjectToXML<List<Administrator>>(Administrator.AdminList, GetAbsoluteFilePath("admins.xml"));
-            }
-            else if (File.Exists(GetAbsoluteFilePath("admins.xml")))
-            {
-                File.Delete(GetAbsoluteFilePath("admins.xml"));
-            }
-            if (Core.userCache.Count != 0)
-            {
-                ObjectToFile<Dictionary<ulong, string>>(Core.userCache, GetAbsoluteFilePath("cache.rpp"));
-            }
-            else if (File.Exists(GetAbsoluteFilePath("cache.rpp")))
-            {
-                File.Delete(GetAbsoluteFilePath("cache.rpp"));
-            }
-            if (Core.whiteList.Count != 0)
-            {
-                ObjectToXML<List<PList.Player>>(Core.whiteList.PlayerList, GetAbsoluteFilePath("whitelist.xml"));
-            }
-            else if (File.Exists(GetAbsoluteFilePath("whitelist.xml")))
-            {
-                File.Delete(GetAbsoluteFilePath("whitelist.xml"));
-            }
-            if (Core.blackList.Count != 0)
-            {
-                ObjectToXML<List<PList.Player>>(Core.blackList.PlayerList, GetAbsoluteFilePath("bans.xml"));
-            }
-            else if (File.Exists(GetAbsoluteFilePath("bans.xml")))
-            {
-                File.Delete(GetAbsoluteFilePath("bans.xml"));
+                throw;
             }
         }
 

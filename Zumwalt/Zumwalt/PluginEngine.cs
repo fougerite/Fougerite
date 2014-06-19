@@ -67,6 +67,14 @@
                                 {
                                     Hooks.OnServerInit += new Hooks.ServerInitDelegate(plugin.OnServerInit);
                                 }
+                                else if (statement2.Name == "On_PluginInit")
+                                {
+                                    Hooks.OnPluginInit += new Hooks.PluginInitHandlerDelegate(plugin.OnPluginInit);
+                                }
+                                else if (statement2.Name == "On_ServerShutdown")
+                                {
+                                    Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(plugin.OnServerShutdown);
+                                }
                                 else if (statement2.Name == "On_ItemsLoaded")
                                 {
                                     Hooks.OnItemsLoaded += new Hooks.ItemsDatablocksLoaded(plugin.OnItemsLoaded);
@@ -103,9 +111,45 @@
                                 {
                                     Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(plugin.OnPlayerHurt);
                                 }
+                                else if (statement2.Name == "On_PlayerSpawning")
+                                {
+                                    Hooks.OnPlayerSpawning += new Hooks.PlayerSpawnHandlerDelegate(plugin.OnPlayerSpawn);
+                                }
+                                else if (statement2.Name == "On_PlayerSpawned")
+                                {
+                                    Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(plugin.OnPlayerSpawned);
+                                }
+                                else if (statement2.Name == "On_PlayerGathering")
+                                {
+                                    Hooks.OnPlayerGathering += new Hooks.PlayerGatheringHandlerDelegate(plugin.OnPlayerGathering);
+                                }
                                 else if (statement2.Name == "On_EntityHurt")
                                 {
                                     Hooks.OnEntityHurt += new Hooks.EntityHurtDelegate(plugin.OnEntityHurt);
+                                }
+                                else if (statement2.Name == "On_EntityDecay")
+                                {
+                                    Hooks.OnEntityDecay += new Hooks.EntityDecayDelegate(plugin.OnEntityDecay);
+                                }
+                                else if (statement2.Name == "On_EntityDeployed")
+                                {
+                                    Hooks.OnEntityDeployed += new Hooks.EntityDeployedDelegate(plugin.OnEntityDeployed);
+                                }
+                                else if (statement2.Name == "On_NPCHurt")
+                                {
+                                    Hooks.OnNPCHurt += new Hooks.HurtHandlerDelegate(plugin.OnNPCHurt);
+                                }
+                                else if (statement2.Name == "On_NPCKilled")
+                                {
+                                    Hooks.OnNPCKilled += new Hooks.KillHandlerDelegate(plugin.OnNPCKilled);
+                                }
+                                else if (statement2.Name == "On_BlueprintUse")
+                                {
+                                    Hooks.OnBlueprintUse += new Hooks.BlueprintUseHandlerDelagate(plugin.OnBlueprintUse);
+                                }
+                                else if (statement2.Name == "On_DoorUse")
+                                {
+                                    Hooks.OnDoorUse += new Hooks.DoorOpenHandlerDelegate(plugin.OnDoorUse);
                                 }
                             }
                         }
@@ -145,7 +189,7 @@
                     string script = "";
                     foreach (string str5 in strArray)
                     {
-                        string str6 = str5.Replace("toLowerCase(", "Data.ToLower(");
+                        string str6 = str5.Replace("toLowerCase(", "Data.ToLower(").Replace("GetStaticField(", "Util.GetStaticField(").Replace("SetStaticField(", "Util.SetStaticField(").Replace("InvokeStatic(", "Util.InvokeStatic(").Replace("IsNull(", "Util.IsNull(").Replace("Datastore", "DataStore");
                         try
                         {
                             if (str6.Contains("new "))
@@ -183,6 +227,7 @@
                         }
                         catch (Exception)
                         {
+                            Console.WriteLine("Zumwalt : Couln't create instance at line -> " + str5);
                         }
                     }
                     if (this.FilterPlugin(script))
@@ -209,6 +254,7 @@
             }
             this.LoadPlugins(p);
             Data.GetData().Load();
+            Hooks.PluginInit();
         }
 
         public void Secure()

@@ -1,11 +1,11 @@
 ﻿namespace Zumwalt
 {
     using Facepunch.Utility;
+    using RustPP;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
 
     public class Data
     {
@@ -14,15 +14,16 @@
         private static Zumwalt.Data data;
         public static Hashtable inifiles = new Hashtable();
         public Hashtable Zumwalt_shared_data = new Hashtable();
-        public static string PATH = (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Zumwalt\");
+        public static string PATH;
 
+        [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
         {
-            Hashtable hashtable = (Hashtable) this.Zumwalt_shared_data[tablename];
+            Hashtable hashtable = (Hashtable) DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
                 hashtable = new Hashtable();
-                this.Zumwalt_shared_data.Add(tablename, hashtable);
+                DataStore.GetInstance().datastore.Add(tablename, hashtable);
             }
             if (hashtable.ContainsKey(key))
             {
@@ -53,9 +54,19 @@
             return data;
         }
 
+        public IniParser GetRPPConfig()
+        {
+            if (inifiles.ContainsKey("rust++"))
+            {
+                return (IniParser) inifiles["rust++"];
+            }
+            return null;
+        }
+
+        [Obsolete("Replaced with DataStore.Get", false)]
         public object GetTableValue(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable) this.Zumwalt_shared_data[tablename];
+            Hashtable hashtable = (Hashtable) DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
                 return null;
@@ -81,12 +92,25 @@
                         path = str3;
                     }
                 }
-                if (!(path == ""))
+                if (path != "")
                 {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
                     inifiles.Add(key, new IniParser(path));
+                    if (key == "rust++")
+                    {
+                        Core.config = (IniParser) inifiles["rust++"];
+                    }
                     Console.WriteLine("Loaded Config: " + key);
                 }
+            }
+        }
+
+        public void OverrideConfig(string config, string section, string key, string value)
+        {
+            IniParser parser = (IniParser) inifiles[config.ToLower()];
+            if (parser != null)
+            {
+                parser.SetSetting(section, key, value);
             }
         }
 

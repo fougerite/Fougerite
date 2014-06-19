@@ -31,13 +31,16 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\Mono.Cecil.dll</HintPath>
-    </Reference>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Zumwalt_Patcher\ILPatcher.cs" />
     <Compile Include="Zumwalt_Patcher\Logger.cs" />
     <Compile Include="Zumwalt_Patcher\Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

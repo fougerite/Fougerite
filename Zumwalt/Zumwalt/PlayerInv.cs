@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class PlayerInventory
+    public class PlayerInv
     {
         private PlayerItem[] _armorItems;
         private PlayerItem[] _barItems;
@@ -10,7 +10,7 @@
         private PlayerItem[] _items;
         private Zumwalt.Player player;
 
-        public PlayerInventory(Zumwalt.Player player)
+        public PlayerInv(Zumwalt.Player player)
         {
             this.player = player;
             this._inv = player.PlayerClient.controllable.GetComponent<Inventory>();
@@ -29,6 +29,29 @@
             arg.Args = strArray;
             arg.SetUser(this.player.PlayerClient.netUser);
             inv.give(ref arg);
+        }
+
+        public void AddItemTo(string name, int slot)
+        {
+            this.AddItemTo(name, slot, 1);
+        }
+
+        public void AddItemTo(string name, int slot, int amount)
+        {
+            ItemDataBlock byName = DatablockDictionary.GetByName(name);
+            if (byName != null)
+            {
+                Inventory.Slot.Kind belt = Inventory.Slot.Kind.Default;
+                if ((slot > 0x1d) && (slot < 0x24))
+                {
+                    belt = Inventory.Slot.Kind.Belt;
+                }
+                else if ((slot >= 0x24) && (slot < 40))
+                {
+                    belt = Inventory.Slot.Kind.Armor;
+                }
+                this._inv.AddItemSomehow(byName, new Inventory.Slot.Kind?(belt), slot, amount);
+            }
         }
 
         public void Clear()
@@ -89,7 +112,7 @@
                     num++;
                 }
             }
-            return num;
+            return (num + 1);
         }
 
         public bool HasItem(string name)
@@ -102,7 +125,7 @@
             int num = 0;
             foreach (PlayerItem item in this.Items)
             {
-                if (item.Name == item.Name)
+                if (item.Name == name)
                 {
                     if (item.UsesLeft >= number)
                     {
@@ -113,7 +136,7 @@
             }
             foreach (PlayerItem item2 in this.BarItems)
             {
-                if (item2.Name == item2.Name)
+                if (item2.Name == name)
                 {
                     if (item2.UsesLeft >= number)
                     {
@@ -124,7 +147,7 @@
             }
             foreach (PlayerItem item3 in this.ArmorItems)
             {
-                if (item3.Name == item3.Name)
+                if (item3.Name == name)
                 {
                     if (item3.UsesLeft >= number)
                     {
@@ -156,6 +179,11 @@
                     this.ArmorItems[i - 0x24] = new PlayerItem(ref this._inv, i);
                 }
             }
+        }
+
+        public void MoveItem(int s1, int s2)
+        {
+            this._inv.MoveItemAtSlotToEmptySlot(this._inv, s1, s2);
         }
 
         public void RemoveItem(PlayerItem pi)
@@ -193,30 +221,84 @@
 
         public void RemoveItem(string name, int number)
         {
+            int qty = number;
             foreach (PlayerItem item in this.Items)
             {
-                if ((item.Name == item.Name) && (item.UsesLeft >= number))
+                if (item.Name == name)
                 {
-                    this.RemoveItem(item.Slot);
-                    break;
+                    if (item.UsesLeft > qty)
+                    {
+                        item.Consume(qty);
+                        qty = 0;
+                        break;
+                    }
+                    qty -= item.UsesLeft;
+                    if (qty < 0)
+                    {
+                        qty = 0;
+                    }
+                    this._inv.RemoveItem(item.Slot);
+                    if (qty == 0)
+                    {
+                        break;
+                    }
                 }
             }
-            foreach (PlayerItem item2 in this.ArmorItems)
+            if (qty != 0)
             {
-                if ((item2.Name == item2.Name) && (item2.UsesLeft >= number))
+                foreach (PlayerItem item2 in this.ArmorItems)
                 {
-                    this.RemoveItem(item2.Slot);
-                    break;
+                    if (item2.Name == name)
+                    {
+                        if (item2.UsesLeft > qty)
+                        {
+                            item2.Consume(qty);
+                            qty = 0;
+                            break;
+                        }
+                        qty -= item2.UsesLeft;
+                        if (qty < 0)
+                        {
+                            qty = 0;
+                        }
+                        this._inv.RemoveItem(item2.Slot);
+                        if (qty == 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (qty != 0)
+                {
+                    foreach (PlayerItem item3 in this.BarItems)
+                    {
+                        if (item3.Name == name)
+                        {
+                            if (item3.UsesLeft > qty)
+                            {
+                                item3.Consume(qty);
+                                qty = 0;
+                                return;
+                            }
+                            qty -= item3.UsesLeft;
+                            if (qty < 0)
+                            {
+                                qty = 0;
+                            }
+                            this._inv.RemoveItem(item3.Slot);
+                            if (qty == 0)
+                            {
+                                return;
+                            }
+                        }
+                    }
                 }
             }
-            foreach (PlayerItem item3 in this.BarItems)
-            {
-                if ((item3.Name == item3.Name) && (item3.UsesLeft >= number))
-                {
-                    this.RemoveItem(item3.Slot);
-                    return;
-                }
-            }
+        }
+
+        public void RemoveItemAll(string name)
+        {
+            this.RemoveItem(name, 0x1869f);
         }
 
         public PlayerItem[] ArmorItems

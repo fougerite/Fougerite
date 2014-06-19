@@ -16,10 +16,9 @@
         public static IniParser config;
         public static Hashtable kickWaitList = new Hashtable();
         public static System.Collections.Generic.List<ulong> muteList = new System.Collections.Generic.List<ulong>();
-        public static string server_message_name = "Rust++";
         public static System.Collections.Generic.List<ulong> tempConnect = new System.Collections.Generic.List<ulong>();
         public static Dictionary<ulong, string> userCache;
-        public static string Version = "1.5.4";
+        public static string Version = "1.5.5";
         public static PList whiteList = new PList();
 
         static Core()
@@ -63,7 +62,6 @@
             {
                 blackList = new PList();
             }
-            LoadConfig();
         }
 
         public static void handleCommand(ref ConsoleSystem.Arg arg)
@@ -168,9 +166,22 @@
             ChatCommand.AddCommand("/addwl", command23);
         }
 
-        public static void LoadConfig()
+        public static bool IsEnabled()
         {
-            config = new IniParser(Helper.GetAbsoluteFilePath("Rust++.cfg"));
+            if (config == null)
+            {
+                return false;
+            }
+            string setting = config.GetSetting("Settings", "rust++_enabled");
+            switch (setting)
+            {
+                case null:
+                    return false;
+
+                case "false":
+                    return false;
+            }
+            return (setting == "true");
         }
 
         public static void motd(uLink.NetworkPlayer player)

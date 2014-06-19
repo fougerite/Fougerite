@@ -1,30 +1,60 @@
 ﻿namespace Zumwalt
 {
-    using Facepunch.Utility;
     using System;
     using System.Collections.Generic;
 
     public class Server
     {
         private ItemsBlocks _items;
+        private StructureMaster _serverStructs = new StructureMaster();
         public Zumwalt.Data data = new Zumwalt.Data();
         private System.Collections.Generic.List<Zumwalt.Player> players = new System.Collections.Generic.List<Zumwalt.Player>();
         private static Zumwalt.Server server;
-        public static string server_message_name = "Zumwalt";
+        public string server_message_name = "Zumwalt";
         public Util util = new Util();
-        public static string Version = "1.5";
 
         public void Broadcast(string arg)
         {
-            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            foreach (Zumwalt.Player player in this.Players)
+            {
+                player.Message(arg);
+            }
+        }
+
+        public void BroadcastFrom(string name, string arg)
+        {
+            foreach (Zumwalt.Player player in this.Players)
+            {
+                player.MessageFrom(name, arg);
+            }
         }
 
         public void BroadcastNotice(string s)
         {
-            string str = Facepunch.Utility.String.QuoteSafe("");
-            string str2 = Facepunch.Utility.String.QuoteSafe("!");
-            string str3 = Facepunch.Utility.String.QuoteSafe(s);
-            ConsoleNetworker.Broadcast("notice.popup " + str + " " + str2 + " " + str3);
+            foreach (Zumwalt.Player player in this.Players)
+            {
+                player.Notice(s);
+            }
+        }
+
+        public Zumwalt.Player FindPlayer(string s)
+        {
+            Zumwalt.Player player = Zumwalt.Player.FindBySteamID(s);
+            if (player != null)
+            {
+                return player;
+            }
+            player = Zumwalt.Player.FindByGameID(s);
+            if (player != null)
+            {
+                return player;
+            }
+            player = Zumwalt.Player.FindByName(s);
+            if (player != null)
+            {
+                return player;
+            }
+            return null;
         }
 
         public static Zumwalt.Server GetServer()
@@ -75,6 +105,14 @@
             get
             {
                 return this.players;
+            }
+        }
+
+        public StructureMaster ServerStructures
+        {
+            get
+            {
+                return this._serverStructs;
             }
         }
     }

@@ -32,33 +32,51 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>C:\Users\Riketta\Desktop\Rust.Server.v1069\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.ID">
-      <HintPath>C:\Users\Riketta\Desktop\Rust.Server.v1069\rust_server_Data\Managed\Facepunch.ID.dll</HintPath>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Facepunch.ID.dll</HintPath>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
-      <HintPath>C:\Users\Riketta\Desktop\Rust.Server.v1069\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="uLink">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\uLink.dll</HintPath>
+    </Reference>
     <Reference Include="Jint">
-      <HintPath>..\Jint.dll</HintPath>
+      <HintPath>..\References\Jint.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Zumwalt\HurtEvent.cs" />
-    <Compile Include="Zumwalt\DeathEvent.cs" />
+    <Compile Include="Zumwalt\ChatString.cs" />
+    <Compile Include="Zumwalt\Zone3D.cs" />
+    <Compile Include="Zumwalt\DataStore.cs" />
+    <Compile Include="Zumwalt\Events\BPUseEvent.cs" />
+    <Compile Include="Zumwalt\Events\DoorEvent.cs" />
+    <Compile Include="Zumwalt\Events\GatherEvent.cs" />
+    <Compile Include="Zumwalt\Events\HurtEvent.cs" />
+    <Compile Include="Zumwalt\Events\DeathEvent.cs" />
+    <Compile Include="Zumwalt\Events\DecayEvent.cs" />
     <Compile Include="Zumwalt\Entity.cs" />
+    <Compile Include="Zumwalt\Events\SpawnEvent.cs" />
     <Compile Include="Zumwalt\ItemsBlocks.cs" />
-    <Compile Include="Zumwalt\Player.cs" />
     <Compile Include="Zumwalt\NPC.cs" />
+    <Compile Include="ParamsList.cs" />
     <Compile Include="Zumwalt\PlayerItem.cs" />
-    <Compile Include="Zumwalt\TimedEvent.cs" />
+    <Compile Include="Zumwalt\Events\TimedEvent.cs" />
     <Compile Include="Zumwalt\Web.cs" />
     <Compile Include="Zumwalt\World.cs" />
     <Compile Include="Zumwalt\Hooks.cs" />
-    <Compile Include="Zumwalt\PlayerInventory.cs" />
+    <Compile Include="Zumwalt\Player.cs" />
+    <Compile Include="Zumwalt\PlayerInv.cs" />
     <Compile Include="Zumwalt\Server.cs" />
     <Compile Include="Zumwalt\Data.cs" />
     <Compile Include="Zumwalt\PluginEngine.cs" />
@@ -114,11 +132,5 @@
     <Compile Include="Zumwalt\Plugin.cs" />
     <Compile Include="Zumwalt\Util.cs" />
     <Compile Include="Zumwalt\Bootstrap.cs" />
-    <Reference Include="uLink">
-      <HintPath>C:\Users\Riketta\Desktop\Rust.Server.v1069\rust_server_Data\Managed\uLink.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>C:\Users\Riketta\Desktop\Rust.Server.v1069\rust_server_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>

@@ -3,13 +3,13 @@
     using System;
     using UnityEngine;
 
-    public class NPC : Zumwalt.Player
+    public class NPC
     {
         private Character _char;
 
         public NPC(Character c)
         {
-            this.Character = c;
+            this._char = c;
         }
 
         public void Kill()

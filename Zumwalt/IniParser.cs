@@ -116,6 +116,7 @@ public class IniParser
         if (this.keyPairs.ContainsKey(pair))
         {
             this.keyPairs.Remove(pair);
+            this.tmpList.Remove(pair);
         }
     }
 
@@ -189,6 +190,17 @@ public class IniParser
         catch (Exception exception)
         {
             throw exception;
+        }
+    }
+
+    public void SetSetting(string sectionName, string settingName, string value)
+    {
+        SectionPair pair;
+        pair.Section = sectionName;
+        pair.Key = settingName;
+        if (this.keyPairs.ContainsKey(pair))
+        {
+            this.keyPairs[pair] = value;
         }
     }
 

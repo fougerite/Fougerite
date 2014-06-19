@@ -1,16 +1,18 @@
 ﻿namespace RustPP.Commands
 {
+    using Zumwalt;
     using RustPP;
     using RustPP.Permissions;
     using System;
-    using System.Collections.Generic;
     using System.IO;
+    using System.Collections.Generic;
 
     public class ReloadCommand : ChatCommand
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            Core.LoadConfig();
+            Zumwalt.Data.GetData().Load();
+            Core.config = Zumwalt.Data.GetData().GetRPPConfig();
             TimedEvents.startEvents();
             if (File.Exists(Helper.GetAbsoluteFilePath("admins.xml")))
             {

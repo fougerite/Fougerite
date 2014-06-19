@@ -60,9 +60,15 @@
             if (time == 0)
             {
                 Util.sayAll("Server Shutdown NOW!");
-                AvatarSaveProc.SaveAll();
-                ServerSaveManager.AutoSave();
-                Helper.CreateSaves();
+                try
+                {
+                    AvatarSaveProc.SaveAll();
+                    ServerSaveManager.AutoSave();
+                    Helper.CreateSaves();
+                }
+                catch (Exception)
+                {
+                }
                 Process.GetCurrentProcess().Kill();
             }
             else
@@ -77,7 +83,6 @@
             if (!init)
             {
                 init = true;
-                Core.server_message_name = Core.config.GetSetting("Settings", "system_message_name");
                 if (Core.config.GetSetting("Settings", "decay") == "false")
                 {
                     decay.decaytickrate = float.MaxValue;
@@ -128,16 +133,6 @@
                         advertise_begin();
                     };
                     timer.Start();
-                }
-                if (Core.config.GetSetting("Settings", "autosave_enabled") == "true")
-                {
-                    System.Timers.Timer timer2 = new System.Timers.Timer();
-                    timer2.Interval = int.Parse(Core.config.GetSetting("Settings", "autosave_interval"));
-                    timer2.AutoReset = true;
-                    timer2.Elapsed += delegate (object x, ElapsedEventArgs y) {
-                        savealldata();
-                    };
-                    timer2.Start();
                 }
             }
         }

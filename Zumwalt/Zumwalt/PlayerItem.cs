@@ -4,7 +4,6 @@
 
     public class PlayerItem
     {
-        private IInventoryItem _iii;
         private Inventory internalInv;
         private int internalSlot;
 
@@ -86,6 +85,18 @@
             set
             {
                 this.RInventoryItem.datablock.name = value;
+            }
+        }
+
+        public int Quantity
+        {
+            get
+            {
+                return this.UsesLeft;
+            }
+            set
+            {
+                this.UsesLeft = value;
             }
         }
 

@@ -105,10 +105,6 @@
 
         public static bool IsFriend(ref DamageEvent e)
         {
-            if (!server.pvp)
-            {
-                return true;
-            }
             GodModeCommand command = (GodModeCommand) ChatCommand.GetCommand("god");
             try
             {
@@ -217,17 +213,6 @@
                 InstaKOCommand command = ChatCommand.GetCommand("instako") as InstaKOCommand;
                 if (command.IsOn(e.attacker.client.userID))
                 {
-                    try
-                    {
-                        Helper.Log("StructDestroyed.txt", string.Concat(new object[] { e.attacker.client.netUser.displayName, " [", e.attacker.client.netUser.userID, "] destroyed (InstaKO) ", NetUser.FindByUserID(sc._master.ownerID).displayName, "'s ", sc.gameObject.name.Replace("(Clone)", "") }));
-                    }
-                    catch (Exception)
-                    {
-                        if (Core.userCache.ContainsKey(sc._master.ownerID))
-                        {
-                            Helper.Log("StructDestroyed.txt", string.Concat(new object[] { e.attacker.client.netUser.displayName, " [", e.attacker.client.netUser.userID, "] destroyed (InstaKO) ", Core.userCache[sc._master.ownerID], "'s ", sc.gameObject.name.Replace("(Clone)", "") }));
-                        }
-                    }
                     sc.StartCoroutine("DelayedKill");
                 }
                 else

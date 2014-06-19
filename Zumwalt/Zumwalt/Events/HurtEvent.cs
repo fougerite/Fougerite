@@ -1,13 +1,15 @@
-﻿namespace Zumwalt
+﻿namespace Zumwalt.Events
 {
+    using Zumwalt;
     using System;
 
     public class HurtEvent
     {
-        private Zumwalt.Player _attacker;
+        private object _attacker;
         private DamageEvent _de;
+        private bool _decay;
         private Zumwalt.Entity _ent;
-        private Zumwalt.Player _victim;
+        private object _victim;
         private string _weapon;
         private WeaponImpact _wi;
 
@@ -22,9 +24,18 @@
             {
                 this.Attacker = new NPC(d.attacker.character);
             }
-            this.Victim = Zumwalt.Player.FindByPlayerClient(d.victim.client);
+            Zumwalt.Player player2 = Zumwalt.Player.FindByPlayerClient(d.victim.client);
+            if (player2 != null)
+            {
+                this.Victim = player2;
+            }
+            else
+            {
+                this.Victim = new NPC(d.victim.character);
+            }
             this.DamageEvent = d;
             this.WeaponData = null;
+            this.IsDecay = false;
             if (d.extraData != null)
             {
                 WeaponImpact extraData = d.extraData as WeaponImpact;
@@ -43,7 +54,7 @@
             this.Entity = en;
         }
 
-        public Zumwalt.Player Attacker
+        public object Attacker
         {
             get
             {
@@ -79,6 +90,44 @@
             }
         }
 
+        public string DamageType
+        {
+            get
+            {
+                string str = "Unknown";
+                switch (((int) this.DamageEvent.damageTypes))
+                {
+                    case 0:
+                        return "Bleeding";
+
+                    case 1:
+                        return "Generic";
+
+                    case 2:
+                        return "Bullet";
+
+                    case 3:
+                    case 5:
+                    case 6:
+                    case 7:
+                        return str;
+
+                    case 4:
+                        return "Melee";
+
+                    case 8:
+                        return "Explosion";
+
+                    case 0x10:
+                        return "Radiation";
+
+                    case 0x20:
+                        return "Cold";
+                }
+                return str;
+            }
+        }
+
         public Zumwalt.Entity Entity
         {
             get
@@ -91,7 +140,19 @@
             }
         }
 
-        public Zumwalt.Player Victim
+        public bool IsDecay
+        {
+            get
+            {
+                return this._decay;
+            }
+            set
+            {
+                this._decay = value;
+            }
+        }
+
+        public object Victim
         {
             get
             {

@@ -17,6 +17,21 @@
         private Dictionary<string, System.Type> typeCache = new Dictionary<string, System.Type>();
         private static Util util;
 
+        public void ConsoleLog(string str, [Optional, DefaultParameterValue(false)] bool adminOnly)
+        {
+            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            {
+                if (!adminOnly)
+                {
+                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                }
+                else if (player.Admin)
+                {
+                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                }
+            }
+        }
+
         public object CreateArrayInstance(string name, int size)
         {
             System.Type type;
@@ -45,19 +60,34 @@
             return Activator.CreateInstance(type, args);
         }
 
-        public static string GetAbsoluteFilePath(string fileName)
+        public Quaternion CreateQuat(float x, float y, float z, float w)
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Zumwalt\" + fileName);
+            return new Quaternion(x, y, z, w);
         }
 
-        public static string GetAbsoluteFilePathConfig(string fileName)
+        public Vector3 CreateVector(float x, float y, float z)
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Zumwalt\" + fileName);
+            return new Vector3(x, y, z);
+        }
+
+        public void DestroyObject(GameObject go)
+        {
+            NetCull.Destroy(go);
+        }
+
+        public static string GetAbsoluteFilePath(string fileName)
+        {
+            return (GetZumwaltFolder() + fileName);
         }
 
         public static string GetZumwaltFolder()
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Zumwalt\");
+            return Zumwalt.Data.PATH;
+        }
+
+        public static string GetRootFolder()
+        {
+            return Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
         }
 
         public static string GetRustPPDirectory()
@@ -70,6 +100,20 @@
             return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\rust_server_Data\");
         }
 
+        public object GetStaticField(string className, string field)
+        {
+            System.Type type;
+            if (this.TryFindType(className.Replace('.', '+'), out type))
+            {
+                FieldInfo info = type.GetField(field, BindingFlags.Public | BindingFlags.Static);
+                if (info != null)
+                {
+                    return info.GetValue(null);
+                }
+            }
+            return null;
+        }
+
         public static Util GetUtil()
         {
             if (util == null)
@@ -77,6 +121,11 @@
                 util = new Util();
             }
             return util;
+        }
+
+        public float GetVectorsDistance(Vector3 v1, Vector3 v2)
+        {
+            return TransformHelpers.Dist2D(v1, v2);
         }
 
         public static Hashtable HashtableFromFile(string path)
@@ -95,6 +144,36 @@
             formatter.Serialize(writer.BaseStream, ht);
         }
 
+        public Vector3 Infront(Zumwalt.Player p, float length)
+        {
+            return (p.PlayerClient.controllable.transform.position + ((Vector3) (p.PlayerClient.controllable.transform.forward * length)));
+        }
+
+        public object InvokeStatic(string className, string method, ParamsList args)
+        {
+            System.Type type;
+            if (!this.TryFindType(className.Replace('.', '+'), out type))
+            {
+                return null;
+            }
+            MethodInfo info = type.GetMethod(method, BindingFlags.Static);
+            if (info == null)
+            {
+                return null;
+            }
+            if (info.ReturnType == typeof(void))
+            {
+                info.Invoke(null, args.ToArray());
+                return true;
+            }
+            return info.Invoke(null, args.ToArray());
+        }
+
+        public bool IsNull(object obj)
+        {
+            return (obj == null);
+        }
+
         public void Log(string str)
         {
             Console.WriteLine(str);
@@ -105,6 +184,21 @@
             return new System.Text.RegularExpressions.Regex(input).Match(match);
         }
 
+        public Quaternion RotateX(Quaternion q, float angle)
+        {
+            return (q *= Quaternion.Euler(angle, 0f, 0f));
+        }
+
+        public Quaternion RotateY(Quaternion q, float angle)
+        {
+            return (q *= Quaternion.Euler(0f, angle, 0f));
+        }
+
+        public Quaternion RotateZ(Quaternion q, float angle)
+        {
+            return (q *= Quaternion.Euler(0f, 0f, angle));
+        }
+
         public static void say(uLink.NetworkPlayer player, string playername, string arg)
         {
             ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
@@ -112,17 +206,30 @@
 
         public static void sayAll(string arg)
         {
-            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)
         {
             ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+        }
+
+        public void SetStaticField(string className, string field, object val)
+        {
+            System.Type type;
+            if (this.TryFindType(className.Replace('.', '+'), out type))
+            {
+                FieldInfo info = type.GetField(field, BindingFlags.Public | BindingFlags.Static);
+                if (info != null)
+                {
+                    info.SetValue(null, Convert.ChangeType(val, info.FieldType));
+                }
+            }
         }
 
         public bool TryFindType(string typeName, out System.Type t)

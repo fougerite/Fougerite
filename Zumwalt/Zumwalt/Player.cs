@@ -1,22 +1,32 @@
 ﻿namespace Zumwalt
 {
     using Facepunch.Utility;
+    using Zumwalt.Events;
     using Rust;
     using System;
+    using System.Runtime.InteropServices;
+    using uLink;
     using UnityEngine;
 
     public class Player
     {
-        private Zumwalt.PlayerInventory inv;
+        private long connectedAt;
+        private PlayerInv inv;
+        private bool invError;
+        private bool justDied;
         private PlayerClient ourPlayer;
 
         public Player()
         {
+            this.justDied = true;
         }
 
         public Player(PlayerClient client)
         {
+            this.justDied = true;
             this.ourPlayer = client;
+            this.connectedAt = DateTime.UtcNow.Ticks;
+            this.FixInventoryRef();
         }
 
         public void Disconnect()
@@ -24,21 +34,38 @@
             NetUser netUser = this.ourPlayer.netUser;
             if (netUser.connected && (netUser != null))
             {
-                netUser.Kick(NetError.NoError, false);
+                netUser.Kick(NetError.NoError, true);
             }
         }
 
         public Zumwalt.Player Find(string search)
         {
             Zumwalt.Player player = FindBySteamID(search);
-            Zumwalt.Player player2 = FindByName(search);
             if (player != null)
             {
                 return player;
             }
-            if (player2 != null)
+            player = FindByGameID(search);
+            if (player != null)
             {
-                return player2;
+                return player;
+            }
+            player = FindByName(search);
+            if (player != null)
+            {
+                return player;
+            }
+            return null;
+        }
+
+        public static Zumwalt.Player FindByGameID(string uid)
+        {
+            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            {
+                if (player.GameID == uid)
+                {
+                    return player;
+                }
             }
             return null;
         }
@@ -48,6 +75,18 @@
             foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
             {
                 if (player.Name == name)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
+        public static Zumwalt.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
+        {
+            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            {
+                if (player.ourPlayer.netPlayer == np)
                 {
                     return player;
                 }
@@ -79,10 +118,30 @@
             return null;
         }
 
+        public void FixInventoryRef()
+        {
+            Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
+        }
+
+        private void Hooks_OnPlayerKilled(DeathEvent de)
+        {
+            try
+            {
+                Zumwalt.Player victim = de.Victim as Zumwalt.Player;
+                if (victim.GameID == this.GameID)
+                {
+                    this.justDied = true;
+                }
+            }
+            catch (Exception)
+            {
+                this.invError = true;
+            }
+        }
+
         public void InventoryNotice(string arg)
         {
-            string strText = Facepunch.Utility.String.QuoteSafe(arg);
-            Rust.Notice.Inventory(this.ourPlayer.netPlayer, strText);
+            Rust.Notice.Inventory(this.ourPlayer.netPlayer, arg);
         }
 
         public void Kill()
@@ -92,20 +151,37 @@
 
         public void Message(string arg)
         {
-            ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, "chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void MessageFrom(string playername, string arg)
         {
-            ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, "chat.add " + playername + " " + arg);
+            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(playername) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void Notice(string arg)
         {
-            string str = Facepunch.Utility.String.QuoteSafe("");
-            string str2 = Facepunch.Utility.String.QuoteSafe("!");
-            string str3 = Facepunch.Utility.String.QuoteSafe(arg);
-            ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, "notice.popup " + str + " " + str2 + " " + str3);
+            Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
+        }
+
+        public void Notice(string icon, string text, [Optional, DefaultParameterValue(4f)] float duration)
+        {
+            Rust.Notice.Popup(this.PlayerClient.netPlayer, icon, text, duration);
+        }
+
+        public void SendCommand(string cmd)
+        {
+            ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
+        }
+
+        public void TeleportTo(Zumwalt.Player p)
+        {
+            this.TeleportTo(p.X, p.Y, p.Z);
+        }
+
+        public void TeleportTo(float x, float y, float z)
+        {
+            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, new Vector3(x, y, z));
         }
 
         public bool Admin
@@ -113,6 +189,14 @@
             get
             {
                 return this.ourPlayer.netUser.admin;
+            }
+        }
+
+        public string GameID
+        {
+            get
+            {
+                return this.ourPlayer.userID.ToString();
             }
         }
 
@@ -129,15 +213,61 @@
             }
         }
 
-        public Zumwalt.PlayerInventory Inventory
+        public PlayerInv Inventory
         {
             get
             {
-                if (this.inv == null)
+                if (this.invError || this.justDied)
                 {
-                    this.inv = new Zumwalt.PlayerInventory(this);
+                    this.inv = new PlayerInv(this);
+                    this.invError = false;
+                    this.justDied = false;
                 }
                 return this.inv;
+            }
+        }
+
+        public string IP
+        {
+            get
+            {
+                return this.ourPlayer.netPlayer.externalIP;
+            }
+        }
+
+        public bool IsBleeding
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
+            }
+            set
+            {
+                this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float) Convert.ToInt32(value));
+            }
+        }
+
+        public bool IsCold
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsCold();
+            }
+            set
+            {
+                this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float) (-10)) : ((float) 10);
+            }
+        }
+
+        public bool IsInjured
+        {
+            get
+            {
+                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
+            }
+            set
+            {
+                this.PlayerClient.controllable.GetComponent<FallDamage>().SetLegInjury((float) Convert.ToInt32(value));
             }
         }
 
@@ -157,7 +287,12 @@
         {
             get
             {
-                return this.ourPlayer.userName;
+                return this.ourPlayer.netUser.user.Displayname; // displayname_
+            }
+            set
+            {
+                this.ourPlayer.netUser.user.Displayname = value; // displayname_
+                this.ourPlayer.userName = this.ourPlayer.netUser.user.Displayname; // displayname_
             }
         }
 
@@ -182,6 +317,14 @@
             get
             {
                 return this.ourPlayer.netUser.userID.ToString();
+            }
+        }
+
+        public long TimeOnline
+        {
+            get
+            {
+                return ((DateTime.UtcNow.Ticks - this.connectedAt) / 0x2710L);
             }
         }
 
@@ -213,7 +356,7 @@
         {
             get
             {
-                return this.ourPlayer.lastKnownPosition.x;
+                return this.ourPlayer.lastKnownPosition.z;
             }
             set
             {

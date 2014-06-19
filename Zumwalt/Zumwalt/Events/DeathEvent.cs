@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Zumwalt.Events
 {
     using System;
 

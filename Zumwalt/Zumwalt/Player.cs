@@ -287,12 +287,12 @@
         {
             get
             {
-                return this.ourPlayer.netUser.user.Displayname; // displayname_
+                return this.ourPlayer.netUser.user.displayname_; // displayname_
             }
             set
             {
-                this.ourPlayer.netUser.user.Displayname = value; // displayname_
-                this.ourPlayer.userName = this.ourPlayer.netUser.user.Displayname; // displayname_
+                this.ourPlayer.netUser.user.displayname_ = value; // displayname_
+                this.ourPlayer.userName = this.ourPlayer.netUser.user.displayname_; // displayname_
             }
         }
 

@@ -31,22 +31,26 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Facepunch.ID">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Facepunch.ID.dll</HintPath>
+    <Reference Include="Facepunch.ID, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Facepunch.ID.dll</HintPath>
     </Reference>
-    <Reference Include="Google.ProtocolBuffers">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
+    <Reference Include="Google.ProtocolBuffers, Version=2.4.1.521, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="uLink, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\uLink.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="uLink">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\uLink.dll</HintPath>
-    </Reference>
     <Reference Include="Jint">
       <HintPath>..\References\Jint.dll</HintPath>
     </Reference>

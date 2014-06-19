@@ -101,6 +101,55 @@
             return true;
         }
 
+        private bool FieldsUpdatePatch()
+        {
+            try
+            {
+                TypeDefinition Metabolism = cSharpASM.MainModule.GetType("Metabolism");
+                for (int i = 0; i < Metabolism.Fields.Count; i++)
+                    if (Metabolism.Fields[i].Name == "coreTemperature")
+                    {
+                        Metabolism.Fields[i].IsPrivate = false;
+                        Metabolism.Fields[i].IsPublic = true;
+                        break;
+                    }
+
+                TypeDefinition User = cSharpASM.MainModule.GetType("RustProto", "User");
+                for (int i = 0; i < User.Fields.Count; i++)
+                    if (User.Fields[i].Name == "displayname_")
+                    {
+                        User.Fields[i].IsPrivate = false;
+                        User.Fields[i].IsPublic = true;
+                        break;
+                    }
+
+                TypeDefinition ResourceGivePair = cSharpASM.MainModule.GetType("ResourceGivePair");
+                for (int i = 0; i < ResourceGivePair.Fields.Count; i++)
+                    if (ResourceGivePair.Fields[i].Name == "_resourceItemDatablock")
+                    {
+                        ResourceGivePair.Fields[i].IsPrivate = false;
+                        ResourceGivePair.Fields[i].IsPublic = true;
+                        break;
+                    }
+
+                TypeDefinition StructureMaster = cSharpASM.MainModule.GetType("StructureMaster");
+                for (int i = 0; i < StructureMaster.Fields.Count; i++)
+                    if (StructureMaster.Fields[i].Name == "_structureComponents")
+                {
+                    StructureMaster.Fields[i].IsPrivate = false;
+                    StructureMaster.Fields[i].IsPublic = true;
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+                return false;
+            }
+
+            return true;
+        }
+
         private bool BootstrapAttachPatch()
         {
             TypeDefinition type = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Bootstrap");
@@ -804,6 +853,11 @@
                 if (!this.BootstrapAttachPatch())
                 {
                     Logger.Log("Error while applying 'BootstrapAttach' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.FieldsUpdatePatch())
+                {
+                    Logger.Log("Error while applying 'FieldsUpdate' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.NPCHurtKilledPatch_BasicWildLifeAI())

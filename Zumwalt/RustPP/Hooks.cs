@@ -52,7 +52,7 @@
                     }
                     flag = false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     flag = false;
                 }

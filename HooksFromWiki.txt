@@ -1,11 +1,11 @@
 ServerInitItemsLoaded
 TablesLoaded
-Chat +
+Chat
 Console
 Command
-PlayerConnected +
-PlayerDisconnected +
-PlayerKilled +
+PlayerConnected
+PlayerDisconnected
+PlayerKilled
 PlayerHurt
 EntityHurt
 EntityDecay

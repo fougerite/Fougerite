@@ -183,12 +183,10 @@
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
                 
                 iLProcessor = NPCKilled.Body.GetILProcessor();
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
             }
             catch (Exception)
             {
@@ -228,7 +226,6 @@
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
             }
             catch (Exception)
             {
@@ -303,10 +300,13 @@
             try
             {
                 this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 183 - if (byName != null)
-                iLProcessor.InsertBefore(orig.Body.Instructions[183], Instruction.Create(OpCodes.Ldarga_S));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 184 - if (byName != null)
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, type.Fields[5]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, type.Fields[11]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[17]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[14]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, type.Fields[16]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
             catch (Exception)
             {
@@ -383,7 +383,7 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
             catch (Exception)
@@ -721,6 +721,11 @@
                 if (!this.EntityDeployedPatch_StructureComponentDataBlock())
                 {
                     Logger.Log("Error while applying 'EntityDeployed StructureComponentDataBlock' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.PlayerGatherWoodPatch())
+                {
+                    Logger.Log("Error while applying 'PlayerGatherWood' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

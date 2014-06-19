@@ -82,7 +82,7 @@
                                 }
                                 else
                                 {
-                                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator !");
+                                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator!");
                                 }
                                 return;
                             }

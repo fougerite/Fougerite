@@ -23,7 +23,7 @@
                         if (Core.muteList.Contains(client.userID))
                         {
                             Core.muteList.Remove(client.userID);
-                            Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " has been unmuted !");
+                            Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " has been unmuted!");
                         }
                         else
                         {
@@ -32,7 +32,7 @@
                         return;
                     }
                 }
-                Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name : " + str);
+                Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
             }
         }
     }

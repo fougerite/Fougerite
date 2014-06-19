@@ -30,7 +30,7 @@
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + "'s Flags :");
+                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + "'s Flags:");
                     int num2 = 0;
                     int num3 = 0;
                     string str2 = "";

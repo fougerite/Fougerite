@@ -176,7 +176,7 @@
             }
             catch (Exception exception)
             {
-                Console.Write("Error invoking function : " + name + "\nFrom : " + this.path + "\n\n" + exception.ToString());
+                Console.Write("Error invoking function: " + name + "\nFrom: " + this.path + "\n\n" + exception.ToString());
             }
         }
 

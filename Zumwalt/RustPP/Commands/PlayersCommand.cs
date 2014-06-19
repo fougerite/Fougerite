@@ -7,7 +7,7 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { PlayerClient.All.Count, "  Player", (PlayerClient.All.Count > 1) ? "s" : "", " Online:" }));
+            Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { PlayerClient.All.Count, "  Player", (PlayerClient.All.Count > 1) ? "s" : "", " Online: " }));
             int num = 0;
             int num2 = 0;
             string str = "";

@@ -10,7 +10,7 @@
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.1.5";
+        public static string Version = "1.0";
 
         public static void AttachBootstrap()
         {

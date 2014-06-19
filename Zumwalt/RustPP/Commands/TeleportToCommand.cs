@@ -47,7 +47,7 @@
                     }
                     if (list.Count != 0)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found :");
+                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                         for (int j = 1; j < list.Count; j++)
                         {
                             Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
@@ -77,7 +77,7 @@
                 string str = list[choice];
                 if (choice == 0)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled !");
+                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled!");
                     tpWaitList.Remove(Arguments.argUser.userID);
                 }
                 else

@@ -26,7 +26,7 @@
                         {
                             if (userID == num3)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously ? You are already an admin...");
+                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously? You are already an admin...");
                             }
                             else if (Administrator.IsAdmin(userID))
                             {
@@ -35,7 +35,7 @@
                             else
                             {
                                 Administrator.AddAdmin(new Administrator(userID, client.netUser.displayName));
-                                Administrator.NotifyAdmins(client.netUser.displayName + " is now an administrator !");
+                                Administrator.NotifyAdmins(client.netUser.displayName + " is now an administrator!");
                             }
                             return;
                         }

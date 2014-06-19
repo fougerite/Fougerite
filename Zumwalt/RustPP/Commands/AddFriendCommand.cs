@@ -35,7 +35,7 @@
                     }
                     else if (Arguments.argUser.userID == client.userID)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You can't add yourself as a friend !");
+                        Util.sayUser(Arguments.argUser.networkPlayer, "You can't add yourself as a friend!");
                     }
                     else
                     {

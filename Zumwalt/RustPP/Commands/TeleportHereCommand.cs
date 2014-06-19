@@ -53,7 +53,7 @@
                     }
                     if (list.Count > 1)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found :");
+                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                         for (int j = 1; j < list.Count; j++)
                         {
                             Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);

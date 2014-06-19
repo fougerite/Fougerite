@@ -108,7 +108,7 @@
                     }
                     else
                     {
-                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice !");
+                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
                         command.GetTPWaitList().Remove(arg.argUser.userID);
                     }
                 }
@@ -121,7 +121,7 @@
                     }
                     else
                     {
-                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice !");
+                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
                         Core.banWaitList.Remove(arg.argUser.userID);
                     }
                 }
@@ -134,7 +134,7 @@
                     }
                     else
                     {
-                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice !");
+                        Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
                         Core.kickWaitList.Remove(arg.argUser.userID);
                     }
                 }
@@ -164,7 +164,7 @@
                         {
                             Zumwalt.Data.GetData().chat_history.Add(str);
                             Zumwalt.Data.GetData().chat_history_username.Add(item);
-                            Debug.Log("[CHAT] " + item + ":" + str);
+                            Debug.Log("[CHAT] " + item + ": " + str);
                             ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
                         }
                     }
@@ -210,7 +210,7 @@
         {
             if (((a.argUser == null) && (a.Class == "Zumwaltweb")) && (a.Function == "handshake"))
             {
-                a.ReplyWith("All Good !");
+                a.ReplyWith("All Good!");
                 return true;
             }
             bool external = a.argUser == null;
@@ -223,17 +223,17 @@
                 if ((a.argUser != null) && a.argUser.admin)
                 {
                     PluginEngine.GetPluginEngine().ReloadPlugins(Zumwalt.Player.FindByPlayerClient(a.argUser.playerClient));
-                    a.ReplyWith("Zumwalt : Reloaded !");
+                    a.ReplyWith("Zumwalt: Reloaded!");
                 }
                 else if (external)
                 {
                     PluginEngine.GetPluginEngine().ReloadPlugins(null);
-                    a.ReplyWith("Zumwalt : Reloaded !");
+                    a.ReplyWith("Zumwalt: Reloaded!");
                 }
             }
             if ((a.Reply == null) || (a.Reply == ""))
             {
-                a.ReplyWith("Zumwalt : " + a.Class + "." + a.Function + " was executed !");
+                a.ReplyWith("Zumwalt: " + a.Class + "." + a.Function + " was executed!");
             }
             return true;
         }
@@ -425,7 +425,7 @@
             {
                 OnPlayerConnected(item);
             }
-            item.Message("This server is powered by Zumwalt v." + Bootstrap.Version + " !");
+            item.Message("This server is powered by Zumwalt v." + Bootstrap.Version + "!");
             return connected;
         }
 

@@ -36,7 +36,7 @@
                             }
                             else if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator !");
+                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator!");
                             }
                             else
                             {
@@ -51,7 +51,7 @@
                 }
                 if (list.Count != 1)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found :");
+                    Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                     for (int j = 1; j < list.Count; j++)
                     {
                         Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
@@ -75,7 +75,7 @@
                 string str = list[id];
                 if (id == 0)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled !");
+                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled!");
                     Core.kickWaitList.Remove(Arguments.argUser.userID);
                 }
                 else
@@ -87,7 +87,7 @@
                             Core.kickWaitList.Remove(Arguments.argUser.userID);
                             if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator !");
+                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator!");
                             }
                             else
                             {

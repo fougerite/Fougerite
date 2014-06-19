@@ -157,7 +157,7 @@
                 }
                 catch (Exception ex)
                 {
-                    string arg = "Can't load plugin : " + plugin.Path.Remove(0, plugin.Path.LastIndexOf(@"\") + 1);
+                    string arg = "Can't load plugin: " + plugin.Path.Remove(0, plugin.Path.LastIndexOf(@"\") + 1);
                     if (p != null)
                     {
                         p.Message(arg);
@@ -227,7 +227,7 @@
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Zumwalt : Couln't create instance at line -> " + str5);
+                            Console.WriteLine("Zumwalt: Couln't create instance at line -> " + str5);
                         }
                     }
                     if (this.FilterPlugin(script))

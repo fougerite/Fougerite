@@ -26,12 +26,12 @@
                         {
                             if (userID == num3)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously ? You can't unadmin yourself...");
+                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously? You can't unadmin yourself...");
                             }
                             else if (Administrator.IsAdmin(userID))
                             {
                                 Administrator.DeleteAdmin(userID);
-                                Administrator.NotifyAdmins(client.netUser.displayName + " is not an administrator anymore !");
+                                Administrator.NotifyAdmins(client.netUser.displayName + " is not an administrator anymore!");
                             }
                             else
                             {

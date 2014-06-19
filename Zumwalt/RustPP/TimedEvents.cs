@@ -38,7 +38,7 @@
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log("Error while auto-saving !");
+                UnityEngine.Debug.Log("Error while auto-saving!");
             }
         }
 

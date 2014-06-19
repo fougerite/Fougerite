@@ -275,6 +275,46 @@
             return true;
         }
 
+        private bool PlayerGatherWoodPatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("MeleeWeaponDataBlock");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DoAction1")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "PlayerGatherWood")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 183 - if (byName != null)
+                iLProcessor.InsertBefore(orig.Body.Instructions[183], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool EntityDeployedPatch_DeployableItemDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
@@ -304,7 +344,7 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
             catch (Exception)
@@ -343,7 +383,7 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
-                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, type.Fields[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
             catch (Exception)

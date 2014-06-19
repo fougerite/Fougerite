@@ -1,4 +1,8 @@
-Hooks.NPCHurt(ref damage);
+// + - Magma
+// ++ - Zumwalt
+// Nothing - not created
+
+Hooks.NPCHurt(ref damage); // ++
 Hooks.NPCKilled(ref damage);
 Hooks.BlueprintUse(item, this);
 Hooks.ChatReceived(ref arg); // +

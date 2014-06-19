@@ -134,11 +134,15 @@
             return true;
         }
 
-        private bool NPCHurtPatch()
+        private bool NPCHurtKilledPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
             MethodDefinition orig = null;
             MethodDefinition method = null;
+
+            MethodDefinition NPCKilled = null;
+            MethodDefinition NPCKilledHook = null;
+
             foreach (MethodDefinition definition4 in type.Methods)
             {
                 if (definition4.Name == "OnHurt")
@@ -153,6 +157,22 @@
                     method = definition5;
                 }
             }
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "OnKilled")
+                {
+                    NPCKilled = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "NPCKilled")
+                {
+                    NPCKilledHook = definition5;
+                }
+            }
+
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -162,7 +182,12 @@
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+                
+                iLProcessor = NPCKilled.Body.GetILProcessor();
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
             }
             catch (Exception)
@@ -431,6 +456,11 @@
                 if (!this.BootstrapAttachPatch())
                 {
                     Logger.Log("Error while applying 'BootstrapAttach' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.NPCHurtKilledPatch())
+                {
+                    Logger.Log("Error while applying 'NPCHurt' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

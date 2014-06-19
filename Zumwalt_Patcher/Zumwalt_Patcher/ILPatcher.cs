@@ -234,6 +234,62 @@
             return true;
         }
 
+        private bool PlayerSpawningSpawnedPatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("ServerManagement");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+            MethodDefinition SpawnedHook = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "SpawnPlayer")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "PlayerSpawning")
+                {
+                    method = definition5;
+                }
+            }
+
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "PlayerSpawned")
+                {
+                    SpawnedHook = definition5;
+                }
+            }
+
+            if (orig == null || method == null || SpawnedHook == null)
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 117 - user.truthDetector.NoteTeleported(zero, 0.0);
+                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldarg_1));
+                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldarg_2));
+                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Stloc_0));
+
+                // 145 - playerFor.hasLastKnownPosition = true;
+                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Ldarg_2));
+                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(SpawnedHook)));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool ServerShutdownPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("LibRust");
@@ -569,7 +625,7 @@
             return true;
         }
 
-        private bool EntityHurt()
+        private bool EntityHurtPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponent");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("DeployableObject");
@@ -753,7 +809,7 @@
                     Logger.Log("Error while applying 'PlayerHurt' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                if (!this.EntityHurt())
+                if (!this.EntityHurtPatch())
                 {
                     Logger.Log("Error while applying 'EntityHurt' Patch to Assembly-CSharp.dll");
                     flag = false;

@@ -17,7 +17,7 @@ Hooks.EntityDecay(this._deployable, dmg);
 Hooks.PlayerHurt(ref damage); // +
 Hooks.PlayerKilled(ref damage); // +
 Hooks.ServerShutdown(); // ++
-Hooks.PlayerGatherWood(item, rt, ref byName, ref amount, ref name);
+Hooks.PlayerGatherWood(item, rt, ref byName, ref amount, ref name); // ++
 Hooks.PlayerGather(reciever, this, rg, ref amount);
 Hooks.PlayerConnect(User); // +
 Hooks.PlayerSpawning(playerFor, zero, useCamp);

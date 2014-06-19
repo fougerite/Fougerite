@@ -1,6 +1,6 @@
 Rust Zumwalt project
 ====================
-This is an unofficial fork of the project. Source code were obtained with decompiler and corrected by me (Riketta).  
+This is an unofficial fork of Magma. Source code were obtained with decompiler and corrected by me (Riketta).  
   
 **ZumwaltProject full compatible with Magma plugins.**   
   

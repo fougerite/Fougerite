@@ -14,5 +14,5 @@ Zumwalt source code does not currently work only because patcher is old.
   
 *I hope that the community will help me to restore to a new Magma face and develop this project.*  
 ***
-###### Forked by Riketta (Zumwalt Project) - Developed by EquiFox & xEnt (Rust++ and Magma) ######  
+###### Forked by Riketta (Zumwalt Project) - Developed by EquiFox & xEnt (Rust++ and Magma)
 Riketta - rowneg@bk.ru

@@ -197,6 +197,84 @@
             return true;
         }
 
+        private bool EntityDeployed_First()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DoAction1")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "EntityDeployed")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool EntityDeployed_Second()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponentDataBlock");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DoAction1")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "EntityDeployed")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
+                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private bool BlueprintUsePatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BlueprintDataBlock");
@@ -505,6 +583,16 @@
                 if (!this.BlueprintUsePatch())
                 {
                     Logger.Log("Error while applying 'BlueprintUse' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.EntityDeployed_First())
+                {
+                    Logger.Log("Error while applying 'EntityDeployed First' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.EntityDeployed_Second())
+                {
+                    Logger.Log("Error while applying 'EntityDeployed Second' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

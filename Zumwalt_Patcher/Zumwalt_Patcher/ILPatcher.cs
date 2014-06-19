@@ -134,7 +134,7 @@
             return true;
         }
 
-        private bool NPCHurtKilledPatch()
+        private bool NPCHurtKilledPatch_BasicWildLifeAI()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
             MethodDefinition orig = null;
@@ -197,7 +197,47 @@
             return true;
         }
 
-        private bool EntityDeployed_First()
+        private bool NPCHurtKilledPatch_HostileWildlifeAI()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("HostileWildlifeAI");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "OnHurt")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "NPCHurt")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor();
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool EntityDeployedPatch_DeployableItemDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
             MethodDefinition orig = null;
@@ -236,7 +276,7 @@
             return true;
         }
 
-        private bool EntityDeployed_Second()
+        private bool EntityDeployedPatch_StructureComponentDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponentDataBlock");
             MethodDefinition orig = null;
@@ -575,24 +615,30 @@
                     Logger.Log("Error while applying 'BootstrapAttach' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                if (!this.NPCHurtKilledPatch())
+                if (!this.NPCHurtKilledPatch_BasicWildLifeAI())
                 {
-                    Logger.Log("Error while applying 'NPCHurtKilled' Patch to Assembly-CSharp.dll");
+                    Logger.Log("Error while applying 'NPCHurtKilled BasicWildLifeAI' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
+                if (!this.NPCHurtKilledPatch_HostileWildlifeAI())
+                {
+                    Logger.Log("Error while applying 'NPCHurtKilledPatch HostileWildlifeAI' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                
                 if (!this.BlueprintUsePatch())
                 {
                     Logger.Log("Error while applying 'BlueprintUse' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                if (!this.EntityDeployed_First())
+                if (!this.EntityDeployedPatch_DeployableItemDataBlock())
                 {
-                    Logger.Log("Error while applying 'EntityDeployed First' Patch to Assembly-CSharp.dll");
+                    Logger.Log("Error while applying 'EntityDeployed DeployableItemDataBlock' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                if (!this.EntityDeployed_Second())
+                if (!this.EntityDeployedPatch_StructureComponentDataBlock())
                 {
-                    Logger.Log("Error while applying 'EntityDeployed Second' Patch to Assembly-CSharp.dll");
+                    Logger.Log("Error while applying 'EntityDeployed StructureComponentDataBlock' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.ChatPatch())

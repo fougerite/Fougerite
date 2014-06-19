@@ -10,7 +10,7 @@ Hooks.PlayerDisconnect(user); // +
 Hooks.ConsoleReceived(ref arg); // +
 Hooks.ItemsLoaded(items, _dataBlocks, _dataBlocksByUniqueID); // +
 Hooks.TablesLoaded(_lootSpawnLists); // +
-Hooks.EntityDeployed(component);
+Hooks.EntityDeployed(component); // ++
 Hooks.CheckOwner(this, controllable); // +
 Hooks.EntityHurt(this, ref damage); // +
 Hooks.EntityDecay(this._deployable, dmg);

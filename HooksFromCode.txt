@@ -2,7 +2,7 @@
 // ++ - Zumwalt
 // Nothing - not created
 
-Hooks.NPCHurt(ref damage); // ++
+Hooks.NPCHurt(ref damage); // ++ - 2 hooks
 Hooks.NPCKilled(ref damage); // ++
 Hooks.BlueprintUse(item, this); // ++
 Hooks.ChatReceived(ref arg); // +
@@ -10,13 +10,13 @@ Hooks.PlayerDisconnect(user); // +
 Hooks.ConsoleReceived(ref arg); // +
 Hooks.ItemsLoaded(items, _dataBlocks, _dataBlocksByUniqueID); // +
 Hooks.TablesLoaded(_lootSpawnLists); // +
-Hooks.EntityDeployed(component); // ++
+Hooks.EntityDeployed(component); // ++ - 2 hooks
 Hooks.CheckOwner(this, controllable); // +
 Hooks.EntityHurt(this, ref damage); // +
 Hooks.EntityDecay(this._deployable, dmg);
 Hooks.PlayerHurt(ref damage); // +
 Hooks.PlayerKilled(ref damage); // +
-Hooks.ServerShutdown();
+Hooks.ServerShutdown(); // ++
 Hooks.PlayerGatherWood(item, rt, ref byName, ref amount, ref name);
 Hooks.PlayerGather(reciever, this, rg, ref amount);
 Hooks.PlayerConnect(User); // +

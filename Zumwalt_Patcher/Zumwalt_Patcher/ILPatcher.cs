@@ -197,7 +197,7 @@
             return true;
         }
 
-        private bool NPCHurtKilledPatch_HostileWildlifeAI()
+        private bool NPCHurtPatch_HostileWildlifeAI()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("HostileWildlifeAI");
             MethodDefinition orig = null;
@@ -229,6 +229,44 @@
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool ServerShutdownPatch()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("LibRust");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "OnDestroy")
+                {
+                    orig = definition4;
+                }
+            }
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "ServerShutdown")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 5 - Shutdown();
+                iLProcessor.InsertBefore(orig.Body.Instructions[5], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
             }
             catch (Exception)
             {
@@ -620,12 +658,16 @@
                     Logger.Log("Error while applying 'NPCHurtKilled BasicWildLifeAI' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                if (!this.NPCHurtKilledPatch_HostileWildlifeAI())
+                if (!this.NPCHurtPatch_HostileWildlifeAI())
                 {
-                    Logger.Log("Error while applying 'NPCHurtKilledPatch HostileWildlifeAI' Patch to Assembly-CSharp.dll");
+                    Logger.Log("Error while applying 'NPCHurtPatch HostileWildlifeAI' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
-                
+                if (!this.ServerShutdownPatch())
+                {
+                    Logger.Log("Error while applying 'ServerShutdown' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
                 if (!this.BlueprintUsePatch())
                 {
                     Logger.Log("Error while applying 'BlueprintUse' Patch to Assembly-CSharp.dll");

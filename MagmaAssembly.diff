@@ -25,43 +25,7 @@
          Facepunch.NetworkView networkView = base.networkView;
 
 		 
-		 
---- Vanilla\BlueprintDataBlock.cs	2014-06-18 23:47:30.737000000 +1000
-+++ Magma\BlueprintDataBlock.cs	2014-06-19 00:42:24.692000000 +1000
-@@ -1,4 +1,4 @@
--using Rust;
-+using Magma;
- using RustProto;
- using System;
- using System.Collections.Generic;
-@@ -252,23 +252,7 @@
- 
-     public virtual void UseItem(IBlueprintItem item)
-     {
--        PlayerInventory inventory = item.inventory as PlayerInventory;
--        if (inventory != null)
--        {
--            if (inventory.BindBlueprint(this))
--            {
--                int count = 1;
--                if (item.Consume(ref count))
--                {
--                    inventory.RemoveItem(item.slot);
--                }
--                Notice.Popup(inventory.networkView.owner, "", "You can now craft: " + this.resultItem.name, 4f);
--            }
--            else
--            {
--                Notice.Popup(inventory.networkView.owner, "", "You already have this blueprint", 4f);
--            }
--        }
-+        Hooks.BlueprintUse(item, this);
-     }
- 
-     [Serializable]
-
-	 
-	 
+		  
 --- Vanilla\BlueprintDataBlock.cs	2014-06-18 23:47:30.737000000 +1000
 +++ Magma\BlueprintDataBlock.cs	2014-06-19 00:42:24.692000000 +1000
 @@ -1,4 +1,4 @@

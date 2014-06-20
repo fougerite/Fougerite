@@ -5,6 +5,7 @@
     using System;
     using System.Collections;
     using System.IO;
+    using UnityEngine;
 
     public class PluginEngine
     {
@@ -232,7 +233,8 @@
                     }
                     if (this.FilterPlugin(script))
                     {
-                        Console.WriteLine("Loaded: " + path);
+                        Debug.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
+                        //Console.WriteLine("Loaded: " + path);
                         Plugin plugin = new Plugin(path);
                         plugin.Code = script;
                         this.plugins.Add(plugin);

@@ -872,7 +872,7 @@
                 definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
                 definition4.Body.Instructions.Clear();
                 definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarga_S, definition4.Parameters[0]));
                 definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
                 definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }

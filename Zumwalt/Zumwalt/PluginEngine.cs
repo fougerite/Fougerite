@@ -25,7 +25,7 @@
             {
                 if (str.Contains(str2))
                 {
-                    Console.WriteLine("Script cannot contain: " + str2);
+                    UnityEngine.Debug.Log("Script cannot contain: " + str2);
                     return false;
                 }
             }
@@ -63,7 +63,7 @@
                             FunctionDeclarationStatement statement2 = (FunctionDeclarationStatement) statement;
                             if (statement2 != null)
                             {
-                                Console.WriteLine("Found Function: " + statement2.Name);
+                                UnityEngine.Debug.Log("Found Function: " + statement2.Name);
                                 if (statement2.Name == "On_ServerInit")
                                 {
                                     Hooks.OnServerInit += new Hooks.ServerInitDelegate(plugin.OnServerInit);
@@ -228,20 +228,20 @@
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Zumwalt: Couln't create instance at line -> " + str5);
+                            UnityEngine.Debug.Log("Zumwalt: Couln't create instance at line -> " + str5);
                         }
                     }
                     if (this.FilterPlugin(script))
                     {
                         Debug.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
-                        //Console.WriteLine("Loaded: " + path);
+                        //UnityEngine.Debug.Log("Loaded: " + path);
                         Plugin plugin = new Plugin(path);
                         plugin.Code = script;
                         this.plugins.Add(plugin);
                     }
                     else
                     {
-                        Console.WriteLine("PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
+                        UnityEngine.Debug.Log("PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
                     }
                 }
             }

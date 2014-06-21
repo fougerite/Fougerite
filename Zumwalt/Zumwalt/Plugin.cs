@@ -50,7 +50,7 @@
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.ToString());
+                UnityEngine.Debug.Log(exception.ToString());
             }
             return null;
         }

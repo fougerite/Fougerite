@@ -344,7 +344,7 @@
         {
             if ((((name != "!Ng") && (name != ":rabbit_prefab_a")) && ((name != ";res_woodpile") && (name != ";res_ore_1"))) && ((((((((((((((name != ";res_ore_2") & (name != ";res_ore_3")) & (name != ":stag_prefab")) & (name != ":boar_prefab")) & (name != ":chicken_prefab")) & (name != ":bear_prefab")) & (name != ":wolf_prefab")) & (name != ":mutant_bear")) & (name != ":mutant_wolf")) & (name != "AmmoLootBox")) & (name != "MedicalLootBox")) & (name != "BoxLoot")) & (name != "WeaponLootBox")) & (name != "SupplyCrate")))
             {
-                Console.WriteLine(name);
+                UnityEngine.Debug.Log(name);
             }
         }
 
@@ -392,7 +392,7 @@
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.ToString());
+                UnityEngine.Debug.Log(exception.ToString());
             }
         }
 
@@ -408,7 +408,7 @@
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.ToString());
+                UnityEngine.Debug.Log(exception.ToString());
             }
         }
 
@@ -535,30 +535,41 @@
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.ToString());
+                UnityEngine.Debug.Log(exception.ToString());
                 return true;
             }
         }
 
         public static void PlayerSpawned(PlayerClient pc, Vector3 pos, bool camp)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
-            SpawnEvent se = new SpawnEvent(pos, camp);
-            if ((OnPlayerSpawned != null) && (player != null))
+            try
             {
-                OnPlayerSpawned(player, se);
+                Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
+                SpawnEvent se = new SpawnEvent(pos, camp);
+                if ((OnPlayerSpawned != null) && (player != null))
+                {
+                    OnPlayerSpawned(player, se);
+                }
             }
+            catch (Exception ex)
+            { Console.WriteLine(ex); }
         }
 
         public static Vector3 PlayerSpawning(PlayerClient pc, Vector3 pos, bool camp)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
-            SpawnEvent se = new SpawnEvent(pos, camp);
-            if ((OnPlayerSpawning != null) && (player != null))
+            try
             {
-                OnPlayerSpawning(player, se);
+                Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
+                SpawnEvent se = new SpawnEvent(pos, camp);
+                if ((OnPlayerSpawning != null) && (player != null))
+                {
+                    OnPlayerSpawning(player, se);
+                }
+                return new Vector3(se.X, se.Y, se.Z);
             }
-            return new Vector3(se.X, se.Y, se.Z);
+            catch (Exception ex)
+            { Console.WriteLine(ex); }
+            return new Vector3(0, 0, 0);
         }
 
         public static void PluginInit()

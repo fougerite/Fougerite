@@ -13,7 +13,7 @@ Hooks.TablesLoaded(_lootSpawnLists); // +
 Hooks.EntityDeployed(component); // ++ - 2 hooks
 Hooks.CheckOwner(this, controllable); // +
 Hooks.EntityHurt(this, ref damage); // +
-Hooks.EntityDecay(this._deployable, dmg);
+Hooks.EntityDecay(this._deployable, dmg); // ++
 Hooks.PlayerHurt(ref damage); // +
 Hooks.PlayerKilled(ref damage); // +
 Hooks.ServerShutdown(); // ++

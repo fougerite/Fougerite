@@ -186,6 +186,98 @@
             return true;
         }
 
+        private bool EntityDecayPatch_StructureMaster()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureMaster");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DoDecay")
+                {
+                    orig = definition4;
+                }
+            }
+
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "EntityDecay")
+                {
+                    method = definition5;
+                }
+            }
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor();
+                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[6]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[6]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_3));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+            return true;
+        }
+
+        private bool EntityDecayPatch_EnvDecay()
+        {
+            TypeDefinition type = this.cSharpASM.MainModule.GetType("EnvDecay");
+            MethodDefinition orig = null;
+            MethodDefinition method = null;
+
+            foreach (MethodDefinition definition4 in type.Methods)
+            {
+                if (definition4.Name == "DecayThink")
+                {
+                    orig = definition4;
+                }
+            }
+
+            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
+            {
+                if (definition5.Name == "EntityDecay")
+                {
+                    method = definition5;
+                }
+            }
+
+            FieldDefinition Field = null;
+            foreach (FieldDefinition definition5 in type.Fields)
+                if (definition5.Name == "_deployable")
+                    Field = definition5;
+
+            if ((orig == null) || (method == null))
+            {
+                return false;
+            }
+            try
+            {
+                this.CloneMethod(orig);
+                ILProcessor iLProcessor = orig.Body.GetILProcessor();
+                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[2]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[2]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Ldfld, Field));
+                //iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldarg_0, Field));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+            return true;
+        }
+
         private bool NPCHurtKilledPatch_BasicWildLifeAI()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
@@ -233,12 +325,12 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
                 
                 iLProcessor = NPCKilled.Body.GetILProcessor();
-                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, NPCKilled.Parameters[0]));
                 iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
+                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, NPCKilled.Parameters[0]));
             }
             catch (Exception ex)
             {
@@ -277,8 +369,8 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
             }
             catch (Exception ex)
             {
@@ -325,17 +417,23 @@
             try
             {
                 this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 117 - user.truthDetector.NoteTeleported(zero, 0.0);
-                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldarg_1));
-                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Ldarg_2));
-                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[117], Instruction.Create(OpCodes.Stloc_0));
+                ILProcessor iLProcessor = orig.Body.GetILProcessor();
 
-                // 145 - playerFor.hasLastKnownPosition = true;
-                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Ldarg_2));
-                iLProcessor.InsertBefore(orig.Body.Instructions[145], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(SpawnedHook)));
+                // 141 - playerFor.hasLastKnownPosition = true;
+                int Position = orig.Body.Instructions.Count - 2;
+                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(SpawnedHook)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_2));
+                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_1));
+
+                // 114 - user.truthDetector.NoteTeleported(zero, 0.0);
+                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Stloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_2));
+                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_1));
+
+
             }
             catch (Exception ex)
             {
@@ -413,12 +511,12 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 184 - if (byName != null)
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[5]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[11]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[17]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[14]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[16]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[16]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[14]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[17]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[11]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[5]));
             }
             catch (Exception ex)
             {
@@ -456,11 +554,12 @@
             try
             {
                 this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 82 - int amount = (int) Mathf.Abs(this.gatherProgress);
-                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldarg_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Ldloca, orig.Body.Variables[1]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[82], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 30 - int amount = (int) Mathf.Abs(this.gatherProgress);
+                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloca, orig.Body.Variables[1]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloc_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_0));
+                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_1));
             }
             catch (Exception ex)
             {
@@ -499,8 +598,8 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
             }
             catch (Exception ex)
             {
@@ -539,8 +638,8 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
-                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
                 iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
             }
             catch (Exception ex)
             {
@@ -577,10 +676,11 @@
             {
                 this.CloneMethod(orig);
                 orig.Body.Instructions.Clear();
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1)); // Or 0 1?
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+
             }
             catch (Exception ex)
             {
@@ -863,6 +963,16 @@
                 if (!this.NPCHurtKilledPatch_BasicWildLifeAI())
                 {
                     Logger.Log("Error while applying 'NPCHurtKilled BasicWildLifeAI' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.EntityDecayPatch_StructureMaster())
+                {
+                    Logger.Log("Error while applying 'EntityDecayPatch StructureMaster' Patch to Assembly-CSharp.dll");
+                    flag = false;
+                }
+                if (!this.EntityDecayPatch_EnvDecay())
+                {
+                    Logger.Log("Error while applying 'EntityDecayPatch EnvDecay' Patch to Assembly-CSharp.dll");
                     flag = false;
                 }
                 if (!this.NPCHurtPatch_HostileWildlifeAI())

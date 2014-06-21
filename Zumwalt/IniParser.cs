@@ -138,7 +138,7 @@ public class IniParser
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
-        return (string) this.keyPairs[pair];
+        return (string)this.keyPairs[pair];
     }
 
     public bool isCommandOn(string cmdName)

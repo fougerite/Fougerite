@@ -176,7 +176,7 @@
 
         public void Log(string str)
         {
-            Console.WriteLine(str);
+            UnityEngine.Debug.Log(str);
         }
 
         public Match Regex(string input, string match)

@@ -100,7 +100,7 @@
                     {
                         Core.config = (IniParser) inifiles["rust++"];
                     }
-                    Console.WriteLine("Loaded Config: " + key);
+                    UnityEngine.Debug.Log("Loaded Config: " + key);
                 }
             }
         }

@@ -264,11 +264,11 @@
             {
                 this.CloneMethod(orig);
                 ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[2]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[2]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[50], Instruction.Create(OpCodes.Ldfld, Field));
-                //iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldarg_0, Field));
+                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[2]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
+                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[2]));
+                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldfld, Field));
+                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldarg_0));
             }
             catch (Exception ex)
             {
@@ -676,9 +676,9 @@
             {
                 this.CloneMethod(orig);
                 orig.Body.Instructions.Clear();
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1)); // Or 0 1?
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
                 orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
             }

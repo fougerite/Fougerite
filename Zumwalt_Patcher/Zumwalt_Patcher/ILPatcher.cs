@@ -27,28 +27,14 @@
         private bool AccessPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("Character");
-            MethodDefinition definition2 = null;
-            foreach (MethodDefinition definition3 in type.Methods)
-            {
-                if (definition3.Name == "OnDestroy")
-                {
-                    definition2 = definition3;
-                }
-            }
-            if (definition2 == null)
+            MethodDefinition onDestroy = type.GetMethod ("OnDestroy");
+            if (onDestroy == null) 
             {
                 return false;
             }
-            try
-            {
-                definition2.Attributes = (MethodAttributes) ((ushort) (((int) definition2.Attributes) - 1));
-                definition2.IsPublic = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
+
+            onDestroy.IsPublic = true;
+            onDestroy.IsPrivate = false;
             return true;
         }
 
@@ -56,42 +42,24 @@
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("EnvDecay");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("StructureMaster");
-            MethodDefinition definition3 = null;
-            MethodDefinition definition4 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition6 in type.Methods)
-            {
-                if (definition6.Name == "Awake")
-                {
-                    definition3 = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in definition2.Methods)
-            {
-                if (definition7.Name == "DoDecay")
-                {
-                    definition4 = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "DecayDisabled")
-                {
-                    method = definition8;
-                }
-            }
-            if (((definition4 == null) || (definition3 == null)) || (method == null))
+
+            MethodDefinition awake = type.GetMethod("Awake");
+            MethodDefinition doDecay = type.GetMethod("DoDecay");
+            MethodDefinition decayDisabled = this.HooksClass.GetMethod("DecayDisabled");
+
+            if (((awake == null) || (doDecay == null)) || (decayDisabled == null)) 
             {
                 return false;
             }
+
             try
             {
-                ILProcessor iLProcessor = definition3.Body.GetILProcessor();
-                iLProcessor.InsertBefore(definition3.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertAfter(definition3.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, definition3.Body.Instructions[definition3.Body.Instructions.Count - 1]));
-                iLProcessor = definition4.Body.GetILProcessor();
-                iLProcessor.InsertBefore(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertAfter(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, definition4.Body.Instructions[definition4.Body.Instructions.Count - 1]));
+                ILProcessor iLProcessor = awake.Body.GetILProcessor();
+                iLProcessor.InsertBefore(awake.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(decayDisabled)));
+                iLProcessor.InsertAfter(awake.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, awake.Body.Instructions[awake.Body.Instructions.Count - 1]));
+                iLProcessor = doDecay.Body.GetILProcessor();
+                iLProcessor.InsertBefore(doDecay.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(decayDisabled)));
+                iLProcessor.InsertAfter(doDecay.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, doDecay.Body.Instructions[doDecay.Body.Instructions.Count - 1]));
             }
             catch (Exception ex)
             {
@@ -106,40 +74,16 @@
             try
             {
                 TypeDefinition Metabolism = cSharpASM.MainModule.GetType("Metabolism");
-                for (int i = 0; i < Metabolism.Fields.Count; i++)
-                    if (Metabolism.Fields[i].Name == "coreTemperature")
-                    {
-                        Metabolism.Fields[i].IsPrivate = false;
-                        Metabolism.Fields[i].IsPublic = true;
-                        break;
-                    }
+                Metabolism.GetField("coreTemperature").SetPublic(true);
 
                 TypeDefinition User = cSharpASM.MainModule.GetType("RustProto", "User");
-                for (int i = 0; i < User.Fields.Count; i++)
-                    if (User.Fields[i].Name == "displayname_")
-                    {
-                        User.Fields[i].IsPrivate = false;
-                        User.Fields[i].IsPublic = true;
-                        break;
-                    }
+                User.GetField("displayname_").SetPublic(true);
 
                 TypeDefinition ResourceGivePair = cSharpASM.MainModule.GetType("ResourceGivePair");
-                for (int i = 0; i < ResourceGivePair.Fields.Count; i++)
-                    if (ResourceGivePair.Fields[i].Name == "_resourceItemDatablock")
-                    {
-                        ResourceGivePair.Fields[i].IsPrivate = false;
-                        ResourceGivePair.Fields[i].IsPublic = true;
-                        break;
-                    }
+                ResourceGivePair.GetField("_resourceItemDatablock").SetPublic(true);
 
                 TypeDefinition StructureMaster = cSharpASM.MainModule.GetType("StructureMaster");
-                for (int i = 0; i < StructureMaster.Fields.Count; i++)
-                    if (StructureMaster.Fields[i].Name == "_structureComponents")
-                {
-                    StructureMaster.Fields[i].IsPrivate = false;
-                    StructureMaster.Fields[i].IsPublic = true;
-                    break;
-                }
+                StructureMaster.GetField("_structureComponents").SetPublic(true);
             }
             catch (Exception ex)
             {
@@ -152,61 +96,33 @@
 
         private bool BootstrapAttachPatch()
         {
-            TypeDefinition type = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Bootstrap");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("ServerInit");
-            MethodDefinition method = null;
-            MethodDefinition definition4 = null;
-            foreach (MethodDefinition definition5 in type.Methods)
-            {
-                if (definition5.Name == "AttachBootstrap")
-                {
-                    method = definition5;
-                }
-            }
-            foreach (MethodDefinition definition6 in definition2.Methods)
-            {
-                if (definition6.Name == "Awake")
-                {
-                    definition4 = definition6;
-                }
-            }
-            if ((method == null) || (definition4 == null))
+            TypeDefinition zumwaltBootstrap = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Bootstrap");
+            TypeDefinition serverInit = this.cSharpASM.MainModule.GetType("ServerInit");
+            MethodDefinition attachBootstrap = zumwaltBootstrap.GetMethod("AttachBootstrap");
+            MethodDefinition awake = serverInit.GetMethod("Awake");
+            if ((attachBootstrap == null) || (awake == null))
             {
                 return false;
             }
+
             try
             {
-                definition4.Body.GetILProcessor().InsertAfter(definition4.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+                awake.Body.GetILProcessor().InsertAfter(awake.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(attachBootstrap)));
             }
             catch (Exception ex)
             {
                 Logger.Log(ex);
                 return false;
             }
+
             return true;
         }
 
         private bool EntityDecayPatch_StructureMaster()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureMaster");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoDecay")
-                {
-                    orig = definition4;
-                }
-            }
-
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDecay")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("DoDecay");
+            MethodDefinition method = this.HooksClass.GetMethod("EntityDecay");
 
             if ((orig == null) || (method == null))
             {
@@ -232,29 +148,9 @@
         private bool EntityDecayPatch_EnvDecay()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("EnvDecay");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DecayThink")
-                {
-                    orig = definition4;
-                }
-            }
-
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDecay")
-                {
-                    method = definition5;
-                }
-            }
-
-            FieldDefinition Field = null;
-            foreach (FieldDefinition definition5 in type.Fields)
-                if (definition5.Name == "_deployable")
-                    Field = definition5;
+            MethodDefinition orig = type.GetMethod("DecayThink");
+            MethodDefinition method = this.HooksClass.GetMethod("EntityDecay");
+            FieldDefinition Field = type.GetField("_deployable");
 
             if ((orig == null) || (method == null))
             {
@@ -281,41 +177,11 @@
         private bool NPCHurtKilledPatch_BasicWildLifeAI()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            MethodDefinition orig = type.GetMethod("OnHurt");
+            MethodDefinition method = this.HooksClass.GetMethod("NPCHurt");
 
-            MethodDefinition NPCKilled = null;
-            MethodDefinition NPCKilledHook = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnHurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCHurt")
-                {
-                    method = definition5;
-                }
-            }
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnKilled")
-                {
-                    NPCKilled = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCKilled")
-                {
-                    NPCKilledHook = definition5;
-                }
-            }
+            MethodDefinition NPCKilled = type.GetMethod("OnKilled");
+            MethodDefinition NPCKilledHook = this.HooksClass.GetMethod("NPCKilled");
 
             if ((orig == null) || (method == null) || (NPCKilled == null) || (NPCKilledHook == null))
             {
@@ -343,23 +209,8 @@
         private bool NPCHurtPatch_HostileWildlifeAI()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("HostileWildlifeAI");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnHurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCHurt")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("OnHurt");
+            MethodDefinition method = this.HooksClass.GetMethod("NPCHurt");
 
             if ((orig == null) || (method == null))
             {
@@ -383,32 +234,9 @@
         private bool PlayerSpawningSpawnedPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("ServerManagement");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition SpawnedHook = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "SpawnPlayer")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerSpawning")
-                {
-                    method = definition5;
-                }
-            }
-
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerSpawned")
-                {
-                    SpawnedHook = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("SpawnPlayer");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerSpawning");
+            MethodDefinition SpawnedHook = this.HooksClass.GetMethod("PlayerSpawned");
 
             if (orig == null || method == null || SpawnedHook == null)
             {
@@ -446,23 +274,8 @@
         private bool ServerShutdownPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("LibRust");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnDestroy")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ServerShutdown")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("OnDestroy");
+            MethodDefinition method = this.HooksClass.GetMethod("ServerShutdown");
 
             if ((orig == null) || (method == null))
             {
@@ -485,23 +298,8 @@
         private bool PlayerGatherWoodPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("MeleeWeaponDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerGatherWood")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerGatherWood");
 
             if ((orig == null) || (method == null))
             {
@@ -529,23 +327,8 @@
         private bool PlayerGatherPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("ResourceTarget");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoGather")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerGather")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("DoGather");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerGather");
 
             if ((orig == null) || (method == null))
             {
@@ -572,23 +355,8 @@
         private bool EntityDeployedPatch_DeployableItemDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDeployed")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = this.HooksClass.GetMethod("EntityDeployed");
 
             if ((orig == null) || (method == null))
             {
@@ -612,23 +380,8 @@
         private bool EntityDeployedPatch_StructureComponentDataBlock()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponentDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDeployed")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = this.HooksClass.GetMethod("EntityDeployed");
 
             if ((orig == null) || (method == null))
             {
@@ -652,22 +405,9 @@
         private bool BlueprintUsePatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("BlueprintDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "UseItem")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "BlueprintUse")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("UseItem");
+            MethodDefinition method = this.HooksClass.GetMethod("BlueprintUse");
+
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -693,22 +433,9 @@
         private bool ChatPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("chat");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "say")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ChatReceived")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("say");
+            MethodDefinition method = this.HooksClass.GetMethod("ChatReceived");
+
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -750,22 +477,9 @@
         private bool ConsolePatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("ConsoleSystem");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "RunCommand")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ConsoleReceived")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("RunCommand");
+            MethodDefinition method = this.HooksClass.GetMethod("ConsoleReceived");
+
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -793,22 +507,8 @@
         private bool DoorSharing()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableObject");
-            MethodDefinition definition2 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "BelongsTo")
-                {
-                    definition2 = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "CheckOwner")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition definition2 = type.GetMethod("BelongsTo");
+            MethodDefinition method = this.HooksClass.GetMethod("CheckOwner");
             if ((definition2 == null) || (method == null))
             {
                 return false;
@@ -834,30 +534,10 @@
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponent");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("DeployableObject");
-            MethodDefinition definition3 = null;
-            MethodDefinition definition4 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition6 in type.Methods)
-            {
-                if (definition6.Name == "OnHurt")
-                {
-                    definition3 = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in definition2.Methods)
-            {
-                if (definition7.Name == "OnHurt")
-                {
-                    definition4 = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "EntityHurt")
-                {
-                    method = definition8;
-                }
-            }
+            MethodDefinition definition3 = type.GetMethod("OnHurt");
+            MethodDefinition definition4 = definition2.GetMethod("OnHurt");
+            MethodDefinition method = this.HooksClass.GetMethod("EntityHurt");
+
             if (((definition3 == null) || (definition4 == null)) || (method == null))
             {
                 return false;
@@ -887,30 +567,9 @@
         private bool ItemsTablesLoadedPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("DatablockDictionary");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition definition4 = null;
-            foreach (MethodDefinition definition5 in type.Methods)
-            {
-                if (definition5.Name == "Initialize")
-                {
-                    orig = definition5;
-                }
-            }
-            foreach (MethodDefinition definition6 in this.HooksClass.Methods)
-            {
-                if (definition6.Name == "ItemsLoaded")
-                {
-                    method = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in this.HooksClass.Methods)
-            {
-                if (definition7.Name == "TablesLoaded")
-                {
-                    definition4 = definition7;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("Initialize");
+            MethodDefinition method = this.HooksClass.GetMethod("ItemsLoaded");
+            MethodDefinition definition4 = this.HooksClass.GetMethod("TablesLoaded");
             if (((orig == null) || (method == null)) || (definition4 == null))
             {
                 return false;
@@ -1089,22 +748,8 @@
         private bool PlayerHurtPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("HumanBodyTakeDamage");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "Hurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerHurt")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("Hurt");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerHurt");
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -1128,38 +773,11 @@
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("RustServerManagement");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("ConnectionAcceptor");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition definition5 = null;
-            MethodDefinition definition6 = null;
-            foreach (MethodDefinition definition7 in type.Methods)
-            {
-                if (definition7.Name == "OnUserConnected")
-                {
-                    orig = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "PlayerConnect")
-                {
-                    method = definition8;
-                }
-            }
-            foreach (MethodDefinition definition9 in definition2.Methods)
-            {
-                if (definition9.Name == "uLink_OnPlayerDisconnected")
-                {
-                    definition5 = definition9;
-                }
-            }
-            foreach (MethodDefinition definition10 in this.HooksClass.Methods)
-            {
-                if (definition10.Name == "PlayerDisconnect")
-                {
-                    definition6 = definition10;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("OnUserConnected");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerConnect");
+            MethodDefinition definition5 = definition2.GetMethod("uLink_OnPlayerDisconnected");
+            MethodDefinition definition6 = this.HooksClass.GetMethod("PlayerDisconnect");
+
             if (((orig == null) || (method == null)) || ((definition5 == null) || (definition6 == null)))
             {
                 return false;
@@ -1187,22 +805,8 @@
         private bool PlayerKilledPatch()
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("HumanController");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnKilled")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerKilled")
-                {
-                    method = definition5;
-                }
-            }
+            MethodDefinition orig = type.GetMethod("OnKilled");
+            MethodDefinition method = this.HooksClass.GetMethod("PlayerKilled");
             if ((orig == null) || (method == null))
             {
                 return false;
@@ -1228,32 +832,12 @@
         {
             TypeDefinition type = this.cSharpASM.MainModule.GetType("VoiceCom");
             TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("PlayerClient");
-            MethodDefinition definition3 = null;
-            MethodDefinition method = null;
-            FieldDefinition field = null;
+            MethodDefinition definition3 = type.GetMethod("clientspeak");
+            MethodDefinition method = HooksClass.GetMethod("ShowTalker");
+            FieldDefinition field = definition2.GetField("netPlayer");
             VariableDefinition variable = null;
-            foreach (MethodDefinition definition7 in type.Methods)
-            {
-                if (definition7.Name == "clientspeak")
-                {
-                    definition3 = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "ShowTalker")
-                {
-                    method = definition8;
-                }
-            }
-            foreach (FieldDefinition definition9 in definition2.Fields)
-            {
-                if (definition9.Name == "netPlayer")
-                {
-                    field = definition9;
-                }
-            }
             variable = definition3.Body.Variables[6];
+
             if (((definition3 == null) || (method == null)) || ((field == null) || (variable == null)))
             {
                 return false;

@@ -867,7 +867,7 @@
                 MethodReference reference = this.cSharpASM.MainModule.Import(method);
                 definition3.Body.Instructions.Clear();
                 definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarga_S, definition4.Parameters[0]));
                 definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
                 definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
                 definition4.Body.Instructions.Clear();

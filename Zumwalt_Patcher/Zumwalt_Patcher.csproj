@@ -3,12 +3,11 @@
   <PropertyGroup>
     <ProjectType>local</ProjectType>
     <ProjectVersion>7.10.377</ProjectVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{935412BA-2118-488D-839A-AAB76E60BA8C}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <AssemblyName>Zumwalt_Patcher</AssemblyName>
     <OutputType>Exe</OutputType>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -36,10 +35,12 @@
     <Compile Include="Zumwalt_Patcher\ILPatcher.cs" />
     <Compile Include="Zumwalt_Patcher\Logger.cs" />
     <Compile Include="Zumwalt_Patcher\Program.cs" />
+    <Compile Include="Zumwalt_Patcher\TypeDefinitionExtensions.cs" />
+    <Compile Include="Zumwalt_Patcher\MethodDefinitionExtensions.cs" />
+    <Compile Include="Zumwalt_Patcher\FieldDefinitionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Mono.Cecil">
       <HintPath>..\References\Mono.Cecil.dll</HintPath>
     </Reference>
   </ItemGroup>

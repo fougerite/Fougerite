@@ -3,12 +3,12 @@
   <PropertyGroup>
     <ProjectType>local</ProjectType>
     <ProjectVersion>7.10.377</ProjectVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <AssemblyName>Zumwalt</AssemblyName>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -31,33 +31,15 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Facepunch.ID, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Facepunch.ID.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.ProtocolBuffers, Version=2.4.1.521, Culture=neutral, PublicKeyToken=55f7125234beb589, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
-    </Reference>
-    <Reference Include="uLink, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\uLink.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="Jint">
       <HintPath>..\References\Jint.dll</HintPath>
     </Reference>
     <Reference Include="System.Core">
-      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla\rust_server_Data\Managed\System.Core.dll</HintPath>
+      <HintPath>..\References\System.Core.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Zumwalt\ChatString.cs" />
@@ -136,5 +118,17 @@
     <Compile Include="Zumwalt\Plugin.cs" />
     <Compile Include="Zumwalt\Util.cs" />
     <Compile Include="Zumwalt\Bootstrap.cs" />
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.ID">
+      <HintPath>..\References\Facepunch.ID.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers">
+      <HintPath>..\References\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="uLink">
+      <HintPath>..\References\uLink.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

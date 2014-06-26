@@ -39,4 +39,3 @@ namespace Zumwalt_Patcher
         }
     }
 }
-

@@ -218,7 +218,7 @@
             {
                 OnConsoleReceived(ref a, external);
             }
-            if ((a.Class == "Zumwalt") && (a.Function.ToLower() == "reload"))
+            if ((a.Class.ToLower() == "zumwalt") && (a.Function.ToLower() == "reload"))
             {
                 if ((a.argUser != null) && a.argUser.admin)
                 {

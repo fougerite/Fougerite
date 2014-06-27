@@ -6,17 +6,16 @@
 
     public class ILPatcher
     {
-        private AssemblyDefinition cSharpASM;
-        //private AssemblyDefinition firstPassASM;
-        private TypeDefinition HooksClass;
-        private AssemblyDefinition ZumwaltAsm;
+        private AssemblyDefinition rustAssembly = null;
+        private AssemblyDefinition zumwaltAssembly = null;
+        private TypeDefinition hooksClass = null;
 
         public ILPatcher()
         {
             try
             {
-                this.ZumwaltAsm = AssemblyDefinition.ReadAssembly("Zumwalt.dll");
-                this.HooksClass = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Hooks");
+                rustAssembly = AssemblyDefinition.ReadAssembly("Assembly-CSharp.dll");
+                // rustFirstPassAssembly = AssemblyDefinition.ReadAssembly("Assembly-CSharp-firstpass.dll");
             }
             catch (Exception ex)
             {
@@ -24,709 +23,233 @@
             }
         }
 
-        private bool AccessPatch()
+        private void AccessPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("Character");
-            MethodDefinition definition2 = null;
-            foreach (MethodDefinition definition3 in type.Methods)
-            {
-                if (definition3.Name == "OnDestroy")
-                {
-                    definition2 = definition3;
-                }
-            }
-            if (definition2 == null)
-            {
-                return false;
-            }
-            try
-            {
-                definition2.Attributes = (MethodAttributes) ((ushort) (((int) definition2.Attributes) - 1));
-                definition2.IsPublic = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition type = rustAssembly.MainModule.GetType("Character");
+            MethodDefinition onDestroy = type.GetMethod ("OnDestroy");
+            onDestroy.IsPublic = true;
+            onDestroy.IsPrivate = false;
         }
 
-        private bool AntiDecay()
+        private void AntiDecay()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("EnvDecay");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("StructureMaster");
-            MethodDefinition definition3 = null;
-            MethodDefinition definition4 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition6 in type.Methods)
-            {
-                if (definition6.Name == "Awake")
-                {
-                    definition3 = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in definition2.Methods)
-            {
-                if (definition7.Name == "DoDecay")
-                {
-                    definition4 = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "DecayDisabled")
-                {
-                    method = definition8;
-                }
-            }
-            if (((definition4 == null) || (definition3 == null)) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                ILProcessor iLProcessor = definition3.Body.GetILProcessor();
-                iLProcessor.InsertBefore(definition3.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertAfter(definition3.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, definition3.Body.Instructions[definition3.Body.Instructions.Count - 1]));
-                iLProcessor = definition4.Body.GetILProcessor();
-                iLProcessor.InsertBefore(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertAfter(definition4.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, definition4.Body.Instructions[definition4.Body.Instructions.Count - 1]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition type = rustAssembly.MainModule.GetType("EnvDecay");
+            TypeDefinition definition2 = rustAssembly.MainModule.GetType("StructureMaster");
+
+            MethodDefinition awake = type.GetMethod("Awake");
+            MethodDefinition doDecay = type.GetMethod("DoDecay");
+            MethodDefinition decayDisabled = hooksClass.GetMethod("DecayDisabled");
+
+            ILProcessor iLProcessor = awake.Body.GetILProcessor();
+            iLProcessor.InsertBefore(awake.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.rustAssembly.MainModule.Import(decayDisabled)));
+            iLProcessor.InsertAfter(awake.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, awake.Body.Instructions[awake.Body.Instructions.Count - 1]));
+            iLProcessor = doDecay.Body.GetILProcessor();
+            iLProcessor.InsertBefore(doDecay.Body.Instructions[0], Instruction.Create(OpCodes.Callvirt, this.rustAssembly.MainModule.Import(decayDisabled)));
+            iLProcessor.InsertAfter(doDecay.Body.Instructions[0], Instruction.Create(OpCodes.Brtrue, doDecay.Body.Instructions[doDecay.Body.Instructions.Count - 1]));
         }
 
-        private bool FieldsUpdatePatch()
+        private void FieldsUpdatePatch()
         {
-            try
-            {
-                TypeDefinition Metabolism = cSharpASM.MainModule.GetType("Metabolism");
-                for (int i = 0; i < Metabolism.Fields.Count; i++)
-                    if (Metabolism.Fields[i].Name == "coreTemperature")
-                    {
-                        Metabolism.Fields[i].IsPrivate = false;
-                        Metabolism.Fields[i].IsPublic = true;
-                        break;
-                    }
+            TypeDefinition Metabolism = rustAssembly.MainModule.GetType("Metabolism");
+            Metabolism.GetField("coreTemperature").SetPublic(true);
 
-                TypeDefinition User = cSharpASM.MainModule.GetType("RustProto", "User");
-                for (int i = 0; i < User.Fields.Count; i++)
-                    if (User.Fields[i].Name == "displayname_")
-                    {
-                        User.Fields[i].IsPrivate = false;
-                        User.Fields[i].IsPublic = true;
-                        break;
-                    }
+            TypeDefinition User = rustAssembly.MainModule.GetType("RustProto", "User");
+            User.GetField("displayname_").SetPublic(true);
 
-                TypeDefinition ResourceGivePair = cSharpASM.MainModule.GetType("ResourceGivePair");
-                for (int i = 0; i < ResourceGivePair.Fields.Count; i++)
-                    if (ResourceGivePair.Fields[i].Name == "_resourceItemDatablock")
-                    {
-                        ResourceGivePair.Fields[i].IsPrivate = false;
-                        ResourceGivePair.Fields[i].IsPublic = true;
-                        break;
-                    }
+            TypeDefinition ResourceGivePair = rustAssembly.MainModule.GetType("ResourceGivePair");
+            ResourceGivePair.GetField("_resourceItemDatablock").SetPublic(true);
 
-                TypeDefinition StructureMaster = cSharpASM.MainModule.GetType("StructureMaster");
-                for (int i = 0; i < StructureMaster.Fields.Count; i++)
-                    if (StructureMaster.Fields[i].Name == "_structureComponents")
-                {
-                    StructureMaster.Fields[i].IsPrivate = false;
-                    StructureMaster.Fields[i].IsPublic = true;
-                    break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-
-            return true;
+            TypeDefinition StructureMaster = rustAssembly.MainModule.GetType("StructureMaster");
+            StructureMaster.GetField("_structureComponents").SetPublic(true);
         }
 
-        private bool BootstrapAttachPatch()
+        private void BootstrapAttachPatch()
         {
-            TypeDefinition type = this.ZumwaltAsm.MainModule.GetType("Zumwalt.Bootstrap");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("ServerInit");
-            MethodDefinition method = null;
-            MethodDefinition definition4 = null;
-            foreach (MethodDefinition definition5 in type.Methods)
-            {
-                if (definition5.Name == "AttachBootstrap")
-                {
-                    method = definition5;
-                }
-            }
-            foreach (MethodDefinition definition6 in definition2.Methods)
-            {
-                if (definition6.Name == "Awake")
-                {
-                    definition4 = definition6;
-                }
-            }
-            if ((method == null) || (definition4 == null))
-            {
-                return false;
-            }
-            try
-            {
-                definition4.Body.GetILProcessor().InsertAfter(definition4.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition zumwaltBootstrap = zumwaltAssembly.MainModule.GetType("Zumwalt.Bootstrap");
+            TypeDefinition serverInit = rustAssembly.MainModule.GetType("ServerInit");
+            MethodDefinition attachBootstrap = zumwaltBootstrap.GetMethod("AttachBootstrap");
+            MethodDefinition awake = serverInit.GetMethod("Awake");
+
+            awake.Body.GetILProcessor().InsertAfter(awake.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(attachBootstrap)));
         }
 
-        private bool EntityDecayPatch_StructureMaster()
+        private void EntityDecayPatch_StructureMaster()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureMaster");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("StructureMaster");
+            MethodDefinition orig = type.GetMethod("DoDecay");
+            MethodDefinition method = hooksClass.GetMethod("EntityDecay");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoDecay")
-                {
-                    orig = definition4;
-                }
-            }
-
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDecay")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[6]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[6]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_3));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[6]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Callvirt, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[6]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[244], Instruction.Create(OpCodes.Ldloc_3));
         }
 
-        private bool EntityDecayPatch_EnvDecay()
+        private void EntityDecayPatch_EnvDecay()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("EnvDecay");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("EnvDecay");
+            MethodDefinition orig = type.GetMethod("DecayThink");
+            MethodDefinition method = hooksClass.GetMethod("EntityDecay");
+            FieldDefinition Field = type.GetField("_deployable");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DecayThink")
-                {
-                    orig = definition4;
-                }
-            }
-
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDecay")
-                {
-                    method = definition5;
-                }
-            }
-
-            FieldDefinition Field = null;
-            foreach (FieldDefinition definition5 in type.Fields)
-                if (definition5.Name == "_deployable")
-                    Field = definition5;
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[2]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[2]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldfld, Field));
-                iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldarg_0));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Stloc_S, orig.Body.Variables[2]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Callvirt, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[2]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldfld, Field));
+            iLProcessor.InsertBefore(orig.Body.Instructions[49], Instruction.Create(OpCodes.Ldarg_0));
         }
 
-        private bool NPCHurtKilledPatch_BasicWildLifeAI()
+        private void NPCHurtKilledPatch_BasicWildLifeAI()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("BasicWildLifeAI");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("BasicWildLifeAI");
+            MethodDefinition orig = type.GetMethod("OnHurt");
+            MethodDefinition method = hooksClass.GetMethod("NPCHurt");
 
-            MethodDefinition NPCKilled = null;
-            MethodDefinition NPCKilledHook = null;
+            MethodDefinition NPCKilled = type.GetMethod("OnKilled");
+            MethodDefinition NPCKilledHook = hooksClass.GetMethod("NPCKilled");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnHurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCHurt")
-                {
-                    method = definition5;
-                }
-            }
-
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnKilled")
-                {
-                    NPCKilled = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCKilled")
-                {
-                    NPCKilledHook = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null) || (NPCKilled == null) || (NPCKilledHook == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
-                
-                iLProcessor = NPCKilled.Body.GetILProcessor();
-                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(NPCKilledHook)));
-                iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, NPCKilled.Parameters[0]));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
+            
+            iLProcessor = NPCKilled.Body.GetILProcessor();
+            iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(NPCKilledHook)));
+            iLProcessor.InsertBefore(NPCKilled.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, NPCKilled.Parameters[0]));
         }
 
-        private bool NPCHurtPatch_HostileWildlifeAI()
+        private void NPCHurtPatch_HostileWildlifeAI()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("HostileWildlifeAI");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("HostileWildlifeAI");
+            MethodDefinition orig = type.GetMethod("OnHurt");
+            MethodDefinition method = hooksClass.GetMethod("NPCHurt");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnHurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "NPCHurt")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
         }
 
-        private bool PlayerSpawningSpawnedPatch()
+        private void PlayerSpawningSpawnedPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("ServerManagement");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition SpawnedHook = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("ServerManagement");
+            MethodDefinition orig = type.GetMethod("SpawnPlayer");
+            MethodDefinition method = hooksClass.GetMethod("PlayerSpawning");
+            MethodDefinition SpawnedHook = hooksClass.GetMethod("PlayerSpawned");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "SpawnPlayer")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerSpawning")
-                {
-                    method = definition5;
-                }
-            }
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
 
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerSpawned")
-                {
-                    SpawnedHook = definition5;
-                }
-            }
+            // 141 - playerFor.hasLastKnownPosition = true;
+            int Position = orig.Body.Instructions.Count - 2;
+            iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(SpawnedHook)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_2));
+            iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldloc_0));
+            iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_1));
 
-            if (orig == null || method == null || SpawnedHook == null)
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-
-                // 141 - playerFor.hasLastKnownPosition = true;
-                int Position = orig.Body.Instructions.Count - 2;
-                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(SpawnedHook)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_2));
-                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_1));
-
-                // 114 - user.truthDetector.NoteTeleported(zero, 0.0);
-                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Stloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_2));
-                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_1));
-
-
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            // 114 - user.truthDetector.NoteTeleported(zero, 0.0);
+            iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Stloc_0));
+            iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_2));
+            iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldloc_0));
+            iLProcessor.InsertBefore(orig.Body.Instructions[114], Instruction.Create(OpCodes.Ldarg_1));
         }
 
-        private bool ServerShutdownPatch()
+        private void ServerShutdownPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("LibRust");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("LibRust");
+            MethodDefinition orig = type.GetMethod("OnDestroy");
+            MethodDefinition method = hooksClass.GetMethod("ServerShutdown");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnDestroy")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ServerShutdown")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 5 - Shutdown();
-                iLProcessor.InsertBefore(orig.Body.Instructions[5], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 5 - Shutdown();
+            iLProcessor.InsertBefore(orig.Body.Instructions[5], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
         }
 
-        private bool PlayerGatherWoodPatch()
+        private void PlayerGatherWoodPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("MeleeWeaponDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("MeleeWeaponDataBlock");
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = hooksClass.GetMethod("PlayerGatherWood");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerGatherWood")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 184 - if (byName != null)
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[16]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[14]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[17]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[11]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[5]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 184 - if (byName != null)
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[16]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[14]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloca_S, orig.Body.Variables[17]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[11]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[184], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[5]));
         }
 
-        private bool PlayerGatherPatch()
+        private void PlayerGatherPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("ResourceTarget");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("ResourceTarget");
+            MethodDefinition orig = type.GetMethod("DoGather");
+            MethodDefinition method = hooksClass.GetMethod("PlayerGather");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoGather")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerGather")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 30 - int amount = (int) Mathf.Abs(this.gatherProgress);
-                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloca, orig.Body.Variables[1]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_0));
-                iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_1));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 30 - int amount = (int) Mathf.Abs(this.gatherProgress);
+            iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloca, orig.Body.Variables[1]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldloc_0));
+            iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_0));
+            iLProcessor.InsertBefore(orig.Body.Instructions[30], Instruction.Create(OpCodes.Ldarg_1));
         }
 
-        private bool EntityDeployedPatch_DeployableItemDataBlock()
+        private void EntityDeployedPatch_DeployableItemDataBlock()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableItemDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("DeployableItemDataBlock");
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = hooksClass.GetMethod("EntityDeployed");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDeployed")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 60 - leave (end of try block)
+            iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[60], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
         }
 
-        private bool EntityDeployedPatch_StructureComponentDataBlock()
+        private void EntityDeployedPatch_StructureComponentDataBlock()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponentDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
+            TypeDefinition type = rustAssembly.MainModule.GetType("StructureComponentDataBlock");
+            MethodDefinition orig = type.GetMethod("DoAction1");
+            MethodDefinition method = hooksClass.GetMethod("EntityDeployed");
 
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "DoAction1")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "EntityDeployed")
-                {
-                    method = definition5;
-                }
-            }
-
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
-                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor(); // 102 - int count = 1;
+            iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[102], Instruction.Create(OpCodes.Ldloc_S, orig.Body.Variables[8]));
         }
 
-        private bool BlueprintUsePatch()
+        private void BlueprintUsePatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("BlueprintDataBlock");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "UseItem")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "BlueprintUse")
-                {
-                    method = definition5;
-                }
-            }
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                orig.Body.Instructions.Clear();
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+            TypeDefinition type = rustAssembly.MainModule.GetType("BlueprintDataBlock");
+            MethodDefinition orig = type.GetMethod("UseItem");
+            MethodDefinition method = hooksClass.GetMethod("BlueprintUse");
 
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            this.CloneMethod(orig);
+            orig.Body.Instructions.Clear();
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
 
-        private bool ChatPatch()
+        private void ChatPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("chat");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "say")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ChatReceived")
-                {
-                    method = definition5;
-                }
-            }
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                orig.Body.Instructions.Clear();
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition type = rustAssembly.MainModule.GetType("chat");
+            MethodDefinition orig = type.GetMethod("say");
+            MethodDefinition method = hooksClass.GetMethod("ChatReceived");
+
+            this.CloneMethod(orig);
+            orig.Body.Instructions.Clear();
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            orig.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
 
         private MethodDefinition CloneMethod(MethodDefinition orig) // Method Backuping
@@ -747,330 +270,175 @@
             return definition;
         }
 
-        private bool ConsolePatch()
+        private void ConsolePatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("ConsoleSystem");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
+            TypeDefinition type = rustAssembly.MainModule.GetType("ConsoleSystem");
+            MethodDefinition orig = type.GetMethod("RunCommand");
+            MethodDefinition method = hooksClass.GetMethod("ConsoleReceived");
+
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            for (int i = 0; i < 8; i++)
             {
-                if (definition4.Name == "RunCommand")
-                {
-                    orig = definition4;
-                }
+                iLProcessor.Remove(orig.Body.Instructions[11]);
             }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "ConsoleReceived")
-                {
-                    method = definition5;
-                }
-            }
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                for (int i = 0; i < 8; i++)
-                {
-                    iLProcessor.Remove(orig.Body.Instructions[11]);
-                }
-                iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Ret));
-                iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Ldarg_0));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Ret));
+            iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[11], Instruction.Create(OpCodes.Ldarg_0));
         }
 
-        private bool DoorSharing()
+        private void DoorSharing()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("DeployableObject");
-            MethodDefinition definition2 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "BelongsTo")
-                {
-                    definition2 = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "CheckOwner")
-                {
-                    method = definition5;
-                }
-            }
-            if ((definition2 == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                definition2.Body.Instructions.Clear();
-                definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Nop));
-                definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-                definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition type = rustAssembly.MainModule.GetType("DeployableObject");
+            MethodDefinition definition2 = type.GetMethod("BelongsTo");
+            MethodDefinition method = hooksClass.GetMethod("CheckOwner");
+
+            definition2.Body.Instructions.Clear();
+            definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Nop));
+            definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+            definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            definition2.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
 
-        private bool EntityHurtPatch()
+        private void EntityHurtPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("StructureComponent");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("DeployableObject");
-            MethodDefinition definition3 = null;
-            MethodDefinition definition4 = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition6 in type.Methods)
-            {
-                if (definition6.Name == "OnHurt")
-                {
-                    definition3 = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in definition2.Methods)
-            {
-                if (definition7.Name == "OnHurt")
-                {
-                    definition4 = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "EntityHurt")
-                {
-                    method = definition8;
-                }
-            }
-            if (((definition3 == null) || (definition4 == null)) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                MethodReference reference = this.cSharpASM.MainModule.Import(method);
-                definition3.Body.Instructions.Clear();
-                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarga_S, definition4.Parameters[0]));
-                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
-                definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-                definition4.Body.Instructions.Clear();
-                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarga_S, definition4.Parameters[0]));
-                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
-                definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            TypeDefinition type = rustAssembly.MainModule.GetType("StructureComponent");
+            TypeDefinition definition2 = rustAssembly.MainModule.GetType("DeployableObject");
+            MethodDefinition definition3 = type.GetMethod("OnHurt");
+            MethodDefinition definition4 = definition2.GetMethod("OnHurt");
+            MethodDefinition method = hooksClass.GetMethod("EntityHurt");
+
+            MethodReference reference = rustAssembly.MainModule.Import(method);
+            definition3.Body.Instructions.Clear();
+            definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+            definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
+            definition3.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+            definition4.Body.Instructions.Clear();
+            definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+            definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarga_S, definition4.Parameters[0]));
+            definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
+            definition4.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
 
-        private bool ItemsTablesLoadedPatch()
+        private void ItemsTablesLoadedPatch()
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("DatablockDictionary");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition definition4 = null;
-            foreach (MethodDefinition definition5 in type.Methods)
+            TypeDefinition type = rustAssembly.MainModule.GetType("DatablockDictionary");
+            MethodDefinition orig = type.GetMethod("Initialize");
+            MethodDefinition method = hooksClass.GetMethod("ItemsLoaded");
+            MethodDefinition definition4 = hooksClass.GetMethod("TablesLoaded");
+
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            for (int i = 0; i < 13; i++)
             {
-                if (definition5.Name == "Initialize")
-                {
-                    orig = definition5;
-                }
+                iLProcessor.Remove(orig.Body.Instructions[0x17]);
             }
-            foreach (MethodDefinition definition6 in this.HooksClass.Methods)
-            {
-                if (definition6.Name == "ItemsLoaded")
-                {
-                    method = definition6;
-                }
-            }
-            foreach (MethodDefinition definition7 in this.HooksClass.Methods)
-            {
-                if (definition7.Name == "TablesLoaded")
-                {
-                    definition4 = definition7;
-                }
-            }
-            if (((orig == null) || (method == null)) || (definition4 == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                for (int i = 0; i < 13; i++)
-                {
-                    iLProcessor.Remove(orig.Body.Instructions[0x17]);
-                }
-                orig.Body.Instructions[0x24] = Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0x24], Instruction.Create(OpCodes.Ldsfld, type.Fields[2]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0x24], Instruction.Create(OpCodes.Ldsfld, type.Fields[1]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Stsfld, type.Fields[4]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(definition4)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Ldsfld, type.Fields[4]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
+            orig.Body.Instructions[0x24] = Instruction.Create(OpCodes.Callvirt, rustAssembly.MainModule.Import(method));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0x24], Instruction.Create(OpCodes.Ldsfld, type.Fields[2]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0x24], Instruction.Create(OpCodes.Ldsfld, type.Fields[1]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Stsfld, type.Fields[4]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Callvirt, rustAssembly.MainModule.Import(definition4)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0x3f], Instruction.Create(OpCodes.Ldsfld, type.Fields[4]));
         }
 
-        public bool Patch()
+        private void PlayerHurtPatch()
+        {
+            TypeDefinition type = rustAssembly.MainModule.GetType("HumanBodyTakeDamage");
+            MethodDefinition orig = type.GetMethod("Hurt");
+            MethodDefinition method = hooksClass.GetMethod("PlayerHurt");
+
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_1));
+            iLProcessor.InsertAfter(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+        }
+
+        private void PlayerJoinLeavePatch()
+        {
+            TypeDefinition type = rustAssembly.MainModule.GetType("RustServerManagement");
+            TypeDefinition definition2 = rustAssembly.MainModule.GetType("ConnectionAcceptor");
+            MethodDefinition orig = type.GetMethod("OnUserConnected");
+            MethodDefinition method = hooksClass.GetMethod("PlayerConnect");
+            MethodDefinition definition5 = definition2.GetMethod("uLink_OnPlayerDisconnected");
+            MethodDefinition definition6 = hooksClass.GetMethod("PlayerDisconnect");
+
+            this.CloneMethod(orig);
+            this.CloneMethod(definition5);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[orig.Body.Instructions.Count - 1]));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_1));
+            iLProcessor = definition5.Body.GetILProcessor();
+            iLProcessor.InsertAfter(definition5.Body.Instructions[0x23], Instruction.Create(OpCodes.Ldloc_1));
+            iLProcessor.InsertAfter(definition5.Body.Instructions[0x24], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(definition6)));
+        }
+
+        private void PlayerKilledPatch()
+        {
+            TypeDefinition type = rustAssembly.MainModule.GetType("HumanController");
+            MethodDefinition orig = type.GetMethod("OnKilled");
+            MethodDefinition method = hooksClass.GetMethod("PlayerKilled");
+
+            this.CloneMethod(orig);
+            ILProcessor iLProcessor = orig.Body.GetILProcessor();
+            iLProcessor.InsertAfter(orig.Body.Instructions[0x15], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
+            iLProcessor.InsertAfter(orig.Body.Instructions[0x16], Instruction.Create(OpCodes.Callvirt, rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertAfter(orig.Body.Instructions[0x17], Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x2f]));
+            orig.Body.Instructions[0x11] = Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x16]);
+        }
+
+        private void TalkerNotifications()
+        {
+            TypeDefinition type = rustAssembly.MainModule.GetType("VoiceCom");
+            TypeDefinition definition2 = rustAssembly.MainModule.GetType("PlayerClient");
+            MethodDefinition definition3 = type.GetMethod("clientspeak");
+            MethodDefinition method = hooksClass.GetMethod("ShowTalker");
+            FieldDefinition field = definition2.GetField("netPlayer");
+            VariableDefinition variable = null;
+            variable = definition3.Body.Variables[6];
+
+            ILProcessor iLProcessor = definition3.Body.GetILProcessor();
+            iLProcessor.InsertAfter(definition3.Body.Instructions[0x57], Instruction.Create(OpCodes.Ldloc_S, variable));
+            iLProcessor.InsertAfter(definition3.Body.Instructions[0x58], Instruction.Create(OpCodes.Ldfld, rustAssembly.MainModule.Import(field)));
+            iLProcessor.InsertAfter(definition3.Body.Instructions[0x59], Instruction.Create(OpCodes.Ldloc_0));
+            iLProcessor.InsertAfter(definition3.Body.Instructions[90], Instruction.Create(OpCodes.Call, rustAssembly.MainModule.Import(method)));
+        }
+
+        public bool FirstPass() 
         {
             try
             {
                 bool flag = true;
-                this.cSharpASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp.dll");
-                //this.firstPassASM = AssemblyDefinition.ReadAssembly("Assembly-CSharp-firstpass.dll");
-                if (this.cSharpASM.MainModule.GetType("Zumwalt_Patched") != null)
+
+                if (rustAssembly.MainModule.GetType("Zumwalt_Patched_FirstPass") != null)
                 {
                     Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
                     return false;
                 }
-                if (!this.BootstrapAttachPatch())
+
+                try 
                 {
-                    Logger.Log("Error while applying 'BootstrapAttach' Patch to Assembly-CSharp.dll");
+                    this.FieldsUpdatePatch();
+                } 
+                catch (Exception ex) 
+                {
+                    Logger.Log(ex);
                     flag = false;
                 }
-                if (!this.FieldsUpdatePatch())
-                {
-                    Logger.Log("Error while applying 'FieldsUpdate' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.NPCHurtKilledPatch_BasicWildLifeAI())
-                {
-                    Logger.Log("Error while applying 'NPCHurtKilled BasicWildLifeAI' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.EntityDecayPatch_StructureMaster())
-                {
-                    Logger.Log("Error while applying 'EntityDecayPatch StructureMaster' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.EntityDecayPatch_EnvDecay())
-                {
-                    Logger.Log("Error while applying 'EntityDecayPatch EnvDecay' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.NPCHurtPatch_HostileWildlifeAI())
-                {
-                    Logger.Log("Error while applying 'NPCHurtPatch HostileWildlifeAI' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.ServerShutdownPatch())
-                {
-                    Logger.Log("Error while applying 'ServerShutdown' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.BlueprintUsePatch())
-                {
-                    Logger.Log("Error while applying 'BlueprintUse' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.EntityDeployedPatch_DeployableItemDataBlock())
-                {
-                    Logger.Log("Error while applying 'EntityDeployed DeployableItemDataBlock' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.EntityDeployedPatch_StructureComponentDataBlock())
-                {
-                    Logger.Log("Error while applying 'EntityDeployed StructureComponentDataBlock' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.PlayerGatherWoodPatch())
-                {
-                    Logger.Log("Error while applying 'PlayerGatherWood' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.PlayerGatherPatch())
-                {
-                    Logger.Log("Error while applying 'PlayerGather' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.PlayerSpawningSpawnedPatch())
-                {
-                    Logger.Log("Error while applying 'PlayerSpawningSpawned' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.ChatPatch())
-                {
-                    Logger.Log("Error while applying 'Chat' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.ConsolePatch())
-                {
-                    Logger.Log("Error while applying 'Console' Patch to Assembly-CSharp-firstpass.dll");
-                    flag = false;
-                }
-                if (!this.PlayerJoinLeavePatch())
-                {
-                    Logger.Log("Error while applying 'PlayerJoinLeave' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.PlayerKilledPatch())
-                {
-                    Logger.Log("Error while applying 'PlayerKilled' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.PlayerHurtPatch())
-                {
-                    Logger.Log("Error while applying 'PlayerHurt' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.EntityHurtPatch())
-                {
-                    Logger.Log("Error while applying 'EntityHurt' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.ItemsTablesLoadedPatch())
-                {
-                    Logger.Log("Error while applying 'ItemsTablesLoaded' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.DoorSharing())
-                {
-                    Logger.Log("Error while applying 'DoorSharing' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
-                if (!this.TalkerNotifications())
-                {
-                    Logger.Log("Error while applying 'TalkerNotification' Patch to Assembly-CSharp.dll");
-                    flag = false;
-                }
+
                 try
                 {
                     TypeReference type = AssemblyDefinition.ReadAssembly("mscorlib.dll").MainModule.GetType("System.String");
-                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched", TypeAttributes.AnsiClass | TypeAttributes.Public);
-                    this.cSharpASM.MainModule.Types.Add(item);
-                    TypeReference fieldType = this.cSharpASM.MainModule.Import(type);
+                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched_FirstPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
+                    rustAssembly.MainModule.Types.Add(item);
+                    TypeReference fieldType = rustAssembly.MainModule.Import(type);
                     FieldDefinition definition3 = new FieldDefinition("Version", FieldAttributes.CompilerControlled | FieldAttributes.FamANDAssem | FieldAttributes.Family, fieldType);
                     definition3.HasConstant = true;
                     definition3.Constant = Program.Version;
-                    this.cSharpASM.MainModule.GetType("Zumwalt_Patched").Fields.Add(definition3);
-                    this.cSharpASM.Write("Assembly-CSharp.dll");
+                    rustAssembly.MainModule.GetType("Zumwalt_Patched_FirstPass").Fields.Add(definition3);
+                    rustAssembly.Write("Assembly-CSharp.dll");
                 }
                 catch (Exception ex)
                 {
@@ -1086,192 +454,76 @@
             }
         }
 
-        private bool PlayerHurtPatch()
+        public bool SecondPass() 
         {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("HumanBodyTakeDamage");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "Hurt")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerHurt")
-                {
-                    method = definition5;
-                }
-            }
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
             try
             {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_1));
-                iLProcessor.InsertAfter(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
-        }
+                bool flag = true;
 
-        private bool PlayerJoinLeavePatch()
-        {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("RustServerManagement");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("ConnectionAcceptor");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            MethodDefinition definition5 = null;
-            MethodDefinition definition6 = null;
-            foreach (MethodDefinition definition7 in type.Methods)
-            {
-                if (definition7.Name == "OnUserConnected")
-                {
-                    orig = definition7;
-                }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "PlayerConnect")
-                {
-                    method = definition8;
-                }
-            }
-            foreach (MethodDefinition definition9 in definition2.Methods)
-            {
-                if (definition9.Name == "uLink_OnPlayerDisconnected")
-                {
-                    definition5 = definition9;
-                }
-            }
-            foreach (MethodDefinition definition10 in this.HooksClass.Methods)
-            {
-                if (definition10.Name == "PlayerDisconnect")
-                {
-                    definition6 = definition10;
-                }
-            }
-            if (((orig == null) || (method == null)) || ((definition5 == null) || (definition6 == null)))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                this.CloneMethod(definition5);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[orig.Body.Instructions.Count - 1]));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertBefore(orig.Body.Instructions[0], Instruction.Create(OpCodes.Ldarg_1));
-                iLProcessor = definition5.Body.GetILProcessor();
-                iLProcessor.InsertAfter(definition5.Body.Instructions[0x23], Instruction.Create(OpCodes.Ldloc_1));
-                iLProcessor.InsertAfter(definition5.Body.Instructions[0x24], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(definition6)));
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
-        }
+                zumwaltAssembly = AssemblyDefinition.ReadAssembly("Zumwalt.dll");
+                hooksClass = zumwaltAssembly.MainModule.GetType("Zumwalt.Hooks");
 
-        private bool PlayerKilledPatch()
-        {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("HumanController");
-            MethodDefinition orig = null;
-            MethodDefinition method = null;
-            foreach (MethodDefinition definition4 in type.Methods)
-            {
-                if (definition4.Name == "OnKilled")
-                {
-                    orig = definition4;
-                }
-            }
-            foreach (MethodDefinition definition5 in this.HooksClass.Methods)
-            {
-                if (definition5.Name == "PlayerKilled")
-                {
-                    method = definition5;
-                }
-            }
-            if ((orig == null) || (method == null))
-            {
-                return false;
-            }
-            try
-            {
-                this.CloneMethod(orig);
-                ILProcessor iLProcessor = orig.Body.GetILProcessor();
-                iLProcessor.InsertAfter(orig.Body.Instructions[0x15], Instruction.Create(OpCodes.Ldarga_S, orig.Parameters[0]));
-                iLProcessor.InsertAfter(orig.Body.Instructions[0x16], Instruction.Create(OpCodes.Callvirt, this.cSharpASM.MainModule.Import(method)));
-                iLProcessor.InsertAfter(orig.Body.Instructions[0x17], Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x2f]));
-                orig.Body.Instructions[0x11] = Instruction.Create(OpCodes.Brfalse, orig.Body.Instructions[0x16]);
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(ex);
-                return false;
-            }
-            return true;
-        }
 
-        private bool TalkerNotifications()
-        {
-            TypeDefinition type = this.cSharpASM.MainModule.GetType("VoiceCom");
-            TypeDefinition definition2 = this.cSharpASM.MainModule.GetType("PlayerClient");
-            MethodDefinition definition3 = null;
-            MethodDefinition method = null;
-            FieldDefinition field = null;
-            VariableDefinition variable = null;
-            foreach (MethodDefinition definition7 in type.Methods)
-            {
-                if (definition7.Name == "clientspeak")
+                if (rustAssembly.MainModule.GetType("Zumwalt_Patched_SecondPass") != null)
                 {
-                    definition3 = definition7;
+                    Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
+                    return false;
                 }
-            }
-            foreach (MethodDefinition definition8 in this.HooksClass.Methods)
-            {
-                if (definition8.Name == "ShowTalker")
+
+                try 
                 {
-                    method = definition8;
-                }
-            }
-            foreach (FieldDefinition definition9 in definition2.Fields)
-            {
-                if (definition9.Name == "netPlayer")
+                    this.BootstrapAttachPatch();
+                    this.NPCHurtKilledPatch_BasicWildLifeAI();
+                    this.EntityDecayPatch_StructureMaster();
+                    this.EntityDecayPatch_EnvDecay();
+                    this.NPCHurtPatch_HostileWildlifeAI();
+                    this.ServerShutdownPatch();
+                    this.BlueprintUsePatch();
+                    this.EntityDeployedPatch_DeployableItemDataBlock();
+                    this.EntityDeployedPatch_StructureComponentDataBlock();
+                    this.PlayerGatherWoodPatch();
+                    this.PlayerGatherPatch();
+                    this.PlayerSpawningSpawnedPatch();
+                    this.ChatPatch();
+                    this.ConsolePatch();
+                    this.PlayerJoinLeavePatch();
+                    this.PlayerKilledPatch();
+                    this.PlayerHurtPatch();
+                    this.EntityHurtPatch();
+                    this.ItemsTablesLoadedPatch();
+                    this.DoorSharing();
+                    this.TalkerNotifications();
+                } 
+                catch (Exception ex) 
                 {
-                    field = definition9;
+                    Logger.Log(ex);
+                    flag = false;
                 }
-            }
-            variable = definition3.Body.Variables[6];
-            if (((definition3 == null) || (method == null)) || ((field == null) || (variable == null)))
-            {
-                return false;
-            }
-            try
-            {
-                ILProcessor iLProcessor = definition3.Body.GetILProcessor();
-                iLProcessor.InsertAfter(definition3.Body.Instructions[0x57], Instruction.Create(OpCodes.Ldloc_S, variable));
-                iLProcessor.InsertAfter(definition3.Body.Instructions[0x58], Instruction.Create(OpCodes.Ldfld, this.cSharpASM.MainModule.Import(field)));
-                iLProcessor.InsertAfter(definition3.Body.Instructions[0x59], Instruction.Create(OpCodes.Ldloc_0));
-                iLProcessor.InsertAfter(definition3.Body.Instructions[90], Instruction.Create(OpCodes.Call, this.cSharpASM.MainModule.Import(method)));
+
+                try
+                {
+                    TypeReference type = AssemblyDefinition.ReadAssembly("mscorlib.dll").MainModule.GetType("System.String");
+                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched_SecondPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
+                    rustAssembly.MainModule.Types.Add(item);
+                    TypeReference fieldType = rustAssembly.MainModule.Import(type);
+                    FieldDefinition definition3 = new FieldDefinition("Version", FieldAttributes.CompilerControlled | FieldAttributes.FamANDAssem | FieldAttributes.Family, fieldType);
+                    definition3.HasConstant = true;
+                    definition3.Constant = Program.Version;
+                    rustAssembly.MainModule.GetType("Zumwalt_Patched_SecondPass").Fields.Add(definition3);
+                    rustAssembly.Write("Assembly-CSharp.dll");
+                }
+                catch (Exception ex)
+                {
+                    flag = false;
+                    Logger.Log(ex);
+                }
+                return flag;
             }
             catch (Exception ex)
             {
                 Logger.Log(ex);
                 return false;
             }
-            return true;
         }
 
         private void WrapMethod(MethodDefinition md, MethodDefinition origMethod, AssemblyDefinition asm)
@@ -1309,4 +561,3 @@
         }
     }
 }
-

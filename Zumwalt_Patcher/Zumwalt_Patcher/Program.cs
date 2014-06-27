@@ -1,29 +1,41 @@
-﻿namespace Zumwalt_Patcher
-{
-    using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Zumwalt_Patcher
+{
     internal class Program
     {
-        public static string Version = "1.5";
+        public static string Version = "1.5.1";
 
         private static void Main(string[] args)
         {
-            ILPatcher patcher = new ILPatcher();
+            bool firstPass = args.Contains ("-1");
+            bool secondPass = args.Contains ("-2");
+
             Logger.Clear();
-            Logger.Log("Starting patching...");
-            try
+
+            if (!firstPass && !secondPass) 
             {
-                if (patcher.Patch())
-                {
-                    Logger.Log("The patch was applied successfully!");
-                }
+                Logger.Log ("No command specified.");
             }
-            catch (Exception exception)
+
+            ILPatcher patcher = new ILPatcher ();
+
+            bool result = true;
+            if (firstPass) 
             {
-                Logger.Log(exception.ToString());
+                result = result && patcher.FirstPass ();
             }
-            Console.ReadLine();
+
+            if (secondPass) 
+            {
+                result = result && patcher.SecondPass ();
+            }
+
+            if (result) {
+                Logger.Log ("The patch was applied successfully!");
+            }
         }
     }
 }
-

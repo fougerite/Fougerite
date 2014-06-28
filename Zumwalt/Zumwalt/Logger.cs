@@ -21,30 +21,30 @@ namespace Zumwalt
             return Text;
         }
 
-        public static void Log(string Msg)
+        public static void Log(string Message, UnityEngine.Object Context = null)
         {
-            Logger.Log(Msg);
+            Logger.Log(Message, Context);
             using (StreamWriter Writer = new StreamWriter(LogsFolder + "Log.txt", true))
-                Writer.WriteLine(LogFormat(Msg));
+                Writer.WriteLine(LogFormat(Message));
         }
 
-        public static void LogWarning(string Msg)
+        public static void LogWarning(string Message, UnityEngine.Object Context = null)
         {
-            Debug.LogWarning(Msg);
+            Debug.LogWarning(Message, Context);
             using (StreamWriter Writer = new StreamWriter(LogsFolder + "LogWarning.txt", true))
-                Writer.WriteLine(LogFormat(Msg));
+                Writer.WriteLine(LogFormat(Message));
         }
 
-        public static void LogError(string Msg)
+        public static void LogError(string Message, UnityEngine.Object Context = null)
         {
-            Debug.LogError(Msg);
+            Debug.LogError(Message, Context);
             using (StreamWriter Writer = new StreamWriter(LogsFolder + "LogError.txt", true))
-                Writer.WriteLine(LogFormat(Msg));
+                Writer.WriteLine(LogFormat(Message));
         }
 
-        public static void LogException(Exception Ex)
+        public static void LogException(Exception Ex, UnityEngine.Object Context = null)
         {
-            Debug.LogException(Ex);
+            Debug.LogException(Ex, Context);
             using (StreamWriter Writer = new StreamWriter(LogsFolder + "LogException.txt", true))
                 Writer.WriteLine(LogFormat(Ex.ToString()));
         }

@@ -149,7 +149,7 @@
             return (p.PlayerClient.controllable.transform.position + ((Vector3)(p.PlayerClient.controllable.transform.forward * length)));
         }
 
-        public object InvokeStatic(string className, string method, ParamsList args)
+        public object InvokeStatic(string className, string method, object[] args)
         {
             System.Type type;
             if (!this.TryFindType(className.Replace('.', '+'), out type))
@@ -163,10 +163,10 @@
             }
             if (info.ReturnType == typeof(void))
             {
-                info.Invoke(null, args.ToArray());
+                info.Invoke(null, args);
                 return true;
             }
-            return info.Invoke(null, args.ToArray());
+            return info.Invoke(null, args);
         }
 
         public bool IsNull(object obj)

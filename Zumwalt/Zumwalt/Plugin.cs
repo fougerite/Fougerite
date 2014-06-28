@@ -68,7 +68,7 @@
             return timer;
         }
 
-        public TimedEvent CreateTimer(string name, int timeoutDelay, ParamsList args)
+        public TimedEvent CreateTimer(string name, int timeoutDelay, object[] args)
         {
             TimedEvent event2 = this.CreateTimer(name, timeoutDelay);
             event2.Args = args;
@@ -333,11 +333,11 @@
             }
         }
 
-        public void OnTimerCBArgs(string name, ParamsList args)
+        public void OnTimerCBArgs(string name, object[] args)
         {
             if (this.Code.Contains(name + "Callback"))
             {
-                this.Invoke(name + "Callback", new object[] { args });
+                this.Invoke(name + "Callback", args);
             }
         }
 

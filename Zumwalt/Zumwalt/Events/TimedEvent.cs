@@ -7,7 +7,7 @@
 
     public class TimedEvent
     {
-        private ParamsList _args;
+        private object[] _args;
         private string _name;
         private System.Timers.Timer _timer;
         private long lastTick;
@@ -24,7 +24,7 @@
             this._timer.Elapsed += new ElapsedEventHandler(this._timer_Elapsed);
         }
 
-        public TimedEvent(string name, double interval, ParamsList args)
+        public TimedEvent(string name, double interval, object[] args)
             : this(name, interval)
         {
             this.Args = args;
@@ -54,7 +54,7 @@
             this._timer.Stop();
         }
 
-        public ParamsList Args
+        public object[] Args
         {
             get
             {
@@ -98,7 +98,7 @@
             }
         }
 
-        public delegate void TimedEventFireArgsDelegate(string name, ParamsList list);
+        public delegate void TimedEventFireArgsDelegate(string name, object[] list);
 
         public delegate void TimedEventFireDelegate(string name);
     }

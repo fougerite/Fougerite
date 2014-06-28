@@ -58,7 +58,6 @@
     <Compile Include="Zumwalt\Events\SpawnEvent.cs" />
     <Compile Include="Zumwalt\ItemsBlocks.cs" />
     <Compile Include="Zumwalt\NPC.cs" />
-    <Compile Include="ParamsList.cs" />
     <Compile Include="Zumwalt\PlayerItem.cs" />
     <Compile Include="Zumwalt\Events\TimedEvent.cs" />
     <Compile Include="Zumwalt\Web.cs" />

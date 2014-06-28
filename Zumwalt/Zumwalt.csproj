@@ -36,8 +36,8 @@
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Jurassic">
-      <HintPath>..\References\Jurassic.dll</HintPath>
+    <Reference Include="Jint">
+      <HintPath>..\References\Jint.dll</HintPath>
     </Reference>
     <Reference Include="System.Core">
       <HintPath>..\References\System.Core.dll</HintPath>

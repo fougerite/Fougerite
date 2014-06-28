@@ -12,11 +12,40 @@
         private ArrayList commands;
         private string path;
         private System.Collections.Generic.List<TimedEvent> timers;
+        public Jurassic.Library.ObjectInstance JSObject;
 
         public Plugin(string path)
         {
             this.Path = path;
             this.timers = new System.Collections.Generic.List<TimedEvent>();
+        }
+
+        public void InstallHooks()
+        {
+            Jurassic.Undefined undefined = Jurassic.Undefined.Value;
+
+            if (JSObject.GetPropertyValue("OnServerInit") != undefined) Hooks.OnServerInit += this.OnServerInit;
+            if (JSObject.GetPropertyValue("OnPluginInit") != undefined) Hooks.OnPluginInit += this.OnPluginInit;
+            if (JSObject.GetPropertyValue("OnServerShutdown") != undefined) Hooks.OnServerShutdown += this.OnServerShutdown;
+            if (JSObject.GetPropertyValue("OnItemsLoaded") != undefined) Hooks.OnItemsLoaded += this.OnItemsLoaded;
+            if (JSObject.GetPropertyValue("OnTablesLoaded") != undefined) Hooks.OnTablesLoaded += this.OnTablesLoaded;
+            if (JSObject.GetPropertyValue("OnChat") != undefined) Hooks.OnChat += this.OnChat;
+            if (JSObject.GetPropertyValue("OnConsole") != undefined) Hooks.OnConsoleReceived += this.OnConsole;
+            if (JSObject.GetPropertyValue("OnCommand") != undefined) Hooks.OnCommand += this.OnCommand;
+            if (JSObject.GetPropertyValue("OnPlayerConnected") != undefined) Hooks.OnPlayerConnected += this.OnPlayerConnected;
+            if (JSObject.GetPropertyValue("OnPlayerDisconnected") != undefined) Hooks.OnPlayerDisconnected += this.OnPlayerDisconnected;
+            if (JSObject.GetPropertyValue("OnPlayerKilled") != undefined) Hooks.OnPlayerKilled += this.OnPlayerKilled;
+            if (JSObject.GetPropertyValue("OnPlayerHurt") != undefined) Hooks.OnPlayerHurt += this.OnPlayerHurt;
+            if (JSObject.GetPropertyValue("OnPlayerSpawning") != undefined) Hooks.OnPlayerSpawning += this.OnPlayerSpawning;
+            if (JSObject.GetPropertyValue("OnPlayerSpawned") != undefined) Hooks.OnPlayerSpawned += this.OnPlayerSpawned;
+            if (JSObject.GetPropertyValue("OnPlayerGathering") != undefined) Hooks.OnPlayerGathering += this.OnPlayerGathering;
+            if (JSObject.GetPropertyValue("OnEntityHurt") != undefined) Hooks.OnEntityHurt += this.OnEntityHurt;
+            if (JSObject.GetPropertyValue("OnEntityDecay") != undefined) Hooks.OnEntityDecay += this.OnEntityDecay;
+            if (JSObject.GetPropertyValue("OnEntityDeployed") != undefined) Hooks.OnEntityDeployed += this.OnEntityDeployed;
+            if (JSObject.GetPropertyValue("OnNPCHurt") != undefined) Hooks.OnNPCHurt += this.OnNPCHurt;
+            if (JSObject.GetPropertyValue("OnNPCKilled") != undefined) Hooks.OnNPCKilled += this.OnNPCKilled;
+            if (JSObject.GetPropertyValue("OnBlueprintUse") != undefined) Hooks.OnBlueprintUse += this.OnBlueprintUse;
+            if (JSObject.GetPropertyValue("OnDoorUse") != undefined) Hooks.OnDoorUse += this.OnDoorUse;
         }
 
         public bool CreateDir(string name)
@@ -156,23 +185,7 @@
         {
             try
             {
-                PluginEngine.GetPluginEngine().Interpreter.Run(this.Code);
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Server", Zumwalt.Server.GetServer());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Data", Zumwalt.Data.GetData());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("DataStore", DataStore.GetInstance());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Util", Util.GetUtil());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Web", new Web());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Time", this);
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("World", World.GetWorld());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Plugin", this);
-                if (obj != null)
-                {
-                    PluginEngine.GetPluginEngine().Interpreter.CallFunction(name, obj);
-                }
-                else
-                {
-                    PluginEngine.GetPluginEngine().Interpreter.CallFunction(name, new object[0]);
-                }
+                JSObject.CallMemberFunction(name, obj);
             }
             catch (Exception ex)
             {
@@ -295,7 +308,7 @@
             this.Invoke("On_PlayerKilled", new object[] { de });
         }
 
-        public void OnPlayerSpawn(Zumwalt.Player p, SpawnEvent se)
+        public void OnPlayerSpawning(Zumwalt.Player p, SpawnEvent se)
         {
             this.Invoke("On_PlayerSpawning", new object[] { p, se });
         }

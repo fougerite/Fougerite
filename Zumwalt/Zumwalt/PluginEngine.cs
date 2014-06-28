@@ -1,45 +1,32 @@
 ﻿namespace Zumwalt
 {
-    using Jint;
-    using Jint.Expressions;
+    using Jurassic;
+    using Jurassic.Library;
+
     using System;
-    using System.Collections;
+    using System.Collections.Generic;
     using System.IO;
     using UnityEngine;
 
     public class PluginEngine
     {
-        private string[] filters = new string[] { "system.io", "system.xml" };
-        private JintEngine interpreter = new JintEngine();
-        private static PluginEngine PE;
-        private ArrayList plugins = new ArrayList();
+        private static PluginEngine singleton;
+
+        public ScriptEngine ScriptEngine = new ScriptEngine();
+        public List<Plugin> Plugins = new List<Plugin>();
 
         private PluginEngine()
         {
         }
 
-        public bool FilterPlugin(string script)
-        {
-            string str = script.ToLower();
-            foreach (string str2 in this.filters)
-            {
-                if (str.Contains(str2))
-                {
-                    Logger.Log("Script cannot contain: " + str2);
-                    return false;
-                }
-            }
-            return true;
-        }
-
         public static PluginEngine GetPluginEngine()
         {
-            if (PE == null)
+            if (singleton == null)
             {
-                PE = new PluginEngine();
-                PE.Init();
+                singleton = new PluginEngine();
+                singleton.Init();
             }
-            return PE;
+            return singleton;
         }
 
         public void Init()
@@ -47,114 +34,59 @@
             this.ReloadPlugins(null);
         }
 
+        public void SetGlobals()
+        {
+            ScriptEngine.SetGlobalValue("Server", Zumwalt.Server.GetServer());
+            ScriptEngine.SetGlobalValue("Data", Zumwalt.Data.GetData());
+            ScriptEngine.SetGlobalValue("DataStore", DataStore.GetInstance());
+            ScriptEngine.SetGlobalValue("Util", Util.GetUtil());
+            ScriptEngine.SetGlobalValue("Web", new Web());
+            ScriptEngine.SetGlobalValue("Time", this);
+            ScriptEngine.SetGlobalValue("World", World.GetWorld());
+            ScriptEngine.SetGlobalValue("Plugin", this);
+
+            ScriptEngine.CompatibilityMode = CompatibilityMode.Latest;
+            ScriptEngine.EnableExposedClrTypes = true;
+        }
+
         public void LoadPlugins(Player p)
         {
             Hooks.ResetHooks();
-            this.ParsePlugin();
-            foreach (Plugin plugin in this.plugins)
+
+            SetGlobals();
+
+            this.ParsePlugins();
+            foreach (Plugin plugin in this.Plugins)
             {
                 try
                 {
-                    this.interpreter.Run(plugin.Code);
-                    foreach (Statement statement in JintEngine.Compile(plugin.Code, false).Statements)
-                    {
-                        if (statement.GetType() == typeof(FunctionDeclarationStatement))
-                        {
-                            FunctionDeclarationStatement statement2 = (FunctionDeclarationStatement)statement;
-                            if (statement2 != null)
-                            {
-                                Logger.Log("Found Function: " + statement2.Name);
-                                if (statement2.Name == "On_ServerInit")
-                                {
-                                    Hooks.OnServerInit += new Hooks.ServerInitDelegate(plugin.OnServerInit);
-                                }
-                                else if (statement2.Name == "On_PluginInit")
-                                {
-                                    Hooks.OnPluginInit += new Hooks.PluginInitHandlerDelegate(plugin.OnPluginInit);
-                                }
-                                else if (statement2.Name == "On_ServerShutdown")
-                                {
-                                    Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(plugin.OnServerShutdown);
-                                }
-                                else if (statement2.Name == "On_ItemsLoaded")
-                                {
-                                    Hooks.OnItemsLoaded += new Hooks.ItemsDatablocksLoaded(plugin.OnItemsLoaded);
-                                }
-                                else if (statement2.Name == "On_TablesLoaded")
-                                {
-                                    Hooks.OnTablesLoaded += new Hooks.LootTablesLoaded(plugin.OnTablesLoaded);
-                                }
-                                else if (statement2.Name == "On_Chat")
-                                {
-                                    Hooks.OnChat += new Hooks.ChatHandlerDelegate(plugin.OnChat);
-                                }
-                                else if (statement2.Name == "On_Console")
-                                {
-                                    Hooks.OnConsoleReceived += new Hooks.ConsoleHandlerDelegate(plugin.OnConsole);
-                                }
-                                else if (statement2.Name == "On_Command")
-                                {
-                                    Hooks.OnCommand += new Hooks.CommandHandlerDelegate(plugin.OnCommand);
-                                }
-                                else if (statement2.Name == "On_PlayerConnected")
-                                {
-                                    Hooks.OnPlayerConnected += new Hooks.ConnectionHandlerDelegate(plugin.OnPlayerConnected);
-                                }
-                                else if (statement2.Name == "On_PlayerDisconnected")
-                                {
-                                    Hooks.OnPlayerDisconnected += new Hooks.DisconnectionHandlerDelegate(plugin.OnPlayerDisconnected);
-                                }
-                                else if (statement2.Name == "On_PlayerKilled")
-                                {
-                                    Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(plugin.OnPlayerKilled);
-                                }
-                                else if (statement2.Name == "On_PlayerHurt")
-                                {
-                                    Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(plugin.OnPlayerHurt);
-                                }
-                                else if (statement2.Name == "On_PlayerSpawning")
-                                {
-                                    Hooks.OnPlayerSpawning += new Hooks.PlayerSpawnHandlerDelegate(plugin.OnPlayerSpawn);
-                                }
-                                else if (statement2.Name == "On_PlayerSpawned")
-                                {
-                                    Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(plugin.OnPlayerSpawned);
-                                }
-                                else if (statement2.Name == "On_PlayerGathering")
-                                {
-                                    Hooks.OnPlayerGathering += new Hooks.PlayerGatheringHandlerDelegate(plugin.OnPlayerGathering);
-                                }
-                                else if (statement2.Name == "On_EntityHurt")
-                                {
-                                    Hooks.OnEntityHurt += new Hooks.EntityHurtDelegate(plugin.OnEntityHurt);
-                                }
-                                else if (statement2.Name == "On_EntityDecay")
-                                {
-                                    Hooks.OnEntityDecay += new Hooks.EntityDecayDelegate(plugin.OnEntityDecay);
-                                }
-                                else if (statement2.Name == "On_EntityDeployed")
-                                {
-                                    Hooks.OnEntityDeployed += new Hooks.EntityDeployedDelegate(plugin.OnEntityDeployed);
-                                }
-                                else if (statement2.Name == "On_NPCHurt")
-                                {
-                                    Hooks.OnNPCHurt += new Hooks.HurtHandlerDelegate(plugin.OnNPCHurt);
-                                }
-                                else if (statement2.Name == "On_NPCKilled")
-                                {
-                                    Hooks.OnNPCKilled += new Hooks.KillHandlerDelegate(plugin.OnNPCKilled);
-                                }
-                                else if (statement2.Name == "On_BlueprintUse")
-                                {
-                                    Hooks.OnBlueprintUse += new Hooks.BlueprintUseHandlerDelagate(plugin.OnBlueprintUse);
-                                }
-                                else if (statement2.Name == "On_DoorUse")
-                                {
-                                    Hooks.OnDoorUse += new Hooks.DoorOpenHandlerDelegate(plugin.OnDoorUse);
-                                }
-                            }
-                        }
-                    }
+                    this.ScriptEngine.Execute(plugin.Code);
+                    this.ScriptEngine.Execute(@"plugin = {
+                        'OnServerInit': On_ServerInit,
+                        'OnPluginInit': On_PluginInit,
+                        'OnServerShutdown': On_ServerShutdown,
+                        'OnItemsLoaded': On_ItemsLoaded,
+                        'OnTablesLoaded': On_TablesLoaded,
+                        'OnChat': On_Chat,
+                        'OnConsole': On_Console,
+                        'OnCommand': On_Command,
+                        'OnPlayerConnected': On_PlayerConnected,
+                        'OnPlayerDisconnected': On_PlayerDisconnected,
+                        'OnPlayerKilled': On_PlayerKilled,
+                        'OnPlayerHurt': On_PlayerHurt,
+                        'OnPlayerSpawning': On_PlayerSpawning,
+                        'OnPlayerSpawned': On_PlayerSpawned,
+                        'OnPlayerGathering': On_PlayerGathering,
+                        'OnEntityHurt': On_EntityHurt,
+                        'OnEntityDecay': On_EntityDecay,
+                        'OnEntityDeployed': On_EntityDeployed,
+                        'OnNPCHurt': On_NPCHurt,
+                        'OnNPCKilled': On_NPCKilled,
+                        'OnBlueprintUse': On_BlueprintUse,
+                        'OnDoorUse': On_DoorUse,
+                    }");
+                    plugin.JSObject = ScriptEngine.GetGlobalValue<ObjectInstance>("plugin");
+                    plugin.InstallHooks();
                 }
                 catch (Exception ex)
                 {
@@ -172,9 +104,9 @@
             }
         }
 
-        public void ParsePlugin()
+        public void ParsePlugins()
         {
-            this.plugins.Clear();
+            this.Plugins.Clear();
             foreach (string str in Directory.GetDirectories(Util.GetZumwaltFolder()))
             {
                 string path = "";
@@ -233,61 +165,23 @@
                             Logger.Log("Zumwalt: Couln't create instance at line -> " + str5);
                         }
                     }
-                    if (this.FilterPlugin(script))
-                    {
-                        Logger.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
-                        //Logger.Log("Loaded: " + path);
-                        Plugin plugin = new Plugin(path);
-                        plugin.Code = script;
-                        this.plugins.Add(plugin);
-                    }
-                    else
-                    {
-                        Logger.Log("PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
-                    }
+                    Logger.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
+                    Plugin plugin = new Plugin(path);
+                    plugin.Code = script;
+                    this.Plugins.Add(plugin);
                 }
             }
         }
 
         public void ReloadPlugins(Player p)
         {
-            this.Secure();
-            foreach (Plugin plugin in this.plugins)
+            foreach (Plugin plugin in this.Plugins)
             {
                 plugin.KillTimers();
             }
             this.LoadPlugins(p);
             Data.GetData().Load();
             Hooks.PluginInit();
-        }
-
-        public void Secure()
-        {
-            this.interpreter.AllowClr(true);
-        }
-
-        public JintEngine Interpreter
-        {
-            get
-            {
-                return this.interpreter;
-            }
-            set
-            {
-                this.interpreter = value;
-            }
-        }
-
-        public ArrayList Plugins
-        {
-            get
-            {
-                return this.plugins;
-            }
-            set
-            {
-                this.plugins = value;
-            }
         }
     }
 }

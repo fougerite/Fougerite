@@ -208,7 +208,7 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-            if (((a.argUser == null) && (a.Class == "Zumwaltweb")) && (a.Function == "handshake"))
+            if (((a.argUser == null) && (a.Class == "zumwaltweb")) && (a.Function == "handshake"))
             {
                 a.ReplyWith("All Good!");
                 return true;

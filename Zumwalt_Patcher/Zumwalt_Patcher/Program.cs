@@ -43,6 +43,7 @@ namespace Zumwalt_Patcher
             if (result) {
                 Logger.Log("The patch was applied successfully!");
             }
+            Console.ReadLine();
         }
     }
 }

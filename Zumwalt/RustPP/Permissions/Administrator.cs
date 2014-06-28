@@ -15,9 +15,9 @@
         [XmlIgnore]
         private static System.Collections.Generic.List<Administrator> admins = new System.Collections.Generic.List<Administrator>();
         public static string[] PermissionsFlags = new string[] { 
-            "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
-            "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
-         };
+      "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
+      "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
+     };
 
         public Administrator()
         {
@@ -86,7 +86,8 @@
 
         public bool HasPermission(string perm)
         {
-            return (this.Flags.FindIndex(delegate (string x) {
+            return (this.Flags.FindIndex(delegate(string x)
+            {
                 return x.Equals(perm, StringComparison.OrdinalIgnoreCase);
             }) != -1);
         }
@@ -130,6 +131,7 @@
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogException(ex);
                 }
             }
         }
@@ -184,4 +186,3 @@
         }
     }
 }
-

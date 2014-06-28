@@ -16,8 +16,8 @@
         {
             try
             {
-                ShareCommand command = (ShareCommand) ChatCommand.GetCommand("share");
-                FriendsCommand command2 = (FriendsCommand) ChatCommand.GetCommand("friends");
+                ShareCommand command = (ShareCommand)ChatCommand.GetCommand("share");
+                FriendsCommand command2 = (FriendsCommand)ChatCommand.GetCommand("friends");
                 if (command.GetSharedDoors().Count != 0)
                 {
                     ObjectToFile<Hashtable>(command.GetSharedDoors(), GetAbsoluteFilePath("doorsSave.rpp"));
@@ -69,6 +69,7 @@
             }
             catch (Exception ex)
             {
+                Zumwalt.Logger.LogException(ex);
                 throw;
             }
         }
@@ -88,14 +89,14 @@
             FileStream stream = new FileStream(path, FileMode.Open);
             StreamReader reader = new StreamReader(stream);
             BinaryFormatter formatter = new BinaryFormatter();
-            return (T) formatter.Deserialize(reader.BaseStream);
+            return (T)formatter.Deserialize(reader.BaseStream);
         }
 
         public static T ObjectFromXML<T>(string path)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T));
             TextReader textReader = new StreamReader(path);
-            T local = (T) serializer.Deserialize(textReader);
+            T local = (T)serializer.Deserialize(textReader);
             textReader.Close();
             return local;
         }
@@ -117,4 +118,3 @@
         }
     }
 }
-

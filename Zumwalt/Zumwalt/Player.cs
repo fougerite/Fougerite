@@ -136,6 +136,7 @@
             catch (Exception ex)
             {
                 this.invError = true;
+                Logger.LogException(ex);
             }
         }
 
@@ -243,7 +244,7 @@
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float) Convert.ToInt32(value));
+                this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float)Convert.ToInt32(value));
             }
         }
 
@@ -255,7 +256,7 @@
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float) (-10)) : ((float) 10);
+                this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float)(-10)) : ((float)10);
             }
         }
 
@@ -267,7 +268,7 @@
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<FallDamage>().SetLegInjury((float) Convert.ToInt32(value));
+                this.PlayerClient.controllable.GetComponent<FallDamage>().SetLegInjury((float)Convert.ToInt32(value));
             }
         }
 
@@ -365,4 +366,3 @@
         }
     }
 }
-

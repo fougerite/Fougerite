@@ -37,7 +37,7 @@
                     this.GetObject<StructureComponent>().StartCoroutine("DelayedKill");
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 if (this.IsDeployableObject())
                 {
@@ -65,7 +65,7 @@
 
         private T GetObject<T>()
         {
-            return (T) this.Object;
+            return (T)this.Object;
         }
 
         public TakeDamage GetTakeDamage()
@@ -312,4 +312,3 @@
         }
     }
 }
-

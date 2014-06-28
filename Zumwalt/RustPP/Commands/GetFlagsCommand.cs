@@ -42,7 +42,7 @@
                             num2 = 0;
                             break;
                         }
-                        str2 = str2 + str3 + ",  ";
+                        str2 = str2 + str3 + ", ";
                         if (num2 == 6)
                         {
                             num2 = 0;
@@ -63,4 +63,3 @@
         }
     }
 }
-

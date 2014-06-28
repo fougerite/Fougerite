@@ -49,9 +49,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Private Message Usage:   /pm \"player\" \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Private Message Usage:  /pm \"player\" \"message\"");
             }
         }
     }
 }
-

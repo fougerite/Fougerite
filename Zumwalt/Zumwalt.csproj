@@ -45,6 +45,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Zumwalt\ChatString.cs" />
+    <Compile Include="Zumwalt\Logger.cs" />
     <Compile Include="Zumwalt\Zone3D.cs" />
     <Compile Include="Zumwalt\DataStore.cs" />
     <Compile Include="Zumwalt\Events\BPUseEvent.cs" />

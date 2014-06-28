@@ -18,9 +18,9 @@
             }
             catch (Exception ex)
             {
+                Logger.LogException(ex);
             }
             Util.sayUser(Arguments.argUser.networkPlayer, "You have spawned an Admin Loadout!");
         }
     }
 }
-

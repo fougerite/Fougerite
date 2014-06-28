@@ -17,7 +17,7 @@
             }
             else
             {
-                ((FriendList) friendsLists[Arguments.argUser.userID]).OutputList(ref Arguments);
+                ((FriendList)friendsLists[Arguments.argUser.userID]).OutputList(ref Arguments);
             }
         }
 
@@ -32,4 +32,3 @@
         }
     }
 }
-

@@ -49,7 +49,8 @@
             }
         }
 
-        public HurtEvent(ref DamageEvent d, Zumwalt.Entity en) : this(ref d)
+        public HurtEvent(ref DamageEvent d, Zumwalt.Entity en)
+            : this(ref d)
         {
             this.Entity = en;
         }
@@ -95,7 +96,7 @@
             get
             {
                 string str = "Unknown";
-                switch (((int) this.DamageEvent.damageTypes))
+                switch (((int)this.DamageEvent.damageTypes))
                 {
                     case 0:
                         return "Bleeding";
@@ -189,4 +190,3 @@
         }
     }
 }
-

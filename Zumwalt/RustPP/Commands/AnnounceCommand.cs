@@ -30,9 +30,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Announce Usage:   /announce \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Announce Usage:  /announce \"message\"");
             }
         }
     }
 }
-

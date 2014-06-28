@@ -46,7 +46,7 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Reply Command Usage:   /r \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Reply Command Usage:  /r \"message\"");
             }
         }
 
@@ -61,4 +61,3 @@
         }
     }
 }
-

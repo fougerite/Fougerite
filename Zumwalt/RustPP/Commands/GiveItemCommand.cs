@@ -40,9 +40,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Spawn Item usage:   /give \"playerName\" \"itemName\" \"quantity\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Spawn Item usage:  /give \"playerName\" \"itemName\" \"quantity\"");
             }
         }
     }
 }
-

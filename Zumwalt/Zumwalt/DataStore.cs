@@ -12,7 +12,7 @@
 
         public void Add(string tablename, object key, object val)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
                 hashtable = new Hashtable();
@@ -30,7 +30,7 @@
 
         public bool ContainsKey(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
                 foreach (object obj2 in hashtable.Keys)
@@ -46,7 +46,7 @@
 
         public bool ContainsValue(string tablename, object val)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
                 foreach (object obj2 in hashtable.Values)
@@ -62,7 +62,7 @@
 
         public int Count(string tablename)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
                 return 0;
@@ -72,7 +72,7 @@
 
         public void Flush(string tablename)
         {
-            if (((Hashtable) this.datastore[tablename]) != null)
+            if (((Hashtable)this.datastore[tablename]) != null)
             {
                 this.datastore.Remove(tablename);
             }
@@ -80,7 +80,7 @@
 
         public object Get(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
                 return null;
@@ -99,7 +99,7 @@
 
         public Hashtable GetTable(string tablename)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
                 return null;
@@ -109,7 +109,7 @@
 
         public object[] Keys(string tablename)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
                 object[] array = new object[hashtable.Keys.Count];
@@ -131,13 +131,14 @@
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogException(ex);
                 }
             }
         }
 
         public void Remove(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
                 hashtable.Remove(key);
@@ -155,7 +156,7 @@
 
         public object[] Values(string tablename)
         {
-            Hashtable hashtable = (Hashtable) this.datastore[tablename];
+            Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
                 object[] array = new object[hashtable.Values.Count];
@@ -166,4 +167,3 @@
         }
     }
 }
-

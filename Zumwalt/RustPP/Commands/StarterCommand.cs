@@ -19,7 +19,7 @@
             }
             else
             {
-                int num = (int) this.starterkits[Arguments.argUser.playerClient.userID];
+                int num = (int)this.starterkits[Arguments.argUser.playerClient.userID];
                 if ((Environment.TickCount - num) < (int.Parse(Core.config.GetSetting("Settings", "starterkit_cooldown")) * 0x3e8))
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, "You must wait awhile before using this..");
@@ -44,4 +44,3 @@
         }
     }
 }
-

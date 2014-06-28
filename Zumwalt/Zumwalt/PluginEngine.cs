@@ -25,7 +25,7 @@
             {
                 if (str.Contains(str2))
                 {
-                    UnityEngine.Debug.Log("Script cannot contain: " + str2);
+                    Logger.Log("Script cannot contain: " + str2);
                     return false;
                 }
             }
@@ -60,10 +60,10 @@
                     {
                         if (statement.GetType() == typeof(FunctionDeclarationStatement))
                         {
-                            FunctionDeclarationStatement statement2 = (FunctionDeclarationStatement) statement;
+                            FunctionDeclarationStatement statement2 = (FunctionDeclarationStatement)statement;
                             if (statement2 != null)
                             {
-                                UnityEngine.Debug.Log("Found Function: " + statement2.Name);
+                                Logger.Log("Found Function: " + statement2.Name);
                                 if (statement2.Name == "On_ServerInit")
                                 {
                                     Hooks.OnServerInit += new Hooks.ServerInitDelegate(plugin.OnServerInit);
@@ -167,6 +167,7 @@
                     {
                         Server.GetServer().Broadcast(arg);
                     }
+                    Logger.LogException(ex);
                 }
             }
         }
@@ -228,20 +229,21 @@
                         }
                         catch (Exception ex)
                         {
-                            UnityEngine.Debug.Log("Zumwalt: Couln't create instance at line -> " + str5);
+                            Logger.LogException(ex);
+                            Logger.Log("Zumwalt: Couln't create instance at line -> " + str5);
                         }
                     }
                     if (this.FilterPlugin(script))
                     {
-                        Debug.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
-                        //UnityEngine.Debug.Log("Loaded: " + path);
+                        Logger.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
+                        //Logger.Log("Loaded: " + path);
                         Plugin plugin = new Plugin(path);
                         plugin.Code = script;
                         this.plugins.Add(plugin);
                     }
                     else
                     {
-                        UnityEngine.Debug.Log("PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
+                        Logger.Log("PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
                     }
                 }
             }
@@ -289,4 +291,3 @@
         }
     }
 }
-

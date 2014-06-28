@@ -93,9 +93,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "AddFlag Usage:   /addflag  flag1 flag2...");
+                Util.sayUser(Arguments.argUser.networkPlayer, "AddFlag Usage:  /addflag flag1 flag2...");
             }
         }
     }
 }
-

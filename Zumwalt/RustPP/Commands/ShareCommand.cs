@@ -31,7 +31,7 @@
                                 Util.sayUser(Arguments.argUser.networkPlayer, "Why would you share with yourself?");
                                 return;
                             }
-                            ArrayList list = (ArrayList) shared_doors[key];
+                            ArrayList list = (ArrayList)shared_doors[key];
                             if (list != null)
                             {
                                 if (list.Contains(userID))
@@ -56,7 +56,7 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:   /share \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:  /share \"playerName\"");
             }
         }
 
@@ -71,4 +71,3 @@
         }
     }
 }
-

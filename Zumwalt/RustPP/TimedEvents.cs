@@ -38,7 +38,8 @@
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log("Error while auto-saving!");
+                Logger.LogException(ex);
+                Logger.Log("Error while auto-saving!");
             }
         }
 
@@ -48,7 +49,8 @@
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Interval = 10000.0;
             timer.AutoReset = true;
-            timer.Elapsed += delegate (object x, ElapsedEventArgs y) {
+            timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+            {
                 shutdown_tick();
             };
             timer.Start();
@@ -68,6 +70,7 @@
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogException(ex);
                 }
                 Process.GetCurrentProcess().Kill();
             }
@@ -129,7 +132,8 @@
                     System.Timers.Timer timer = new System.Timers.Timer();
                     timer.Interval = int.Parse(Core.config.GetSetting("Settings", "notice_interval"));
                     timer.AutoReset = true;
-                    timer.Elapsed += delegate (object x, ElapsedEventArgs y) {
+                    timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                    {
                         advertise_begin();
                     };
                     timer.Start();
@@ -138,4 +142,3 @@
         }
     }
 }
-

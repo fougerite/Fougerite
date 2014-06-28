@@ -18,49 +18,49 @@
         private static System.Collections.Generic.List<object> decayList = new System.Collections.Generic.List<object>();
         private static Hashtable talkerTimers = new Hashtable();
 
-        public static  event BlueprintUseHandlerDelagate OnBlueprintUse;
+        public static event BlueprintUseHandlerDelagate OnBlueprintUse;
 
-        public static  event ChatHandlerDelegate OnChat;
+        public static event ChatHandlerDelegate OnChat;
 
-        public static  event CommandHandlerDelegate OnCommand;
+        public static event CommandHandlerDelegate OnCommand;
 
-        public static  event ConsoleHandlerDelegate OnConsoleReceived;
+        public static event ConsoleHandlerDelegate OnConsoleReceived;
 
-        public static  event DoorOpenHandlerDelegate OnDoorUse;
+        public static event DoorOpenHandlerDelegate OnDoorUse;
 
-        public static  event EntityDecayDelegate OnEntityDecay;
+        public static event EntityDecayDelegate OnEntityDecay;
 
-        public static  event EntityDeployedDelegate OnEntityDeployed;
+        public static event EntityDeployedDelegate OnEntityDeployed;
 
-        public static  event EntityHurtDelegate OnEntityHurt;
+        public static event EntityHurtDelegate OnEntityHurt;
 
-        public static  event ItemsDatablocksLoaded OnItemsLoaded;
+        public static event ItemsDatablocksLoaded OnItemsLoaded;
 
-        public static  event HurtHandlerDelegate OnNPCHurt;
+        public static event HurtHandlerDelegate OnNPCHurt;
 
-        public static  event KillHandlerDelegate OnNPCKilled;
+        public static event KillHandlerDelegate OnNPCKilled;
 
-        public static  event ConnectionHandlerDelegate OnPlayerConnected;
+        public static event ConnectionHandlerDelegate OnPlayerConnected;
 
-        public static  event DisconnectionHandlerDelegate OnPlayerDisconnected;
+        public static event DisconnectionHandlerDelegate OnPlayerDisconnected;
 
-        public static  event PlayerGatheringHandlerDelegate OnPlayerGathering;
+        public static event PlayerGatheringHandlerDelegate OnPlayerGathering;
 
-        public static  event HurtHandlerDelegate OnPlayerHurt;
+        public static event HurtHandlerDelegate OnPlayerHurt;
 
-        public static  event KillHandlerDelegate OnPlayerKilled;
+        public static event KillHandlerDelegate OnPlayerKilled;
 
-        public static  event PlayerSpawnHandlerDelegate OnPlayerSpawned;
+        public static event PlayerSpawnHandlerDelegate OnPlayerSpawned;
 
-        public static  event PlayerSpawnHandlerDelegate OnPlayerSpawning;
+        public static event PlayerSpawnHandlerDelegate OnPlayerSpawning;
 
-        public static  event PluginInitHandlerDelegate OnPluginInit;
+        public static event PluginInitHandlerDelegate OnPluginInit;
 
-        public static  event ServerInitDelegate OnServerInit;
+        public static event ServerInitDelegate OnServerInit;
 
-        public static  event ServerShutdownDelegate OnServerShutdown;
+        public static event ServerShutdownDelegate OnServerShutdown;
 
-        public static  event LootTablesLoaded OnTablesLoaded;
+        public static event LootTablesLoaded OnTablesLoaded;
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
@@ -164,7 +164,7 @@
                         {
                             Zumwalt.Data.GetData().chat_history.Add(str);
                             Zumwalt.Data.GetData().chat_history_username.Add(item);
-                            Debug.Log("[CHAT] " + item + ": " + str);
+                            Logger.ChatLog(item, str);
                             ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
                         }
                     }
@@ -184,7 +184,7 @@
                 if (Core.IsEnabled() && !de.Open)
                 {
                     ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
-                    ArrayList list = (ArrayList) command.GetSharedDoors()[obj.ownerID];
+                    ArrayList list = (ArrayList)command.GetSharedDoors()[obj.ownerID];
                     if (list == null)
                     {
                         de.Open = false;
@@ -356,6 +356,7 @@
             }
             catch (Exception ex)
             {
+                Logger.LogException(ex);
             }
         }
 
@@ -379,7 +380,7 @@
         {
             if ((((name != "!Ng") && (name != ":rabbit_prefab_a")) && ((name != ";res_woodpile") && (name != ";res_ore_1"))) && ((((((((((((((name != ";res_ore_2") & (name != ";res_ore_3")) & (name != ":stag_prefab")) & (name != ":boar_prefab")) & (name != ":chicken_prefab")) & (name != ":bear_prefab")) & (name != ":wolf_prefab")) & (name != ":mutant_bear")) & (name != ":mutant_wolf")) & (name != "AmmoLootBox")) & (name != "MedicalLootBox")) & (name != "BoxLoot")) & (name != "WeaponLootBox")) & (name != "SupplyCrate")))
             {
-                UnityEngine.Debug.Log(name);
+                Logger.Log(name);
             }
         }
 
@@ -425,9 +426,9 @@
                     }
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                UnityEngine.Debug.Log(exception.ToString());
+                Logger.LogException(ex);
             }
         }
 
@@ -441,9 +442,9 @@
                     OnNPCKilled(de);
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                UnityEngine.Debug.Log(exception.ToString());
+                Logger.LogException(ex);
             }
         }
 
@@ -568,9 +569,9 @@
                 }
                 return event2.DropItems;
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                UnityEngine.Debug.Log(exception.ToString());
+                Logger.LogException(ex);
                 return true;
             }
         }
@@ -587,7 +588,9 @@
                 }
             }
             catch (Exception ex)
-            { Console.WriteLine(ex); }
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static Vector3 PlayerSpawning(PlayerClient pc, Vector3 pos, bool camp)
@@ -603,8 +606,10 @@
                 return new Vector3(se.X, se.Y, se.Z);
             }
             catch (Exception ex)
-            { Console.WriteLine(ex); }
-            return new Vector3(0, 0, 0);
+            {
+                Logger.LogException(ex);
+            }
+            return Vector3.zero;
         }
 
         public static void PluginInit()
@@ -617,49 +622,71 @@
 
         public static void ResetHooks()
         {
-            OnPluginInit = delegate {
+            OnPluginInit = delegate
+            {
             };
-            OnChat = delegate (Zumwalt.Player param0, ref ChatString param1) {
+            OnChat = delegate(Zumwalt.Player param0, ref ChatString param1)
+            {
             };
-            OnCommand = delegate (Zumwalt.Player param0, string param1, string[] param2) {
+            OnCommand = delegate(Zumwalt.Player param0, string param1, string[] param2)
+            {
             };
-            OnPlayerConnected = delegate (Zumwalt.Player param0) {
+            OnPlayerConnected = delegate(Zumwalt.Player param0)
+            {
             };
-            OnPlayerDisconnected = delegate (Zumwalt.Player param0) {
+            OnPlayerDisconnected = delegate(Zumwalt.Player param0)
+            {
             };
-            OnNPCKilled = delegate (DeathEvent param0) {
+            OnNPCKilled = delegate(DeathEvent param0)
+            {
             };
-            OnNPCHurt = delegate (HurtEvent param0) {
+            OnNPCHurt = delegate(HurtEvent param0)
+            {
             };
-            OnPlayerKilled = delegate (DeathEvent param0) {
+            OnPlayerKilled = delegate(DeathEvent param0)
+            {
             };
-            OnPlayerHurt = delegate (HurtEvent param0) {
+            OnPlayerHurt = delegate(HurtEvent param0)
+            {
             };
-            OnPlayerSpawned = delegate (Zumwalt.Player param0, SpawnEvent param1) {
+            OnPlayerSpawned = delegate(Zumwalt.Player param0, SpawnEvent param1)
+            {
             };
-            OnPlayerSpawning = delegate (Zumwalt.Player param0, SpawnEvent param1) {
+            OnPlayerSpawning = delegate(Zumwalt.Player param0, SpawnEvent param1)
+            {
             };
-            OnPlayerGathering = delegate (Zumwalt.Player param0, GatherEvent param1) {
+            OnPlayerGathering = delegate(Zumwalt.Player param0, GatherEvent param1)
+            {
             };
-            OnEntityHurt = delegate (HurtEvent param0) {
+            OnEntityHurt = delegate(HurtEvent param0)
+            {
             };
-            OnEntityDecay = delegate (DecayEvent param0) {
+            OnEntityDecay = delegate(DecayEvent param0)
+            {
             };
-            OnEntityDeployed = delegate (Zumwalt.Player param0, Entity param1) {
+            OnEntityDeployed = delegate(Zumwalt.Player param0, Entity param1)
+            {
             };
-            OnConsoleReceived = delegate (ref ConsoleSystem.Arg param0, bool param1) {
+            OnConsoleReceived = delegate(ref ConsoleSystem.Arg param0, bool param1)
+            {
             };
-            OnBlueprintUse = delegate (Zumwalt.Player param0, BPUseEvent param1) {
+            OnBlueprintUse = delegate(Zumwalt.Player param0, BPUseEvent param1)
+            {
             };
-            OnDoorUse = delegate (Zumwalt.Player param0, DoorEvent param1) {
+            OnDoorUse = delegate(Zumwalt.Player param0, DoorEvent param1)
+            {
             };
-            OnTablesLoaded = delegate (Dictionary<string, LootSpawnList> param0) {
+            OnTablesLoaded = delegate(Dictionary<string, LootSpawnList> param0)
+            {
             };
-            OnItemsLoaded = delegate (ItemsBlocks param0) {
+            OnItemsLoaded = delegate(ItemsBlocks param0)
+            {
             };
-            OnServerInit = delegate {
+            OnServerInit = delegate
+            {
             };
-            OnServerShutdown = delegate {
+            OnServerShutdown = delegate
+            {
             };
             foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
             {
@@ -699,7 +726,7 @@
                     {
                         if (talkerTimers.ContainsKey(p.userID))
                         {
-                            if ((Environment.TickCount - ((int) talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
+                            if ((Environment.TickCount - ((int)talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
                             {
                                 return;
                             }
@@ -714,6 +741,7 @@
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogException(ex);
                 }
             }
         }
@@ -766,4 +794,3 @@
         public delegate void ServerShutdownDelegate();
     }
 }
-

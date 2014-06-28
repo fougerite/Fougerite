@@ -18,7 +18,7 @@
             str = str.Trim();
             if ((ChatArguments == null) && !(str == ""))
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Kick Usage:   /kick \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Kick Usage:  /kick \"playerName\"");
             }
             else if (str != "")
             {
@@ -71,7 +71,7 @@
         {
             if (Core.kickWaitList.Contains(Arguments.argUser.userID))
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>) Core.kickWaitList[Arguments.argUser.userID];
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.kickWaitList[Arguments.argUser.userID];
                 string str = list[id];
                 if (id == 0)
                 {
@@ -103,4 +103,3 @@
         }
     }
 }
-

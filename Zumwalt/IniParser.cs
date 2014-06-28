@@ -171,7 +171,7 @@ public class IniParser
             {
                 if (pair2.Section == str3)
                 {
-                    str = (string) this.keyPairs[pair2];
+                    str = (string)this.keyPairs[pair2];
                     if (str != null)
                     {
                         str = "=" + str;
@@ -211,4 +211,3 @@ public class IniParser
         public string Key;
     }
 }
-

@@ -24,7 +24,8 @@
             this._timer.Elapsed += new ElapsedEventHandler(this._timer_Elapsed);
         }
 
-        public TimedEvent(string name, double interval, ParamsList args) : this(name, interval)
+        public TimedEvent(string name, double interval, ParamsList args)
+            : this(name, interval)
         {
             this.Args = args;
         }
@@ -102,4 +103,3 @@
         public delegate void TimedEventFireDelegate(string name);
     }
 }
-

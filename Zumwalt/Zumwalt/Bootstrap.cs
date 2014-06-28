@@ -18,11 +18,12 @@
             {
                 Bootstrap bootstrap = new Bootstrap();
                 new GameObject(bootstrap.GetType().FullName).AddComponent(bootstrap.GetType());
-                Debug.Log("Loaded: Zumwalt");
+                Logger.Log("Loaded: Zumwalt");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.Log("Error while loading Zumwalt!");
+                Logger.LogException(ex);
+                Logger.Log("Error while loading Zumwalt!");
             }
         }
 
@@ -33,6 +34,7 @@
 
         public void Start()
         {
+            Logger.Init();
             if (File.Exists(Util.GetServerFolder() + @"\ZumwaltDirectory.cfg"))
             {
                 Zumwalt.Data.PATH = new IniParser(Util.GetServerFolder() + @"\ZumwaltDirectory.cfg").GetSetting("Settings", "Directory");
@@ -50,7 +52,8 @@
                 System.Timers.Timer timer = new System.Timers.Timer();
                 timer.Interval = 30000.0;
                 timer.AutoReset = false;
-                timer.Elapsed += delegate (object x, ElapsedEventArgs y) {
+                timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                {
                     TimedEvents.startEvents();
                 };
                 TimedEvents.startEvents();

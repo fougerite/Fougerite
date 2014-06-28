@@ -71,9 +71,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "RemoveFlag Usage:   /unflag  flag1 flag2...");
+                Util.sayUser(Arguments.argUser.networkPlayer, "RemoveFlag Usage:  /unflag flag1 flag2...");
             }
         }
     }
 }
-

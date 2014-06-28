@@ -30,11 +30,10 @@
             }
             foreach (PlayerClient client in PlayerClient.FindAllWithString(displayName))
             {
-                string strValue = string.Concat(new object[] { "Location: X: ", (int) client.lastKnownPosition.x, " Y: ", (int) client.lastKnownPosition.y, " Z: ", (int) client.lastKnownPosition.z });
+                string strValue = string.Concat(new object[] { "Location: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z });
                 Arguments.ReplyWith(strValue);
-                Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { (str2 == "") ? "Your" : (displayName + "'s"), " Location Is: X: ", (int) client.lastKnownPosition.x, " Y: ", (int) client.lastKnownPosition.y, " Z: ", (int) client.lastKnownPosition.z }));
+                Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { (str2 == "") ? "Your" : (displayName + "'s"), " Location Is: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z }));
             }
         }
     }
 }
-

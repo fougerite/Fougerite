@@ -21,6 +21,7 @@
             }
             catch (Exception ex)
             {
+                Logger.LogException(ex);
             }
         }
 
@@ -33,15 +34,15 @@
             }
             try
             {
-                SleepingBag bag1 = (SleepingBag) obj;
+                SleepingBag bag1 = (SleepingBag)obj;
                 flag = false;
             }
-            catch (Exception ex)
+            catch
             {
                 try
                 {
                     ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
-                    ArrayList list = (ArrayList) command.GetSharedDoors()[obj.ownerID];
+                    ArrayList list = (ArrayList)command.GetSharedDoors()[obj.ownerID];
                     if (list == null)
                     {
                         return false;
@@ -66,7 +67,7 @@
             {
                 return (Core.config.GetSetting("Settings", "decay") == "false");
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -83,7 +84,7 @@
                     {
                         Helper.Log("StructDestroyed.txt", string.Concat(new object[] { e.attacker.client.netUser.displayName, " [", e.attacker.client.netUser.userID, "] destroyed (InstaKO) ", NetUser.FindByUserID(dep.ownerID).displayName, "'s ", dep.gameObject.name.Replace("(Clone)", "") }));
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         if (Core.userCache.ContainsKey(dep.ownerID))
                         {
@@ -97,7 +98,7 @@
                     dep.UpdateClientHealth();
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 dep.UpdateClientHealth();
             }
@@ -105,11 +106,11 @@
 
         public static bool IsFriend(ref DamageEvent e)
         {
-            GodModeCommand command = (GodModeCommand) ChatCommand.GetCommand("god");
+            GodModeCommand command = (GodModeCommand)ChatCommand.GetCommand("god");
             try
             {
-                FriendsCommand command2 = (FriendsCommand) ChatCommand.GetCommand("friends");
-                FriendList list = (FriendList) command2.GetFriendsLists()[e.attacker.userID];
+                FriendsCommand command2 = (FriendsCommand)ChatCommand.GetCommand("friends");
+                FriendList list = (FriendList)command2.GetFriendsLists()[e.attacker.userID];
                 if (Core.config.GetSetting("Settings", "friendly_fire") == "true")
                 {
                     return command.IsOn(e.victim.userID);
@@ -120,7 +121,7 @@
                 }
                 return (list.isFriendWith(e.victim.userID) || command.IsOn(e.victim.userID));
             }
-            catch (Exception ex)
+            catch
             {
                 return command.IsOn(e.victim.userID);
             }
@@ -132,7 +133,7 @@
             {
                 return (Core.config.GetSetting("Settings", "keepitems") == "true");
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -176,7 +177,7 @@
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
             }
             return true;
@@ -203,6 +204,7 @@
             }
             catch (Exception ex)
             {
+                Logger.LogException(ex);
             }
         }
 
@@ -220,11 +222,10 @@
                     sc.UpdateClientHealth();
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 sc.UpdateClientHealth();
             }
         }
     }
 }
-

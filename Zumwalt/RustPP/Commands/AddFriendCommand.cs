@@ -26,9 +26,10 @@
                     catch (Exception ex)
                     {
                         client = null;
+                        Logger.LogException(ex);
                     }
-                    FriendsCommand command = (FriendsCommand) ChatCommand.GetCommand("friends");
-                    FriendList list = (FriendList) command.GetFriendsLists()[Arguments.argUser.userID];
+                    FriendsCommand command = (FriendsCommand)ChatCommand.GetCommand("friends");
+                    FriendList list = (FriendList)command.GetFriendsLists()[Arguments.argUser.userID];
                     if (client == null)
                     {
                         Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + name);
@@ -59,9 +60,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:   /addfriend  \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:  /addfriend \"playerName\"");
             }
         }
     }
 }
-

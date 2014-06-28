@@ -45,9 +45,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Remove Admin Usage:   /unadmin \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Remove Admin Usage:  /unadmin \"playerName\"");
             }
         }
     }
 }
-

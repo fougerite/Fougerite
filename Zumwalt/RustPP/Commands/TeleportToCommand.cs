@@ -13,7 +13,7 @@
         {
             if (ChatArguments == null)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:   /tpto \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tpto \"playerName\"");
             }
             else
             {
@@ -25,7 +25,7 @@
                 str = str.Trim();
                 if (!(str != ""))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:   /tphere \"playerName\"");
+                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
                 }
                 else
                 {
@@ -73,7 +73,7 @@
         {
             if (tpWaitList.Contains(Arguments.argUser.userID))
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>) tpWaitList[Arguments.argUser.userID];
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)tpWaitList[Arguments.argUser.userID];
                 string str = list[choice];
                 if (choice == 0)
                 {
@@ -97,4 +97,3 @@
         }
     }
 }
-

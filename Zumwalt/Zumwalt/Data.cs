@@ -19,7 +19,7 @@
         [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
         {
-            Hashtable hashtable = (Hashtable) DataStore.GetInstance().datastore[tablename];
+            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
                 hashtable = new Hashtable();
@@ -37,7 +37,7 @@
 
         public string GetConfigValue(string config, string section, string key)
         {
-            IniParser parser = (IniParser) inifiles[config.ToLower()];
+            IniParser parser = (IniParser)inifiles[config.ToLower()];
             if (parser == null)
             {
                 return "Config does not exist";
@@ -58,7 +58,7 @@
         {
             if (inifiles.ContainsKey("rust++"))
             {
-                return (IniParser) inifiles["rust++"];
+                return (IniParser)inifiles["rust++"];
             }
             return null;
         }
@@ -66,7 +66,7 @@
         [Obsolete("Replaced with DataStore.Get", false)]
         public object GetTableValue(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable) DataStore.GetInstance().datastore[tablename];
+            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
                 return null;
@@ -98,16 +98,16 @@
                     inifiles.Add(key, new IniParser(path));
                     if (key == "rust++")
                     {
-                        Core.config = (IniParser) inifiles["rust++"];
+                        Core.config = (IniParser)inifiles["rust++"];
                     }
-                    UnityEngine.Debug.Log("Loaded Config: " + key);
+                    Logger.Log("Loaded Config: " + key);
                 }
             }
         }
 
         public void OverrideConfig(string config, string section, string key, string value)
         {
-            IniParser parser = (IniParser) inifiles[config.ToLower()];
+            IniParser parser = (IniParser)inifiles[config.ToLower()];
             if (parser != null)
             {
                 parser.SetSetting(section, key, value);
@@ -145,4 +145,3 @@
         }
     }
 }
-

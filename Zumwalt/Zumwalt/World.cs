@@ -77,7 +77,7 @@
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Description: " + block.itemDescriptionOverride + "\n");
                 if (block is BulletWeaponDataBlock)
                 {
-                    BulletWeaponDataBlock block2 = (BulletWeaponDataBlock) block;
+                    BulletWeaponDataBlock block2 = (BulletWeaponDataBlock)block;
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Min Damage: " + block2.damageMin + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Max Damage: " + block2.damageMax + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Ammo: " + block2.ammoType.ToString() + "\n");
@@ -308,4 +308,3 @@
         }
     }
 }
-

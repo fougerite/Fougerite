@@ -45,9 +45,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "AddAdmin Usage:   /addadmin \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "AddAdmin Usage:  /addadmin \"playerName\"");
             }
         }
     }
 }
-

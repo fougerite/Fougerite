@@ -26,9 +26,10 @@
                     catch (Exception ex)
                     {
                         client = null;
+                        Logger.LogException(ex);
                     }
-                    FriendsCommand command = (FriendsCommand) ChatCommand.GetCommand("friends");
-                    FriendList list = (FriendList) command.GetFriendsLists()[Arguments.argUser.userID];
+                    FriendsCommand command = (FriendsCommand)ChatCommand.GetCommand("friends");
+                    FriendList list = (FriendList)command.GetFriendsLists()[Arguments.argUser.userID];
                     if (list != null)
                     {
                         string realName;
@@ -70,9 +71,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:   /unfriend \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:  /unfriend \"playerName\"");
             }
         }
     }
 }
-

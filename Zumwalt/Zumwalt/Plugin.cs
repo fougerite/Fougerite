@@ -48,9 +48,9 @@
                 File.WriteAllText(path, "");
                 return new IniParser(path);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                UnityEngine.Debug.Log(exception.ToString());
+                Logger.LogException(ex);
             }
             return null;
         }
@@ -60,7 +60,7 @@
             TimedEvent timer = this.GetTimer(name);
             if (timer == null)
             {
-                timer = new TimedEvent(name, (double) timeoutDelay);
+                timer = new TimedEvent(name, (double)timeoutDelay);
                 timer.OnFire += new TimedEvent.TimedEventFireDelegate(this.OnTimerCB);
                 this.timers.Add(timer);
                 return timer;
@@ -142,8 +142,8 @@
 
         public long GetTimestamp()
         {
-            TimeSpan span = (TimeSpan) (DateTime.UtcNow - new DateTime(0x7b2, 1, 1, 0, 0, 0));
-            return (long) span.TotalSeconds;
+            TimeSpan span = (TimeSpan)(DateTime.UtcNow - new DateTime(0x7b2, 1, 1, 0, 0, 0));
+            return (long)span.TotalSeconds;
         }
 
         public bool IniExists(string name)
@@ -174,9 +174,10 @@
                     PluginEngine.GetPluginEngine().Interpreter.CallFunction(name, new object[0]);
                 }
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Console.Write("Error invoking function: " + name + "\nFrom: " + this.path + "\n\n" + exception.ToString());
+                Logger.LogError("Error invoking function: " + name + "\nFrom: " + this.path + "\n\n" + ex.ToString());
+                Logger.LogException(ex);
             }
         }
 
@@ -377,4 +378,3 @@
         }
     }
 }
-

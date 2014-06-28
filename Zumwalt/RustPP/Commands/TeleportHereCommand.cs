@@ -10,7 +10,7 @@
         {
             if (ChatArguments == null)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:   /tphere \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
             }
             else
             {
@@ -22,7 +22,7 @@
                 str = str.Trim();
                 if (!(str != ""))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:   /tphere \"playerName\"");
+                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
                 }
                 else
                 {
@@ -72,4 +72,3 @@
         }
     }
 }
-

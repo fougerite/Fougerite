@@ -18,7 +18,7 @@
             str = str.Trim();
             if ((ChatArguments == null) && !(str == ""))
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Ban Usage:   /ban \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Ban Usage:  /ban \"playerName\"");
             }
             else if (str != "")
             {
@@ -74,7 +74,7 @@
         {
             if (Core.banWaitList.Contains(Arguments.argUser.userID))
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>) Core.banWaitList[Arguments.argUser.userID];
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.banWaitList[Arguments.argUser.userID];
                 string str = list[id];
                 if (id == 0)
                 {
@@ -106,4 +106,3 @@
         }
     }
 }
-

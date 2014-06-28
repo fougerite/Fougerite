@@ -34,9 +34,9 @@
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogException(ex);
                 }
             }
         }
     }
 }
-

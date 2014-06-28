@@ -36,9 +36,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Unban Usage:   /unban \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Unban Usage:  /unban \"playerName\"");
             }
         }
     }
 }
-

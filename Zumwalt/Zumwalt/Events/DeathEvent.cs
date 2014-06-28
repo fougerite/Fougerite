@@ -6,7 +6,8 @@
     {
         private bool _drop;
 
-        public DeathEvent(ref DamageEvent d) : base(ref d)
+        public DeathEvent(ref DamageEvent d)
+            : base(ref d)
         {
             this.DropItems = true;
         }
@@ -24,4 +25,3 @@
         }
     }
 }
-

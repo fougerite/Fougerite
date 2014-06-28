@@ -29,8 +29,8 @@
                                 Util.sayUser(Arguments.argUser.networkPlayer, "Why would you unshare with yourself?");
                                 return;
                             }
-                            ShareCommand command = (ShareCommand) ChatCommand.GetCommand("share");
-                            ArrayList list = (ArrayList) command.GetSharedDoors()[num3];
+                            ShareCommand command = (ShareCommand)ChatCommand.GetCommand("share");
+                            ArrayList list = (ArrayList)command.GetSharedDoors()[num3];
                             if ((list != null) && list.Contains(userID))
                             {
                                 list.Remove(userID);
@@ -45,9 +45,8 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:   /unshare \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:  /unshare \"playerName\"");
             }
         }
     }
 }
-

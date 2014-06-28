@@ -133,7 +133,7 @@
             FileStream stream = new FileStream(path, FileMode.Open);
             StreamReader reader = new StreamReader(stream);
             BinaryFormatter formatter = new BinaryFormatter();
-            return (Hashtable) formatter.Deserialize(reader.BaseStream);
+            return (Hashtable)formatter.Deserialize(reader.BaseStream);
         }
 
         public static void HashtableToFile(Hashtable ht, string path)
@@ -146,7 +146,7 @@
 
         public Vector3 Infront(Zumwalt.Player p, float length)
         {
-            return (p.PlayerClient.controllable.transform.position + ((Vector3) (p.PlayerClient.controllable.transform.forward * length)));
+            return (p.PlayerClient.controllable.transform.position + ((Vector3)(p.PlayerClient.controllable.transform.forward * length)));
         }
 
         public object InvokeStatic(string className, string method, ParamsList args)
@@ -176,7 +176,7 @@
 
         public void Log(string str)
         {
-            UnityEngine.Debug.Log(str);
+            Logger.Log(str);
         }
 
         public Match Regex(string input, string match)
@@ -253,4 +253,3 @@
         }
     }
 }
-

@@ -261,10 +261,45 @@
         {
             Entity e = new Entity(entity);
             Zumwalt.Player creator = e.Creator;
+
+            if (Core.IsEnabled() && Core.config.GetSetting("Settings", "rampfix") == "true")
+                RampFix(e, creator);
+
             if (OnEntityDeployed != null)
-            {
                 OnEntityDeployed(creator, e);
-            }
+        }
+
+        private static void RampFix(Entity e, Player creator) // by dretax14 (RampFix plugin)
+        {
+            if (e != null)
+                if (e.Name == "WoodRamp" || e.Name == "MetalRamp")
+                {
+                    var name = e.Name;
+                    foreach (Entity ent in World.GetWorld().Entities)
+                    {
+                        if (ent.Name == "WoodRamp" || ent.Name == "MetalRamp")
+                        {
+                            var one = Util.GetUtil().CreateVector(ent.X, ent.Y, ent.Z);
+                            var two = Util.GetUtil().CreateVector(e.X, e.Y, e.Z);
+                            var dist = Util.GetUtil().GetVectorsDistance(one, two);
+                            if (e != ent && e.InstanceID != ent.InstanceID)
+                                if (dist == 0)
+                                {
+                                    if (Core.config.GetSetting("Settings", "rampgiveback") == "true" && creator != null)
+                                    {
+                                        if (name == "WoodRamp")
+                                            name = "Wood Ramp";
+                                        else if (name == "MetalRamp")
+                                            name = "Metal Ramp";
+
+                                        // Make sure that the player is online
+                                        creator.Inventory.AddItem(name, 1);
+                                    }
+                                    e.Destroy();
+                                }
+                        }
+                    }
+                }
         }
 
         public static void EntityHurt(object entity, ref DamageEvent e)

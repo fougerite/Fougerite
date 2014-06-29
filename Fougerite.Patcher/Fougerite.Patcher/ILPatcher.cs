@@ -23,14 +23,6 @@
             }
         }
 
-        private void AccessPatch()
-        {
-            TypeDefinition type = rustAssembly.MainModule.GetType("Character");
-            MethodDefinition onDestroy = type.GetMethod ("OnDestroy");
-            onDestroy.IsPublic = true;
-            onDestroy.IsPrivate = false;
-        }
-
         private void AntiDecay()
         {
             TypeDefinition type = rustAssembly.MainModule.GetType("EnvDecay");

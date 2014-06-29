@@ -69,14 +69,14 @@
             }
             catch (Exception ex)
             {
-                Zumwalt.Logger.LogException(ex);
+                Fougerite.Logger.LogException(ex);
                 throw;
             }
         }
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Zumwalt\Rust++\" + fileName);
+            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Fougerite\Rust++\" + fileName);
         }
 
         public static void Log(string logName, string msg)

@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -8,7 +8,7 @@
     {
         public Hashtable datastore = new Hashtable();
         private static DataStore instance;
-        public static string PATH = (Util.GetServerFolder() + @"..\save\ZumwaltDatastore.ds");
+        public static string PATH = (Util.GetServerFolder() + @"..\save\FougeriteDatastore.ds");
 
         public void Add(string tablename, object key, object val)
         {
@@ -127,7 +127,7 @@
                 {
                     Hashtable hashtable = Util.HashtableFromFile(PATH);
                     this.datastore = hashtable;
-                    Util.GetUtil().ConsoleLog("Zumwalt DataStore Loaded", false);
+                    Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
                 }
                 catch (Exception ex)
                 {
@@ -150,7 +150,7 @@
             if (this.datastore.Count != 0)
             {
                 Util.HashtableToFile(this.datastore, PATH);
-                Util.GetUtil().ConsoleLog("Zumwalt DataStore Saved", false);
+                Util.GetUtil().ConsoleLog("Fougerite DataStore Saved", false);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace RustPP.Commands
 {
-    using Zumwalt;
+    using Fougerite;
     using RustPP;
     using RustPP.Permissions;
     using System;
@@ -11,8 +11,8 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            Zumwalt.Data.GetData().Load();
-            Core.config = Zumwalt.Data.GetData().GetRPPConfig();
+            Fougerite.Data.GetData().Load();
+            Core.config = Fougerite.Data.GetData().GetRPPConfig();
             TimedEvents.startEvents();
             if (File.Exists(Helper.GetAbsoluteFilePath("admins.xml")))
             {

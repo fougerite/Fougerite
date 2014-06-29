@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch;
     using Rust.Steam;
@@ -18,12 +18,12 @@
             {
                 Bootstrap bootstrap = new Bootstrap();
                 new GameObject(bootstrap.GetType().FullName).AddComponent(bootstrap.GetType());
-                Logger.Log("Loaded: Zumwalt");
+                Logger.Log("Loaded: Fougerite");
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
-                Logger.Log("Error while loading Zumwalt!");
+                Logger.Log("Error while loading Fougerite!");
             }
         }
 
@@ -35,18 +35,18 @@
         public void Start()
         {
             Logger.Init();
-            if (File.Exists(Util.GetServerFolder() + @"\ZumwaltDirectory.cfg"))
+            if (File.Exists(Util.GetServerFolder() + @"\FougeriteDirectory.cfg"))
             {
-                Zumwalt.Data.PATH = new IniParser(Util.GetServerFolder() + @"\ZumwaltDirectory.cfg").GetSetting("Settings", "Directory");
+                Fougerite.Data.PATH = new IniParser(Util.GetServerFolder() + @"\FougeriteDirectory.cfg").GetSetting("Settings", "Directory");
             }
             else
             {
-                Zumwalt.Data.PATH = Util.GetRootFolder() + @"\save\Zumwalt\";
+                Fougerite.Data.PATH = Util.GetRootFolder() + @"\save\Fougerite\";
             }
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
             PluginEngine.GetPluginEngine();
-            Core.config = Zumwalt.Data.GetData().GetRPPConfig();
+            Core.config = Fougerite.Data.GetData().GetRPPConfig();
             if ((Core.config != null) && Core.IsEnabled())
             {
                 System.Timers.Timer timer = new System.Timers.Timer();
@@ -59,7 +59,7 @@
                 TimedEvents.startEvents();
                 timer.Start();
             }
-            Zumwalt.Hooks.ServerStarted();
+            Fougerite.Hooks.ServerStarted();
         }
     }
 }

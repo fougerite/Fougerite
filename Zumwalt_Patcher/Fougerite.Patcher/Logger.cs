@@ -1,4 +1,4 @@
-﻿namespace Zumwalt_Patcher
+﻿namespace Fougerite_Patcher
 {
   using System;
   using System.IO;

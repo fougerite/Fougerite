@@ -1,7 +1,7 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
-    using Zumwalt.Events;
+    using Fougerite.Events;
     using Rust;
     using System;
     using System.Runtime.InteropServices;
@@ -38,9 +38,9 @@
             }
         }
 
-        public Zumwalt.Player Find(string search)
+        public Fougerite.Player Find(string search)
         {
-            Zumwalt.Player player = FindBySteamID(search);
+            Fougerite.Player player = FindBySteamID(search);
             if (player != null)
             {
                 return player;
@@ -58,9 +58,9 @@
             return null;
         }
 
-        public static Zumwalt.Player FindByGameID(string uid)
+        public static Fougerite.Player FindByGameID(string uid)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (player.GameID == uid)
                 {
@@ -70,9 +70,9 @@
             return null;
         }
 
-        public static Zumwalt.Player FindByName(string name)
+        public static Fougerite.Player FindByName(string name)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (player.Name == name)
                 {
@@ -82,9 +82,9 @@
             return null;
         }
 
-        public static Zumwalt.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
+        public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (player.ourPlayer.netPlayer == np)
                 {
@@ -94,9 +94,9 @@
             return null;
         }
 
-        public static Zumwalt.Player FindByPlayerClient(PlayerClient pc)
+        public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (player.PlayerClient == pc)
                 {
@@ -106,9 +106,9 @@
             return null;
         }
 
-        public static Zumwalt.Player FindBySteamID(string uid)
+        public static Fougerite.Player FindBySteamID(string uid)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (player.SteamID == uid)
                 {
@@ -127,7 +127,7 @@
         {
             try
             {
-                Zumwalt.Player victim = de.Victim as Zumwalt.Player;
+                Fougerite.Player victim = de.Victim as Fougerite.Player;
                 if (victim.GameID == this.GameID)
                 {
                     this.justDied = true;
@@ -152,7 +152,7 @@
 
         public void Message(string arg)
         {
-            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void MessageFrom(string playername, string arg)
@@ -175,7 +175,7 @@
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void TeleportTo(Zumwalt.Player p)
+        public void TeleportTo(Fougerite.Player p)
         {
             this.TeleportTo(p.X, p.Y, p.Z);
         }

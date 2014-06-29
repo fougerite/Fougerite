@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using System;
     using System.Net;

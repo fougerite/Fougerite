@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Zumwalt_Patcher
+namespace Fougerite_Patcher
 {
     internal class Program
     {

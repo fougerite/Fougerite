@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch;
     using System;
@@ -37,12 +37,12 @@
             }
         }
 
-        public void AirdropAtPlayer(Zumwalt.Player p)
+        public void AirdropAtPlayer(Fougerite.Player p)
         {
             this.AirdropAtPlayer(p, 1);
         }
 
-        public void AirdropAtPlayer(Zumwalt.Player p, int rep)
+        public void AirdropAtPlayer(Fougerite.Player p, int rep)
         {
             for (int i = 0; i < rep; i++)
             {
@@ -100,17 +100,17 @@
             }
         }
 
-        public StructureMaster CreateSM(Zumwalt.Player p)
+        public StructureMaster CreateSM(Fougerite.Player p)
         {
             return this.CreateSM(p, p.X, p.Y, p.Z, p.PlayerClient.transform.rotation);
         }
 
-        public StructureMaster CreateSM(Zumwalt.Player p, float x, float y, float z)
+        public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z)
         {
             return this.CreateSM(p, x, y, z, Quaternion.identity);
         }
 
-        public StructureMaster CreateSM(Zumwalt.Player p, float x, float y, float z, Quaternion rot)
+        public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z, Quaternion rot)
         {
             StructureMaster master = NetCull.InstantiateClassic<StructureMaster>(Bundling.Load<StructureMaster>("content/structures/StructureMasterPrefab"), new Vector3(x, y, z), rot, 0);
             master.SetupCreator(p.PlayerClient.controllable);
@@ -244,12 +244,12 @@
             return this.Spawn(prefab, new Vector3(x, y, z), rot, rep);
         }
 
-        public object SpawnAtPlayer(string prefab, Zumwalt.Player p)
+        public object SpawnAtPlayer(string prefab, Fougerite.Player p)
         {
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, 1);
         }
 
-        public object SpawnAtPlayer(string prefab, Zumwalt.Player p, int rep)
+        public object SpawnAtPlayer(string prefab, Fougerite.Player p, int rep)
         {
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, rep);
         }

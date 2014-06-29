@@ -1,6 +1,6 @@
 ﻿namespace RustPP.Commands
 {
-    using Zumwalt;
+    using Fougerite;
     using RustPP.Permissions;
     using System;
 

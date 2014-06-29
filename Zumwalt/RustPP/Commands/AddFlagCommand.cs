@@ -1,7 +1,7 @@
 ﻿namespace RustPP.Commands
 {
     using Facepunch.Utility;
-    using Zumwalt;
+    using Fougerite;
     using RustPP.Permissions;
     using System;
 

@@ -1,6 +1,6 @@
 ﻿namespace RustPP.Commands
 {
-    using Zumwalt;
+    using Fougerite;
     using RustPP;
     using System;
 
@@ -10,10 +10,10 @@
         {
             for (int i = 1 + int.Parse(Core.config.GetSetting("Settings", "chat_history_amount")); i > 0; i--)
             {
-                if (Zumwalt.Data.GetData().chat_history_username.Count >= i)
+                if (Fougerite.Data.GetData().chat_history_username.Count >= i)
                 {
-                    string playername = Zumwalt.Data.GetData().chat_history_username[Zumwalt.Data.GetData().chat_history_username.Count - i];
-                    string arg = Zumwalt.Data.GetData().chat_history[Zumwalt.Data.GetData().chat_history.Count - i];
+                    string playername = Fougerite.Data.GetData().chat_history_username[Fougerite.Data.GetData().chat_history_username.Count - i];
+                    string arg = Fougerite.Data.GetData().chat_history[Fougerite.Data.GetData().chat_history.Count - i];
                     if (playername != null)
                     {
                         Util.say(Arguments.argUser.networkPlayer, playername, arg);

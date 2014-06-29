@@ -1,6 +1,6 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
-    using Zumwalt.Events;
+    using Fougerite.Events;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -26,7 +26,7 @@
                 return false;
             }
             string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Zumwalt.Data.PATH + str + @"\" + name;
+            string path = Fougerite.Data.PATH + str + @"\" + name;
             if (Directory.Exists(path))
             {
                 return false;
@@ -44,7 +44,7 @@
                     return null;
                 }
                 string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-                string path = Zumwalt.Data.PATH + str + @"\" + name + ".ini";
+                string path = Fougerite.Data.PATH + str + @"\" + name + ".ini";
                 File.WriteAllText(path, "");
                 return new IniParser(path);
             }
@@ -80,7 +80,7 @@
         public void DeleteLog(string file)
         {
             string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Zumwalt.Data.PATH + str + @"\" + file + ".ini";
+            string path = Fougerite.Data.PATH + str + @"\" + file + ".ini";
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -97,7 +97,7 @@
             if (!name.Contains(".."))
             {
                 string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-                string path = Zumwalt.Data.PATH + str + @"\" + name + ".ini";
+                string path = Fougerite.Data.PATH + str + @"\" + name + ".ini";
                 if (File.Exists(path))
                 {
                     return new IniParser(path);
@@ -109,7 +109,7 @@
         public System.Collections.Generic.List<IniParser> GetInis(string name)
         {
             string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Zumwalt.Data.PATH + str + @"\" + name;
+            string path = Fougerite.Data.PATH + str + @"\" + name;
             System.Collections.Generic.List<IniParser> list = new System.Collections.Generic.List<IniParser>();
             foreach (string str3 in Directory.GetFiles(path))
             {
@@ -149,7 +149,7 @@
         public bool IniExists(string name)
         {
             string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            return File.Exists(Zumwalt.Data.PATH + str + @"\" + name + ".ini");
+            return File.Exists(Fougerite.Data.PATH + str + @"\" + name + ".ini");
         }
 
         private void Invoke(string name, params object[] obj)
@@ -157,8 +157,8 @@
             try
             {
                 PluginEngine.GetPluginEngine().Interpreter.Run(this.Code);
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Server", Zumwalt.Server.GetServer());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Data", Zumwalt.Data.GetData());
+                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Server", Fougerite.Server.GetServer());
+                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Data", Fougerite.Data.GetData());
                 PluginEngine.GetPluginEngine().Interpreter.SetParameter("DataStore", DataStore.GetInstance());
                 PluginEngine.GetPluginEngine().Interpreter.SetParameter("Util", Util.GetUtil());
                 PluginEngine.GetPluginEngine().Interpreter.SetParameter("Web", new Web());
@@ -203,20 +203,20 @@
         public void Log(string file, string text)
         {
             string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            File.AppendAllText(Zumwalt.Data.PATH + str + @"\" + file + ".ini", "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + text + "\r\n");
+            File.AppendAllText(Fougerite.Data.PATH + str + @"\" + file + ".ini", "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + text + "\r\n");
         }
 
-        public void OnBlueprintUse(Zumwalt.Player p, BPUseEvent ae)
+        public void OnBlueprintUse(Fougerite.Player p, BPUseEvent ae)
         {
             this.Invoke("On_BlueprintUse", new object[] { p, ae });
         }
 
-        public void OnChat(Zumwalt.Player player, ref ChatString text)
+        public void OnChat(Fougerite.Player player, ref ChatString text)
         {
             this.Invoke("On_Chat", new object[] { player, text });
         }
 
-        public void OnCommand(Zumwalt.Player player, string command, string[] args)
+        public void OnCommand(Fougerite.Player player, string command, string[] args)
         {
             this.Invoke("On_Command", new object[] { player, command, args });
         }
@@ -225,7 +225,7 @@
         {
             if (!external)
             {
-                this.Invoke("On_Console", new object[] { Zumwalt.Player.FindByPlayerClient(arg.argUser.playerClient), arg });
+                this.Invoke("On_Console", new object[] { Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), arg });
             }
             else
             {
@@ -235,7 +235,7 @@
             }
         }
 
-        public void OnDoorUse(Zumwalt.Player p, DoorEvent de)
+        public void OnDoorUse(Fougerite.Player p, DoorEvent de)
         {
             this.Invoke("On_DoorUse", new object[] { p, de });
         }
@@ -245,7 +245,7 @@
             this.Invoke("On_EntityDecay", new object[] { de });
         }
 
-        public void OnEntityDeployed(Zumwalt.Player p, Entity e)
+        public void OnEntityDeployed(Fougerite.Player p, Entity e)
         {
             this.Invoke("On_EntityDeployed", new object[] { p, e });
         }
@@ -270,17 +270,17 @@
             this.Invoke("On_NPCKilled", new object[] { de });
         }
 
-        public void OnPlayerConnected(Zumwalt.Player player)
+        public void OnPlayerConnected(Fougerite.Player player)
         {
             this.Invoke("On_PlayerConnected", new object[] { player });
         }
 
-        public void OnPlayerDisconnected(Zumwalt.Player player)
+        public void OnPlayerDisconnected(Fougerite.Player player)
         {
             this.Invoke("On_PlayerDisconnected", new object[] { player });
         }
 
-        public void OnPlayerGathering(Zumwalt.Player p, GatherEvent ge)
+        public void OnPlayerGathering(Fougerite.Player p, GatherEvent ge)
         {
             this.Invoke("On_PlayerGathering", new object[] { p, ge });
         }
@@ -295,12 +295,12 @@
             this.Invoke("On_PlayerKilled", new object[] { de });
         }
 
-        public void OnPlayerSpawn(Zumwalt.Player p, SpawnEvent se)
+        public void OnPlayerSpawn(Fougerite.Player p, SpawnEvent se)
         {
             this.Invoke("On_PlayerSpawning", new object[] { p, se });
         }
 
-        public void OnPlayerSpawned(Zumwalt.Player p, SpawnEvent se)
+        public void OnPlayerSpawned(Fougerite.Player p, SpawnEvent se)
         {
             this.Invoke("On_PlayerSpawned", new object[] { p, se });
         }

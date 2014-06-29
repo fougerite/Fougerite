@@ -1,4 +1,4 @@
-﻿// Assembly Zumwalt, Version 1.0.5193.6246
+﻿// Assembly Fougerite, Version 1.0.5193.6246
 
 [assembly: System.Reflection.AssemblyTrademark("")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
@@ -9,7 +9,7 @@
 [assembly: System.Diagnostics.Debuggable(System.Diagnostics.DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
 [assembly: System.Runtime.CompilerServices.CompilationRelaxations(8)]
 [assembly: System.Reflection.AssemblyDescription("")]
-[assembly: System.Reflection.AssemblyTitle("Zumwalt")]
+[assembly: System.Reflection.AssemblyTitle("Fougerite")]
 [assembly: System.Reflection.AssemblyConfiguration("")]
 [assembly: System.Reflection.AssemblyCompany("")]
-[assembly: System.Reflection.AssemblyProduct("Zumwalt")]
+[assembly: System.Reflection.AssemblyProduct("Fougerite")]

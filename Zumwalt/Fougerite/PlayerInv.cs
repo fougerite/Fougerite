@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using System;
 
@@ -8,9 +8,9 @@
         private PlayerItem[] _barItems;
         private Inventory _inv;
         private PlayerItem[] _items;
-        private Zumwalt.Player player;
+        private Fougerite.Player player;
 
-        public PlayerInv(Zumwalt.Player player)
+        public PlayerInv(Fougerite.Player player)
         {
             this.player = player;
             this._inv = player.PlayerClient.controllable.GetComponent<Inventory>();

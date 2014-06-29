@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace Zumwalt
+namespace Fougerite
 {
     public static class Logger
     {

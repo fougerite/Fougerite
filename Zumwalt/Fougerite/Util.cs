@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
     using System;
@@ -19,7 +19,7 @@
 
         public void ConsoleLog(string str, [Optional, DefaultParameterValue(false)] bool adminOnly)
         {
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 if (!adminOnly)
                 {
@@ -77,12 +77,12 @@
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            return (GetZumwaltFolder() + fileName);
+            return (GetFougeriteFolder() + fileName);
         }
 
-        public static string GetZumwaltFolder()
+        public static string GetFougeriteFolder()
         {
-            return Zumwalt.Data.PATH;
+            return Fougerite.Data.PATH;
         }
 
         public static string GetRootFolder()
@@ -144,7 +144,7 @@
             formatter.Serialize(writer.BaseStream, ht);
         }
 
-        public Vector3 Infront(Zumwalt.Player p, float length)
+        public Vector3 Infront(Fougerite.Player p, float length)
         {
             return (p.PlayerClient.controllable.transform.position + ((Vector3)(p.PlayerClient.controllable.transform.forward * length)));
         }
@@ -206,12 +206,12 @@
 
         public static void sayAll(string arg)
         {
-            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Zumwalt.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)

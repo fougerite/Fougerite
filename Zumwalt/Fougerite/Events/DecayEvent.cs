@@ -1,14 +1,14 @@
-﻿namespace Zumwalt.Events
+﻿namespace Fougerite.Events
 {
-    using Zumwalt;
+    using Fougerite;
     using System;
 
     public class DecayEvent
     {
         private float _dmg;
-        private Zumwalt.Entity _ent;
+        private Fougerite.Entity _ent;
 
-        public DecayEvent(Zumwalt.Entity en, ref float dmg)
+        public DecayEvent(Fougerite.Entity en, ref float dmg)
         {
             this.Entity = en;
             this.DamageAmount = dmg;
@@ -26,7 +26,7 @@
             }
         }
 
-        public Zumwalt.Entity Entity
+        public Fougerite.Entity Entity
         {
             get
             {

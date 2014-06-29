@@ -1,4 +1,4 @@
-﻿namespace Zumwalt_Patcher
+﻿namespace Fougerite_Patcher
 {
     using Mono.Cecil;
     using Mono.Cecil.Cil;
@@ -7,7 +7,7 @@
     public class ILPatcher
     {
         private AssemblyDefinition rustAssembly = null;
-        private AssemblyDefinition zumwaltAssembly = null;
+        private AssemblyDefinition fougeriteAssembly = null;
         private TypeDefinition hooksClass = null;
 
         public ILPatcher()
@@ -65,9 +65,9 @@
 
         private void BootstrapAttachPatch()
         {
-            TypeDefinition zumwaltBootstrap = zumwaltAssembly.MainModule.GetType("Zumwalt.Bootstrap");
+            TypeDefinition fougeriteBootstrap = zumwaltAssembly.MainModule.GetType("Fougerite.Bootstrap");
             TypeDefinition serverInit = rustAssembly.MainModule.GetType("ServerInit");
-            MethodDefinition attachBootstrap = zumwaltBootstrap.GetMethod("AttachBootstrap");
+            MethodDefinition attachBootstrap = fougeriteBootstrap.GetMethod("AttachBootstrap");
             MethodDefinition awake = serverInit.GetMethod("Awake");
 
             awake.Body.GetILProcessor().InsertAfter(awake.Body.Instructions[0x74], Instruction.Create(OpCodes.Call, this.rustAssembly.MainModule.Import(attachBootstrap)));
@@ -412,7 +412,7 @@
             {
                 bool flag = true;
 
-                if (rustAssembly.MainModule.GetType("Zumwalt_Patched_FirstPass") != null)
+                if (rustAssembly.MainModule.GetType("Fougerite_Patched_FirstPass") != null)
                 {
                     Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
                     return false;
@@ -431,13 +431,13 @@
                 try
                 {
                     TypeReference type = AssemblyDefinition.ReadAssembly("mscorlib.dll").MainModule.GetType("System.String");
-                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched_FirstPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
+                    TypeDefinition item = new TypeDefinition("", "Fougerite_Patched_FirstPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
                     rustAssembly.MainModule.Types.Add(item);
                     TypeReference fieldType = rustAssembly.MainModule.Import(type);
                     FieldDefinition definition3 = new FieldDefinition("Version", FieldAttributes.CompilerControlled | FieldAttributes.FamANDAssem | FieldAttributes.Family, fieldType);
                     definition3.HasConstant = true;
                     definition3.Constant = Program.Version;
-                    rustAssembly.MainModule.GetType("Zumwalt_Patched_FirstPass").Fields.Add(definition3);
+                    rustAssembly.MainModule.GetType("Fougerite_Patched_FirstPass").Fields.Add(definition3);
                     rustAssembly.Write("Assembly-CSharp.dll");
                 }
                 catch (Exception ex)
@@ -460,11 +460,11 @@
             {
                 bool flag = true;
 
-                zumwaltAssembly = AssemblyDefinition.ReadAssembly("Zumwalt.dll");
-                hooksClass = zumwaltAssembly.MainModule.GetType("Zumwalt.Hooks");
+                fougeriteAssembly = AssemblyDefinition.ReadAssembly("Fougerite.dll");
+                hooksClass = fougeriteAssembly.MainModule.GetType("Fougerite.Hooks");
 
 
-                if (rustAssembly.MainModule.GetType("Zumwalt_Patched_SecondPass") != null)
+                if (rustAssembly.MainModule.GetType("Fougerite_Patched_SecondPass") != null)
                 {
                     Logger.Log("Assembly-CSharp.dll is already patched, please use a clean library.");
                     return false;
@@ -503,13 +503,13 @@
                 try
                 {
                     TypeReference type = AssemblyDefinition.ReadAssembly("mscorlib.dll").MainModule.GetType("System.String");
-                    TypeDefinition item = new TypeDefinition("", "Zumwalt_Patched_SecondPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
+                    TypeDefinition item = new TypeDefinition("", "Fougerite_Patched_SecondPass", TypeAttributes.AnsiClass | TypeAttributes.Public);
                     rustAssembly.MainModule.Types.Add(item);
                     TypeReference fieldType = rustAssembly.MainModule.Import(type);
                     FieldDefinition definition3 = new FieldDefinition("Version", FieldAttributes.CompilerControlled | FieldAttributes.FamANDAssem | FieldAttributes.Family, fieldType);
                     definition3.HasConstant = true;
                     definition3.Constant = Program.Version;
-                    rustAssembly.MainModule.GetType("Zumwalt_Patched_SecondPass").Fields.Add(definition3);
+                    rustAssembly.MainModule.GetType("Fougerite_Patched_SecondPass").Fields.Add(definition3);
                     rustAssembly.Write("Assembly-CSharp.dll");
                 }
                 catch (Exception ex)

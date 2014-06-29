@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
     using RustPP;
@@ -11,9 +11,9 @@
     {
         public System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
-        private static Zumwalt.Data data;
+        private static Fougerite.Data data;
         public static Hashtable inifiles = new Hashtable();
-        public Hashtable Zumwalt_shared_data = new Hashtable();
+        public Hashtable Fougerite_shared_data = new Hashtable();
         public static string PATH;
 
         [Obsolete("Replaced with DataStore.Add", false)]
@@ -45,11 +45,11 @@
             return parser.GetSetting(section, key);
         }
 
-        public static Zumwalt.Data GetData()
+        public static Fougerite.Data GetData()
         {
             if (data == null)
             {
-                data = new Zumwalt.Data();
+                data = new Fougerite.Data();
             }
             return data;
         }

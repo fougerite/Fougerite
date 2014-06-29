@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@
             this.Object = Obj;
         }
 
-        public void ChangeOwner(Zumwalt.Player p)
+        public void ChangeOwner(Fougerite.Player p)
         {
             if (this.IsDeployableObject())
             {
@@ -111,11 +111,11 @@
             }
         }
 
-        public Zumwalt.Player Creator
+        public Fougerite.Player Creator
         {
             get
             {
-                return Zumwalt.Player.FindByGameID(this.CreatorID.ToString());
+                return Fougerite.Player.FindByGameID(this.CreatorID.ToString());
             }
         }
 
@@ -206,11 +206,11 @@
             }
         }
 
-        public Zumwalt.Player Owner
+        public Fougerite.Player Owner
         {
             get
             {
-                return Zumwalt.Player.FindByGameID(this.OwnerID.ToString());
+                return Fougerite.Player.FindByGameID(this.OwnerID.ToString());
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace Zumwalt.Events
+﻿namespace Fougerite.Events
 {
     using System;
 

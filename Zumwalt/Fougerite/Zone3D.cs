@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -26,7 +26,7 @@
             return this.Contains(new Vector3(en.X, en.Y, en.Z));
         }
 
-        public bool Contains(Zumwalt.Player p)
+        public bool Contains(Fougerite.Player p)
         {
             return this.Contains(p.Location);
         }
@@ -70,7 +70,7 @@
             return null;
         }
 
-        public static Zone3D GlobalContains(Zumwalt.Player p)
+        public static Zone3D GlobalContains(Fougerite.Player p)
         {
             Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
             if (table != null)

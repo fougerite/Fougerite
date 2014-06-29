@@ -1,7 +1,7 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
-    using Zumwalt.Events;
+    using Fougerite.Events;
     using Rust;
     using RustPP;
     using RustPP.Commands;
@@ -64,7 +64,7 @@
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(item.controllable.playerClient);
+            Fougerite.Player player = Fougerite.Player.FindByPlayerClient(item.controllable.playerClient);
             if (player != null)
             {
                 BPUseEvent ae = new BPUseEvent(bdb);
@@ -151,7 +151,7 @@
                     ChatString text = new ChatString(str);
                     if (OnChat != null)
                     {
-                        OnChat(Zumwalt.Player.FindByPlayerClient(arg.argUser.playerClient), ref text);
+                        OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref text);
                     }
                     str = Facepunch.Utility.String.QuoteSafe(text.NewText.Substring(1, text.NewText.Length - 2));
                     if (str != "")
@@ -162,8 +162,8 @@
                         }
                         else
                         {
-                            Zumwalt.Data.GetData().chat_history.Add(str);
-                            Zumwalt.Data.GetData().chat_history_username.Add(item);
+                            Fougerite.Data.GetData().chat_history.Add(str);
+                            Fougerite.Data.GetData().chat_history_username.Add(item);
                             Logger.ChatLog(item, str);
                             ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
                         }
@@ -200,7 +200,7 @@
                 }
                 if (OnDoorUse != null)
                 {
-                    OnDoorUse(Zumwalt.Player.FindByPlayerClient(controllable.playerClient), de);
+                    OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
                 }
             }
             return de.Open;
@@ -208,7 +208,7 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-            if (((a.argUser == null) && (a.Class == "zumwaltweb")) && (a.Function == "handshake"))
+            if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
             {
                 a.ReplyWith("All Good!");
                 return true;
@@ -218,22 +218,22 @@
             {
                 OnConsoleReceived(ref a, external);
             }
-            if ((a.Class.ToLower() == "zumwalt") && (a.Function.ToLower() == "reload"))
+            if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
             {
                 if ((a.argUser != null) && a.argUser.admin)
                 {
-                    PluginEngine.GetPluginEngine().ReloadPlugins(Zumwalt.Player.FindByPlayerClient(a.argUser.playerClient));
-                    a.ReplyWith("Zumwalt: Reloaded!");
+                    PluginEngine.GetPluginEngine().ReloadPlugins(Fougerite.Player.FindByPlayerClient(a.argUser.playerClient));
+                    a.ReplyWith("Fougerite: Reloaded!");
                 }
                 else if (external)
                 {
                     PluginEngine.GetPluginEngine().ReloadPlugins(null);
-                    a.ReplyWith("Zumwalt: Reloaded!");
+                    a.ReplyWith("Fougerite: Reloaded!");
                 }
             }
             if ((a.Reply == null) || (a.Reply == ""))
             {
-                a.ReplyWith("Zumwalt: " + a.Class + "." + a.Function + " was executed!");
+                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
             }
             return true;
         }
@@ -260,7 +260,7 @@
         public static void EntityDeployed(object entity)
         {
             Entity e = new Entity(entity);
-            Zumwalt.Player creator = e.Creator;
+            Fougerite.Player creator = e.Creator;
 
             if (Core.IsEnabled() && Core.config.GetSetting("Settings", "rampfix") == "true")
                 RampFix(e, creator);
@@ -372,7 +372,7 @@
             }
             if (OnCommand != null)
             {
-                OnCommand(Zumwalt.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
+                OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
             }
         }
 
@@ -398,7 +398,7 @@
                 idDB.Add(block.uniqueID, num);
                 num++;
             }
-            Zumwalt.Server.GetServer().Items = blocks;
+            Fougerite.Server.GetServer().Items = blocks;
             return blocks.ToArray();
         }
 
@@ -450,8 +450,8 @@
 
         public static bool PlayerConnect(NetUser user)
         {
-            Zumwalt.Player item = new Zumwalt.Player(user.playerClient);
-            Zumwalt.Server.GetServer().Players.Add(item);
+            Fougerite.Player item = new Fougerite.Player(user.playerClient);
+            Fougerite.Server.GetServer().Players.Add(item);
             bool connected = user.connected;
             if (Core.IsEnabled())
             {
@@ -461,16 +461,16 @@
             {
                 OnPlayerConnected(item);
             }
-            item.Message("This server is powered by Zumwalt v." + Bootstrap.Version + "!");
+            item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
             return connected;
         }
 
         public static void PlayerDisconnect(NetUser user)
         {
-            Zumwalt.Player item = Zumwalt.Player.FindByPlayerClient(user.playerClient);
+            Fougerite.Player item = Fougerite.Player.FindByPlayerClient(user.playerClient);
             if (item != null)
             {
-                Zumwalt.Server.GetServer().Players.Remove(item);
+                Fougerite.Server.GetServer().Players.Remove(item);
             }
             if (Core.IsEnabled())
             {
@@ -484,7 +484,7 @@
 
         public static void PlayerGather(Inventory rec, ResourceTarget rt, ResourceGivePair rg, ref int amount)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByNetworkPlayer(rec.networkView.owner);
+            Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.networkView.owner);
             GatherEvent ge = new GatherEvent(rt, rg, amount);
             if (OnPlayerGathering != null)
             {
@@ -501,14 +501,14 @@
 
         public static void PlayerGatherWood(IMeleeWeaponItem rec, ResourceTarget rt, ref ItemDataBlock db, ref int amount, ref string name)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByNetworkPlayer(rec.inventory.networkView.owner);
+            Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.inventory.networkView.owner);
             GatherEvent ge = new GatherEvent(rt, db, amount);
             ge.Item = "Wood";
             if (OnPlayerGathering != null)
             {
                 OnPlayerGathering(player, ge);
             }
-            db = Zumwalt.Server.GetServer().Items.Find(ge.Item);
+            db = Fougerite.Server.GetServer().Items.Find(ge.Item);
             amount = ge.Quantity;
             name = ge.Item;
         }
@@ -518,8 +518,8 @@
             HurtEvent he = new HurtEvent(ref e);
             if (!(he.Attacker is NPC) && !(he.Victim is NPC))
             {
-                Zumwalt.Player attacker = he.Attacker as Zumwalt.Player;
-                Zumwalt.Player victim = he.Victim as Zumwalt.Player;
+                Fougerite.Player attacker = he.Attacker as Fougerite.Player;
+                Fougerite.Player victim = he.Victim as Fougerite.Player;
                 Zone3D zoned = Zone3D.GlobalContains(attacker);
                 if ((zoned != null) && !zoned.PVP)
                 {
@@ -556,9 +556,9 @@
                 if (Core.IsEnabled() && !(event2.Attacker is NPC))
                 {
                     event2.DropItems = !RustPP.Hooks.KeepItem();
-                    Zumwalt.Player attacker = event2.Attacker as Zumwalt.Player;
-                    Zumwalt.Player victim = event2.Victim as Zumwalt.Player;
-                    if ((attacker.Name != victim.Name) && (Zumwalt.Server.GetServer().FindPlayer(attacker.Name) != null))
+                    Fougerite.Player attacker = event2.Attacker as Fougerite.Player;
+                    Fougerite.Player victim = event2.Victim as Fougerite.Player;
+                    if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))
                     {
                         RustPP.Hooks.broadcastDeath(victim.Name, attacker.Name, event2.WeaponName);
                     }
@@ -580,7 +580,7 @@
         {
             try
             {
-                Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
+                Fougerite.Player player = Fougerite.Player.FindByPlayerClient(pc);
                 SpawnEvent se = new SpawnEvent(pos, camp);
                 if ((OnPlayerSpawned != null) && (player != null))
                 {
@@ -597,7 +597,7 @@
         {
             try
             {
-                Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(pc);
+                Fougerite.Player player = Fougerite.Player.FindByPlayerClient(pc);
                 SpawnEvent se = new SpawnEvent(pos, camp);
                 if ((OnPlayerSpawning != null) && (player != null))
                 {
@@ -625,16 +625,16 @@
             OnPluginInit = delegate
             {
             };
-            OnChat = delegate(Zumwalt.Player param0, ref ChatString param1)
+            OnChat = delegate(Fougerite.Player param0, ref ChatString param1)
             {
             };
-            OnCommand = delegate(Zumwalt.Player param0, string param1, string[] param2)
+            OnCommand = delegate(Fougerite.Player param0, string param1, string[] param2)
             {
             };
-            OnPlayerConnected = delegate(Zumwalt.Player param0)
+            OnPlayerConnected = delegate(Fougerite.Player param0)
             {
             };
-            OnPlayerDisconnected = delegate(Zumwalt.Player param0)
+            OnPlayerDisconnected = delegate(Fougerite.Player param0)
             {
             };
             OnNPCKilled = delegate(DeathEvent param0)
@@ -649,13 +649,13 @@
             OnPlayerHurt = delegate(HurtEvent param0)
             {
             };
-            OnPlayerSpawned = delegate(Zumwalt.Player param0, SpawnEvent param1)
+            OnPlayerSpawned = delegate(Fougerite.Player param0, SpawnEvent param1)
             {
             };
-            OnPlayerSpawning = delegate(Zumwalt.Player param0, SpawnEvent param1)
+            OnPlayerSpawning = delegate(Fougerite.Player param0, SpawnEvent param1)
             {
             };
-            OnPlayerGathering = delegate(Zumwalt.Player param0, GatherEvent param1)
+            OnPlayerGathering = delegate(Fougerite.Player param0, GatherEvent param1)
             {
             };
             OnEntityHurt = delegate(HurtEvent param0)
@@ -664,16 +664,16 @@
             OnEntityDecay = delegate(DecayEvent param0)
             {
             };
-            OnEntityDeployed = delegate(Zumwalt.Player param0, Entity param1)
+            OnEntityDeployed = delegate(Fougerite.Player param0, Entity param1)
             {
             };
             OnConsoleReceived = delegate(ref ConsoleSystem.Arg param0, bool param1)
             {
             };
-            OnBlueprintUse = delegate(Zumwalt.Player param0, BPUseEvent param1)
+            OnBlueprintUse = delegate(Fougerite.Player param0, BPUseEvent param1)
             {
             };
-            OnDoorUse = delegate(Zumwalt.Player param0, DoorEvent param1)
+            OnDoorUse = delegate(Fougerite.Player param0, DoorEvent param1)
             {
             };
             OnTablesLoaded = delegate(Dictionary<string, LootSpawnList> param0)
@@ -688,7 +688,7 @@
             OnServerShutdown = delegate
             {
             };
-            foreach (Zumwalt.Player player in Zumwalt.Server.GetServer().Players)
+            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 player.FixInventoryRef();
             }
@@ -755,23 +755,23 @@
             return lists;
         }
 
-        public delegate void BlueprintUseHandlerDelagate(Zumwalt.Player player, BPUseEvent ae);
+        public delegate void BlueprintUseHandlerDelagate(Fougerite.Player player, BPUseEvent ae);
 
-        public delegate void ChatHandlerDelegate(Zumwalt.Player player, ref ChatString text);
+        public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
 
-        public delegate void CommandHandlerDelegate(Zumwalt.Player player, string text, string[] args);
+        public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);
 
-        public delegate void ConnectionHandlerDelegate(Zumwalt.Player player);
+        public delegate void ConnectionHandlerDelegate(Fougerite.Player player);
 
         public delegate void ConsoleHandlerDelegate(ref ConsoleSystem.Arg arg, bool external);
 
-        public delegate void DisconnectionHandlerDelegate(Zumwalt.Player player);
+        public delegate void DisconnectionHandlerDelegate(Fougerite.Player player);
 
-        public delegate void DoorOpenHandlerDelegate(Zumwalt.Player p, DoorEvent de);
+        public delegate void DoorOpenHandlerDelegate(Fougerite.Player p, DoorEvent de);
 
         public delegate void EntityDecayDelegate(DecayEvent de);
 
-        public delegate void EntityDeployedDelegate(Zumwalt.Player player, Entity e);
+        public delegate void EntityDeployedDelegate(Fougerite.Player player, Entity e);
 
         public delegate void EntityHurtDelegate(HurtEvent he);
 
@@ -783,9 +783,9 @@
 
         public delegate void LootTablesLoaded(Dictionary<string, LootSpawnList> lists);
 
-        public delegate void PlayerGatheringHandlerDelegate(Zumwalt.Player player, GatherEvent ge);
+        public delegate void PlayerGatheringHandlerDelegate(Fougerite.Player player, GatherEvent ge);
 
-        public delegate void PlayerSpawnHandlerDelegate(Zumwalt.Player player, SpawnEvent se);
+        public delegate void PlayerSpawnHandlerDelegate(Fougerite.Player player, SpawnEvent se);
 
         public delegate void PluginInitHandlerDelegate();
 

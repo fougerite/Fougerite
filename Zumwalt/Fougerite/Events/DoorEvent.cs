@@ -1,20 +1,20 @@
-﻿namespace Zumwalt.Events
+﻿namespace Fougerite.Events
 {
-    using Zumwalt;
+    using Fougerite;
     using System;
 
     public class DoorEvent
     {
-        private Zumwalt.Entity _ent;
+        private Fougerite.Entity _ent;
         private bool _open;
 
-        public DoorEvent(Zumwalt.Entity e)
+        public DoorEvent(Fougerite.Entity e)
         {
             this.Open = false;
             this.Entity = e;
         }
 
-        public Zumwalt.Entity Entity
+        public Fougerite.Entity Entity
         {
             get
             {

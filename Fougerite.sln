@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zumwalt", "Zumwalt\Zumwalt.csproj", "{BD30E9D1-3322-48A4-B846-A969E32DC3F3}"
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fougerite", "Zumwalt\Fougerite.csproj", "{BD30E9D1-3322-48A4-B846-A969E32DC3F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zumwalt_Patcher", "Zumwalt_Patcher\Zumwalt_Patcher.csproj", "{935412BA-2118-488D-839A-AAB76E60BA8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fougerite.Patcher", "Zumwalt_Patcher\Fougerite.Patcher.csproj", "{935412BA-2118-488D-839A-AAB76E60BA8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

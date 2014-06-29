@@ -1,6 +1,6 @@
 ﻿namespace RustPP.Permissions
 {
-    using Zumwalt;
+    using Fougerite;
     using RustPP;
     using System;
     using System.Collections.Generic;

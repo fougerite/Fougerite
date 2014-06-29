@@ -1,6 +1,6 @@
-﻿namespace Zumwalt.Events
+﻿namespace Fougerite.Events
 {
-    using Zumwalt;
+    using Fougerite;
     using System;
 
     public class HurtEvent
@@ -8,14 +8,14 @@
         private object _attacker;
         private DamageEvent _de;
         private bool _decay;
-        private Zumwalt.Entity _ent;
+        private Fougerite.Entity _ent;
         private object _victim;
         private string _weapon;
         private WeaponImpact _wi;
 
         public HurtEvent(ref DamageEvent d)
         {
-            Zumwalt.Player player = Zumwalt.Player.FindByPlayerClient(d.attacker.client);
+            Fougerite.Player player = Fougerite.Player.FindByPlayerClient(d.attacker.client);
             if (player != null)
             {
                 this.Attacker = player;
@@ -24,7 +24,7 @@
             {
                 this.Attacker = new NPC(d.attacker.character);
             }
-            Zumwalt.Player player2 = Zumwalt.Player.FindByPlayerClient(d.victim.client);
+            Fougerite.Player player2 = Fougerite.Player.FindByPlayerClient(d.victim.client);
             if (player2 != null)
             {
                 this.Victim = player2;
@@ -49,7 +49,7 @@
             }
         }
 
-        public HurtEvent(ref DamageEvent d, Zumwalt.Entity en)
+        public HurtEvent(ref DamageEvent d, Fougerite.Entity en)
             : this(ref d)
         {
             this.Entity = en;
@@ -129,7 +129,7 @@
             }
         }
 
-        public Zumwalt.Entity Entity
+        public Fougerite.Entity Entity
         {
             get
             {

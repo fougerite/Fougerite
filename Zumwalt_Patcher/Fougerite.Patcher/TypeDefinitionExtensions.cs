@@ -4,7 +4,7 @@ using System.Linq;
 
 using Mono.Cecil;
 
-namespace Zumwalt_Patcher {
+namespace Fougerite_Patcher {
   static class Empty<T> {
     public static readonly T [] Array = new T [0];
   }

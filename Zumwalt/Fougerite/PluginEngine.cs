@@ -1,4 +1,4 @@
-﻿namespace Zumwalt
+﻿namespace Fougerite
 {
     using Jint;
     using Jint.Expressions;
@@ -175,7 +175,7 @@
         public void ParsePlugin()
         {
             this.plugins.Clear();
-            foreach (string str in Directory.GetDirectories(Util.GetZumwaltFolder()))
+            foreach (string str in Directory.GetDirectories(Util.GetFougeriteFolder()))
             {
                 string path = "";
                 foreach (string str3 in Directory.GetFiles(str))
@@ -230,7 +230,7 @@
                         catch (Exception ex)
                         {
                             Logger.LogException(ex);
-                            Logger.Log("Zumwalt: Couln't create instance at line -> " + str5);
+                            Logger.Log("Fougerite: Couln't create instance at line -> " + str5);
                         }
                     }
                     if (this.FilterPlugin(script))

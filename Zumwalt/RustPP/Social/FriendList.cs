@@ -1,6 +1,6 @@
 ﻿namespace RustPP.Social
 {
-    using Zumwalt;
+    using Fougerite;
     using System;
     using System.Collections;
 

@@ -32,12 +32,12 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Global.cs" />
-    <Compile Include="Zumwalt_Patcher\ILPatcher.cs" />
-    <Compile Include="Zumwalt_Patcher\Logger.cs" />
-    <Compile Include="Zumwalt_Patcher\Program.cs" />
-    <Compile Include="Zumwalt_Patcher\TypeDefinitionExtensions.cs" />
-    <Compile Include="Zumwalt_Patcher\MethodDefinitionExtensions.cs" />
-    <Compile Include="Zumwalt_Patcher\FieldDefinitionExtensions.cs" />
+    <Compile Include="Fougerite.Patcher\ILPatcher.cs" />
+    <Compile Include="Fougerite.Patcher\Logger.cs" />
+    <Compile Include="Fougerite.Patcher\Program.cs" />
+    <Compile Include="Fougerite.Patcher\TypeDefinitionExtensions.cs" />
+    <Compile Include="Fougerite.Patcher\MethodDefinitionExtensions.cs" />
+    <Compile Include="Fougerite.Patcher\FieldDefinitionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Cecil">

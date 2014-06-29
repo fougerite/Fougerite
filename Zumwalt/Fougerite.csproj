@@ -5,7 +5,7 @@
     <ProjectVersion>7.10.377</ProjectVersion>
     <ProjectGuid>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <AssemblyName>Zumwalt</AssemblyName>
+    <AssemblyName>Fougerite</AssemblyName>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>

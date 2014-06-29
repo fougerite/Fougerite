@@ -5,7 +5,7 @@
     <ProjectVersion>7.10.377</ProjectVersion>
     <ProjectGuid>{935412BA-2118-488D-839A-AAB76E60BA8C}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <AssemblyName>Zumwalt_Patcher</AssemblyName>
+    <AssemblyName>Fougerite.Patcher</AssemblyName>
     <OutputType>Exe</OutputType>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
   </PropertyGroup>

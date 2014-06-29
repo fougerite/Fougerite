@@ -65,7 +65,7 @@
 
         private void BootstrapAttachPatch()
         {
-            TypeDefinition fougeriteBootstrap = zumwaltAssembly.MainModule.GetType("Fougerite.Bootstrap");
+            TypeDefinition fougeriteBootstrap = fougeriteAssembly.MainModule.GetType("Fougerite.Bootstrap");
             TypeDefinition serverInit = rustAssembly.MainModule.GetType("ServerInit");
             MethodDefinition attachBootstrap = fougeriteBootstrap.GetMethod("AttachBootstrap");
             MethodDefinition awake = serverInit.GetMethod("Awake");

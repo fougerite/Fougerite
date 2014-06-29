@@ -1,4 +1,4 @@
-﻿namespace Fougerite_Patcher
+﻿namespace Fougerite.Patcher
 {
     using Mono.Cecil;
     using Mono.Cecil.Cil;

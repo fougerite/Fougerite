@@ -4,7 +4,7 @@ using System.Linq;
 
 using Mono.Cecil;
 
-namespace Fougerite_Patcher
+namespace Fougerite.Patcher
 {
   static class MethodDefinitionExtensions
   {

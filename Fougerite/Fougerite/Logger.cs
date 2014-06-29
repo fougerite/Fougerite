@@ -8,14 +8,38 @@ namespace Fougerite
 {
     public static class Logger
     {
+        struct Writer
+        {
+            public StreamWriter LogWriter;
+            public string DateTime;
+        }
+
         private static string LogsFolder = @".\logs\";
-        private static StreamWriter LogWriter;
+        private static Writer LogWriter;
+        private static Writer ChatWriter;
 
         public static void Init()
         {
+            LogWriterInit();
+            ChatWriterInit();
+
             Directory.CreateDirectory(LogsFolder);
         }
 
+        private static void LogWriterInit()
+        {
+            LogWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
+            LogWriter.LogWriter = new StreamWriter(LogsFolder + "Log " + LogWriter.DateTime + ".txt", true);
+            LogWriter.LogWriter.AutoFlush = true;
+        }
+
+        private static void ChatWriterInit()
+        {
+            ChatWriter.DateTime = LogWriter.DateTime;
+            ChatWriter.LogWriter = new StreamWriter(LogsFolder + "Chat " + ChatWriter.DateTime + ".txt", true);
+            ChatWriter.LogWriter.AutoFlush = true;
+        }
+        
         private static string LogFormat(string Text)
         {
             Text = "[" + DateTime.Now + "] " + Text;
@@ -24,8 +48,16 @@ namespace Fougerite
 
         private static void WriteLog(string Message)
         {
-            using (LogWriter = new StreamWriter(LogsFolder + "Log " + DateTime.Now.ToString("dd_MM_yyyy") + ".txt", true))
-                LogWriter.WriteLine(LogFormat(Message));
+            if (LogWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
+                LogWriterInit();
+            LogWriter.LogWriter.WriteLine(LogFormat(Message));
+        }
+
+        private static void WriteChat(string Message)
+        {
+            if (ChatWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
+                ChatWriterInit();
+            ChatWriter.LogWriter.WriteLine(LogFormat(Message));
         }
 
         public static void Log(string Message, UnityEngine.Object Context = null)
@@ -61,8 +93,6 @@ namespace Fougerite
             Msg = "[CHAT] " + Sender + ": " + Msg;
             Debug.Log(Msg);
 
-            using (LogWriter = new StreamWriter(LogsFolder + "Chat " + DateTime.Now.ToString("dd_MM_yyyy") + ".txt", true))
-                LogWriter.WriteLine(LogFormat(Msg));
         }
     }
 }

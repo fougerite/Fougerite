@@ -63,28 +63,28 @@ namespace Fougerite
         public static void Log(string Message, UnityEngine.Object Context = null)
         {
             Debug.Log(Message, Context);
-            Message = "[Console]" + Message;
+            Message = "[Console] " + Message;
             WriteLog(Message);
         }
 
         public static void LogWarning(string Message, UnityEngine.Object Context = null)
         {
             Debug.LogWarning(Message, Context);
-            Message = "[Warning]" + Message;
+            Message = "[Warning] " + Message;
             WriteLog(Message);
         }
 
         public static void LogError(string Message, UnityEngine.Object Context = null)
         {
             Debug.LogError(Message, Context);
-            Message = "[Error]" + Message;
+            Message = "[Error] " + Message;
             WriteLog(Message);
         }
 
         public static void LogException(Exception Ex, UnityEngine.Object Context = null)
         {
             Debug.LogException(Ex, Context);
-            string Message = "[Exception]" + Ex.ToString();
+            string Message = "[Exception] " + Ex.ToString();
             WriteLog(Message);
         }
 

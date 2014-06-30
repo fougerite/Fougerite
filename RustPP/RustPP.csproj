@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EF61739C-9A45-479F-90DE-08D37F4EE653}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RustPP</RootNamespace>
+    <AssemblyName>RustPP</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\AboutCommand.cs" />
+    <Compile Include="Commands\AddAdminCommand.cs" />
+    <Compile Include="Commands\AddFlagCommand.cs" />
+    <Compile Include="Commands\AddFriendCommand.cs" />
+    <Compile Include="Commands\AnnounceCommand.cs" />
+    <Compile Include="Commands\BanCommand.cs" />
+    <Compile Include="Commands\ChatCommand.cs" />
+    <Compile Include="Commands\FriendsCommand.cs" />
+    <Compile Include="Commands\GetFlagsCommand.cs" />
+    <Compile Include="Commands\GiveItemCommand.cs" />
+    <Compile Include="Commands\GodModeCommand.cs" />
+    <Compile Include="Commands\HelpCommand.cs" />
+    <Compile Include="Commands\HistoryCommand.cs" />
+    <Compile Include="Commands\InstaKOCommand.cs" />
+    <Compile Include="Commands\KickCommand.cs" />
+    <Compile Include="Commands\KillCommand.cs" />
+    <Compile Include="Commands\LoadoutCommand.cs" />
+    <Compile Include="Commands\LocationCommand.cs" />
+    <Compile Include="Commands\MasterAdminCommand.cs" />
+    <Compile Include="Commands\MOTDCommand.cs" />
+    <Compile Include="Commands\MuteCommand.cs" />
+    <Compile Include="Commands\PingCommand.cs" />
+    <Compile Include="Commands\PlayersCommand.cs" />
+    <Compile Include="Commands\PrivateMessagesCommand.cs" />
+    <Compile Include="Commands\ReloadCommand.cs" />
+    <Compile Include="Commands\RemoveAdminCommand.cs" />
+    <Compile Include="Commands\RemoveFlagsCommand.cs" />
+    <Compile Include="Commands\ReplyCommand.cs" />
+    <Compile Include="Commands\RulesCommand.cs" />
+    <Compile Include="Commands\SaveAllCommand.cs" />
+    <Compile Include="Commands\ShareCommand.cs" />
+    <Compile Include="Commands\SpawnItemCommand.cs" />
+    <Compile Include="Commands\StarterCommand.cs" />
+    <Compile Include="Commands\TeleportHereCommand.cs" />
+    <Compile Include="Commands\TeleportToCommand.cs" />
+    <Compile Include="Commands\UnbanCommand.cs" />
+    <Compile Include="Commands\UnfriendCommand.cs" />
+    <Compile Include="Commands\UnmuteCommand.cs" />
+    <Compile Include="Commands\UnshareCommand.cs" />
+    <Compile Include="Commands\WhiteListAddCommand.cs" />
+    <Compile Include="Core.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Hooks.cs" />
+    <Compile Include="Permissions\Administrator.cs" />
+    <Compile Include="PList.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="rustpp.cs" />
+    <Compile Include="Social\FriendList.cs" />
+    <Compile Include="TimedEvents.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

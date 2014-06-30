@@ -93,6 +93,7 @@ namespace Fougerite
             Msg = "[CHAT] " + Sender + ": " + Msg;
             Debug.Log(Msg);
 
+            WriteChat(Msg);
         }
     }
 }

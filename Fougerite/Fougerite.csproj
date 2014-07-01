@@ -43,6 +43,7 @@
       <HintPath>..\References\System.Core.dll</HintPath>
     </Reference>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Fougerite\Config.cs" />
     <Compile Include="Fougerite\Module.cs" />
     <Compile Include="Fougerite\ModuleContainer.cs" />
     <Compile Include="Fougerite\ModuleManager.cs" />

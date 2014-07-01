@@ -41,8 +41,11 @@
             
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
+
+            Config.Init();
             ModuleManager.LoadModules();
             PluginEngine.GetPluginEngine();
+
             Fougerite.Hooks.ServerStarted();
         }
     }

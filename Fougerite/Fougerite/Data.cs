@@ -53,15 +53,6 @@
             return data;
         }
 
-        public IniParser GetRPPConfig()
-        {
-            if (inifiles.ContainsKey("rust++"))
-            {
-                return (IniParser)inifiles["rust++"];
-            }
-            return null;
-        }
-
         [Obsolete("Replaced with DataStore.Get", false)]
         public object GetTableValue(string tablename, object key)
         {
@@ -95,8 +86,6 @@
                 {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
                     inifiles.Add(key, new IniParser(path));
-                    //if (key == "rust++")
-                    //    Core.config = (IniParser)inifiles["rust++"];
                     Logger.Log("Loaded Config: " + key);
                 }
             }

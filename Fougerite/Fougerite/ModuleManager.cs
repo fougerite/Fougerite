@@ -22,10 +22,11 @@ namespace Fougerite
         }
     }
 
-    class ModuleManager
+    public class ModuleManager
     {
         public static readonly Version ApiVersion = new Version(1, 0, 0, 0);
-        private static string ModulesFolder = @".\Modules\";
+        public static string ModulesFolder = @".\Modules\";
+        public static string ModulesFolderFull = Environment.CurrentDirectory + ModuleManager.ModulesFolder;
         private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
         private static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
@@ -38,20 +39,20 @@ namespace Fougerite
         internal static void LoadModules()
         {
             Logger.Log("Loading modules...");
-            string IgnoredPluginsFilePath = Path.Combine(ModulesFolder, "ignoredplugins.txt");
+            string IgnoredPluginsFilePath = Path.Combine(ModulesFolder, "ignoredmodules.txt");
 
-            List<string> IgnoredFiles = new List<string>();
+            List<string> IgnoredModules = new List<string>();
             if (File.Exists(IgnoredPluginsFilePath))
-                IgnoredFiles.AddRange(File.ReadAllLines(IgnoredPluginsFilePath));
+                IgnoredModules.AddRange(File.ReadAllLines(IgnoredPluginsFilePath));
 
-            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolder).GetFiles("*.dll");
+            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolder).GetFiles("*.dll", SearchOption.AllDirectories);
 
             Dictionary<Module, Stopwatch> PluginInitWatches = new Dictionary<Module, Stopwatch>();
             foreach (FileInfo FileInfo in FileInfos)
             {
                 Logger.Log("Module Found: " + FileInfo.Name);
                 string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(FileInfo.Name);
-                if (IgnoredFiles.Contains(FileNameWithoutExtension))
+                if (IgnoredModules.Contains(FileNameWithoutExtension))
                 {
                     Logger.LogWarning(string.Format("{0} was ignored from being loaded.", FileNameWithoutExtension));
                     continue;
@@ -77,31 +78,33 @@ namespace Fougerite
                             continue;
                         Logger.Log("Checked " + Type.FullName);
 
-                        object[] CustomAttributes = Type.GetCustomAttributes(typeof(ApiVersionAttribute), false);
-                        if (CustomAttributes.Length == 0)
-                            continue;
-                        Logger.Log("Ok " + Type.FullName);
+                        //object[] CustomAttributes = Type.GetCustomAttributes(typeof(ApiVersionAttribute), false);
+                        //if (CustomAttributes.Length == 0)
+                        //    continue;
+                        //Logger.Log("Ok " + Type.FullName);
 
-                        if (!IsIgnoreVersion)
-                        {
-                            var ApiVersionAttribute = (ApiVersionAttribute)CustomAttributes[0];
-                            Version ApiVersion = ApiVersionAttribute.ApiVersion;
-                            if (ApiVersion.Major != ApiVersion.Major || ApiVersion.Minor != ApiVersion.Minor)
-                            {
-                                Logger.LogWarning(string.Format("Plugin \"{0}\" is designed for a different API version ({1}) and was ignored.",
-                                    Type.FullName, ApiVersion.ToString(2)));
-                                continue;
-                            }
-                        }
+                        //if (!IsIgnoreVersion)
+                        //{
+                        //    var ApiVersionAttribute = (ApiVersionAttribute)CustomAttributes[0];
+                        //    Version ApiVersion = ApiVersionAttribute.ApiVersion;
+                        //    if (ApiVersion.Major != ApiVersion.Major || ApiVersion.Minor != ApiVersion.Minor)
+                        //    {
+                        //        Logger.LogWarning(string.Format("Plugin \"{0}\" is designed for a different API version ({1}) and was ignored.",
+                        //            Type.FullName, ApiVersion.ToString(2)));
+                        //        continue;
+                        //    }
+                        //}
 
                         Module PluginInstance = null;
                         try
                         {
+                            Logger.Log("Loading " + Type.FullName);
                             Stopwatch InitTimeWatch = new Stopwatch();
                             InitTimeWatch.Start();
                             PluginInstance = (Module)Activator.CreateInstance(Type);
                             InitTimeWatch.Stop();
                             PluginInitWatches.Add(PluginInstance, InitTimeWatch);
+                            Logger.Log("Loaded? " + Type.FullName);
                         }
                         catch (Exception ex)
                         {
@@ -114,6 +117,7 @@ namespace Fougerite
                             Logger.Log("Loaded " + FileInfo.Name);
                             break;
                         }
+                        Logger.Log("End! " + Type.FullName);
                     }
                 }
                 catch (Exception ex)
@@ -135,18 +139,19 @@ namespace Fougerite
 
                 try
                 {
+                    Logger.Log("INIT!");
                     CurrentModule.Initialize();
                 }
                 catch (Exception ex)
                 {
                     // Broken plugins better stop the entire server init.
                     Logger.LogError(string.Format(
-                        "Plugin \"{0}\" has thrown an exception during initialization. {1}", CurrentModule.Plugin.Name, ex));
+                        "Module \"{0}\" has thrown an exception during initialization. {1}", CurrentModule.Plugin.Name, ex));
                 }
 
                 InitTimeWatch.Stop();
                 Logger.Log(string.Format(
-                    "Plugin {0} v{1} (by {2}) initiated.", CurrentModule.Plugin.Name, CurrentModule.Plugin.Version, CurrentModule.Plugin.Author));
+                    "Module {0} v{1} (by {2}) initiated.", CurrentModule.Plugin.Name, CurrentModule.Plugin.Version, CurrentModule.Plugin.Author));
             }
         }
 
@@ -165,7 +170,7 @@ namespace Fougerite
                 catch (Exception ex)
                 {
                     Logger.LogError(string.Format(
-                        "Plugin \"{0}\" has thrown an exception while being deinitialized:\n{1}", ModuleContainer.Plugin.Name, ex));
+                        "Module \"{0}\" has thrown an exception while being deinitialized:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
 
                 UnloadWatch.Stop();
@@ -184,7 +189,7 @@ namespace Fougerite
                 catch (Exception ex)
                 {
                     Logger.LogError(string.Format(
-                        "Plugin \"{0}\" has thrown an exception while being disposed:\n{1}", ModuleContainer.Plugin.Name, ex));
+                        "Module \"{0}\" has thrown an exception while being disposed:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
 
                 UnloadWatch.Stop();

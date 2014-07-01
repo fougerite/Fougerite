@@ -11,22 +11,35 @@ namespace RustPP
     using System.Collections;
     using System.Timers;
 
-    class RustPPModule : Module
+    public class RustPPModule : Module
     {
+        public static IniParser GetRPPConfig()
+        {
+            return new IniParser(ModuleManager.ModulesFolderFull + "Rust++.cfg");
+        }
+
         public override void Initialize()
         {
-            Core.config = Fougerite.Data.GetData().GetRPPConfig();
-            if ((Core.config != null) && Core.IsEnabled())
+            try
             {
-                System.Timers.Timer timer = new System.Timers.Timer();
-                timer.Interval = 30000.0;
-                timer.AutoReset = false;
-                timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                Core.config = GetRPPConfig();
+                
+                if ((Core.config != null) && Core.IsEnabled())
                 {
+                    System.Timers.Timer timer = new System.Timers.Timer();
+                    timer.Interval = 30000.0;
+                    timer.AutoReset = false;
+                    timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                    {
+                        TimedEvents.startEvents();
+                    };
                     TimedEvents.startEvents();
-                };
-                TimedEvents.startEvents();
-                timer.Start();
+                    timer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
 
             Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);

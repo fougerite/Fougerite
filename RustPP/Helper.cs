@@ -1,5 +1,6 @@
 ﻿namespace RustPP
 {
+    using Fougerite;
     using RustPP.Commands;
     using RustPP.Permissions;
     using System;
@@ -76,7 +77,7 @@
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Fougerite\Rust++\" + fileName);
+            return (ModuleManager.ModulesFolderFull + fileName);
         }
 
         public static void Log(string logName, string msg)

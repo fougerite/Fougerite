@@ -17,9 +17,17 @@ namespace Fougerite
         private static string LogsFolder = @".\logs\";
         private static Writer LogWriter;
         private static Writer ChatWriter;
+        private static bool IsShowDebug = false;
+        private static bool IsShowErrors = false;
+        private static bool IsShowException = false;
 
         public static void Init()
         {
+            IsShowDebug = Config.GetBoolValuer("Logging", "debug");
+            IsShowErrors = Config.GetBoolValuer("Logging", "error");
+            IsShowException = Config.GetBoolValuer("Logging", "exception");
+
+
             try
             {
                 Directory.CreateDirectory(LogsFolder);
@@ -39,6 +47,7 @@ namespace Fougerite
             {
                 if (LogWriter.LogWriter != null)
                     LogWriter.LogWriter.Close();
+
                 LogWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
                 LogWriter.LogWriter = new StreamWriter(LogsFolder + "Log " + LogWriter.DateTime + ".txt", true);
                 LogWriter.LogWriter.AutoFlush = true;
@@ -55,6 +64,7 @@ namespace Fougerite
             {
                 if (ChatWriter.LogWriter != null)
                     ChatWriter.LogWriter.Close();
+
                 ChatWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
                 ChatWriter.LogWriter = new StreamWriter(LogsFolder + "Chat " + ChatWriter.DateTime + ".txt", true);
                 ChatWriter.LogWriter.AutoFlush = true;
@@ -115,15 +125,25 @@ namespace Fougerite
 
         public static void LogError(string Message, UnityEngine.Object Context = null)
         {
-            Debug.LogError(Message, Context);
+            if (IsShowErrors)
+                Debug.LogError(Message, Context);
             Message = "[Error] " + Message;
             WriteLog(Message);
         }
 
         public static void LogException(Exception Ex, UnityEngine.Object Context = null)
         {
-            Debug.LogException(Ex, Context);
+            if (IsShowException)
+                Debug.LogException(Ex, Context);
             string Message = "[Exception] " + Ex.ToString();
+            WriteLog(Message);
+        }
+
+        public static void LogDebug(string Message, UnityEngine.Object Context = null)
+        {
+            if (IsShowDebug)
+                Debug.Log("<color=orange>[DEBUG]</color> " + Message, Context);
+            Message = "[Debug] " + Message;
             WriteLog(Message);
         }
 

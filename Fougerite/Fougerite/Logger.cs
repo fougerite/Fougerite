@@ -23,9 +23,9 @@ namespace Fougerite
 
         public static void Init()
         {
-            IsShowDebug = Config.GetBoolValuer("Logging", "debug");
-            IsShowErrors = Config.GetBoolValuer("Logging", "error");
-            IsShowException = Config.GetBoolValuer("Logging", "exception");
+            IsShowDebug = Config.GetBoolValue("Logging", "debug");
+            IsShowErrors = Config.GetBoolValue("Logging", "error");
+            IsShowException = Config.GetBoolValue("Logging", "exception");
 
 
             try

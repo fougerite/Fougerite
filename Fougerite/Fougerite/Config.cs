@@ -25,7 +25,7 @@ namespace Fougerite
             return FougeriteConfig.GetSetting(Section, Setting);
         }
 
-        public static bool GetBoolValuer(string Section,string Setting)
+        public static bool GetBoolValue(string Section,string Setting)
         {
             return Config.FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
         }

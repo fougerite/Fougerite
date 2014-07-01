@@ -17,16 +17,15 @@ namespace Fougerite
         private static string LogsFolder = @".\logs\";
         private static Writer LogWriter;
         private static Writer ChatWriter;
-        private static bool IsShowDebug = false;
-        private static bool IsShowErrors = false;
-        private static bool IsShowException = false;
+        private static bool showDebug = false;
+        private static bool showErrors = false;
+        private static bool showException = false;
 
         public static void Init()
         {
-            IsShowDebug = Config.GetBoolValue("Logging", "debug");
-            IsShowErrors = Config.GetBoolValue("Logging", "error");
-            IsShowException = Config.GetBoolValue("Logging", "exception");
-
+            showDebug = Config.GetBoolValue("Logging", "debug");
+            showErrors = Config.GetBoolValue("Logging", "error");
+            showException = Config.GetBoolValue("Logging", "exception");
 
             try
             {
@@ -125,7 +124,7 @@ namespace Fougerite
 
         public static void LogError(string Message, UnityEngine.Object Context = null)
         {
-            if (IsShowErrors)
+            if (showErrors)
                 Debug.LogError(Message, Context);
             Message = "[Error] " + Message;
             WriteLog(Message);
@@ -133,7 +132,7 @@ namespace Fougerite
 
         public static void LogException(Exception Ex, UnityEngine.Object Context = null)
         {
-            if (IsShowException)
+            if (showException)
                 Debug.LogException(Ex, Context);
             string Message = "[Exception] " + Ex.ToString();
             WriteLog(Message);
@@ -141,7 +140,7 @@ namespace Fougerite
 
         public static void LogDebug(string Message, UnityEngine.Object Context = null)
         {
-            if (IsShowDebug)
+            if (showDebug)
                 Debug.Log("<color=orange>[DEBUG]</color> " + Message, Context);
             Message = "[Debug] " + Message;
             WriteLog(Message);

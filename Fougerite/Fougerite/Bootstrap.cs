@@ -2,7 +2,6 @@
 {
     using Facepunch;
     using Rust.Steam;
-    using RustPP;
     using System;
     using System.IO;
     using System.Timers;
@@ -36,29 +35,14 @@
         {
             Logger.Init();
             if (File.Exists(Util.GetServerFolder() + @"\FougeriteDirectory.cfg"))
-            {
                 Fougerite.Data.PATH = new IniParser(Util.GetServerFolder() + @"\FougeriteDirectory.cfg").GetSetting("Settings", "Directory");
-            }
             else
-            {
                 Fougerite.Data.PATH = Util.GetRootFolder() + @"\save\Fougerite\";
-            }
+            
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
+            ModuleManager.LoadModules();
             PluginEngine.GetPluginEngine();
-            Core.config = Fougerite.Data.GetData().GetRPPConfig();
-            if ((Core.config != null) && Core.IsEnabled())
-            {
-                System.Timers.Timer timer = new System.Timers.Timer();
-                timer.Interval = 30000.0;
-                timer.AutoReset = false;
-                timer.Elapsed += delegate(object x, ElapsedEventArgs y)
-                {
-                    TimedEvents.startEvents();
-                };
-                TimedEvents.startEvents();
-                timer.Start();
-            }
             Fougerite.Hooks.ServerStarted();
         }
     }

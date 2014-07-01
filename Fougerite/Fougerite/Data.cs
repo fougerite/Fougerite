@@ -1,7 +1,6 @@
 ﻿namespace Fougerite
 {
     using Facepunch.Utility;
-    using RustPP;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -96,10 +95,8 @@
                 {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
                     inifiles.Add(key, new IniParser(path));
-                    if (key == "rust++")
-                    {
-                        Core.config = (IniParser)inifiles["rust++"];
-                    }
+                    //if (key == "rust++")
+                    //    Core.config = (IniParser)inifiles["rust++"];
                     Logger.Log("Loaded Config: " + key);
                 }
             }

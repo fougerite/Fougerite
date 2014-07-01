@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,15 +24,33 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.ID">
+      <HintPath>..\bin\Facepunch.ID.dll</HintPath>
+    </Reference>
+    <Reference Include="Fougerite">
+      <HintPath>..\bin\Fougerite.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="uLink">
+      <HintPath>..\References\uLink.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\Develop\Rust\!BIN\Server Vanilla Dev\rust_server_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AboutCommand.cs" />
@@ -81,7 +99,8 @@
     <Compile Include="Permissions\Administrator.cs" />
     <Compile Include="PList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="rustpp.cs" />
+    <Compile Include="commands.cs" />
+    <Compile Include="RustPPModule.cs" />
     <Compile Include="Social\FriendList.cs" />
     <Compile Include="TimedEvents.cs" />
   </ItemGroup>

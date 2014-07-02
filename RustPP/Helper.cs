@@ -77,7 +77,7 @@
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            return (ModuleManager.ModulesFolderFull + fileName);
+            return (ModuleManager.ModulesFolderFull + RustPPModule.ConfigsFolder + fileName);
         }
 
         public static void Log(string logName, string msg)

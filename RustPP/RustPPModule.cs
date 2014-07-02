@@ -9,30 +9,49 @@ namespace RustPP
     using Rust;
     using RustPP.Commands;
     using System.Collections;
+    using System.IO;
+    using System.Reflection;
     using System.Timers;
 
-    public class RustPPModule : Module
+    public class RustPPModule : Fougerite.Module
     {
+        public override string Name
+        {
+            get { return "RustPP"; }
+        }
+        public override string Author
+        {
+            get { return "xEnt22"; }
+        }
+        public override string Description
+        {
+            get { return ""; }
+        }
+        public override Version Version
+        {
+            get { return Assembly.GetExecutingAssembly().GetName().Version; }
+        }
+
+        Timer timer;
         public static IniParser GetRPPConfig()
         {
             return new IniParser(ModuleManager.ModulesFolderFull + "Rust++.cfg");
         }
 
+        public static string ConfigsFolder;
         public override void Initialize()
         {
+            ConfigsFolder = @"\configs\";
             try
             {
                 Core.config = GetRPPConfig();
                 
                 if ((Core.config != null) && Core.IsEnabled())
                 {
-                    System.Timers.Timer timer = new System.Timers.Timer();
+                    timer = new System.Timers.Timer();
                     timer.Interval = 30000.0;
                     timer.AutoReset = false;
-                    timer.Elapsed += delegate(object x, ElapsedEventArgs y)
-                    {
-                        TimedEvents.startEvents();
-                    };
+                    timer.Elapsed += new ElapsedEventHandler(TimeEvent);
                     TimedEvents.startEvents();
                     timer.Start();
                 }
@@ -44,7 +63,6 @@ namespace RustPP
 
             Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
             Fougerite.Hooks.OnDoorUse += new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Fougerite.Hooks.OnEntityDeployed += new Fougerite.Hooks.EntityDeployedDelegate(EntityDeployed);
             Fougerite.Hooks.OnEntityHurt += new Fougerite.Hooks.EntityHurtDelegate(EntityHurt);
             Fougerite.Hooks.OnPlayerConnected += new Fougerite.Hooks.ConnectionHandlerDelegate(PlayerConnect);
             Fougerite.Hooks.OnPlayerDisconnected += new Fougerite.Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
@@ -54,6 +72,29 @@ namespace RustPP
             Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
             Fougerite.Hooks.OnRPPCommand += new Fougerite.Hooks.RPPCommandHandlerDelegate(Command);
+        }
+
+        //public void DeInitialize()
+        //{
+        //    timer.Elapsed -= new ElapsedEventHandler(TimeEvent);
+        //    timer.Stop();
+
+        //    Fougerite.Hooks.OnEntityDecay -= new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
+        //    Fougerite.Hooks.OnDoorUse -= new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
+        //    Fougerite.Hooks.OnEntityHurt -= new Fougerite.Hooks.EntityHurtDelegate(EntityHurt);
+        //    Fougerite.Hooks.OnPlayerConnected -= new Fougerite.Hooks.ConnectionHandlerDelegate(PlayerConnect);
+        //    Fougerite.Hooks.OnPlayerDisconnected -= new Fougerite.Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
+        //    Fougerite.Hooks.OnPlayerKilled -= new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
+        //    Fougerite.Hooks.OnServerShutdown -= new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
+        //    Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
+        //    Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
+        //    Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
+        //    Fougerite.Hooks.OnRPPCommand -= new Fougerite.Hooks.RPPCommandHandlerDelegate(Command);
+        //}
+
+        void TimeEvent(object x, ElapsedEventArgs y)
+        {
+            TimedEvents.startEvents();
         }
 
         void ChatReceived(ref ConsoleSystem.Arg arg)
@@ -215,39 +256,6 @@ namespace RustPP
                     else
                         Fougerite.Hooks.decayList.Remove(he.Entity);
             }
-        }
-
-        void EntityDeployed(Player creator, Entity e) // by dretax14 (RampFix plugin)
-        {
-            if (e != null)
-                if (e.Name == "WoodRamp" || e.Name == "MetalRamp")
-                {
-                    var name = e.Name;
-                    foreach (Entity ent in World.GetWorld().Entities)
-                    {
-                        if (ent.Name == "WoodRamp" || ent.Name == "MetalRamp")
-                        {
-                            var one = Util.GetUtil().CreateVector(ent.X, ent.Y, ent.Z);
-                            var two = Util.GetUtil().CreateVector(e.X, e.Y, e.Z);
-                            var dist = Util.GetUtil().GetVectorsDistance(one, two);
-                            if (e != ent && e.InstanceID != ent.InstanceID)
-                                if (dist == 0)
-                                {
-                                    if (Core.config.GetSetting("Settings", "rampgiveback") == "true" && creator != null)
-                                    {
-                                        if (name == "WoodRamp")
-                                            name = "Wood Ramp";
-                                        else if (name == "MetalRamp")
-                                            name = "Metal Ramp";
-
-                                        // Make sure that the player is online
-                                        creator.Inventory.AddItem(name, 1);
-                                    }
-                                    e.Destroy();
-                                }
-                        }
-                    }
-                }
         }
     }
 }

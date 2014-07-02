@@ -20,12 +20,6 @@ namespace Fougerite
             else Debug.Log("Config " + ConfigPath + " NOT loaded!");
         }
 
-        public static string GetValueDefault(string Setting)
-        {
-            return FougeriteConfig.GetSetting("Fougerite", Setting);
-
-        }
-
         public static string GetValue(string Section, string Setting)
         {
             return FougeriteConfig.GetSetting(Section, Setting);

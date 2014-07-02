@@ -153,7 +153,7 @@ namespace Fougerite
         public static void LogDebug(string Message, UnityEngine.Object Context = null)
         {
             if (showDebug)
-                Debug.Log("<color=#ffa500ff>[DEBUG]</color> " + Message, Context);
+                Debug.Log("[DEBUG] " + Message, Context);
             Message = "[Debug] " + Message;
             WriteLog(Message);
         }

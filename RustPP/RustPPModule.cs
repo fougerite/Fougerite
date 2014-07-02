@@ -38,7 +38,7 @@ namespace RustPP
         public static string ConfigsFolder;
         public override void Initialize()
         {
-            ConfigFile = ModuleManager.ModulesFolderFull + "\\" + Name + "\\Rust++.cfg";
+            ConfigFile = ModuleManager.ModulesFolderFull + Name + "\\Rust++.cfg";
             ConfigsFolder = @"\configs\";
             try
             {

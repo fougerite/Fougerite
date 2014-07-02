@@ -30,7 +30,7 @@ namespace RampFix
         IniParser Config;
         public override void Initialize()
         {
-            Config = new IniParser(ModuleManager.ModulesFolderFull + "\\" + Name + @"\RampFix.cfg");
+            Config = new IniParser(ModuleManager.ModulesFolderFull + Name + @"\RampFix.cfg");
             Fougerite.Hooks.OnEntityDeployed += new Fougerite.Hooks.EntityDeployedDelegate(EntityDeployed);
         }
         //public override void DeInitialize()

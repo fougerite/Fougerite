@@ -308,7 +308,7 @@
             this.Invoke("On_PlayerKilled", new object[] { de });
         }
 
-        public void OnPlayerSpawn(Fougerite.Player p, SpawnEvent se)
+        public void OnPlayerSpawning(Fougerite.Player p, SpawnEvent se)
         {
             this.Invoke("On_PlayerSpawning", new object[] { p, se });
         }

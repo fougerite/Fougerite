@@ -36,17 +36,17 @@
 
         public void SetGlobals()
         {
-            ScriptEngine.SetGlobalValue("Server", Zumwalt.Server.GetServer());
-            ScriptEngine.SetGlobalValue("Data", Zumwalt.Data.GetData());
+            ScriptEngine.CompatibilityMode = CompatibilityMode.Latest;
+            ScriptEngine.EnableExposedClrTypes = true;
+
+            ScriptEngine.SetGlobalValue("Server", Fougerite.Server.GetServer());
+            ScriptEngine.SetGlobalValue("Data", Fougerite.Data.GetData());
             ScriptEngine.SetGlobalValue("DataStore", DataStore.GetInstance());
             ScriptEngine.SetGlobalValue("Util", Util.GetUtil());
             ScriptEngine.SetGlobalValue("Web", new Web());
             ScriptEngine.SetGlobalValue("Time", this);
             ScriptEngine.SetGlobalValue("World", World.GetWorld());
             ScriptEngine.SetGlobalValue("Plugin", this);
-
-            ScriptEngine.CompatibilityMode = CompatibilityMode.Latest;
-            ScriptEngine.EnableExposedClrTypes = true;
         }
 
         public void LoadPlugins(Player p)

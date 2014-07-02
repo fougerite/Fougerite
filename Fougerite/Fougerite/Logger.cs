@@ -45,6 +45,11 @@ namespace Fougerite
             {
                 Debug.LogException(ex);
             }
+
+            if (showDebug)
+                Logger.LogDebug("Ok");
+            if (showErrors)
+                Logger.LogError("Ok");
         }
 
         private static void LogWriterInit()
@@ -148,7 +153,7 @@ namespace Fougerite
         public static void LogDebug(string Message, UnityEngine.Object Context = null)
         {
             if (showDebug)
-                Debug.Log("<color=orange>[DEBUG]</color> " + Message, Context);
+                Debug.Log("<color=#ffa500ff>[DEBUG]</color> " + Message, Context);
             Message = "[Debug] " + Message;
             WriteLog(Message);
         }

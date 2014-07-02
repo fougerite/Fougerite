@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 namespace Fougerite
 {
@@ -15,9 +16,9 @@ namespace Fougerite
             if (File.Exists(ConfigPath))
             {
                 FougeriteConfig = new IniParser(ConfigPath);
-                Logger.Log("Config " + ConfigPath + " loaded!");
+                Debug.Log("Config " + ConfigPath + " loaded!");
             }
-            else Logger.Log("Config " + ConfigPath + " NOT loaded!");
+            else Debug.Log("Config " + ConfigPath + " NOT loaded!");
         }
 
         public static string GetValueDefault(string Setting)

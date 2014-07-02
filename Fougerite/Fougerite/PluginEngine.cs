@@ -44,9 +44,13 @@
             ScriptEngine.SetGlobalValue("DataStore", DataStore.GetInstance());
             ScriptEngine.SetGlobalValue("Util", Util.GetUtil());
             ScriptEngine.SetGlobalValue("Web", new Web());
-            ScriptEngine.SetGlobalValue("Time", this);
             ScriptEngine.SetGlobalValue("World", World.GetWorld());
-            ScriptEngine.SetGlobalValue("Plugin", this);
+
+            ScriptEngine.Execute(@"
+String.prototype.Contains = function(arg) {
+    return this.indexOf(arg) != -1;
+}
+");
         }
 
         public void LoadPlugins(Player p)
@@ -61,30 +65,30 @@
                 try
                 {
                     this.ScriptEngine.Execute(plugin.Code);
-                    this.ScriptEngine.Execute(@"plugin = {
-                        'OnServerInit': On_ServerInit,
-                        'OnPluginInit': On_PluginInit,
-                        'OnServerShutdown': On_ServerShutdown,
-                        'OnItemsLoaded': On_ItemsLoaded,
-                        'OnTablesLoaded': On_TablesLoaded,
-                        'OnChat': On_Chat,
-                        'OnConsole': On_Console,
-                        'OnCommand': On_Command,
-                        'OnPlayerConnected': On_PlayerConnected,
-                        'OnPlayerDisconnected': On_PlayerDisconnected,
-                        'OnPlayerKilled': On_PlayerKilled,
-                        'OnPlayerHurt': On_PlayerHurt,
-                        'OnPlayerSpawning': On_PlayerSpawning,
-                        'OnPlayerSpawned': On_PlayerSpawned,
-                        'OnPlayerGathering': On_PlayerGathering,
-                        'OnEntityHurt': On_EntityHurt,
-                        'OnEntityDecay': On_EntityDecay,
-                        'OnEntityDeployed': On_EntityDeployed,
-                        'OnNPCHurt': On_NPCHurt,
-                        'OnNPCKilled': On_NPCKilled,
-                        'OnBlueprintUse': On_BlueprintUse,
-                        'OnDoorUse': On_DoorUse,
-                    }");
+                    this.ScriptEngine.Execute(@"plugin = {};
+                        if (typeof On_ServerInit !== 'undefined') { plugin.On_ServerInit = On_ServerInit; On_ServerInit = undefined; } else { plugin.On_ServerInit = undefined; }
+                        if (typeof On_PluginInit !== 'undefined') { plugin.On_PluginInit = On_PluginInit; On_PluginInit = undefined; } else { plugin.On_PluginInit = undefined; }
+                        if (typeof On_ServerShutdown !== 'undefined') { plugin.On_ServerShutdown = On_ServerShutdown; On_ServerShutdown = undefined; } else { plugin.On_ServerShutdown = undefined; }
+                        if (typeof On_ItemsLoaded !== 'undefined') { plugin.On_ItemsLoaded = On_ItemsLoaded; On_ItemsLoaded = undefined; } else { plugin.On_ItemsLoaded = undefined; }
+                        if (typeof On_TablesLoaded !== 'undefined') { plugin.On_TablesLoaded = On_TablesLoaded; On_TablesLoaded = undefined; } else { plugin.On_TablesLoaded = undefined; }
+                        if (typeof On_Chat !== 'undefined') { plugin.On_Chat = On_Chat; On_Chat = undefined; } else { plugin.On_Chat = undefined; }
+                        if (typeof On_Console !== 'undefined') { plugin.On_Console = On_Console; On_Console = undefined; } else { plugin.On_Console = undefined; }
+                        if (typeof On_Command !== 'undefined') { plugin.On_Command = On_Command; On_Command = undefined; } else { plugin.On_Command = undefined; }
+                        if (typeof On_PlayerConnected !== 'undefined') { plugin.On_PlayerConnected = On_PlayerConnected; On_PlayerConnected = undefined; } else { plugin.On_PlayerConnected = undefined; }
+                        if (typeof On_PlayerDisconnected !== 'undefined') { plugin.On_PlayerDisconnected = On_PlayerDisconnected; On_PlayerDisconnected = undefined; } else { plugin.On_PlayerDisconnected = undefined; }
+                        if (typeof On_PlayerKilled !== 'undefined') { plugin.On_PlayerKilled = On_PlayerKilled; On_PlayerKilled = undefined; } else { plugin.On_PlayerKilled = undefined; }
+                        if (typeof On_PlayerHurt !== 'undefined') { plugin.On_PlayerHurt = On_PlayerHurt; On_PlayerHurt = undefined; } else { plugin.On_PlayerHurt = undefined; }
+                        if (typeof On_PlayerSpawning !== 'undefined') { plugin.On_PlayerSpawning = On_PlayerSpawning; On_PlayerSpawning = undefined; } else { plugin.On_PlayerSpawning = undefined; }
+                        if (typeof On_PlayerSpawned !== 'undefined') { plugin.On_PlayerSpawned = On_PlayerSpawned; On_PlayerSpawned = undefined; } else { plugin.On_PlayerSpawned = undefined; }
+                        if (typeof On_PlayerGathering !== 'undefined') { plugin.On_PlayerGathering = On_PlayerGathering; On_PlayerGathering = undefined; } else { plugin.On_PlayerGathering = undefined; }
+                        if (typeof On_EntityHurt !== 'undefined') { plugin.On_EntityHurt = On_EntityHurt; On_EntityHurt = undefined; } else { plugin.On_EntityHurt = undefined; }
+                        if (typeof On_EntityDecay !== 'undefined') { plugin.On_EntityDecay = On_EntityDecay; On_EntityDecay = undefined; } else { plugin.On_EntityDecay = undefined; }
+                        if (typeof On_EntityDeployed !== 'undefined') { plugin.On_EntityDeployed = On_EntityDeployed; On_EntityDeployed = undefined; } else { plugin.On_EntityDeployed = undefined; }
+                        if (typeof On_NPCHurt !== 'undefined') { plugin.On_NPCHurt = On_NPCHurt; On_NPCHurt = undefined; } else { plugin.On_NPCHurt = undefined; }
+                        if (typeof On_NPCKilled !== 'undefined') { plugin.On_NPCKilled = On_NPCKilled; On_NPCKilled = undefined; } else { plugin.On_NPCKilled = undefined; }
+                        if (typeof On_BlueprintUse !== 'undefined') { plugin.On_BlueprintUse = On_BlueprintUse; On_BlueprintUse = undefined; } else { plugin.On_BlueprintUse = undefined; }
+                        if (typeof On_DoorUse !== 'undefined') { plugin.On_DoorUse = On_DoorUse; On_DoorUse = undefined; } else { plugin.On_DoorUse = undefined; }
+                    ");
                     plugin.JSObject = ScriptEngine.GetGlobalValue<ObjectInstance>("plugin");
                     plugin.InstallHooks();
                 }
@@ -168,6 +172,7 @@
                     Logger.Log("[Plugin] Loaded: " + Directory.GetParent(path).Name);
                     Plugin plugin = new Plugin(path);
                     plugin.Code = script;
+                    plugin.Engine = ScriptEngine;
                     this.Plugins.Add(plugin);
                 }
             }

@@ -1,6 +1,7 @@
 ﻿namespace Fougerite
 {
     using Fougerite.Events;
+    using Jurassic.Library;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -13,6 +14,7 @@
         private string path;
         private System.Collections.Generic.List<TimedEvent> timers;
         public Jurassic.Library.ObjectInstance JSObject;
+        private ClrInstanceWrapper thisWrapper;
 
         public Plugin(string path)
         {
@@ -24,28 +26,28 @@
         {
             Jurassic.Undefined undefined = Jurassic.Undefined.Value;
 
-            if (JSObject.GetPropertyValue("OnServerInit") != undefined) Hooks.OnServerInit += this.OnServerInit;
-            if (JSObject.GetPropertyValue("OnPluginInit") != undefined) Hooks.OnPluginInit += this.OnPluginInit;
-            if (JSObject.GetPropertyValue("OnServerShutdown") != undefined) Hooks.OnServerShutdown += this.OnServerShutdown;
-            if (JSObject.GetPropertyValue("OnItemsLoaded") != undefined) Hooks.OnItemsLoaded += this.OnItemsLoaded;
-            if (JSObject.GetPropertyValue("OnTablesLoaded") != undefined) Hooks.OnTablesLoaded += this.OnTablesLoaded;
-            if (JSObject.GetPropertyValue("OnChat") != undefined) Hooks.OnChat += this.OnChat;
-            if (JSObject.GetPropertyValue("OnConsole") != undefined) Hooks.OnConsoleReceived += this.OnConsole;
-            if (JSObject.GetPropertyValue("OnCommand") != undefined) Hooks.OnCommand += this.OnCommand;
-            if (JSObject.GetPropertyValue("OnPlayerConnected") != undefined) Hooks.OnPlayerConnected += this.OnPlayerConnected;
-            if (JSObject.GetPropertyValue("OnPlayerDisconnected") != undefined) Hooks.OnPlayerDisconnected += this.OnPlayerDisconnected;
-            if (JSObject.GetPropertyValue("OnPlayerKilled") != undefined) Hooks.OnPlayerKilled += this.OnPlayerKilled;
-            if (JSObject.GetPropertyValue("OnPlayerHurt") != undefined) Hooks.OnPlayerHurt += this.OnPlayerHurt;
-            if (JSObject.GetPropertyValue("OnPlayerSpawning") != undefined) Hooks.OnPlayerSpawning += this.OnPlayerSpawning;
-            if (JSObject.GetPropertyValue("OnPlayerSpawned") != undefined) Hooks.OnPlayerSpawned += this.OnPlayerSpawned;
-            if (JSObject.GetPropertyValue("OnPlayerGathering") != undefined) Hooks.OnPlayerGathering += this.OnPlayerGathering;
-            if (JSObject.GetPropertyValue("OnEntityHurt") != undefined) Hooks.OnEntityHurt += this.OnEntityHurt;
-            if (JSObject.GetPropertyValue("OnEntityDecay") != undefined) Hooks.OnEntityDecay += this.OnEntityDecay;
-            if (JSObject.GetPropertyValue("OnEntityDeployed") != undefined) Hooks.OnEntityDeployed += this.OnEntityDeployed;
-            if (JSObject.GetPropertyValue("OnNPCHurt") != undefined) Hooks.OnNPCHurt += this.OnNPCHurt;
-            if (JSObject.GetPropertyValue("OnNPCKilled") != undefined) Hooks.OnNPCKilled += this.OnNPCKilled;
-            if (JSObject.GetPropertyValue("OnBlueprintUse") != undefined) Hooks.OnBlueprintUse += this.OnBlueprintUse;
-            if (JSObject.GetPropertyValue("OnDoorUse") != undefined) Hooks.OnDoorUse += this.OnDoorUse;
+            if (JSObject.GetPropertyValue("On_ServerInit") != undefined) Hooks.OnServerInit += this.OnServerInit;
+            if (JSObject.GetPropertyValue("On_PluginInit") != undefined) Hooks.OnPluginInit += this.OnPluginInit;
+            if (JSObject.GetPropertyValue("On_ServerShutdown") != undefined) Hooks.OnServerShutdown += this.OnServerShutdown;
+            if (JSObject.GetPropertyValue("On_ItemsLoaded") != undefined) Hooks.OnItemsLoaded += this.OnItemsLoaded;
+            if (JSObject.GetPropertyValue("On_TablesLoaded") != undefined) Hooks.OnTablesLoaded += this.OnTablesLoaded;
+            if (JSObject.GetPropertyValue("On_Chat") != undefined) Hooks.OnChat += this.OnChat;
+            if (JSObject.GetPropertyValue("On_Console") != undefined) Hooks.OnConsoleReceived += this.OnConsole;
+            if (JSObject.GetPropertyValue("On_Command") != undefined) Hooks.OnCommand += this.OnCommand;
+            if (JSObject.GetPropertyValue("On_PlayerConnected") != undefined) Hooks.OnPlayerConnected += this.OnPlayerConnected;
+            if (JSObject.GetPropertyValue("On_PlayerDisconnected") != undefined) Hooks.OnPlayerDisconnected += this.OnPlayerDisconnected;
+            if (JSObject.GetPropertyValue("On_PlayerKilled") != undefined) Hooks.OnPlayerKilled += this.OnPlayerKilled;
+            if (JSObject.GetPropertyValue("On_PlayerHurt") != undefined) Hooks.OnPlayerHurt += this.OnPlayerHurt;
+            if (JSObject.GetPropertyValue("On_PlayerSpawning") != undefined) Hooks.OnPlayerSpawning += this.OnPlayerSpawning;
+            if (JSObject.GetPropertyValue("On_PlayerSpawned") != undefined) Hooks.OnPlayerSpawned += this.OnPlayerSpawned;
+            if (JSObject.GetPropertyValue("On_PlayerGathering") != undefined) Hooks.OnPlayerGathering += this.OnPlayerGathering;
+            if (JSObject.GetPropertyValue("On_EntityHurt") != undefined) Hooks.OnEntityHurt += this.OnEntityHurt;
+            if (JSObject.GetPropertyValue("On_EntityDecay") != undefined) Hooks.OnEntityDecay += this.OnEntityDecay;
+            if (JSObject.GetPropertyValue("On_EntityDeployed") != undefined) Hooks.OnEntityDeployed += this.OnEntityDeployed;
+            if (JSObject.GetPropertyValue("On_NPCHurt") != undefined) Hooks.OnNPCHurt += this.OnNPCHurt;
+            if (JSObject.GetPropertyValue("On_NPCKilled") != undefined) Hooks.OnNPCKilled += this.OnNPCKilled;
+            if (JSObject.GetPropertyValue("On_BlueprintUse") != undefined) Hooks.OnBlueprintUse += this.OnBlueprintUse;
+            if (JSObject.GetPropertyValue("On_DoorUse") != undefined) Hooks.OnDoorUse += this.OnDoorUse;
         }
 
         public bool CreateDir(string name)
@@ -183,6 +185,21 @@
 
         private void Invoke(string name, params object[] obj)
         {
+            Engine.SetGlobalValue("Time", thisWrapper);
+            Engine.SetGlobalValue("Plugin", thisWrapper);
+
+            for (int i = 0; i < obj.Length; i++)
+            {
+                TypeCode tc = Type.GetTypeCode(obj[i].GetType());
+                if (tc == TypeCode.Object)
+                {
+                    if (!(obj[i] is ObjectInstance))
+                    {
+                        obj[i] = new ClrInstanceWrapper(Engine, obj[i]);
+                    }
+                }
+            }
+
             try
             {
                 JSObject.CallMemberFunction(name, obj);
@@ -221,7 +238,7 @@
 
         public void OnBlueprintUse(Fougerite.Player p, BPUseEvent ae)
         {
-            this.Invoke("On_BlueprintUse", new object[] { p, ae });
+            this.Invoke("On_BlueprintUse", new object[] { new ClrInstanceWrapper(Engine, p), ae });
         }
 
         public void OnChat(Fougerite.Player player, ref ChatString text)
@@ -231,7 +248,11 @@
 
         public void OnCommand(Fougerite.Player player, string command, string[] args)
         {
-            this.Invoke("On_Command", new object[] { player, command, args });
+            if (args == null)
+            {
+                args = new string[0];
+            }
+            this.Invoke("On_Command", new object[] { player, command, Engine.Array.New(args) });
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
@@ -387,6 +408,20 @@
             set
             {
                 this.path = value;
+            }
+        }
+
+        private Jurassic.ScriptEngine engine;
+        public Jurassic.ScriptEngine Engine 
+        {
+            get
+            {
+                return engine;
+            }
+            set
+            {
+                engine = value;
+                thisWrapper = new ClrInstanceWrapper(value, this);
             }
         }
     }

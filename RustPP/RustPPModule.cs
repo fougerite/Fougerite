@@ -67,9 +67,8 @@ namespace RustPP
             Fougerite.Hooks.OnPlayerKilled += new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
             Fougerite.Hooks.OnServerShutdown += new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
-            Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-            Fougerite.Hooks.OnRPPCommand += new Fougerite.Hooks.RPPCommandHandlerDelegate(Command);
+            Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
         }
 
         //public void DeInitialize()
@@ -85,9 +84,8 @@ namespace RustPP
         //    Fougerite.Hooks.OnPlayerKilled -= new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
         //    Fougerite.Hooks.OnServerShutdown -= new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
         //    Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
-        //    Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
         //    Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-        //    Fougerite.Hooks.OnRPPCommand -= new Fougerite.Hooks.RPPCommandHandlerDelegate(Command);
+        //    Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
         //}
 
         void TimeEvent(object x, ElapsedEventArgs y)
@@ -97,6 +95,8 @@ namespace RustPP
 
         void ChatReceived(ref ConsoleSystem.Arg arg)
         {
+            string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
+
             TeleportToCommand command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
             if (command.GetTPWaitList().Contains(arg.argUser.userID))
             {
@@ -140,12 +140,9 @@ namespace RustPP
                 }
                 arg = null;
             }
-        }
-
-        void Command(ref ConsoleSystem.Arg arg)
-        {
-            if (Core.IsEnabled())
-                Core.handleCommand(ref arg);
+            else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
+                if (Core.IsEnabled())
+                    Core.handleCommand(ref arg);
         }
 
         void Chat(Fougerite.Player p, ref ChatString text)

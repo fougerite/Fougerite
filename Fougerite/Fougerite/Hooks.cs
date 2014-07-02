@@ -24,8 +24,6 @@
 
         public static event CommandHandlerDelegate OnCommand;
 
-        public static event RPPCommandHandlerDelegate OnRPPCommand;
-
         public static event ConsoleHandlerDelegate OnConsoleReceived;
 
         public static event DoorOpenHandlerDelegate OnDoorUse;
@@ -109,13 +107,7 @@
                     OnChatReceived(ref arg);
                 if (arg == null)
                     return;
-
-                if (OnRPPCommand != null)
-                    OnRPPCommand(ref arg);
-                if (arg == null)
-                    return;
-
-                if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
+                else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
                     handleCommand(ref arg);
                 else
                 {
@@ -563,8 +555,6 @@
         public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
 
         public delegate void ChatRecivedDelegate(ref ConsoleSystem.Arg arg);
-
-        public delegate void RPPCommandHandlerDelegate(ref ConsoleSystem.Arg arg);
         
         public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);
 

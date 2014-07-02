@@ -41,7 +41,7 @@
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            Config.Init();
+            Config.Init(@".\Fougerite.cfg");
             Logger.Init();
             ModuleManager.LoadModules();
             PluginEngine.GetPluginEngine();

@@ -9,9 +9,8 @@ namespace Fougerite
     class Config
     {
         public static IniParser FougeriteConfig;
-        private static string ConfigPath = @".\Fougerite.cfg";
 
-        public static void Init()
+        public static void Init(string ConfigPath)
         {
             if (File.Exists(ConfigPath))
             {

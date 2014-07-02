@@ -23,9 +23,16 @@ namespace Fougerite
 
         public static void Init()
         {
-            showDebug = Config.GetBoolValue("Logging", "debug");
-            showErrors = Config.GetBoolValue("Logging", "error");
-            showException = Config.GetBoolValue("Logging", "exception");
+            try
+            {
+                showDebug = Config.GetBoolValue("Logging", "debug");
+                showErrors = Config.GetBoolValue("Logging", "error");
+                showException = Config.GetBoolValue("Logging", "exception");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
 
             try
             {

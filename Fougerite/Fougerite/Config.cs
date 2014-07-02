@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Fougerite
@@ -11,7 +12,12 @@ namespace Fougerite
 
         public static void Init()
         {
-            FougeriteConfig = new IniParser(ConfigPath);
+            if (File.Exists(ConfigPath))
+            {
+                FougeriteConfig = new IniParser(ConfigPath);
+                Logger.Log("Config " + ConfigPath + " loaded!");
+            }
+            else Logger.Log("Config " + ConfigPath + " NOT loaded!");
         }
 
         public static string GetValueDefault(string Setting)

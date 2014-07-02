@@ -25,7 +25,7 @@ namespace Fougerite
     public class ModuleManager
     {
         public static readonly Version ApiVersion = new Version(1, 0, 0, 0);
-        public static string ModulesFolder = @".\Modules\";
+        public static string ModulesFolder = @"\Modules\";
         public static string ModulesFolderFull = Environment.CurrentDirectory + ModuleManager.ModulesFolder;
         //private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
@@ -39,13 +39,13 @@ namespace Fougerite
         internal static void LoadModules()
         {
             Logger.Log("[Modules] Loading modules...");
-            string IgnoredPluginsFilePath = Path.Combine(ModulesFolder, "ignoredmodules.txt");
+            string IgnoredPluginsFilePath = Path.Combine(ModulesFolderFull, "ignoredmodules.txt");
 
             List<string> IgnoredModules = new List<string>();
             if (File.Exists(IgnoredPluginsFilePath))
                 IgnoredModules.AddRange(File.ReadAllLines(IgnoredPluginsFilePath));
 
-            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolder).GetFiles("*.dll", SearchOption.AllDirectories);
+            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolderFull).GetFiles("*.dll", SearchOption.AllDirectories);
 
             Dictionary<Module, Stopwatch> PluginInitWatches = new Dictionary<Module, Stopwatch>();
             foreach (FileInfo FileInfo in FileInfos)

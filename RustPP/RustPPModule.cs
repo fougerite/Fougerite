@@ -33,18 +33,16 @@ namespace RustPP
         }
 
         Timer timer;
-        public static IniParser GetRPPConfig()
-        {
-            return new IniParser(ModuleManager.ModulesFolderFull + "Rust++.cfg");
-        }
 
+        public static string ConfigFile;
         public static string ConfigsFolder;
         public override void Initialize()
         {
+            ConfigFile = ModuleManager.ModulesFolderFull + "\\" + Name + "\\Rust++.cfg";
             ConfigsFolder = @"\configs\";
             try
             {
-                Core.config = GetRPPConfig();
+                Core.config = new IniParser(ConfigFile);
                 
                 if ((Core.config != null) && Core.IsEnabled())
                 {

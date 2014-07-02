@@ -12,7 +12,6 @@
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             Fougerite.Data.GetData().Load();
-            Core.config = RustPPModule.GetRPPConfig();
             TimedEvents.startEvents();
             if (File.Exists(Helper.GetAbsoluteFilePath("admins.xml")))
             {

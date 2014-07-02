@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectType>local</ProjectType>
+    <ProjectVersion>7.10.377</ProjectVersion>
+    <ProjectGuid>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <AssemblyName>Fougerite</AssemblyName>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.XML" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\References\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Jurassic">
+      <HintPath>..\References\Jurassic.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\References\System.Core.dll</HintPath>
+    </Reference>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Fougerite\ChatString.cs" />
+    <Compile Include="Fougerite\Logger.cs" />
+    <Compile Include="Fougerite\Zone3D.cs" />
+    <Compile Include="Fougerite\DataStore.cs" />
+    <Compile Include="Fougerite\Events\BPUseEvent.cs" />
+    <Compile Include="Fougerite\Events\DoorEvent.cs" />
+    <Compile Include="Fougerite\Events\GatherEvent.cs" />
+    <Compile Include="Fougerite\Events\HurtEvent.cs" />
+    <Compile Include="Fougerite\Events\DeathEvent.cs" />
+    <Compile Include="Fougerite\Events\DecayEvent.cs" />
+    <Compile Include="Fougerite\Entity.cs" />
+    <Compile Include="Fougerite\Events\SpawnEvent.cs" />
+    <Compile Include="Fougerite\ItemsBlocks.cs" />
+    <Compile Include="Fougerite\NPC.cs" />
+    <Compile Include="Fougerite\PlayerItem.cs" />
+    <Compile Include="Fougerite\Events\TimedEvent.cs" />
+    <Compile Include="Fougerite\Web.cs" />
+    <Compile Include="Fougerite\World.cs" />
+    <Compile Include="Fougerite\Hooks.cs" />
+    <Compile Include="Fougerite\Player.cs" />
+    <Compile Include="Fougerite\PlayerInv.cs" />
+    <Compile Include="Fougerite\Server.cs" />
+    <Compile Include="Fougerite\Data.cs" />
+    <Compile Include="Fougerite\PluginEngine.cs" />
+    <Compile Include="RustPP\Commands\ChatCommand.cs" />
+    <Compile Include="RustPP\Commands\AboutCommand.cs" />
+    <Compile Include="RustPP\Commands\AddAdminCommand.cs" />
+    <Compile Include="RustPP\Commands\AddFlagCommand.cs" />
+    <Compile Include="RustPP\Commands\AddFriendCommand.cs" />
+    <Compile Include="RustPP\Commands\AnnounceCommand.cs" />
+    <Compile Include="RustPP\Commands\BanCommand.cs" />
+    <Compile Include="RustPP\Commands\FriendsCommand.cs" />
+    <Compile Include="RustPP\Commands\GetFlagsCommand.cs" />
+    <Compile Include="RustPP\Commands\GiveItemCommand.cs" />
+    <Compile Include="RustPP\Commands\GodModeCommand.cs" />
+    <Compile Include="RustPP\Commands\HelpCommand.cs" />
+    <Compile Include="RustPP\Commands\HistoryCommand.cs" />
+    <Compile Include="RustPP\Commands\InstaKOCommand.cs" />
+    <Compile Include="RustPP\Commands\KickCommand.cs" />
+    <Compile Include="RustPP\Commands\KillCommand.cs" />
+    <Compile Include="RustPP\Commands\LoadoutCommand.cs" />
+    <Compile Include="RustPP\Commands\LocationCommand.cs" />
+    <Compile Include="RustPP\Commands\MasterAdminCommand.cs" />
+    <Compile Include="RustPP\Commands\MOTDCommand.cs" />
+    <Compile Include="RustPP\Commands\MuteCommand.cs" />
+    <Compile Include="RustPP\Commands\PingCommand.cs" />
+    <Compile Include="RustPP\Commands\PlayersCommand.cs" />
+    <Compile Include="RustPP\Commands\PrivateMessagesCommand.cs" />
+    <Compile Include="RustPP\Commands\ReloadCommand.cs" />
+    <Compile Include="RustPP\Commands\RemoveAdminCommand.cs" />
+    <Compile Include="RustPP\Commands\RemoveFlagsCommand.cs" />
+    <Compile Include="RustPP\Commands\ReplyCommand.cs" />
+    <Compile Include="RustPP\Commands\RulesCommand.cs" />
+    <Compile Include="RustPP\Commands\SaveAllCommand.cs" />
+    <Compile Include="RustPP\Commands\ShareCommand.cs" />
+    <Compile Include="RustPP\Commands\SpawnItemCommand.cs" />
+    <Compile Include="RustPP\Commands\StarterCommand.cs" />
+    <Compile Include="RustPP\Commands\TeleportHereCommand.cs" />
+    <Compile Include="RustPP\Commands\TeleportToCommand.cs" />
+    <Compile Include="RustPP\Commands\UnbanCommand.cs" />
+    <Compile Include="RustPP\Commands\UnfriendCommand.cs" />
+    <Compile Include="RustPP\Commands\UnmuteCommand.cs" />
+    <Compile Include="RustPP\Commands\UnshareCommand.cs" />
+    <Compile Include="RustPP\Commands\WhiteListAddCommand.cs" />
+    <Compile Include="RustPP\Core.cs" />
+    <Compile Include="RustPP\Helper.cs" />
+    <Compile Include="RustPP\Hooks.cs" />
+    <Compile Include="RustPP\Permissions\Administrator.cs" />
+    <Compile Include="RustPP\PList.cs" />
+    <Compile Include="rustpp.cs" />
+    <Compile Include="RustPP\Social\FriendList.cs" />
+    <Compile Include="RustPP\TimedEvents.cs" />
+    <Compile Include="IniParser.cs" />
+    <Compile Include="Fougerite\Plugin.cs" />
+    <Compile Include="Fougerite\Util.cs" />
+    <Compile Include="Fougerite\Bootstrap.cs" />
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.ID">
+      <HintPath>..\References\Facepunch.ID.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers">
+      <HintPath>..\References\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="uLink">
+      <HintPath>..\References\uLink.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

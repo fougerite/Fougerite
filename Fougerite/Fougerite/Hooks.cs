@@ -222,12 +222,12 @@
             {
                 if ((a.argUser != null) && a.argUser.admin)
                 {
-                    PluginEngine.GetPluginEngine().ReloadPlugins(Fougerite.Player.FindByPlayerClient(a.argUser.playerClient));
+                    PluginEngine.Instance().ReloadPlugins();
                     a.ReplyWith("Fougerite: Reloaded!");
                 }
                 else if (external)
                 {
-                    PluginEngine.GetPluginEngine().ReloadPlugins(null);
+                    PluginEngine.Instance().ReloadPlugins();
                     a.ReplyWith("Fougerite: Reloaded!");
                 }
             }

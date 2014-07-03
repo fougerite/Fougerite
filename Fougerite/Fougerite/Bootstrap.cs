@@ -18,12 +18,12 @@
             {
                 Bootstrap bootstrap = new Bootstrap();
                 new GameObject(bootstrap.GetType().FullName).AddComponent(bootstrap.GetType());
-                Logger.Log("Loaded: Fougerite");
+                Debug.Log("Loaded: Fougerite");
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex);
-                Logger.Log("Error while loading Fougerite!");
+                Debug.LogException(ex);
+                Debug.Log("Error while loading Fougerite!");
             }
         }
 
@@ -45,7 +45,7 @@
             }
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
-            PluginEngine.GetPluginEngine();
+            PluginEngine.Instance();
             Core.config = Fougerite.Data.GetData().GetRPPConfig();
             if ((Core.config != null) && Core.IsEnabled())
             {

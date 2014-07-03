@@ -25,8 +25,7 @@ namespace Fougerite
     public class ModuleManager
     {
         public static readonly Version ApiVersion = new Version(1, 0, 0, 0);
-        public static string ModulesFolder = @"\Modules\";
-        public static string ModulesFolderFull = Environment.CurrentDirectory + ModuleManager.ModulesFolder;
+        public static string ModulesFolder = @".\Modules\";
         //private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
         private static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
@@ -39,15 +38,14 @@ namespace Fougerite
         internal static void LoadModules()
         {
             Logger.Log("[Modules] Loading modules...");
-            string IgnoredPluginsFilePath = Path.Combine(ModulesFolderFull, "ignoredmodules.txt");
+            string IgnoredPluginsFilePath = Path.Combine(ModulesFolder, "ignoredmodules.txt");
 
             List<string> IgnoredModules = new List<string>();
             if (File.Exists(IgnoredPluginsFilePath))
                 IgnoredModules.AddRange(File.ReadAllLines(IgnoredPluginsFilePath));
 
-            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolderFull).GetFiles("*.dll", SearchOption.AllDirectories);
+            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolder).GetFiles("*.dll", SearchOption.AllDirectories);
 
-            Dictionary<Module, Stopwatch> PluginInitWatches = new Dictionary<Module, Stopwatch>();
             foreach (FileInfo FileInfo in FileInfos)
             {
                 Logger.LogDebug("[Modules] Module Found: " + FileInfo.Name);
@@ -76,32 +74,10 @@ namespace Fougerite
                             continue;
                         Logger.LogDebug("[Modules] Checked " + Type.FullName);
 
-                        //object[] CustomAttributes = Type.GetCustomAttributes(typeof(ApiVersionAttribute), false);
-                        //if (CustomAttributes.Length == 0)
-                        //    continue;
-                        //Logger.Log("Ok " + Type.FullName);
-
-                        //if (!IsIgnoreVersion)
-                        //{
-                        //    var ApiVersionAttribute = (ApiVersionAttribute)CustomAttributes[0];
-                        //    Version ApiVersion = ApiVersionAttribute.ApiVersion;
-                        //    if (ApiVersion.Major != ApiVersion.Major || ApiVersion.Minor != ApiVersion.Minor)
-                        //    {
-                        //        Logger.LogWarning(string.Format("Plugin \"{0}\" is designed for a different API version ({1}) and was ignored.",
-                        //            Type.FullName, ApiVersion.ToString(2)));
-                        //        continue;
-                        //    }
-                        //}
-
                         Module PluginInstance = null;
                         try
                         {
-                            Logger.LogDebug("[Modules] Creating instance: " + Type.FullName);
-                            Stopwatch InitTimeWatch = new Stopwatch();
-                            InitTimeWatch.Start();
                             PluginInstance = (Module)Activator.CreateInstance(Type);
-                            InitTimeWatch.Stop();
-                            PluginInitWatches.Add(PluginInstance, InitTimeWatch);
                             Logger.LogDebug("[Modules] Instance created: " + Type.FullName);
                         }
                         catch (Exception ex)
@@ -111,7 +87,9 @@ namespace Fougerite
                         }
                         if (PluginInstance != null)
                         {
-                            Modules.Add(new ModuleContainer(PluginInstance));
+                            ModuleContainer Container = new ModuleContainer(PluginInstance);
+                            Container.Plugin.ModuleFolder = Path.GetDirectoryName(FileInfo.FullName);
+                            Modules.Add(Container);
                             Logger.LogDebug("[Modules] Module added: " + FileInfo.Name);
                             break;
                         }
@@ -131,9 +109,6 @@ namespace Fougerite
 
             foreach (ModuleContainer CurrentModule in OrderedModuleSelector)
             {
-                Stopwatch InitTimeWatch = PluginInitWatches[CurrentModule.Plugin];
-                InitTimeWatch.Start();
-
                 try
                 {
                     CurrentModule.Initialize();
@@ -145,7 +120,6 @@ namespace Fougerite
                         "[Modules] Module \"{0}\" has thrown an exception during initialization. {1}", CurrentModule.Plugin.Name, ex));
                 }
 
-                InitTimeWatch.Stop();
                 Logger.Log(string.Format(
                     "[Modules] Module {0} v{1} (by {2}) initiated.", CurrentModule.Plugin.Name, CurrentModule.Plugin.Version, CurrentModule.Plugin.Author));
             }

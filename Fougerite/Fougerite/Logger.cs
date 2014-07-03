@@ -45,11 +45,6 @@ namespace Fougerite
             {
                 Debug.LogException(ex);
             }
-
-            if (showDebug)
-                Logger.LogDebug("Ok");
-            if (showErrors)
-                Logger.LogError("Ok");
         }
 
         private static void LogWriterInit()

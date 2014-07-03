@@ -32,14 +32,21 @@ namespace RustPP
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
+        public static string GetAbsoluteFilePath(string fileName)
+        {
+            return (RustPPModule.StaticModuleFolder + RustPPModule.ConfigsFolder + fileName);
+        }
+
         Timer timer;
 
         public static string ConfigFile;
         public static string ConfigsFolder;
+        public static string StaticModuleFolder;
         public override void Initialize()
         {
-            ConfigFile = ModuleManager.ModulesFolderFull + Name + "\\Rust++.cfg";
             ConfigsFolder = @"\configs\";
+            ConfigFile = ModuleFolder + ConfigsFolder + "\\Rust++.cfg";
+            StaticModuleFolder = ModuleFolder;
             try
             {
                 Core.config = new IniParser(ConfigFile);

@@ -13,21 +13,21 @@
         {
             Fougerite.Data.GetData().Load();
             TimedEvents.startEvents();
-            if (File.Exists(Helper.GetAbsoluteFilePath("admins.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("admins.xml")))
             {
-                Administrator.AdminList = Helper.ObjectFromXML<List<Administrator>>(Helper.GetAbsoluteFilePath("admins.xml"));
+                Administrator.AdminList = Helper.ObjectFromXML<List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("whitelist.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("whitelist.xml")))
             {
-                Core.whiteList = new PList(Helper.ObjectFromXML<List<PList.Player>>(Helper.GetAbsoluteFilePath("whitelist.xml")));
+                Core.whiteList = new PList(Helper.ObjectFromXML<List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("whitelist.xml")));
             }
             else
             {
                 Core.whiteList = new PList();
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("bans.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("bans.xml")))
             {
-                Core.blackList = new PList(Helper.ObjectFromXML<List<PList.Player>>(Helper.GetAbsoluteFilePath("bans.xml")));
+                Core.blackList = new PList(Helper.ObjectFromXML<List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("bans.xml")));
             }
             else
             {

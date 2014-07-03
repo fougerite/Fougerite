@@ -26,37 +26,37 @@
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;
-            if (File.Exists(Helper.GetAbsoluteFilePath("doorsSave.rpp")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")))
             {
-                command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(Helper.GetAbsoluteFilePath("doorsSave.rpp")));
+                command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("friendsSave.rpp")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp")))
             {
-                command2.SetFriendsLists(Helper.ObjectFromFile<Hashtable>(Helper.GetAbsoluteFilePath("friendsSave.rpp")));
+                command2.SetFriendsLists(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp")));
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("admins.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("admins.xml")))
             {
-                Administrator.AdminList = Helper.ObjectFromXML<System.Collections.Generic.List<Administrator>>(Helper.GetAbsoluteFilePath("admins.xml"));
+                Administrator.AdminList = Helper.ObjectFromXML<System.Collections.Generic.List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("cache.rpp")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")))
             {
-                userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(Helper.GetAbsoluteFilePath("cache.rpp"));
+                userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
             }
             else
             {
                 userCache = new Dictionary<ulong, string>();
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("whitelist.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("whitelist.xml")))
             {
-                whiteList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(Helper.GetAbsoluteFilePath("whitelist.xml")));
+                whiteList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("whitelist.xml")));
             }
             else
             {
                 whiteList = new PList();
             }
-            if (File.Exists(Helper.GetAbsoluteFilePath("bans.xml")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("bans.xml")))
             {
-                blackList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(Helper.GetAbsoluteFilePath("bans.xml")));
+                blackList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("bans.xml")));
             }
             else
             {

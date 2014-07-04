@@ -17,27 +17,68 @@ namespace Fougerite
         private static string LogsFolder = @".\logs\";
         private static Writer LogWriter;
         private static Writer ChatWriter;
+        private static bool showDebug = false;
+        private static bool showErrors = false;
+        private static bool showException = false;
 
         public static void Init()
         {
-            LogWriterInit();
-            ChatWriterInit();
+            try
+            {
+                showDebug = Config.GetBoolValue("Logging", "debug");
+                showErrors = Config.GetBoolValue("Logging", "error");
+                showException = Config.GetBoolValue("Logging", "exception");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
 
-            Directory.CreateDirectory(LogsFolder);
+            try
+            {
+                Directory.CreateDirectory(LogsFolder);
+
+                LogWriterInit();
+                ChatWriterInit();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         private static void LogWriterInit()
         {
-            LogWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
-            LogWriter.LogWriter = new StreamWriter(LogsFolder + "Log " + LogWriter.DateTime + ".txt", true);
-            LogWriter.LogWriter.AutoFlush = true;
+            try
+            {
+                if (LogWriter.LogWriter != null)
+                    LogWriter.LogWriter.Close();
+
+                LogWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
+                LogWriter.LogWriter = new StreamWriter(LogsFolder + "Log " + LogWriter.DateTime + ".txt", true);
+                LogWriter.LogWriter.AutoFlush = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         private static void ChatWriterInit()
         {
-            ChatWriter.DateTime = LogWriter.DateTime;
-            ChatWriter.LogWriter = new StreamWriter(LogsFolder + "Chat " + ChatWriter.DateTime + ".txt", true);
-            ChatWriter.LogWriter.AutoFlush = true;
+            try
+            {
+                if (ChatWriter.LogWriter != null)
+                    ChatWriter.LogWriter.Close();
+
+                ChatWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
+                ChatWriter.LogWriter = new StreamWriter(LogsFolder + "Chat " + ChatWriter.DateTime + ".txt", true);
+                ChatWriter.LogWriter.AutoFlush = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
         
         private static string LogFormat(string Text)
@@ -48,43 +89,67 @@ namespace Fougerite
 
         private static void WriteLog(string Message)
         {
-            if (LogWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
-                LogWriterInit();
-            LogWriter.LogWriter.WriteLine(LogFormat(Message));
+            try
+            {
+                if (LogWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
+                    LogWriterInit();
+                LogWriter.LogWriter.WriteLine(LogFormat(Message));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         private static void WriteChat(string Message)
         {
-            if (ChatWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
-                ChatWriterInit();
-            ChatWriter.LogWriter.WriteLine(LogFormat(Message));
+            try
+            {
+                if (ChatWriter.DateTime != DateTime.Now.ToString("dd_MM_yyyy"))
+                    ChatWriterInit();
+                ChatWriter.LogWriter.WriteLine(LogFormat(Message));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         public static void Log(string Message, UnityEngine.Object Context = null)
         {
             Debug.Log(Message, Context);
-            Message = "[Console]" + Message;
+            Message = "[Console] " + Message;
             WriteLog(Message);
         }
 
         public static void LogWarning(string Message, UnityEngine.Object Context = null)
         {
             Debug.LogWarning(Message, Context);
-            Message = "[Warning]" + Message;
+            Message = "[Warning] " + Message;
             WriteLog(Message);
         }
 
         public static void LogError(string Message, UnityEngine.Object Context = null)
         {
-            Debug.LogError(Message, Context);
-            Message = "[Error]" + Message;
+            if (showErrors)
+                Debug.LogError(Message, Context);
+            Message = "[Error] " + Message;
             WriteLog(Message);
         }
 
         public static void LogException(Exception Ex, UnityEngine.Object Context = null)
         {
-            Debug.LogException(Ex, Context);
-            string Message = "[Exception]" + Ex.ToString();
+            if (showException)
+                Debug.LogException(Ex, Context);
+            string Message = "[Exception] " + Ex.ToString();
+            WriteLog(Message);
+        }
+
+        public static void LogDebug(string Message, UnityEngine.Object Context = null)
+        {
+            if (showDebug)
+                Debug.Log("[DEBUG] " + Message, Context);
+            Message = "[Debug] " + Message;
             WriteLog(Message);
         }
 

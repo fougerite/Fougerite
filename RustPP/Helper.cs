@@ -1,5 +1,6 @@
 ﻿namespace RustPP
 {
+    using Fougerite;
     using RustPP.Commands;
     using RustPP.Permissions;
     using System;
@@ -20,51 +21,51 @@
                 FriendsCommand command2 = (FriendsCommand)ChatCommand.GetCommand("friends");
                 if (command.GetSharedDoors().Count != 0)
                 {
-                    ObjectToFile<Hashtable>(command.GetSharedDoors(), GetAbsoluteFilePath("doorsSave.rpp"));
+                    ObjectToFile<Hashtable>(command.GetSharedDoors(), RustPPModule.GetAbsoluteFilePath("doorsSave.rpp"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("doorsSave.rpp")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")))
                 {
-                    File.Delete(GetAbsoluteFilePath("doorsSave.rpp"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp"));
                 }
                 if (command2.GetFriendsLists().Count != 0)
                 {
-                    ObjectToFile<Hashtable>(command2.GetFriendsLists(), GetAbsoluteFilePath("friendsSave.rpp"));
+                    ObjectToFile<Hashtable>(command2.GetFriendsLists(), RustPPModule.GetAbsoluteFilePath("friendsSave.rpp"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("friendsSave.rpp")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp")))
                 {
-                    File.Delete(GetAbsoluteFilePath("friendsSave.rpp"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp"));
                 }
                 if (Administrator.AdminList.Count != 0)
                 {
-                    ObjectToXML<List<Administrator>>(Administrator.AdminList, GetAbsoluteFilePath("admins.xml"));
+                    ObjectToXML<List<Administrator>>(Administrator.AdminList, RustPPModule.GetAbsoluteFilePath("admins.xml"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("admins.xml")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("admins.xml")))
                 {
-                    File.Delete(GetAbsoluteFilePath("admins.xml"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("admins.xml"));
                 }
                 if (Core.userCache.Count != 0)
                 {
-                    ObjectToFile<Dictionary<ulong, string>>(Core.userCache, GetAbsoluteFilePath("cache.rpp"));
+                    ObjectToFile<Dictionary<ulong, string>>(Core.userCache, RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("cache.rpp")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")))
                 {
-                    File.Delete(GetAbsoluteFilePath("cache.rpp"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                 }
                 if (Core.whiteList.Count != 0)
                 {
-                    ObjectToXML<List<PList.Player>>(Core.whiteList.PlayerList, GetAbsoluteFilePath("whitelist.xml"));
+                    ObjectToXML<List<PList.Player>>(Core.whiteList.PlayerList, RustPPModule.GetAbsoluteFilePath("whitelist.xml"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("whitelist.xml")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("whitelist.xml")))
                 {
-                    File.Delete(GetAbsoluteFilePath("whitelist.xml"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("whitelist.xml"));
                 }
                 if (Core.blackList.Count != 0)
                 {
-                    ObjectToXML<List<PList.Player>>(Core.blackList.PlayerList, GetAbsoluteFilePath("bans.xml"));
+                    ObjectToXML<List<PList.Player>>(Core.blackList.PlayerList, RustPPModule.GetAbsoluteFilePath("bans.xml"));
                 }
-                else if (File.Exists(GetAbsoluteFilePath("bans.xml")))
+                else if (File.Exists(RustPPModule.GetAbsoluteFilePath("bans.xml")))
                 {
-                    File.Delete(GetAbsoluteFilePath("bans.xml"));
+                    File.Delete(RustPPModule.GetAbsoluteFilePath("bans.xml"));
                 }
             }
             catch (Exception ex)
@@ -74,14 +75,9 @@
             }
         }
 
-        public static string GetAbsoluteFilePath(string fileName)
-        {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\Fougerite\Rust++\" + fileName);
-        }
-
         public static void Log(string logName, string msg)
         {
-            File.AppendAllText(GetAbsoluteFilePath(logName), "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + msg + "\r\n");
+            File.AppendAllText(RustPPModule.GetAbsoluteFilePath(logName), "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + msg + "\r\n");
         }
 
         public static T ObjectFromFile<T>(string path)

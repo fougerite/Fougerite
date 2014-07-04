@@ -9,7 +9,7 @@
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.2";
+        public static string Version = "1.0.3";
 
         public static void AttachBootstrap()
         {
@@ -44,7 +44,7 @@
             Config.Init(@".\Fougerite.cfg");
             Logger.Init();
             ModuleManager.LoadModules();
-            PluginEngine.GetPluginEngine();
+            PluginEngine.Instance();
 
             Fougerite.Hooks.ServerStarted();
         }

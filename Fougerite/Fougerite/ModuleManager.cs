@@ -44,7 +44,11 @@ namespace Fougerite
             if (File.Exists(IgnoredPluginsFilePath))
                 IgnoredModules.AddRange(File.ReadAllLines(IgnoredPluginsFilePath));
 
-            FileInfo[] FileInfos = new DirectoryInfo(ModulesFolder).GetFiles("*.dll", SearchOption.AllDirectories);
+
+            DirectoryInfo[] DirectoryInfos = new DirectoryInfo(ModulesFolder).GetDirectories();
+            FileInfo[] FileInfos = new FileInfo[DirectoryInfos.Length];
+            for (int i = 0; i < DirectoryInfos.Length; i++)
+                FileInfos[i] = new FileInfo(DirectoryInfos[i].FullName + "\\" + DirectoryInfos[i].Name + ".dll");
 
             foreach (FileInfo FileInfo in FileInfos)
             {

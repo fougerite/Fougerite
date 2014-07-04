@@ -52,6 +52,8 @@ namespace Fougerite
 
             foreach (FileInfo FileInfo in FileInfos)
             {
+                if (!FileInfo.Exists)
+                    continue;
                 Logger.LogDebug("[Modules] Module Found: " + FileInfo.Name);
                 string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(FileInfo.Name);
                 if (IgnoredModules.Contains(FileNameWithoutExtension))

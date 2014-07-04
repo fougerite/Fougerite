@@ -103,6 +103,7 @@ namespace Fougerite
                 var plugin = plugins[name];
                 plugin.RemoveHooks();
                 plugin.KillTimers();
+                plugins.Remove(name);
             }
         }
 

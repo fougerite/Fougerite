@@ -1,50 +1,243 @@
-﻿namespace Fougerite
-{
-    using Fougerite.Events;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
+﻿using Fougerite.Events;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
+using Jint;
+using Jint.Expressions;
+
+namespace Fougerite
+{
     public class Plugin
     {
-        private string code;
-        private ArrayList commands;
-        private string path;
-        private System.Collections.Generic.List<TimedEvent> timers;
-
-        public Plugin(string path)
+        public JintEngine Engine
         {
-            this.Path = path;
-            this.timers = new System.Collections.Generic.List<TimedEvent>();
+            get;
+            private set;
+        }
+        public string Name
+        {
+            get;
+            private set;
+        }
+        public string Code
+        {
+            get;
+            private set;
         }
 
-        public bool CreateDir(string name)
+        public DirectoryInfo RootDirectory
         {
-            if (name.Contains(".."))
-            {
-                return false;
-            }
-            string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Fougerite.Data.PATH + str + @"\" + name;
-            if (Directory.Exists(path))
-            {
-                return false;
-            }
-            Directory.CreateDirectory(path);
-            return true;
+            get;
+            private set;
         }
 
-        public IniParser CreateIni(string name)
+        public Dictionary<String, TimedEvent> Timers
+        {
+            get;
+            private set;
+        }
+
+        public Plugin(DirectoryInfo directory, string name, string code)
+        {
+            Name = name;
+            Code = code;
+            RootDirectory = directory;
+            Timers = new Dictionary<String, TimedEvent>();
+
+            Engine = new JintEngine();
+            Engine.AllowClr(true);
+
+            InitGlobals();
+            Engine.Run(code);
+            try
+            {
+                Engine.CallFunction("On_PluginInit", new object[0]);
+            }
+            catch { }
+        }
+
+        public void InitGlobals()
+        {
+            Engine.SetParameter("Server", Fougerite.Server.GetServer());
+            Engine.SetParameter("Data", Fougerite.Data.GetData());
+            Engine.SetParameter("DataStore", DataStore.GetInstance());
+            Engine.SetParameter("Util", Util.GetUtil());
+            Engine.SetParameter("Web", new Web());
+            Engine.SetParameter("Time", this);
+            Engine.SetParameter("World", World.GetWorld());
+            Engine.SetParameter("Plugin", this);
+        }
+
+        private void Invoke(string name, params object[] obj)
         {
             try
             {
-                if (name.Contains(".."))
+                Engine.CallFunction(name, obj);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Error invoking function: " + name + "\nFrom: " + Name + "\n\n" + ex.ToString());
+                Logger.LogException(ex);
+            }
+        }
+
+        public IEnumerable<FunctionDeclarationStatement> GetSourceCodeGlobalFunctions()
+        {
+            foreach (Statement statement in JintEngine.Compile(Code, false).Statements)
+            {
+                if (statement.GetType() == typeof(FunctionDeclarationStatement))
                 {
-                    return null;
+                    FunctionDeclarationStatement funcDecl = (FunctionDeclarationStatement)statement;
+                    if (funcDecl != null)
+                    {
+                        yield return funcDecl;
+                    }
                 }
-                string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-                string path = Fougerite.Data.PATH + str + @"\" + name + ".ini";
+            }
+        }
+
+        public void InstallHooks()
+        {
+            foreach (var funcDecl in GetSourceCodeGlobalFunctions())
+            {
+                Logger.Log("Found Function: " + funcDecl.Name);
+                switch (funcDecl.Name)
+                {
+                    case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
+                    case "On_PluginInit": Hooks.OnPluginInit += OnPluginInit; break;
+                    case "On_ServerShutdown": Hooks.OnServerShutdown += OnServerShutdown; break;
+                    case "On_ItemsLoaded": Hooks.OnItemsLoaded += OnItemsLoaded; break;
+                    case "On_TablesLoaded": Hooks.OnTablesLoaded += OnTablesLoaded; break;
+                    case "On_Chat": Hooks.OnChat += OnChat; break;
+                    case "On_Console": Hooks.OnConsoleReceived += OnConsole; break;
+                    case "On_Command": Hooks.OnCommand += OnCommand; break;
+                    case "On_PlayerConnected": Hooks.OnPlayerConnected += OnPlayerConnected; break;
+                    case "On_PlayerDisconnected": Hooks.OnPlayerDisconnected += OnPlayerDisconnected; break;
+                    case "On_PlayerKilled": Hooks.OnPlayerKilled += OnPlayerKilled; break;
+                    case "On_PlayerHurt": Hooks.OnPlayerHurt += OnPlayerHurt; break;
+                    case "On_PlayerSpawning": Hooks.OnPlayerSpawning += OnPlayerSpawn; break;
+                    case "On_PlayerSpawned": Hooks.OnPlayerSpawned += OnPlayerSpawned; break;
+                    case "On_PlayerGathering": Hooks.OnPlayerGathering += OnPlayerGathering; break;
+                    case "On_EntityHurt": Hooks.OnEntityHurt += OnEntityHurt; break;
+                    case "On_EntityDecay": Hooks.OnEntityDecay += OnEntityDecay; break;
+                    case "On_EntityDeployed": Hooks.OnEntityDeployed += OnEntityDeployed; break;
+                    case "On_NPCHurt": Hooks.OnNPCHurt += OnNPCHurt; break;
+                    case "On_NPCKilled": Hooks.OnNPCKilled += OnNPCKilled; break;
+                    case "On_BlueprintUse": Hooks.OnBlueprintUse += OnBlueprintUse; break;
+                    case "On_DoorUse": Hooks.OnDoorUse += OnDoorUse; break;
+                }
+            }
+        }
+
+        public void RemoveHooks()
+        {
+            foreach (var funcDecl in GetSourceCodeGlobalFunctions())
+            {
+                Logger.Log("RemoveHooks, found function " + funcDecl.Name);
+                switch (funcDecl.Name)
+                {
+                    case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
+                    case "On_PluginInit": Hooks.OnPluginInit -= OnPluginInit; break;
+                    case "On_ServerShutdown": Hooks.OnServerShutdown -= OnServerShutdown; break;
+                    case "On_ItemsLoaded": Hooks.OnItemsLoaded -= OnItemsLoaded; break;
+                    case "On_TablesLoaded": Hooks.OnTablesLoaded -= OnTablesLoaded; break;
+                    case "On_Chat": Hooks.OnChat -= OnChat; break;
+                    case "On_Console": Hooks.OnConsoleReceived -= OnConsole; break;
+                    case "On_Command": Hooks.OnCommand -= OnCommand; break;
+                    case "On_PlayerConnected": Hooks.OnPlayerConnected -= OnPlayerConnected; break;
+                    case "On_PlayerDisconnected": Hooks.OnPlayerDisconnected -= OnPlayerDisconnected; break;
+                    case "On_PlayerKilled": Hooks.OnPlayerKilled -= OnPlayerKilled; break;
+                    case "On_PlayerHurt": Hooks.OnPlayerHurt -= OnPlayerHurt; break;
+                    case "On_PlayerSpawning": Hooks.OnPlayerSpawning -= OnPlayerSpawn; break;
+                    case "On_PlayerSpawned": Hooks.OnPlayerSpawned -= OnPlayerSpawned; break;
+                    case "On_PlayerGathering": Hooks.OnPlayerGathering -= OnPlayerGathering; break;
+                    case "On_EntityHurt": Hooks.OnEntityHurt -= OnEntityHurt; break;
+                    case "On_EntityDecay": Hooks.OnEntityDecay -= OnEntityDecay; break;
+                    case "On_EntityDeployed": Hooks.OnEntityDeployed -= OnEntityDeployed; break;
+                    case "On_NPCHurt": Hooks.OnNPCHurt -= OnNPCHurt; break;
+                    case "On_NPCKilled": Hooks.OnNPCKilled -= OnNPCKilled; break;
+                    case "On_BlueprintUse": Hooks.OnBlueprintUse -= OnBlueprintUse; break;
+                    case "On_DoorUse": Hooks.OnDoorUse -= OnDoorUse; break;
+                }
+            }
+        }
+
+        #region File operations.
+
+        private static string NormalizePath(string path)
+        {
+            return Path.GetFullPath(new Uri(path).LocalPath)
+                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                       .ToUpperInvariant();
+        }
+
+        private String ValidateRelativePath(String path)
+        {
+            String normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
+            String rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
+
+            if (!normalizedPath.StartsWith(rootDirNormalizedPath))
+                return null;
+
+            return normalizedPath;
+        }
+
+        public bool CreateDir(string path)
+        {
+            try
+            {
+                path = ValidateRelativePath(path);
+
+                if (path == null)
+                    return false;
+
+                if (Directory.Exists(path))
+                    return false;
+
+                Directory.CreateDirectory(path);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            return false;
+        }
+
+        public IniParser GetIni(string path)
+        {
+            path = ValidateRelativePath(path + ".ini");
+
+            if (path == null)
+                return null;
+            
+            if (File.Exists(path))
+                return new IniParser(path);
+
+            return null;
+        }
+
+        public bool IniExists(string path)
+        {
+            path = ValidateRelativePath(path + ".ini");
+
+            if (path == null)
+                return false;
+
+            return File.Exists(path);
+        }
+
+        public IniParser CreateIni(string path)
+        {
+            try
+            {
+                path = ValidateRelativePath(path + ".ini");
+
                 File.WriteAllText(path, "");
                 return new IniParser(path);
             }
@@ -55,14 +248,56 @@
             return null;
         }
 
+        public List<IniParser> GetInis(string path)
+        {
+            path = ValidateRelativePath(path);
+
+            if (path == null)
+                return new List<IniParser>();
+
+            return Directory.GetFiles(path).Select(p => new IniParser(p)).ToList();
+        }
+
+        public void DeleteLog(string path)
+        {
+            path = ValidateRelativePath(path + ".ini");
+
+            if (path == null)
+                return;
+
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+
+        public void Log(string path, string text)
+        {
+            path = ValidateRelativePath(path + ".ini");
+
+            if (path == null)
+                return;
+
+            File.AppendAllText(path, "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + text + "\r\n");
+        }
+
+        #endregion
+
+        #region Timer functions.
+
+        public TimedEvent GetTimer(string name)
+        {
+            if (Timers.ContainsKey(name))
+                return Timers[name];
+            return null;
+        }
+
         public TimedEvent CreateTimer(string name, int timeoutDelay)
         {
             TimedEvent timer = this.GetTimer(name);
             if (timer == null)
             {
-                timer = new TimedEvent(name, (double)timeoutDelay);
-                timer.OnFire += new TimedEvent.TimedEventFireDelegate(this.OnTimerCB);
-                this.timers.Add(timer);
+                timer = new TimedEvent(name, (double) timeoutDelay);
+                timer.OnFire += OnTimerCB;
+                Timers[name] = timer;
                 return timer;
             }
             return timer;
@@ -70,52 +305,37 @@
 
         public TimedEvent CreateTimer(string name, int timeoutDelay, object[] args)
         {
-            TimedEvent event2 = this.CreateTimer(name, timeoutDelay);
-            event2.Args = args;
-            event2.OnFire -= new TimedEvent.TimedEventFireDelegate(this.OnTimerCB);
-            event2.OnFireArgs += new TimedEvent.TimedEventFireArgsDelegate(this.OnTimerCBArgs);
-            return event2;
+            TimedEvent timer = CreateTimer(name, timeoutDelay);
+            timer.Args = args;
+            timer.OnFire -= OnTimerCB;
+            timer.OnFireArgs += OnTimerCBArgs;
+            return timer;
         }
 
-        public void DeleteLog(string file)
+        public void KillTimer(string name)
         {
-            string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Fougerite.Data.PATH + str + @"\" + file + ".ini";
-            if (File.Exists(path))
+            TimedEvent timer = GetTimer(name);
+            if (timer != null)
             {
-                File.Delete(path);
+                timer.Stop();
+                Timers.Remove(name);
             }
         }
+
+        public void KillTimers()
+        {
+            foreach (var timer in Timers.Values)
+                timer.Stop();
+            Timers.Clear();
+        }
+
+        #endregion Timer functions.
+
+        #region Other functions.
 
         public string GetDate()
         {
             return DateTime.Now.ToShortDateString();
-        }
-
-        public IniParser GetIni(string name)
-        {
-            if (!name.Contains(".."))
-            {
-                string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-                string path = Fougerite.Data.PATH + str + @"\" + name + ".ini";
-                if (File.Exists(path))
-                {
-                    return new IniParser(path);
-                }
-            }
-            return null;
-        }
-
-        public System.Collections.Generic.List<IniParser> GetInis(string name)
-        {
-            string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            string path = Fougerite.Data.PATH + str + @"\" + name;
-            System.Collections.Generic.List<IniParser> list = new System.Collections.Generic.List<IniParser>();
-            foreach (string str3 in Directory.GetFiles(path))
-            {
-                list.Add(new IniParser(str3));
-            }
-            return list;
         }
 
         public int GetTicks()
@@ -128,83 +348,15 @@
             return DateTime.Now.ToShortTimeString();
         }
 
-        public TimedEvent GetTimer(string name)
-        {
-            foreach (TimedEvent event2 in this.timers)
-            {
-                if (event2.Name == name)
-                {
-                    return event2;
-                }
-            }
-            return null;
-        }
-
         public long GetTimestamp()
         {
             TimeSpan span = (TimeSpan)(DateTime.UtcNow - new DateTime(0x7b2, 1, 1, 0, 0, 0));
             return (long)span.TotalSeconds;
         }
 
-        public bool IniExists(string name)
-        {
-            string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            return File.Exists(Fougerite.Data.PATH + str + @"\" + name + ".ini");
-        }
+        #endregion
 
-        private void Invoke(string name, params object[] obj)
-        {
-            try
-            {
-                PluginEngine.GetPluginEngine().Interpreter.Run(this.Code);
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Server", Fougerite.Server.GetServer());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Data", Fougerite.Data.GetData());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("DataStore", DataStore.GetInstance());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Util", Util.GetUtil());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Web", new Web());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Time", this);
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("World", World.GetWorld());
-                PluginEngine.GetPluginEngine().Interpreter.SetParameter("Plugin", this);
-                if (obj != null)
-                {
-                    PluginEngine.GetPluginEngine().Interpreter.CallFunction(name, obj);
-                }
-                else
-                {
-                    PluginEngine.GetPluginEngine().Interpreter.CallFunction(name, new object[0]);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Error invoking function: " + name + "\nFrom: " + this.path + "\n\n" + ex.ToString());
-                Logger.LogException(ex);
-            }
-        }
-
-        public void KillTimer(string name)
-        {
-            TimedEvent timer = this.GetTimer(name);
-            if (timer != null)
-            {
-                timer.Stop();
-                this.timers.Remove(timer);
-            }
-        }
-
-        public void KillTimers()
-        {
-            foreach (TimedEvent event2 in this.timers)
-            {
-                event2.Stop();
-            }
-            this.timers.Clear();
-        }
-
-        public void Log(string file, string text)
-        {
-            string str = System.IO.Path.GetFileName(this.Path).Replace(".js", "");
-            File.AppendAllText(Fougerite.Data.PATH + str + @"\" + file + ".ini", "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + text + "\r\n");
-        }
+        #region Hooks
 
         public void OnBlueprintUse(Fougerite.Player p, BPUseEvent ae)
         {
@@ -341,40 +493,6 @@
             }
         }
 
-        public string Code
-        {
-            get
-            {
-                return this.code;
-            }
-            set
-            {
-                this.code = value;
-            }
-        }
-
-        public ArrayList Commands
-        {
-            get
-            {
-                return this.commands;
-            }
-            set
-            {
-                this.commands = value;
-            }
-        }
-
-        public string Path
-        {
-            get
-            {
-                return this.path;
-            }
-            set
-            {
-                this.path = value;
-            }
-        }
+        #endregion
     }
 }

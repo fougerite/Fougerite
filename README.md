@@ -26,4 +26,5 @@ Use Git Issues system for report bugs, please. Or send me e-mails. =)
 ###### Forked by Riketta (Zumwalt Project)  
 ###### Renamed by Alexknvl (from "Zumwalt" to "Fougerite")  
 Riketta - rowneg@bk.ru
+
 Website - Available Soon

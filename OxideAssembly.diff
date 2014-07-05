@@ -1,0 +1,558 @@
+--- Vanilla\BasicDoor.cs	2014-07-05 15:01:00.322000000 +0300
++++ Oxide\BasicDoor.cs	2014-07-05 15:44:59.588000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using Rust;
+ using RustProto;
+ using RustProto.Helpers;
+@@ -560,6 +561,15 @@
+ 
+     private bool ToggleStateServer(ulong timestamp, Controllable controllable)
+     {
++        object[] args = Main.Array(3);
++        args[0] = this;
++        args[1] = timestamp;
++        args[2] = controllable;
++        object obj5 = Main.Call("OnDoorToggle", args);
++        if (obj5 is bool)
++        {
++            return (bool) obj5;
++        }
+         if (controllable == null)
+         {
+             return this.ToggleStateServer(null, timestamp, null);
+////////////////
+--- Vanilla\BlueprintDataBlock.cs	2014-07-05 15:00:40.399000000 +0300
++++ Oxide\BlueprintDataBlock.cs	2014-07-05 15:46:10.640000000 +0300
+@@ -1,3 +1,4 @@
++using Oxide;
+ using Rust;
+ using RustProto;
+ using System;
+@@ -252,24 +253,30 @@
+ 
+     public virtual void UseItem(IBlueprintItem item)
+     {
+-        PlayerInventory inventory = item.inventory as PlayerInventory;
+-        if (inventory != null)
+-        {
+-            if (inventory.BindBlueprint(this))
+-            {
+-                int count = 1;
+-                if (item.Consume(ref count))
+-                {
+-                    inventory.RemoveItem(item.slot);
+-                }
+-                Notice.Popup(inventory.networkView.owner, "", "You can now craft: " + this.resultItem.name, 4f);
+-            }
+-            else
+-            {
+-                Notice.Popup(inventory.networkView.owner, "", "You already have this blueprint", 4f);
+-            }
+-        }
+-    }
++        object[] args = Main.Array(2);
++        args[0] = this;
++        args[1] = item;
++        if (Main.Call("OnBlueprintUse", args) == null)
++        {
++            PlayerInventory inventory = item.inventory as PlayerInventory;
++            if (inventory != null)
++            {
++                if (inventory.BindBlueprint(this))
++                {
++                    int count = 1;
++                    if (item.Consume(ref count))
++                    {
++                        inventory.RemoveItem(item.slot);
++                    }
++                    Notice.Popup(inventory.networkView.owner, "", "You can now craft: " + this.resultItem.name, 4f);
++                }
++                else
++                {
++                    Notice.Popup(inventory.networkView.owner, "", "You already have this blueprint", 4f);
++                }
++            }
++        }
++    }
+ 
+     [Serializable]
+     public class IngredientEntry
+////////////////
+--- Vanilla\ConnectionAcceptor.cs	2014-07-05 14:59:33.922000000 +0300
++++ Oxide\ConnectionAcceptor.cs	2014-07-05 15:47:00.117000000 +0300
+@@ -1,3 +1,4 @@
++using Oxide;
+ using Rust.Steam;
+ using System;
+ using System.Collections.Generic;
+@@ -95,40 +96,46 @@
+ 
+     public void uLink_OnPlayerApproval(NetworkPlayerApproval approval)
+     {
+-        if (this.m_Connections.Count >= server.maxplayers)
+-        {
+-            approval.Deny(uLink.NetworkConnectionError.TooManyConnectedPlayers);
+-        }
+-        else
+-        {
+-            ClientConnection item = new ClientConnection();
+-            if (!item.ReadConnectionData(approval.loginData))
+-            {
+-                approval.Deny(uLink.NetworkConnectionError.IncorrectParameters);
+-            }
+-            else if (item.Protocol != 0x42d)
+-            {
+-                Debug.Log("Denying entry to client with invalid protocol version (" + approval.ipAddress + ")");
+-                approval.Deny(uLink.NetworkConnectionError.IncompatibleVersions);
+-            }
+-            else if (BanList.Contains(item.UserID))
+-            {
+-                Debug.Log("Rejecting client (" + item.UserID.ToString() + "in banlist)");
+-                approval.Deny(uLink.NetworkConnectionError.ConnectionBanned);
+-            }
+-            else if (this.IsConnected(item.UserID))
+-            {
+-                Debug.Log("Denying entry to " + item.UserID.ToString() + " because they're already connected");
+-                approval.Deny(uLink.NetworkConnectionError.AlreadyConnectedToAnotherServer);
+-            }
+-            else
+-            {
+-                this.m_Connections.Add(item);
+-                base.StartCoroutine(item.AuthorisationRoutine(approval));
+-                approval.Wait();
+-            }
+-        }
+-    }
++        object[] args = Main.Array(2);
++        args[0] = this;
++        args[1] = approval;
++        if (Main.Call("OnUserApprove", args) == null)
++        {
++            if (this.m_Connections.Count >= server.maxplayers)
++            {
++                approval.Deny(uLink.NetworkConnectionError.TooManyConnectedPlayers);
++            }
++            else
++            {
++                ClientConnection item = new ClientConnection();
++                if (!item.ReadConnectionData(approval.loginData))
++                {
++                    approval.Deny(uLink.NetworkConnectionError.IncorrectParameters);
++                }
++                else if (item.Protocol != 0x42d)
++                {
++                    Debug.Log("Denying entry to client with invalid protocol version (" + approval.ipAddress + ")");
++                    approval.Deny(uLink.NetworkConnectionError.IncompatibleVersions);
++                }
++                else if (BanList.Contains(item.UserID))
++                {
++                    Debug.Log("Rejecting client (" + item.UserID.ToString() + "in banlist)");
++                    approval.Deny(uLink.NetworkConnectionError.ConnectionBanned);
++                }
++                else if (this.IsConnected(item.UserID))
++                {
++                    Debug.Log("Denying entry to " + item.UserID.ToString() + " because they're already connected");
++                    approval.Deny(uLink.NetworkConnectionError.AlreadyConnectedToAnotherServer);
++                }
++                else
++                {
++                    this.m_Connections.Add(item);
++                    base.StartCoroutine(item.AuthorisationRoutine(approval));
++                    approval.Wait();
++                }
++            }
++        }
++    }
+ 
+     public void uLink_OnPlayerConnected(uLink.NetworkPlayer player)
+     {
+@@ -151,6 +158,9 @@
+ 
+     public void uLink_OnPlayerDisconnected(uLink.NetworkPlayer player)
+     {
++        object[] args = Main.Array(1);
++        args[0] = player;
++        Main.Call("OnUserDisconnect", args);
+         object localData = player.GetLocalData();
+         if (localData is NetUser)
+         {
+////////////////
+--- Vanilla\ConsoleSystem.cs	2014-07-05 14:59:07.085000000 +0300
++++ Oxide\ConsoleSystem.cs	2014-07-05 15:47:40.289000000 +0300
+@@ -1,5 +1,6 @@
+ using Facepunch.Util;
+ using Facepunch.Utility;
++using Oxide;
+ using System;
+ using System.Collections.Generic;
+ using System.Reflection;
+@@ -243,6 +244,14 @@
+ 
+     public static bool RunCommand(ref Arg arg, [Optional, DefaultParameterValue(true)] bool bWantReply)
+     {
++        object[] args = Main.Array(2);
++        args[0] = (Arg) arg;
++        args[1] = bWantReply;
++        object obj2 = Main.Call("OnRunCommand", args);
++        if (obj2 is bool)
++        {
++            return (bool) obj2;
++        }
+         System.Type[] typeArray = FindTypes(arg.Class);
+         if (typeArray.Length == 0)
+         {
+////////////////
+--- Vanilla\CraftingInventory.cs	2014-07-05 15:00:34.842000000 +0300
++++ Oxide\CraftingInventory.cs	2014-07-05 15:48:14.201000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using System;
+ using System.Collections.Generic;
+ using uLink;
+@@ -107,7 +108,7 @@
+         }
+     }
+ 
+-    [RPC, NGCRPCSkip]
++    [NGCRPCSkip, RPC]
+     protected void CRFC()
+     {
+     }
+@@ -176,22 +177,30 @@
+ 
+     protected void StartCrafting(BlueprintDataBlock blueprint, int amount, ulong startTime)
+     {
+-        bool inProgress = this.crafting.inProgress;
+-        if (this.crafting.Restart(this, amount, blueprint, startTime))
+-        {
+-            this._lastThinkTime = NetCull.time;
+-            if (crafting.timescale != 1f)
+-            {
+-                this.crafting.duration = Math.Max((float) 0.1f, (float) (this.crafting.duration * crafting.timescale));
+-            }
+-            if (this.IsInstant())
+-            {
+-                this.crafting.duration = 0.1f;
+-            }
+-            this.UpdateCraftingDataToOwner();
+-            this.BeginCrafting();
+-        }
+-    }
++        object[] args = Main.Array(4);
++        args[0] = this;
++        args[1] = blueprint;
++        args[2] = amount;
++        args[3] = startTime;
++        if (Main.Call("OnStartCrafting", args) == null)
++        {
++            bool inProgress = this.crafting.inProgress;
++            if (this.crafting.Restart(this, amount, blueprint, startTime))
++            {
++                this._lastThinkTime = NetCull.time;
++                if (crafting.timescale != 1f)
++                {
++                    this.crafting.duration = Math.Max((float) 0.1f, (float) (this.crafting.duration * crafting.timescale));
++                }
++                if (this.IsInstant())
++                {
++                    this.crafting.duration = 0.1f;
++                }
++                this.UpdateCraftingDataToOwner();
++                this.BeginCrafting();
++            }
++        }
++    }
+ 
+     public void TrySendWorkBenchInfo()
+     {
+////////////////
+--- Vanilla\DatablockDictionary.cs	2014-07-05 15:00:46.564000000 +0300
++++ Oxide\DatablockDictionary.cs	2014-07-05 15:48:38.614000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using System;
+ using System.Collections.Generic;
+ using UnityEngine;
+@@ -89,6 +90,7 @@
+             _lootSpawnLists.Add(list2.name, list2);
+         }
+         initializedAtLeastOnce = true;
++        Main.Call("OnDatablocksLoaded", null);
+     }
+ 
+     public static void TryInitialize()
+////////////////
+--- Vanilla\Inventory.cs	2014-07-05 15:00:38.931000000 +0300
++++ Oxide\Inventory.cs	2014-07-05 15:49:20.236000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using RustProto;
+ using RustProto.Helpers;
+ using System;
+@@ -1235,6 +1236,11 @@
+ 
+     protected virtual void ItemAdded(int slot, IInventoryItem item)
+     {
++        object[] args = Main.Array(3);
++        args[0] = this;
++        args[1] = slot;
++        args[2] = item;
++        Main.Call("OnItemAdded", args);
+         FireBarrel local = base.GetLocal<FireBarrel>();
+         if (local != null)
+         {
+@@ -1244,6 +1250,11 @@
+ 
+     protected virtual void ItemRemoved(int slot, IInventoryItem item)
+     {
++        object[] args = Main.Array(3);
++        args[0] = this;
++        args[1] = slot;
++        args[2] = item;
++        Main.Call("OnItemRemoved", args);
+         FireBarrel local = base.GetLocal<FireBarrel>();
+         if (local != null)
+         {
+////////////////
+--- Vanilla\ResearchToolItem!1.cs	2014-07-05 15:00:51.103000000 +0300
++++ Oxide\ResearchToolItem!1.cs	2014-07-05 15:50:53.010000000 +0300
+@@ -1,3 +1,4 @@
++using Oxide;
+ using Rust;
+ using System;
+ 
+@@ -10,6 +11,14 @@
+     public override InventoryItem.MergeResult TryCombine(IInventoryItem otherItem)
+     {
+         BlueprintDataBlock block2;
++        object[] args = Main.Array(2);
++        args[0] = this;
++        args[1] = otherItem;
++        object obj2 = Main.Call("OnResearchItem", args);
++        if (obj2 is InventoryItem.MergeResult)
++        {
++            return (InventoryItem.MergeResult) obj2;
++        }
+         PlayerInventory inventory = base.inventory as PlayerInventory;
+         if ((inventory == null) || (otherItem.inventory != inventory))
+         {
+////////////////
+--- Vanilla\ResourceTarget.cs	2014-07-05 15:00:28.684000000 +0300
++++ Oxide\ResourceTarget.cs	2014-07-05 15:51:12.510000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using Rust;
+ using System;
+ using System.Collections.Generic;
+@@ -17,6 +18,9 @@
+ 
+     public void Awake()
+     {
++        object[] args = Main.Array(1);
++        args[0] = this;
++        Main.Call("OnResourceNodeLoaded", args);
+         this.TryInitialize();
+         this.startingTotal = this.GetTotalResLeft();
+     }
+////////////////
+--- Vanilla\Rust\Steam\Server.cs	2014-07-05 14:59:20.040000000 +0300
++++ Oxide\Rust\Steam\Server.cs	2014-07-05 15:51:27.666000000 +0300
+@@ -1,5 +1,6 @@
+ namespace Rust.Steam
+ {
++    using Oxide;
+     using System;
+     using System.Runtime.CompilerServices;
+     using System.Runtime.InteropServices;
+@@ -17,6 +18,11 @@
+ 
+         public static string GetTags()
+         {
++            object obj2 = Main.Call("OnSteamGetTags", null);
++            if (obj2 is string)
++            {
++                return (string) obj2;
++            }
+             string str = "rust";
+             if (Modded)
+             {
+////////////////
+--- Vanilla\ServerInit.cs	2014-07-05 15:00:58.191000000 +0300
++++ Oxide\ServerInit.cs	2014-07-05 15:51:59.428000000 +0300
+@@ -1,5 +1,6 @@
+ using Facepunch;
+ using Facepunch.Utility;
++using Oxide;
+ using Rust.Steam;
+ using System;
+ using System.Collections;
+@@ -17,7 +18,8 @@
+ 
+     private void Awake()
+     {
+-        UnityEngine.Debug.Log("rust.");
++        Main.Init();
++        UnityEngine.Debug.Log("natj");
+         server.maxplayers = CommandLine.GetSwitchInt("-maxplayers", 0x100);
+         server.map = CommandLine.GetSwitch("-map", "rust_island_2013");
+         server.port = CommandLine.GetSwitchInt("-port", 0x6d6f);
+@@ -68,6 +70,7 @@
+         NetCull.config.timeoutDelay = server.clienttimeout;
+         RCon.Setup();
+         base.StartCoroutine("StartServerProc");
++        Main.Call("ServerStart", null);
+     }
+ 
+     [DebuggerHidden]
+////////////////
+--- Vanilla\ServerManagement.cs	2014-07-05 14:59:56.711000000 +0300
++++ Oxide\ServerManagement.cs	2014-07-05 15:52:40.507000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using RustProto;
+ using System;
+ using System.Collections;
+@@ -272,6 +272,9 @@
+ 
+     public virtual void OnUserConnected(NetUser User)
+     {
++        object[] args = Main.Array(1);
++        args[0] = User;
++        Main.Call("OnUserConnect", args);
+         GameEvent.DoPlayerConnected(User.playerClient);
+     }
+ 
+@@ -377,6 +380,11 @@
+     public Character SpawnPlayer(PlayerClient playerFor, bool useCamp, [Optional, DefaultParameterValue(null)] RustProto.Avatar avatar)
+     {
+         NetUser user;
++        object[] args = Main.Array(3);
++        args[0] = playerFor;
++        args[1] = useCamp;
++        args[2] = avatar;
++        Main.Call("OnSpawnPlayer", args);
+         Vector3 zero = Vector3.zero;
+         UnityEngine.Quaternion identity = UnityEngine.Quaternion.identity;
+         if (((avatar != null) && avatar.HasPos) && avatar.HasAng)
+////////////////
+--- Vanilla\StructureComponentDataBlock.cs	2014-07-05 15:00:45.128000000 +0300
++++ Oxide\StructureComponentDataBlock.cs	2014-07-05 15:53:54.825000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using RustProto;
+ using System;
+ using uLink;
+@@ -15,6 +16,14 @@
+ 
+     public bool CheckBlockers(Vector3 pos)
+     {
++        object[] args = Main.Array(2);
++        args[0] = this;
++        args[1] = pos;
++        object obj2 = Main.Call("OnPlaceStructure", args);
++        if (obj2 is bool)
++        {
++            return (bool) obj2;
++        }
+         if (this._structureToPlace.type == StructureComponent.StructureComponentType.Foundation)
+         {
+             foreach (Collider collider in Physics.OverlapSphere(pos, 12f, 0x10360401))
+////////////////
+--- Vanilla\StructureMaster.cs	2014-07-05 15:01:06.554000000 +0300
++++ Oxide\StructureMaster.cs	2014-07-05 15:54:16.324000000 +0300
+@@ -1,5 +1,6 @@
+ using Facepunch.Collections;
+ using Facepunch.MeshBatch;
++using Oxide;
+ using Rust;
+ using RustProto;
+ using RustProto.Helpers;
+@@ -285,6 +286,13 @@
+ 
+     protected DecayStatus DoDecay()
+     {
++        object[] args = Main.Array(1);
++        args[0] = this;
++        object obj2 = Main.Call("OnStructureDecay", args);
++        if (obj2 is DecayStatus)
++        {
++            return (DecayStatus) obj2;
++        }
+         float num = Time.time - this._lastDecayTime;
+         this._lastDecayTime = Time.time;
+         if (decayRate <= 0f)
+////////////////
+--- Vanilla\SupplyDropZone.cs	2014-07-05 14:58:45.184000000 +0300
++++ Oxide\SupplyDropZone.cs	2014-07-05 15:54:32.634000000 +0300
+@@ -1,4 +1,5 @@
+ using Facepunch;
++using Oxide;
+ using System;
+ using System.Collections.Generic;
+ using UnityEngine;
+@@ -24,17 +25,22 @@
+ 
+     public static void CallAirDropAt(Vector3 targetPos)
+     {
+-        Vector3 pos = targetPos;
+-        SupplyDropPlane component = NetCull.LoadPrefab("C130").GetComponent<SupplyDropPlane>();
+-        float num = 20f * component.maxSpeed;
+-        Vector3 position = pos + ((Vector3) (RandomDirectionXZ() * num));
+-        pos += new Vector3(0f, 300f, 0f);
+-        position += new Vector3(0f, 400f, 0f);
+-        Vector3 vector3 = pos - position;
+-        Quaternion rotation = Quaternion.LookRotation(vector3.normalized);
+-        int group = 0;
+-        NetCull.InstantiateClassic("C130", position, rotation, group).GetComponent<SupplyDropPlane>().SetDropTarget(pos);
+-    }
++        object[] args = Main.Array(1);
++        args[0] = targetPos;
++        if (Main.Call("OnAirdrop", args) == null)
++        {
++            Vector3 pos = targetPos;
++            SupplyDropPlane component = NetCull.LoadPrefab("C130").GetComponent<SupplyDropPlane>();
++            float num = 20f * component.maxSpeed;
++            Vector3 position = pos + ((Vector3) (RandomDirectionXZ() * num));
++            pos += new Vector3(0f, 300f, 0f);
++            position += new Vector3(0f, 400f, 0f);
++            Vector3 vector3 = pos - position;
++            Quaternion rotation = Quaternion.LookRotation(vector3.normalized);
++            int group = 0;
++            NetCull.InstantiateClassic("C130", position, rotation, group).GetComponent<SupplyDropPlane>().SetDropTarget(pos);
++        }
++    }
+ 
+     public static Vector3 GetRandomTargetPos()
+     {
+////////////////
+--- Vanilla\TakeDamage.cs	2014-07-05 14:59:04.089000000 +0300
++++ Oxide\TakeDamage.cs	2014-07-05 15:55:12.892000000 +0300
+@@ -1,3 +1,4 @@
++using Oxide;
+ using RustProto;
+ using RustProto.Helpers;
+ using System;
+@@ -300,6 +301,15 @@
+ 
+     protected void ProcessDamageEvent(ref DamageEvent damage)
+     {
++        object[] args = Main.Array(2);
++        args[0] = this;
++        args[1] = (DamageEvent) damage;
++        object obj2 = Main.Call("OnProcessDamageEvent", args);
++        while (obj2 is DamageEvent)
++        {
++            damage = (DamageEvent) obj2;
++            return;
++        }
+         if (!this.takenodamage)
+         {
+             switch (damage.status)

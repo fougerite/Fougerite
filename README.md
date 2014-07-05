@@ -1,30 +1,32 @@
-Fougerite project
-====================
-This is an unofficial fork of Magma. Source code were obtained with decompiler and corrected by me (Riketta).  
-  
-**Fougerite full compatible with Magma plugins.**   
-  
-To use it you need to add a reference to the project (Zumwalt) patched Assembly-CSharp through Zumwalt_Patcher.  
-All code already updated and work. Just compile it or download from *releases*.  
+# Fougerite project
 
-### HOW TO USE:
-* Compile patcher
-* Patch your clear assembly
-* Add patched assembly to FougeriteProject's References
-* Compile Fougerite.dll
+Fougerite a fully compatible with Magma server mod, featuring better performance and C# plugins.   
 
-Than you must rename Magma config folder to Fougerite.  
-That's all. You may launch your server.  
-  
-**WARNING:** If you using Magma plugins you must rename all calls to class "Magma" in plugin to "Fougerite".  
-Like that: *var player = Magma.Player.FindBySteamID(id);* --> *var player = Fougerite.Player.FindBySteamID(id);*
-  
-*I hope that the community will help me develop this project.*  
-Use Git Issues system for report bugs, please. Or send me e-mails. =) 
+
+## Compilation
+* Compile Fougerite.Patcher.
+* Copy the patcher to the directory with Assembly-CSharp.dll and run it with a "-1" (first pass) option.
+* Copy patched Assembly-CSharp.dll to References directory.
+* Compile Fougerite
+* Compile plugins.
+* Run the patcher with a "-2" (second pass) option.
+
+## Installation
+* Download the latest release (usually unstable) or the previous one.
+* Unpack dlls and install them to rust_server_Data\Managed directory.
+* Rename your Magma.ini config to Fougerite.ini.  
+* Launch your server.  
+
+**WARNING:** If you using Magma plugins you must rename all calls to class "Magma" to "Fougerite":
+```javascript
+  var player = Magma.Player.FindBySteamID(id);
+  var player = Fougerite.Player.FindBySteamID(id);
+```
+
+Use Git Issues system to report bugs, please. Or send an email to rowneg@bk.ru. 
+Please visit [our forum](fougerite.com) for more information.
+
 ***
-###### Developed by EquiFox & xEnt (Rust++ and Magma)  
-###### Forked by Riketta (Zumwalt Project)  
-###### Renamed by Alexknvl (from "Zumwalt" to "Fougerite")  
-Riketta - rowneg@bk.ru
-
-Website - Available Soon
+###### Developed by EquiFox & xEnt (Rust++ and Magma)
+###### Forked by Riketta (Zumwalt Project)
+###### Renamed by Alexknvl (from "Zumwalt" to "Fougerite")

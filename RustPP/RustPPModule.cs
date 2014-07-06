@@ -50,7 +50,7 @@ namespace RustPP
             try
             {
                 Core.config = new IniParser(ConfigFile);
-                
+
                 if ((Core.config != null) && Core.IsEnabled())
                 {
                     timer = new System.Timers.Timer();
@@ -236,7 +236,7 @@ namespace RustPP
             if (Core.IsEnabled())
             {
                 InstaKOCommand command = ChatCommand.GetCommand("instako") as InstaKOCommand;
-                if (command.IsOn(he.DamageEvent.attacker.client.userID))
+                if (command.IsOn(((Fougerite.Player)he.Attacker).PlayerClient.userID))
                     if (!he.IsDecay)
                         he.Entity.Destroy();
                     else

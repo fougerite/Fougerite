@@ -71,6 +71,7 @@ namespace RustPP
             Fougerite.Hooks.OnEntityHurt += new Fougerite.Hooks.EntityHurtDelegate(EntityHurt);
             Fougerite.Hooks.OnPlayerConnected += new Fougerite.Hooks.ConnectionHandlerDelegate(PlayerConnect);
             Fougerite.Hooks.OnPlayerDisconnected += new Fougerite.Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
+            Fougerite.Hooks.OnPlayerHurt += new Fougerite.Hooks.HurtHandlerDelegate(PlayerHurt);
             Fougerite.Hooks.OnPlayerKilled += new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
             Fougerite.Hooks.OnServerShutdown += new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
@@ -131,8 +132,10 @@ namespace RustPP
                 arg = null;
             }
             else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
+            {
                 if (Core.IsEnabled())
                     Core.handleCommand(ref arg);
+            }
         }
 
         void Chat(Fougerite.Player p, ref ChatString text)
@@ -213,7 +216,7 @@ namespace RustPP
         void PlayerHurt(HurtEvent he) // Dirty Hack?
         {
             DamageEvent DEvent = he.DamageEvent;
-            if (Core.IsEnabled() && RustPP.Hooks.IsFriend(ref DEvent))
+            if (RustPP.Hooks.IsFriend(ref DEvent))
                 he.DamageAmount = 0f;
             he.DamageEvent = DEvent;
         }

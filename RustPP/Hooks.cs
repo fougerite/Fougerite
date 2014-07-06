@@ -104,7 +104,7 @@
             }
         }
 
-        public static bool IsFriend(ref DamageEvent e) // ref
+        public static bool IsFriend(DamageEvent e) // ref
         {
             GodModeCommand command = (GodModeCommand)ChatCommand.GetCommand("god");
             try

@@ -215,10 +215,8 @@ namespace RustPP
 
         void PlayerHurt(HurtEvent he) // Dirty Hack?
         {
-            DamageEvent DEvent = he.DamageEvent;
-            if (RustPP.Hooks.IsFriend(ref DEvent))
+            if (RustPP.Hooks.IsFriend(he.DamageEvent))
                 he.DamageAmount = 0f;
-            he.DamageEvent = DEvent;
         }
 
         void PlayerDisconnect(Fougerite.Player player)

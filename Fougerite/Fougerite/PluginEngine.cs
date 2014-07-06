@@ -98,12 +98,21 @@ namespace Fougerite
 
         public void UnloadPlugin(string name)
         {
+            Logger.Log("Unloading " + name + " plugin.");
+
             if (plugins.ContainsKey(name))
             {
                 var plugin = plugins[name];
                 plugin.RemoveHooks();
                 plugin.KillTimers();
                 plugins.Remove(name);
+
+                Logger.Log(name + " plugin was unloaded successfuly.");
+            }
+            else
+            {
+                Logger.LogError("Can't unload " + name + ". Plugin is not loaded.");
+                throw new InvalidOperationException("Can't unload " + name + ". Plugin is not loaded.");
             }
         }
 
@@ -118,7 +127,10 @@ namespace Fougerite
             Logger.Log("Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name))
+            {
+                Logger.LogError(name + " plugin is already loaded.");
                 throw new InvalidOperationException(name + " plugin is already loaded.");
+            }
 
             try
             {
@@ -128,7 +140,7 @@ namespace Fougerite
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log("Plugin " + name + " was loaded successfuly.");
+                Logger.Log(name + " plugin was loaded successfuly.");
             }
             catch (Exception ex)
             {

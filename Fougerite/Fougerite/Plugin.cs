@@ -54,7 +54,7 @@ namespace Fougerite
             Engine.Run(code);
             try
             {
-                Engine.CallFunction("On_PluginInit", new object[0]);
+                Engine.CallFunction("On_PluginInit");
             }
             catch { }
         }
@@ -71,15 +71,15 @@ namespace Fougerite
             Engine.SetParameter("Plugin", this);
         }
 
-        private void Invoke(string name, params object[] obj)
+        private void Invoke(string func, params object[] obj)
         {
             try
             {
-                Engine.CallFunction(name, obj);
+                Engine.CallFunction(func, obj);
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error invoking function: " + name + "\nFrom: " + Name + "\n\n" + ex.ToString());
+                Logger.LogError("Error invoking function " + func + " in " + Name + " plugin.");
                 Logger.LogException(ex);
             }
         }
@@ -360,137 +360,127 @@ namespace Fougerite
 
         public void OnBlueprintUse(Fougerite.Player p, BPUseEvent ae)
         {
-            this.Invoke("On_BlueprintUse", new object[] { p, ae });
+            Invoke("On_BlueprintUse", p, ae);
         }
 
         public void OnChat(Fougerite.Player player, ref ChatString text)
         {
-            this.Invoke("On_Chat", new object[] { player, text });
+            Invoke("On_Chat", player, text);
         }
 
         public void OnCommand(Fougerite.Player player, string command, string[] args)
         {
-            this.Invoke("On_Command", new object[] { player, command, args });
+            Invoke("On_Command", player, command, args);
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
         {
             if (!external)
-            {
-                this.Invoke("On_Console", new object[] { Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), arg });
-            }
+                Invoke("On_Console", Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), arg);
             else
-            {
-                object[] objArray2 = new object[2];
-                objArray2[1] = arg;
-                this.Invoke("On_Console", objArray2);
-            }
+                Invoke("On_Console", null, arg);
         }
 
         public void OnDoorUse(Fougerite.Player p, DoorEvent de)
         {
-            this.Invoke("On_DoorUse", new object[] { p, de });
+            Invoke("On_DoorUse", p, de);
         }
 
         public void OnEntityDecay(DecayEvent de)
         {
-            this.Invoke("On_EntityDecay", new object[] { de });
+            Invoke("On_EntityDecay", de);
         }
 
         public void OnEntityDeployed(Fougerite.Player p, Entity e)
         {
-            this.Invoke("On_EntityDeployed", new object[] { p, e });
+            Invoke("On_EntityDeployed", p, e);
         }
 
         public void OnEntityHurt(HurtEvent he)
         {
-            this.Invoke("On_EntityHurt", new object[] { he });
+            Invoke("On_EntityHurt", he);
         }
 
         public void OnItemsLoaded(ItemsBlocks items)
         {
-            this.Invoke("On_ItemsLoaded", new object[] { items });
+            Invoke("On_ItemsLoaded", items);
         }
 
         public void OnNPCHurt(HurtEvent he)
         {
-            this.Invoke("On_NPCHurt", new object[] { he });
+            Invoke("On_NPCHurt", he);
         }
 
         public void OnNPCKilled(DeathEvent de)
         {
-            this.Invoke("On_NPCKilled", new object[] { de });
+            Invoke("On_NPCKilled", de);
         }
 
         public void OnPlayerConnected(Fougerite.Player player)
         {
-            this.Invoke("On_PlayerConnected", new object[] { player });
+            Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Fougerite.Player player)
         {
-            this.Invoke("On_PlayerDisconnected", new object[] { player });
+            Invoke("On_PlayerDisconnected", player);
         }
 
         public void OnPlayerGathering(Fougerite.Player p, GatherEvent ge)
         {
-            this.Invoke("On_PlayerGathering", new object[] { p, ge });
+            Invoke("On_PlayerGathering", p, ge);
         }
 
         public void OnPlayerHurt(HurtEvent he)
         {
-            this.Invoke("On_PlayerHurt", new object[] { he });
+            Invoke("On_PlayerHurt", he);
         }
 
         public void OnPlayerKilled(DeathEvent de)
         {
-            this.Invoke("On_PlayerKilled", new object[] { de });
+            Invoke("On_PlayerKilled", de);
         }
 
         public void OnPlayerSpawn(Fougerite.Player p, SpawnEvent se)
         {
-            this.Invoke("On_PlayerSpawning", new object[] { p, se });
+            Invoke("On_PlayerSpawning", p, se);
         }
 
         public void OnPlayerSpawned(Fougerite.Player p, SpawnEvent se)
         {
-            this.Invoke("On_PlayerSpawned", new object[] { p, se });
+            Invoke("On_PlayerSpawned", p, se);
         }
 
         public void OnPluginInit()
         {
-            this.Invoke("On_PluginInit", new object[0]);
+            Invoke("On_PluginInit");
         }
 
         public void OnServerInit()
         {
-            this.Invoke("On_ServerInit", new object[0]);
+            Invoke("On_ServerInit");
         }
 
         public void OnServerShutdown()
         {
-            this.Invoke("On_ServerShutdown", new object[0]);
+            Invoke("On_ServerShutdown");
         }
 
         public void OnTablesLoaded(Dictionary<string, LootSpawnList> lists)
         {
-            this.Invoke("On_TablesLoaded", new object[] { lists });
+            Invoke("On_TablesLoaded", lists);
         }
 
         public void OnTimerCB(string name)
         {
-            if (this.Code.Contains(name + "Callback"))
-            {
-                this.Invoke(name + "Callback", new object[0]);
-            }
+            if (Code.Contains(name + "Callback"))
+                Invoke(name + "Callback");
         }
 
         public void OnTimerCBArgs(string name, object[] args)
         {
-            if (this.Code.Contains(name + "Callback"))
-            {
-                this.Invoke(name + "Callback", args);
-            }
+            if (Code.Contains(name + "Callback"))
+                Invoke(name + "Callback", args);
         }
 
         #endregion

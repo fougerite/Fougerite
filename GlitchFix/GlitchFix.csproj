@@ -7,8 +7,8 @@
     <ProjectGuid>{6413D91E-A987-4C45-8B80-72E8C4D47CD2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RampFix</RootNamespace>
-    <AssemblyName>RampFix</AssemblyName>
+    <RootNamespace>GlitchFix</RootNamespace>
+    <AssemblyName>GlitchFix</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\modules\RampFix\</OutputPath>
+    <OutputPath>..\bin\modules\GlitchFix\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\modules\RampFix\</OutputPath>
+    <OutputPath>..\bin\modules\GlitchFix\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -35,31 +35,17 @@
       <HintPath>..\bin\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Facepunch.ID">
-      <HintPath>..\bin\Facepunch.ID.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.ProtocolBuffers">
-      <HintPath>..\bin\Google.ProtocolBuffers.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="uLink">
-      <HintPath>..\bin\uLink.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\bin\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="RampFix.cfg">
+    <None Include="GlitchFix.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="RampFixModule.cs" />
+    <Compile Include="GlitchFixModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

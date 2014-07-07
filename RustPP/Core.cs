@@ -21,7 +21,7 @@
         public static string Version = "1.5.5";
         public static PList whiteList = new PList();
 
-        static Core()
+        public static void Init()
         {
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;

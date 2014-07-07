@@ -44,9 +44,12 @@ namespace RustPP
         public static string StaticModuleFolder;
         public override void Initialize()
         {
-            ConfigsFolder = @"\configs\";
+            ConfigsFolder = @"\Configs\";
             ConfigFile = ModuleFolder + ConfigsFolder + "\\Rust++.cfg";
             StaticModuleFolder = ModuleFolder;
+
+            Core.Init();
+
             try
             {
                 Core.config = new IniParser(ConfigFile);
@@ -240,10 +243,15 @@ namespace RustPP
                 {
                     if (he.Entity != null)
                     {
-                        if (!he.IsDecay)
-                            he.Entity.Destroy();
-                        else
-                            Fougerite.Hooks.decayList.Remove(he.Entity);
+                        try
+                        {
+                            if (!he.IsDecay)
+                                he.Entity.Destroy();
+                            else
+                                Fougerite.Hooks.decayList.Remove(he.Entity);
+                        }
+                        catch (Exception ex)
+                        { Logger.LogDebug("EntityHurt EX: " + ex); }
                     }
                     else Logger.LogDebug("he.Entity is null!");
                 }

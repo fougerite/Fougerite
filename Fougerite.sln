@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fougerite.Patcher", "Fouger
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustPP", "RustPP\RustPP.csproj", "{EF61739C-9A45-479F-90DE-08D37F4EE653}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlitchFix", "..\Rust-Zumwalt\GlitchFix\GlitchFix.csproj", "{6413D91E-A987-4C45-8B80-72E8C4D47CD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlitchFix", "GlitchFix\GlitchFix.csproj", "{6413D91E-A987-4C45-8B80-72E8C4D47CD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

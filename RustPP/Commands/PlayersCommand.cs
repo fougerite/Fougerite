@@ -23,7 +23,7 @@
                 if (num == 6)
                 {
                     num = 0;
-                    Util.sayUser(Arguments.argUser.networkPlayer, str.Substring(0, str.Length - 3));
+                    Util.sayUser(Arguments.argUser.networkPlayer, str.Substring(0, str.Length - 2));
                     str = "";
                 }
                 else

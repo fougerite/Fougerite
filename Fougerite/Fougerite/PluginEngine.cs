@@ -96,7 +96,7 @@ namespace Fougerite
             return script;
         }
 
-        public void UnloadPlugin(string name)
+        public void UnloadPlugin(string name, bool removeFromDict = true)
         {
             Logger.Log("Unloading " + name + " plugin.");
 
@@ -105,7 +105,7 @@ namespace Fougerite
                 var plugin = plugins[name];
                 plugin.RemoveHooks();
                 plugin.KillTimers();
-                plugins.Remove(name);
+                if (removeFromDict) plugins.Remove(name);
 
                 Logger.Log(name + " plugin was unloaded successfuly.");
             }
@@ -119,7 +119,8 @@ namespace Fougerite
         public void UnloadPlugins()
         {
             foreach (var name in plugins.Keys)
-                UnloadPlugin(name);
+                UnloadPlugin(name, false);
+            plugins.Clear();
         }
 
         private void LoadPlugin(string name)

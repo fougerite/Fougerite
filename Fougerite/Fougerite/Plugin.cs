@@ -358,97 +358,153 @@ namespace Fougerite
 
         #region Hooks
 
-        public void OnBlueprintUse(Fougerite.Player p, BPUseEvent ae)
+        public void OnBlueprintUse(Fougerite.Player player, BPUseEvent evt)
         {
-            Invoke("On_BlueprintUse", p, ae);
+            if (player == null) 
+                throw new ArgumentNullException("player");
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_BlueprintUse", player, evt);
         }
 
         public void OnChat(Fougerite.Player player, ref ChatString text)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (text == null)
+                throw new ArgumentNullException("text");
             Invoke("On_Chat", player, text);
         }
 
         public void OnCommand(Fougerite.Player player, string command, string[] args)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (command == null)
+                throw new ArgumentNullException("command");
+            if (args == null)
+                throw new ArgumentNullException("args");
             Invoke("On_Command", player, command, args);
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
         {
+            if (arg == null)
+                throw new ArgumentNullException("arg");
+            Player player = Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient);
+
             if (!external)
-                Invoke("On_Console", Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), arg);
+                Invoke("On_Console", player, arg);
             else
                 Invoke("On_Console", null, arg);
         }
 
-        public void OnDoorUse(Fougerite.Player p, DoorEvent de)
+        public void OnDoorUse(Fougerite.Player player, DoorEvent evt)
         {
-            Invoke("On_DoorUse", p, de);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_DoorUse", player, evt);
         }
 
-        public void OnEntityDecay(DecayEvent de)
+        public void OnEntityDecay(DecayEvent evt)
         {
-            Invoke("On_EntityDecay", de);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_EntityDecay", evt);
         }
 
-        public void OnEntityDeployed(Fougerite.Player p, Entity e)
+        public void OnEntityDeployed(Fougerite.Player player, Entity entity)
         {
-            Invoke("On_EntityDeployed", p, e);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (entity == null)
+                throw new ArgumentNullException("entity");
+            Invoke("On_EntityDeployed", player, entity);
         }
 
-        public void OnEntityHurt(HurtEvent he)
+        public void OnEntityHurt(HurtEvent evt)
         {
-            Invoke("On_EntityHurt", he);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_EntityHurt", evt);
         }
 
         public void OnItemsLoaded(ItemsBlocks items)
         {
+            if (items == null)
+                throw new ArgumentNullException("items");
             Invoke("On_ItemsLoaded", items);
         }
 
-        public void OnNPCHurt(HurtEvent he)
+        public void OnNPCHurt(HurtEvent evt)
         {
-            Invoke("On_NPCHurt", he);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_NPCHurt", evt);
         }
 
-        public void OnNPCKilled(DeathEvent de)
+        public void OnNPCKilled(DeathEvent evt)
         {
-            Invoke("On_NPCKilled", de);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_NPCKilled", evt);
         }
 
         public void OnPlayerConnected(Fougerite.Player player)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
             Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Fougerite.Player player)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
             Invoke("On_PlayerDisconnected", player);
         }
 
-        public void OnPlayerGathering(Fougerite.Player p, GatherEvent ge)
+        public void OnPlayerGathering(Fougerite.Player player, GatherEvent evt)
         {
-            Invoke("On_PlayerGathering", p, ge);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_PlayerGathering", player, evt);
         }
 
-        public void OnPlayerHurt(HurtEvent he)
+        public void OnPlayerHurt(HurtEvent evt)
         {
-            Invoke("On_PlayerHurt", he);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_PlayerHurt", evt);
         }
 
-        public void OnPlayerKilled(DeathEvent de)
+        public void OnPlayerKilled(DeathEvent evt)
         {
-            Invoke("On_PlayerKilled", de);
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_PlayerKilled", evt);
         }
 
-        public void OnPlayerSpawn(Fougerite.Player p, SpawnEvent se)
+        public void OnPlayerSpawn(Fougerite.Player player, SpawnEvent evt)
         {
-            Invoke("On_PlayerSpawning", p, se);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_PlayerSpawning", player, evt);
         }
 
-        public void OnPlayerSpawned(Fougerite.Player p, SpawnEvent se)
+        public void OnPlayerSpawned(Fougerite.Player player, SpawnEvent evt)
         {
-            Invoke("On_PlayerSpawned", p, se);
+            if (player == null)
+                throw new ArgumentNullException("player");
+            if (evt == null)
+                throw new ArgumentNullException("evt");
+            Invoke("On_PlayerSpawned", player, evt);
         }
 
         public void OnPluginInit()

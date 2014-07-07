@@ -237,10 +237,16 @@ namespace RustPP
             {
                 InstaKOCommand command = ChatCommand.GetCommand("instako") as InstaKOCommand;
                 if (command.IsOn(((Fougerite.Player)he.Attacker).PlayerClient.userID))
-                    if (!he.IsDecay)
-                        he.Entity.Destroy();
-                    else
-                        Fougerite.Hooks.decayList.Remove(he.Entity);
+                {
+                    if (he.Entity != null)
+                    {
+                        if (!he.IsDecay)
+                            he.Entity.Destroy();
+                        else
+                            Fougerite.Hooks.decayList.Remove(he.Entity);
+                    }
+                    else Logger.LogDebug("he.Entity is null!");
+                }
             }
         }
     }

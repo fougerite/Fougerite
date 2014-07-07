@@ -102,6 +102,7 @@
                 string item = Facepunch.Utility.String.QuoteSafe(arg.argUser.user.Displayname);
                 string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
 
+                Logger.LogDebug("Player " + item + " execute " + arg.ArgsStr); // arg.GetString(0)
 
                 if (OnChatReceived != null)
                     OnChatReceived(ref arg);

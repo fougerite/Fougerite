@@ -103,7 +103,7 @@ namespace Fougerite
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.Log("Found Function: " + funcDecl.Name);
+                Logger.LogDebug("Found Function: " + funcDecl.Name);
                 switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
@@ -136,7 +136,7 @@ namespace Fougerite
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.Log("RemoveHooks, found function " + funcDecl.Name);
+                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Name);
                 switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;

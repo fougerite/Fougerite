@@ -417,8 +417,6 @@ namespace Fougerite
 
         public void OnEntityDeployed(Fougerite.Player player, Entity entity)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
             if (entity == null)
                 throw new ArgumentNullException("entity");
             Invoke("On_EntityDeployed", player, entity);
@@ -454,15 +452,11 @@ namespace Fougerite
 
         public void OnPlayerConnected(Fougerite.Player player)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
             Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Fougerite.Player player)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
             Invoke("On_PlayerDisconnected", player);
         }
 

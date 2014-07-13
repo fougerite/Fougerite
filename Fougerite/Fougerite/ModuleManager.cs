@@ -157,5 +157,11 @@ namespace Fougerite
                 }
             }
         }
+
+        internal static void ReloadModules()
+        {
+            UnloadModules();
+            LoadModules();
+        }
     }
 }

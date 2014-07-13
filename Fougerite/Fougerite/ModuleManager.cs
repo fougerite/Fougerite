@@ -28,7 +28,7 @@ namespace Fougerite
         public static string ModulesFolder = @".\Modules\";
         //private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
-        private static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
+        public static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
 
         public static ReadOnlyCollection<ModuleContainer> Plugins
         {

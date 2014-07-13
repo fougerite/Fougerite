@@ -29,13 +29,6 @@
             this.FixInventoryRef();
         }
 
-        public string get_SteamID()
-        {
-            System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
-            Logger.LogDebug("[get_SteamID] WTF? " + SteamID + " | " + stackTrace.GetFrame(1).GetMethod().Name);
-            return SteamID;
-        }
-
         public void Disconnect()
         {
             NetUser netUser = this.ourPlayer.netUser;
@@ -324,6 +317,8 @@
         {
             get
             {
+                System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+                Logger.LogDebug("[get_SteamID] WTF? " + SteamID + " | " + stackTrace.GetFrame(1).GetMethod().Name);
                 return this.ourPlayer.netUser.userID.ToString();
             }
         }

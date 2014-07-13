@@ -251,5 +251,12 @@
             }
             return (t != null);
         }
+
+        public bool ContainsString(string str, string key)
+        {
+            if (str.Contains(key))
+                return true;
+            return false;
+        }
     }
 }

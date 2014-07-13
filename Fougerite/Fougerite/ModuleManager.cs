@@ -125,6 +125,8 @@ namespace Fougerite
                 Logger.Log(string.Format(
                     "[Modules] Module {0} v{1} (by {2}) initiated.", CurrentModule.Plugin.Name, CurrentModule.Plugin.Version, CurrentModule.Plugin.Author));
             }
+
+            Hooks.ModulesLoaded();
         }
 
         internal static void UnloadModules()

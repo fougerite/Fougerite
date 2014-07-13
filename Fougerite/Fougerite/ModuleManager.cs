@@ -129,12 +129,8 @@ namespace Fougerite
 
         internal static void UnloadModules()
         {
-            var ModuleUnloadWatches = new Dictionary<ModuleContainer, Stopwatch>();
             foreach (ModuleContainer ModuleContainer in Modules)
             {
-                Stopwatch UnloadWatch = new Stopwatch();
-                UnloadWatch.Start();
-
                 try
                 {
                     ModuleContainer.DeInitialize();
@@ -144,16 +140,10 @@ namespace Fougerite
                     Logger.LogError(string.Format(
                         "[Modules] Module \"{0}\" has thrown an exception while being deinitialized:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
-
-                UnloadWatch.Stop();
-                ModuleUnloadWatches.Add(ModuleContainer, UnloadWatch);
             }
 
             foreach (ModuleContainer ModuleContainer in Modules)
             {
-                Stopwatch UnloadWatch = ModuleUnloadWatches[ModuleContainer];
-                UnloadWatch.Start();
-
                 try
                 {
                     ModuleContainer.Dispose();
@@ -163,8 +153,6 @@ namespace Fougerite
                     Logger.LogError(string.Format(
                         "[Modules] Module \"{0}\" has thrown an exception while being disposed:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
-
-                UnloadWatch.Stop();
             }
         }
     }

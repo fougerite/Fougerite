@@ -44,6 +44,7 @@ namespace Fougerite
         public void DeInitialize()
         {
             this.Initialized = false;
+            this.Plugin.DeInitialize();
         }
 
         public void Dispose()

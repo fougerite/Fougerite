@@ -133,14 +133,10 @@
 
             if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
             {
-                if ((a.argUser != null) && a.argUser.admin)
+                if (((a.argUser != null) && a.argUser.admin) || external)
                 {
                     PluginEngine.Instance().ReloadPlugins();
-                    a.ReplyWith("Fougerite: Reloaded!");
-                }
-                else if (external)
-                {
-                    PluginEngine.Instance().ReloadPlugins();
+                    ModuleManager.ReloadModules();
                     a.ReplyWith("Fougerite: Reloaded!");
                 }
             }

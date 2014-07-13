@@ -12,8 +12,10 @@ Fougerite a fully compatible with Magma server mod, featuring better performance
 * Run the patcher with a "-2" (second pass) option.
 
 ## Installation
+* Backup Your server just incase, if something would go wrong.
 * Download the latest release (usually unstable) or the previous one.
 * Unpack dlls and install them to rust_server_Data\Managed directory.
+* Run Patcher.
 * Rename your Magma.ini config to Fougerite.ini.  
 * Launch your server.  
 

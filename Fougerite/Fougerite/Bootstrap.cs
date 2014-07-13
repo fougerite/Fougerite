@@ -36,12 +36,12 @@
             if (File.Exists(Util.GetServerFolder() + @"\FougeriteDirectory.cfg"))
                 Fougerite.Data.PATH = new IniParser(Util.GetServerFolder() + @"\FougeriteDirectory.cfg").GetSetting("Settings", "Directory");
             else
-                Fougerite.Data.PATH = Util.GetRootFolder() + @"\save\Fougerite\";
+                Fougerite.Data.PATH = Util.GetRootFolder() + @"\Fougerite\";
 
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            Config.Init(@".\Fougerite.cfg");
+            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
             Logger.Init();
             ModuleManager.LoadModules();
             PluginEngine.Instance();

@@ -239,6 +239,12 @@ namespace RustPP
             if (Core.IsEnabled())
             {
                 InstaKOCommand command = ChatCommand.GetCommand("instako") as InstaKOCommand;
+
+                if (!(he.Attacker is Fougerite.Player))
+                {
+                    return;
+                }
+
                 if (command.IsOn(((Fougerite.Player)he.Attacker).PlayerClient.userID))
                 {
                     if (he.Entity != null)

@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using uLink;
     using UnityEngine;
 
@@ -266,20 +267,18 @@
             }
         }
 
-        public System.Collections.Generic.List<Entity> Entities
+        public IEnumerable<Entity> Entities
         {
             get
             {
-                System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
-                foreach (StructureComponent component in Resources.FindObjectsOfTypeAll(typeof(StructureComponent)))
-                {
-                    list.Add(new Entity(component));
-                }
-                foreach (DeployableObject obj2 in Resources.FindObjectsOfTypeAll(typeof(DeployableObject)))
-                {
-                    list.Add(new Entity(obj2));
-                }
-                return list;
+                IEnumerable<Entity> structures = 
+                    StructureMaster.AllStructures
+                    .SelectMany(sm => sm._structureComponents)
+                    .Select(sc => new Entity(sc));
+                IEnumerable<Entity> deployables =
+                    UnityEngine.Object.FindObjectsOfType<DeployableObject>()
+                    .Select(sc => new Entity(sc));
+                return structures.Concat(deployables);
             }
         }
 

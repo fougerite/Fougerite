@@ -112,7 +112,7 @@
                     num++;
                 }
             }
-            return (num + 1);
+            return num;
         }
 
         public bool HasItem(string name)

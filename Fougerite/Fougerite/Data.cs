@@ -86,7 +86,7 @@
                 {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
                     inifiles.Add(key, new IniParser(path));
-                    Logger.Log("Loaded Config: " + key);
+                    Logger.LogDebug("Loaded Config: " + key);
                 }
             }
         }

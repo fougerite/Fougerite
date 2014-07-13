@@ -40,7 +40,7 @@
         public static event ServerShutdownDelegate OnServerShutdown;
         public static event ShowTalkerDelegate OnShowTalker;
         public static event LootTablesLoaded OnTablesLoaded;
-        public static event ModulesLoaded OnModulesLoaded;
+        public static event ModulesLoadedDelegate OnModulesLoaded;
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
@@ -556,6 +556,6 @@
         public delegate void PluginInitHandlerDelegate();
         public delegate void ServerInitDelegate();
         public delegate void ServerShutdownDelegate();
-        public delegate void ModulesLoaded();
+        public delegate void ModulesLoadedDelegate();
     }
 }

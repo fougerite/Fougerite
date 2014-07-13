@@ -17,53 +17,30 @@
         public static Hashtable talkerTimers = new Hashtable();
 
         public static event BlueprintUseHandlerDelagate OnBlueprintUse;
-
         public static event ChatRecivedDelegate OnChatReceived;
-
         public static event ChatHandlerDelegate OnChat;
-
         public static event CommandHandlerDelegate OnCommand;
-
         public static event ConsoleHandlerDelegate OnConsoleReceived;
-
         public static event DoorOpenHandlerDelegate OnDoorUse;
-
         public static event EntityDecayDelegate OnEntityDecay;
-
         public static event EntityDeployedDelegate OnEntityDeployed;
-
         public static event EntityHurtDelegate OnEntityHurt;
-
         public static event ItemsDatablocksLoaded OnItemsLoaded;
-
         public static event HurtHandlerDelegate OnNPCHurt;
-
         public static event KillHandlerDelegate OnNPCKilled;
-
         public static event ConnectionHandlerDelegate OnPlayerConnected;
-
         public static event DisconnectionHandlerDelegate OnPlayerDisconnected;
-
         public static event PlayerGatheringHandlerDelegate OnPlayerGathering;
-
         public static event HurtHandlerDelegate OnPlayerHurt;
-
         public static event KillHandlerDelegate OnPlayerKilled;
-
         public static event PlayerSpawnHandlerDelegate OnPlayerSpawned;
-
         public static event PlayerSpawnHandlerDelegate OnPlayerSpawning;
-
         public static event PluginInitHandlerDelegate OnPluginInit;
-
         public static event ServerInitDelegate OnServerInit;
-
         public static event ServerShutdownDelegate OnServerShutdown;
-
         public static event ShowTalkerDelegate OnShowTalker;
-
         public static event LootTablesLoaded OnTablesLoaded;
-
+        public static event ModulesLoaded OnModulesLoaded;
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
@@ -519,6 +496,10 @@
             OnServerShutdown = delegate
             {
             };
+            OnModulesLoaded = delegate
+            {
+            };
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
                 player.FixInventoryRef();
@@ -545,6 +526,12 @@
                 OnShowTalker(player, p);
         }
 
+        internal static void ModulesLoaded()
+        {
+            if (OnModulesLoaded != null)
+                OnModulesLoaded();
+        }
+
         public static Dictionary<string, LootSpawnList> TablesLoaded(Dictionary<string, LootSpawnList> lists)
         {
             if (OnTablesLoaded != null)
@@ -553,46 +540,26 @@
         }
 
         public delegate void BlueprintUseHandlerDelagate(Fougerite.Player player, BPUseEvent ae);
-
         public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
-
         public delegate void ChatRecivedDelegate(ref ConsoleSystem.Arg arg);
-        
         public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);
-
         public delegate void ConnectionHandlerDelegate(Fougerite.Player player);
-
         public delegate void ConsoleHandlerDelegate(ref ConsoleSystem.Arg arg, bool external);
-
         public delegate void DisconnectionHandlerDelegate(Fougerite.Player player);
-
         public delegate void DoorOpenHandlerDelegate(Fougerite.Player p, DoorEvent de);
-
         public delegate void EntityDecayDelegate(DecayEvent de);
-
         public delegate void EntityDeployedDelegate(Fougerite.Player player, Entity e);
-
         public delegate void EntityHurtDelegate(HurtEvent he);
-
         public delegate void HurtHandlerDelegate(HurtEvent he);
-
         public delegate void ItemsDatablocksLoaded(ItemsBlocks items);
-
         public delegate void KillHandlerDelegate(DeathEvent de);
-
         public delegate void LootTablesLoaded(Dictionary<string, LootSpawnList> lists);
-
         public delegate void PlayerGatheringHandlerDelegate(Fougerite.Player player, GatherEvent ge);
-
         public delegate void PlayerSpawnHandlerDelegate(Fougerite.Player player, SpawnEvent se);
-
         public delegate void ShowTalkerDelegate(uLink.NetworkPlayer player, PlayerClient p);
-        
         public delegate void PluginInitHandlerDelegate();
-
         public delegate void ServerInitDelegate();
-
         public delegate void ServerShutdownDelegate();
-
+        public delegate void ModulesLoaded();
     }
 }

@@ -80,6 +80,10 @@ namespace Fougerite
         {
         }
 
+        public virtual void DeInitialize()
+        {
+        }
+
         public abstract void Initialize();
     }
 }

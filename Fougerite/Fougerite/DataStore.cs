@@ -8,7 +8,7 @@
     {
         public Hashtable datastore = new Hashtable();
         private static DataStore instance;
-        public static string PATH = (Util.GetServerFolder() + @"..\save\FougeriteDatastore.ds");
+        public static string PATH = (Util.GetServerFolder() + @"..\FougeriteDatastore.ds");
 
         public void Add(string tablename, object key, object val)
         {

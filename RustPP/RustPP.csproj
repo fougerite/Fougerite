@@ -11,7 +11,9 @@
     <AssemblyName>RustPP</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -101,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
-      <Project>{bd30e9d1-3322-48a4-b846-a969e32dc3f3}</Project>
+      <Project>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</Project>
       <Name>Fougerite</Name>
       <Private>False</Private>
     </ProjectReference>
@@ -123,7 +125,6 @@
     <Reference Include="System.Core">
       <HintPath>..\References\System.Core.dll</HintPath>
     </Reference>
-    <Reference Include="System.XML" />
     <Reference Include="uLink">
       <HintPath>..\References\uLink.dll</HintPath>
       <Private>False</Private>
@@ -132,6 +133,7 @@
       <HintPath>..\References\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

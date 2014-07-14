@@ -196,22 +196,54 @@
 
         public static void say(uLink.NetworkPlayer player, string playername, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
+            try
+            {
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("say ex");
+                Logger.LogException(ex);
+            }
         }
 
         public static void sayAll(string arg)
         {
-            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            try
+            {
+                ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("sayAll ex");
+                Logger.LogException(ex);
+            }
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            try
+            {
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("sayUser_1 ex");
+                Logger.LogException(ex);
+            }
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            try
+            {
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("sayUser_2 ex");
+                Logger.LogException(ex);
+            }
         }
 
         public void SetStaticField(string className, string field, object val)

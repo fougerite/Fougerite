@@ -156,6 +156,7 @@ namespace Fougerite
                         "[Modules] Module \"{0}\" has thrown an exception while being disposed:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
             }
+            Modules.Clear();
         }
 
         internal static void ReloadModules()

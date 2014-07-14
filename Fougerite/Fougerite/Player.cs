@@ -317,6 +317,20 @@
         {
             get
             {
+                try
+                {
+                    System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+                    Logger.LogDebug("[get_SteamID] WTF? " + this.ourPlayer.netUser.userID.ToString() + " | " + stackTrace.GetFrame(1).GetMethod().Name);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogDebug(ex.ToString());
+                }
+
+                if (this.ourPlayer == null)
+                    Logger.LogDebug("ourPlayer == null");
+                else if (this.ourPlayer.netUser == null)
+                    Logger.LogDebug("netUser == null");
                 return this.ourPlayer.netUser.userID.ToString();
             }
         }

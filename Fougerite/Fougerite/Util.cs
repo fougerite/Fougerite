@@ -19,16 +19,24 @@
 
         public void ConsoleLog(string str, [Optional, DefaultParameterValue(false)] bool adminOnly)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
+            try
             {
-                if (!adminOnly)
+                foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 {
-                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    if (!adminOnly)
+                    {
+                        ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    }
+                    else if (player.Admin)
+                    {
+                        ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    }
                 }
-                else if (player.Admin)
-                {
-                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("ConsoleLog ex");
+                Logger.LogException(ex);
             }
         }
 

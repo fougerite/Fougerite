@@ -32,12 +32,15 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Facepunch.ID">
       <HintPath>..\References\Facepunch.ID.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Google.ProtocolBuffers">
       <HintPath>..\References\Google.ProtocolBuffers.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -47,9 +50,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="uLink">
       <HintPath>..\References\uLink.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +65,7 @@
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
       <Project>{bd30e9d1-3322-48a4-b846-a969e32dc3f3}</Project>
       <Name>Fougerite</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

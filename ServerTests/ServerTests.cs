@@ -63,9 +63,9 @@ namespace ServerTests
         
         void Command(Fougerite.Player player, string cmd, string[] args)
         {
-            if (cmd == "test" && args.Length == 1)
+            if (cmd == "test" && args.Length == 1 && player.Admin)
+            {
                 TesterPlayer = player;
-
                 switch (args[0])
                 {
                     case "all":
@@ -75,6 +75,7 @@ namespace ServerTests
                         player.Message("Enter valid arg!");
                         break;
                 }
+            }
         }
 
         void TestAll()

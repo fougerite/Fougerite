@@ -78,6 +78,9 @@
             {
                 if (chat.enabled)
                 {
+                    if (arg == null)
+                        return;
+
                     string item = Facepunch.Utility.String.QuoteSafe(arg.argUser.user.Displayname);
                     string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
 

@@ -16,8 +16,8 @@ Fougerite a fully compatible with Magma server mod, featuring better performance
 * Download the latest release (usually unstable) or the previous one.
 * Unpack dlls and install them to rust_server_Data\Managed directory.
 * Run Patcher.
-* Rename your Magma.ini config to Fougerite.ini.  
-* Copy your Plugins from the Save folder to: ServerFolder\Fougerite\ (Main Server's Folder, if Fougerite Folder doesn't exist, just create it).
+* Rename your MagmaDirectory.cfg config to FougeriteDirectory.cfg.  
+* If you using Magma copy your plugins from the "save" folder to: "Server_Folder\Fougerite\" (main server's folder, if "Fougerite" folder doesn't exist, just create it) and read read WARNINGs.  
 * Launch your server.  
 
 **WARNING:** If you using Magma plugins you must rename all calls to class "Magma" to "Fougerite":
@@ -25,9 +25,11 @@ Fougerite a fully compatible with Magma server mod, featuring better performance
   var player = Magma.Player.FindBySteamID(id);
   var player = Fougerite.Player.FindBySteamID(id);
 ```
+**WARNING:** If you using Magma you must extract all your files from "save" to main server folder (with rust_server.exe) if you using Magma.  
+Plugins must be placed in "Server_Folder\Fougerite\" - for example "Server\Fougerite\SuperPlugin\SuperPlugin.js"  
 
 Use Git Issues system to report bugs, please. Or send an email to rowneg@bk.ru. 
-Please visit [our forum](fougerite.com) for more information.
+Please visit [our forum](http://fougerite.com/) for more information.
 
 ***
 ###### Developed by EquiFox & xEnt (Rust++ and Magma)

@@ -100,6 +100,7 @@ namespace ServerTests
             PlayerKilled_Test();
             PlayerConnect_Test();
             PlayerDisconnect_Test();
+            Log("Tested!");
         }
 
         void Log(string MSG)
@@ -111,173 +112,257 @@ namespace ServerTests
 
         void BlueprintUse_Test()
         {
-            BlueprintDataBlock BDB = new BlueprintDataBlock();
-            Log("BlueprintUse_Test: Test 1");
-            Hooks.BlueprintUse(null, BDB);
+            try
+            {
+                BlueprintDataBlock BDB = new BlueprintDataBlock();
+                Log("BlueprintUse_Test: Test 1");
+                Hooks.BlueprintUse(null, BDB);
 
-            Log("BlueprintUse_Test: Test 2");
-            Hooks.BlueprintUse(null, null);
+                Log("BlueprintUse_Test: Test 2");
+                Hooks.BlueprintUse(null, null);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void ChatReceived_Test()
         {
-            ConsoleSystem.Arg arg = new ConsoleSystem.Arg("");
-            Log("ChatReceived_Test: Test 1");
-            Hooks.ChatReceived(ref arg);
+            try
+            {
+                ConsoleSystem.Arg arg = new ConsoleSystem.Arg("");
+                Log("ChatReceived_Test: Test 1");
+                Hooks.ChatReceived(ref arg);
 
-            arg = null;
-            Log("ChatReceived_Test: Test 2");
-            Hooks.ChatReceived(ref arg);
+                arg = null;
+                Log("ChatReceived_Test: Test 2");
+                Hooks.ChatReceived(ref arg);
 
-            arg = new ConsoleSystem.Arg("say test");
-            Log("ChatReceived_Test: Test 3");
-            Hooks.ChatReceived(ref arg);
+                arg = new ConsoleSystem.Arg("say test");
+                Log("ChatReceived_Test: Test 3");
+                Hooks.ChatReceived(ref arg);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void ConsoleReceived_Test()
         {
-            ConsoleSystem.Arg arg = new ConsoleSystem.Arg("");
-            Log("ConsoleReceived_Test: Test 1");
-            Hooks.ConsoleReceived(ref arg);
+            try
+            {
+                ConsoleSystem.Arg arg = new ConsoleSystem.Arg("");
+                Log("ConsoleReceived_Test: Test 1");
+                Hooks.ConsoleReceived(ref arg);
 
-            arg = null;
-            Log("ConsoleReceived_Test: Test 2");
-            Hooks.ConsoleReceived(ref arg);
+                arg = null;
+                Log("ConsoleReceived_Test: Test 2");
+                Hooks.ConsoleReceived(ref arg);
 
-            arg = new ConsoleSystem.Arg("say test");
-            Log("ConsoleReceived_Test: Test 3");
-            Hooks.ConsoleReceived(ref arg);
+                arg = new ConsoleSystem.Arg("say test");
+                Log("ConsoleReceived_Test: Test 3");
+                Hooks.ConsoleReceived(ref arg);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void EntityDecay_Test()
         {
-            Entity Ent = null;
-            if (World.GetWorld().Entities.ToArray().Length > 0)
-                Ent = World.GetWorld().Entities.ToArray()[0];
-            if (Ent == null)
-                Log("EntityDecay_Test: Ent == null!");
+            try
+            {
+                Entity Ent = null;
+                if (World.GetWorld().Entities.ToArray().Length > 0)
+                    Ent = World.GetWorld().Entities.ToArray()[0];
+                if (Ent == null)
+                    Log("EntityDecay_Test: Ent == null!");
 
-            Log("EntityDecay_Test: Test 1");
-            Hooks.EntityDecay(Ent, 0f);
+                Log("EntityDecay_Test: Test 1");
+                Hooks.EntityDecay(Ent, 0f);
 
-            Log("EntityDecay_Test: Test 2");
-            Hooks.EntityDecay(Ent, -100f);
+                Log("EntityDecay_Test: Test 2");
+                Hooks.EntityDecay(Ent, -100f);
 
-            Log("EntityDecay_Test: Test 3");
-            Hooks.EntityDecay(Ent, 10000f);
+                Log("EntityDecay_Test: Test 3");
+                Hooks.EntityDecay(Ent, 10000f);
 
-            Log("EntityDecay_Test: Test 4");
-            Hooks.EntityDecay(null, 0f);
+                Log("EntityDecay_Test: Test 4");
+                Hooks.EntityDecay(null, 0f);
 
-            Log("EntityDecay_Test: Test 5");
-            Hooks.EntityDecay(null, 10000f);
+                Log("EntityDecay_Test: Test 5");
+                Hooks.EntityDecay(null, 10000f);
 
-            Ent = new Entity(new object());
+                Ent = new Entity(new object());
 
-            Log("EntityDecay_Test: Test 6");
-            Hooks.EntityDecay(Ent, 0f);
+                Log("EntityDecay_Test: Test 6");
+                Hooks.EntityDecay(Ent, 0f);
 
-            Log("EntityDecay_Test: Test 7");
-            Hooks.EntityDecay(Ent, 10000f);
+                Log("EntityDecay_Test: Test 7");
+                Hooks.EntityDecay(Ent, 10000f);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void EntityDeployed_Test()
         {
-            Entity Ent = null;
-            if (World.GetWorld().Entities.ToArray().Length > 1)
-                Ent = World.GetWorld().Entities.ToArray()[1];
-            if (Ent == null)
-                Log("EntityDeployed_Test: Ent == null!");
+            try
+            {
+                Entity Ent = null;
+                if (World.GetWorld().Entities.ToArray().Length > 1)
+                    Ent = World.GetWorld().Entities.ToArray()[1];
+                if (Ent == null)
+                    Log("EntityDeployed_Test: Ent == null!");
 
-            Log("EntityDeployed_Test: Test 1");
-            Hooks.EntityDeployed(Ent);
+                Log("EntityDeployed_Test: Test 1");
+                Hooks.EntityDeployed(Ent);
 
-            Fougerite.Player player = null;
-            Ent.ChangeOwner(player);
-            Log("EntityDeployed_Test: Test 2");
-            Hooks.EntityDeployed(Ent);
+                Fougerite.Player player = null;
+                Ent.ChangeOwner(player);
+                Log("EntityDeployed_Test: Test 2");
+                Hooks.EntityDeployed(Ent);
 
-            Log("EntityDeployed_Test: Test 3");
-            Hooks.EntityDeployed(null);
+                Log("EntityDeployed_Test: Test 3");
+                Hooks.EntityDeployed(null);
 
-            Ent = new Entity(new object());
-            Log("EntityDeployed_Test: Test 4");
-            Hooks.EntityDeployed(Ent);
+                Ent = new Entity(new object());
+                Log("EntityDeployed_Test: Test 4");
+                Hooks.EntityDeployed(Ent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void EntityHurt_Test()
         {
-            Entity Ent = null;
-            if (World.GetWorld().Entities.ToArray().Length > 2)
-                Ent = World.GetWorld().Entities.ToArray()[2];
-            if (Ent == null)
-                Log("EntityHurt_Test: Ent == null!");
+            try
+            {
+                Entity Ent = null;
+                if (World.GetWorld().Entities.ToArray().Length > 2)
+                    Ent = World.GetWorld().Entities.ToArray()[2];
+                if (Ent == null)
+                    Log("EntityHurt_Test: Ent == null!");
 
-            DamageEvent damageEvent = new DamageEvent();
-            damageEvent.amount = 50f;
+                DamageEvent damageEvent = new DamageEvent();
+                damageEvent.amount = 50f;
 
-            Log("EntityHurt_Test: Test 1");
-            Hooks.EntityHurt(Ent, ref damageEvent);
+                Log("EntityHurt_Test: Test 1");
+                Hooks.EntityHurt(Ent, ref damageEvent);
 
-            Fougerite.Player player = null;
-            Ent.ChangeOwner(player);
-            Log("EntityHurt_Test: Test 2");
-            Hooks.EntityHurt(Ent, ref damageEvent);
+                Fougerite.Player player = null;
+                Ent.ChangeOwner(player);
+                Log("EntityHurt_Test: Test 2");
+                Hooks.EntityHurt(Ent, ref damageEvent);
 
-            Log("EntityHurt_Test: Test 3");
-            Hooks.EntityHurt(null, ref damageEvent);
+                Log("EntityHurt_Test: Test 3");
+                Hooks.EntityHurt(null, ref damageEvent);
 
-            Ent = new Entity(new object());
-            Log("EntityHurt_Test: Test 4");
-            Hooks.EntityHurt(Ent, ref damageEvent);
+                Ent = new Entity(new object());
+                Log("EntityHurt_Test: Test 4");
+                Hooks.EntityHurt(Ent, ref damageEvent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void NPCHurt_Test()
         {
-            DamageEvent damageEvent = new DamageEvent();
-            Log("NPCHurt_Test: Test 1");
-            Hooks.NPCHurt(ref damageEvent);
+            try
+            {
+                DamageEvent damageEvent = new DamageEvent();
+                Log("NPCHurt_Test: Test 1");
+                Hooks.NPCHurt(ref damageEvent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void NPCKilled_Test()
         {
-            DamageEvent damageEvent = new DamageEvent();
-            Log("NPCKilled_Test: Test 1");
-            Hooks.NPCKilled(ref damageEvent);
+            try
+            {
+                DamageEvent damageEvent = new DamageEvent();
+                Log("NPCKilled_Test: Test 1");
+                Hooks.NPCKilled(ref damageEvent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void PlayerConnect_Test()
         {
-            NetUser NUser = null;
-            Log("PlayerConnect_Test: Test 1");
-            Hooks.PlayerConnect(NUser);
+            try
+            {
+                NetUser NUser = null;
+                Log("PlayerConnect_Test: Test 1");
+                Hooks.PlayerConnect(NUser);
 
-            Log("PlayerConnect_Test: Test 2");
-            Hooks.PlayerConnect(TesterPlayer.PlayerClient.netUser);
+                Log("PlayerConnect_Test: Test 2");
+                Hooks.PlayerConnect(TesterPlayer.PlayerClient.netUser);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void PlayerDisconnect_Test()
         {
-            NetUser NUser = null;
-            Log("PlayerConnect_Test: Test 1");
-            Hooks.PlayerDisconnect(NUser);
+            try
+            {
+                NetUser NUser = null;
+                Log("PlayerConnect_Test: Test 1");
+                Hooks.PlayerDisconnect(NUser);
 
-            Log("PlayerConnect_Test: Test 2");
-            Hooks.PlayerDisconnect(TesterPlayer.PlayerClient.netUser);
+                Log("PlayerConnect_Test: Test 2");
+                Hooks.PlayerDisconnect(TesterPlayer.PlayerClient.netUser);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void PlayerHurt_Test()
         {
-            DamageEvent damageEvent = new DamageEvent();
-            Log("PlayerHurt_Test: Test 1");
-            Hooks.PlayerHurt(ref damageEvent);
+            try
+            {
+                DamageEvent damageEvent = new DamageEvent();
+                Log("PlayerHurt_Test: Test 1");
+                Hooks.PlayerHurt(ref damageEvent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         void PlayerKilled_Test()
         {
-            DamageEvent damageEvent = new DamageEvent();
-            Log("PlayerKilled_Test: Test 1");
-            Hooks.PlayerHurt(ref damageEvent);
+            try
+            {
+                DamageEvent damageEvent = new DamageEvent();
+                Log("PlayerKilled_Test: Test 1");
+                Hooks.PlayerHurt(ref damageEvent);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         //

@@ -253,6 +253,20 @@ namespace ServerTests
             Hooks.PlayerDisconnect(TesterPlayer.PlayerClient.netUser);
         }
 
+        void PlayerHurt_Test()
+        {
+            DamageEvent damageEvent = new DamageEvent();
+            Log("PlayerHurt_Test: Test 1");
+            Hooks.PlayerHurt(ref damageEvent);
+        }
+
+        void PlayerKilled_Test()
+        {
+            DamageEvent damageEvent = new DamageEvent();
+            Log("PlayerKilled_Test: Test 1");
+            Hooks.PlayerHurt(ref damageEvent);
+        }
+
         //
 
         void ChatReceived(ref ConsoleSystem.Arg arg)

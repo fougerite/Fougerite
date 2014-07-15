@@ -74,97 +74,135 @@
 
         public static void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            if (chat.enabled)
+            try
             {
-                string item = Facepunch.Utility.String.QuoteSafe(arg.argUser.user.Displayname);
-                string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
-
-                if (arg.GetString(0).StartsWith("/"))
-                    Logger.LogDebug("[CHAT-CMD] " + item + " executed " + arg.ArgsStr); // arg.GetString(0)
-
-                if (OnChatReceived != null)
-                    OnChatReceived(ref arg);
-                if (arg == null)
-                    return;
-                else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
-                    handleCommand(ref arg);
-                else
+                if (chat.enabled)
                 {
-                    ChatString text = new ChatString(str);
-                    if (OnChat != null)
-                        OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref text);
+                    string item = Facepunch.Utility.String.QuoteSafe(arg.argUser.user.Displayname);
+                    string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
 
-                    if (text != null)
+                    if (arg.GetString(0).StartsWith("/"))
+                        Logger.LogDebug("[CHAT-CMD] " + item + " executed " + arg.ArgsStr); // arg.GetString(0)
+
+                    if (OnChatReceived != null)
+                        OnChatReceived(ref arg);
+                    if (arg == null)
+                        return;
+                    else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
+                        handleCommand(ref arg);
+                    else
                     {
-                        str = Facepunch.Utility.String.QuoteSafe(text.NewText.Substring(1, text.NewText.Length - 2));
-                        if (str != "")
+                        ChatString text = new ChatString(str);
+                        if (OnChat != null)
+                            OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref text);
+
+                        if (text != null)
                         {
-                            Fougerite.Data.GetData().chat_history.Add(str);
-                            Fougerite.Data.GetData().chat_history_username.Add(item);
-                            Logger.ChatLog(item, str);
-                            ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
+                            str = Facepunch.Utility.String.QuoteSafe(text.NewText.Substring(1, text.NewText.Length - 2));
+                            if (str != "")
+                            {
+                                Fougerite.Data.GetData().chat_history.Add(str);
+                                Fougerite.Data.GetData().chat_history_username.Add(item);
+                                Logger.ChatLog(item, str);
+                                ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
         {
-            DoorEvent de = new DoorEvent(new Entity(obj));
-            if (obj.ownerID == controllable.playerClient.userID)
-                de.Open = true;
+            try
+            {
+                DoorEvent de = new DoorEvent(new Entity(obj));
+                if (obj.ownerID == controllable.playerClient.userID)
+                    de.Open = true;
 
-            if (!(obj is SleepingBag) && OnDoorUse != null)
-                OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
-            return de.Open;
+                if (!(obj is SleepingBag) && OnDoorUse != null)
+                    OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
+                return de.Open;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+            return false;
         }
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-            if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
+            try
             {
-                a.ReplyWith("All Good!");
+                if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
+                {
+                    a.ReplyWith("All Good!");
+                    return true;
+                }
+                bool external = a.argUser == null;
+                if (OnConsoleReceived != null)
+                    OnConsoleReceived(ref a, external);
+
+                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
+                {
+                    if (((a.argUser != null) && a.argUser.admin) || external)
+                    {
+                        PluginEngine.Instance().ReloadPlugins();
+                        ModuleManager.ReloadModules();
+                        a.ReplyWith("Fougerite: Reloaded!");
+                    }
+                }
+                if ((a.Reply == null) || (a.Reply == ""))
+                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
                 return true;
             }
-            bool external = a.argUser == null;
-            if (OnConsoleReceived != null)
-                OnConsoleReceived(ref a, external);
-
-            if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
+            catch (Exception ex)
             {
-                if (((a.argUser != null) && a.argUser.admin) || external)
-                {
-                    PluginEngine.Instance().ReloadPlugins();
-                    ModuleManager.ReloadModules();
-                    a.ReplyWith("Fougerite: Reloaded!");
-                }
+                Logger.LogException(ex);
             }
-            if ((a.Reply == null) || (a.Reply == ""))
-                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
-            return true;
+            return false;
         }
 
         public static float EntityDecay(object entity, float dmg)
         {
-            DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
-            if (OnEntityDecay != null)
-                OnEntityDecay(de);
+            try
+            {
+                DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
+                if (OnEntityDecay != null)
+                    OnEntityDecay(de);
 
-            if (decayList.Contains(entity))
-                decayList.Remove(entity);
+                if (decayList.Contains(entity))
+                    decayList.Remove(entity);
 
-            decayList.Add(entity);
-            return de.DamageAmount;
+                decayList.Add(entity);
+                return de.DamageAmount;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+            return 0f;
         }
 
         public static void EntityDeployed(object entity)
         {
-            Entity e = new Entity(entity);
-            Fougerite.Player creator = e.Creator;
+            try
+            {
+                Entity e = new Entity(entity);
+                Fougerite.Player creator = e.Creator;
 
-            if (OnEntityDeployed != null)
-                OnEntityDeployed(creator, e);
+                if (OnEntityDeployed != null)
+                    OnEntityDeployed(creator, e);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static void EntityHurt(object entity, ref DamageEvent e)
@@ -207,21 +245,28 @@
 
         public static void handleCommand(ref ConsoleSystem.Arg arg)
         {
-            string displayname = arg.argUser.user.Displayname;
-            string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
-            string text = strArray[0].Trim().Remove(0, 1);
-            string[] args = new string[strArray.Length - 1];
-            for (int i = 1; i < strArray.Length; i++)
-                args[i - 1] = strArray[i].Trim();
+            try
+            {
+                string displayname = arg.argUser.user.Displayname;
+                string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
+                string text = strArray[0].Trim().Remove(0, 1);
+                string[] args = new string[strArray.Length - 1];
+                for (int i = 1; i < strArray.Length; i++)
+                    args[i - 1] = strArray[i].Trim();
 
-            if (OnCommand != null)
-                OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
+                if (OnCommand != null)
+                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static void hijack(string name)
         {
             if ((((name != "!Ng") && (name != ":rabbit_prefab_a")) && ((name != ";res_woodpile") && (name != ";res_ore_1"))) && ((((((((((((((name != ";res_ore_2") & (name != ";res_ore_3")) & (name != ":stag_prefab")) & (name != ":boar_prefab")) & (name != ":chicken_prefab")) & (name != ":bear_prefab")) & (name != ":wolf_prefab")) & (name != ":mutant_bear")) & (name != ":mutant_wolf")) & (name != "AmmoLootBox")) & (name != "MedicalLootBox")) & (name != "BoxLoot")) & (name != "WeaponLootBox")) & (name != "SupplyCrate")))
-                Logger.Log(name);
+                Logger.LogDebug("Hijack: " + name);
         }
 
         public static ItemDataBlock[] ItemsLoaded(System.Collections.Generic.List<ItemDataBlock> items, Dictionary<string, int> stringDB, Dictionary<int, int> idDB)
@@ -283,87 +328,124 @@
 
         public static bool PlayerConnect(NetUser user)
         {
-            Fougerite.Player item = new Fougerite.Player(user.playerClient);
-            Fougerite.Server.GetServer().Players.Add(item);
+            bool connected = false;
+            try
+            {
+                Fougerite.Player item = new Fougerite.Player(user.playerClient);
+                Fougerite.Server.GetServer().Players.Add(item);
 
-            Logger.LogDebug("User Connected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
-            if (OnPlayerConnected != null)
-                OnPlayerConnected(item);
-            bool connected = user.connected;
+                Logger.LogDebug("User Connected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
+                if (OnPlayerConnected != null)
+                    OnPlayerConnected(item);
+                connected = user.connected;
 
-            item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                return connected;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
             return connected;
         }
 
         public static void PlayerDisconnect(NetUser user)
         {
-            Fougerite.Player item = Fougerite.Player.FindByPlayerClient(user.playerClient);
-            if (item != null)
-                Fougerite.Server.GetServer().Players.Remove(item);
+            try
+            {
+                Fougerite.Player item = Fougerite.Player.FindByPlayerClient(user.playerClient);
+                if (item != null)
+                    Fougerite.Server.GetServer().Players.Remove(item);
 
-            Logger.LogDebug("User Disconnected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
-            if (OnPlayerDisconnected != null)
-                OnPlayerDisconnected(item);
+                Logger.LogDebug("User Disconnected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
+                if (OnPlayerDisconnected != null)
+                    OnPlayerDisconnected(item);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static void PlayerGather(Inventory rec, ResourceTarget rt, ResourceGivePair rg, ref int amount)
         {
-            Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.networkView.owner);
-            GatherEvent ge = new GatherEvent(rt, rg, amount);
-            if (OnPlayerGathering != null)
+            try
             {
-                OnPlayerGathering(player, ge);
+                Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.networkView.owner);
+                GatherEvent ge = new GatherEvent(rt, rg, amount);
+                if (OnPlayerGathering != null)
+                {
+                    OnPlayerGathering(player, ge);
+                }
+                amount = ge.Quantity;
+                if (!ge.Override)
+                {
+                    amount = Mathf.Min(amount, rg.AmountLeft());
+                }
+                rg._resourceItemDatablock = ge.Item;
+                rg.ResourceItemName = ge.Item;
             }
-            amount = ge.Quantity;
-            if (!ge.Override)
+            catch (Exception ex)
             {
-                amount = Mathf.Min(amount, rg.AmountLeft());
+                Logger.LogException(ex);
             }
-            rg._resourceItemDatablock = ge.Item;
-            rg.ResourceItemName = ge.Item;
         }
 
         public static void PlayerGatherWood(IMeleeWeaponItem rec, ResourceTarget rt, ref ItemDataBlock db, ref int amount, ref string name)
         {
-            Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.inventory.networkView.owner);
-            GatherEvent ge = new GatherEvent(rt, db, amount);
-            ge.Item = "Wood";
-            if (OnPlayerGathering != null)
+            try
             {
-                OnPlayerGathering(player, ge);
+                Fougerite.Player player = Fougerite.Player.FindByNetworkPlayer(rec.inventory.networkView.owner);
+                GatherEvent ge = new GatherEvent(rt, db, amount);
+                ge.Item = "Wood";
+                if (OnPlayerGathering != null)
+                {
+                    OnPlayerGathering(player, ge);
+                }
+                db = Fougerite.Server.GetServer().Items.Find(ge.Item);
+                amount = ge.Quantity;
+                name = ge.Item;
             }
-            db = Fougerite.Server.GetServer().Items.Find(ge.Item);
-            amount = ge.Quantity;
-            name = ge.Item;
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static void PlayerHurt(ref DamageEvent e)
         {
-            HurtEvent he = new HurtEvent(ref e);
-            if (!(he.Attacker is NPC) && !(he.Victim is NPC))
+            try
             {
-                Fougerite.Player attacker = he.Attacker as Fougerite.Player;
-                Fougerite.Player victim = he.Victim as Fougerite.Player;
-                Zone3D zoned = Zone3D.GlobalContains(attacker);
-                if ((zoned != null) && !zoned.PVP)
+                HurtEvent he = new HurtEvent(ref e);
+                if (!(he.Attacker is NPC) && !(he.Victim is NPC))
                 {
-                    attacker.Message("You are in a PVP restricted area.");
-                    he.DamageAmount = 0f;
-                    e = he.DamageEvent;
-                    return;
+                    Fougerite.Player attacker = he.Attacker as Fougerite.Player;
+                    Fougerite.Player victim = he.Victim as Fougerite.Player;
+                    Zone3D zoned = Zone3D.GlobalContains(attacker);
+                    if ((zoned != null) && !zoned.PVP)
+                    {
+                        attacker.Message("You are in a PVP restricted area.");
+                        he.DamageAmount = 0f;
+                        e = he.DamageEvent;
+                        return;
+                    }
+                    zoned = Zone3D.GlobalContains(victim);
+                    if ((zoned != null) && !zoned.PVP)
+                    {
+                        attacker.Message(victim.Name + " is in a PVP restricted area.");
+                        he.DamageAmount = 0f;
+                        e = he.DamageEvent;
+                        return;
+                    }
                 }
-                zoned = Zone3D.GlobalContains(victim);
-                if ((zoned != null) && !zoned.PVP)
-                {
-                    attacker.Message(victim.Name + " is in a PVP restricted area.");
-                    he.DamageAmount = 0f;
-                    e = he.DamageEvent;
-                    return;
-                }
+                if (OnPlayerHurt != null)
+                    OnPlayerHurt(he);
+                e = he.DamageEvent;
             }
-            if (OnPlayerHurt != null)
-                OnPlayerHurt(he);
-            e = he.DamageEvent;
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
         }
 
         public static bool PlayerKilled(ref DamageEvent de)
@@ -379,7 +461,7 @@
             catch (Exception ex)
             {
                 Logger.LogException(ex);
-                return true;
+                return false;
             }
         }
 

@@ -147,7 +147,7 @@ namespace Fougerite
             for (int i = 1; i < stackTrace.FrameCount; i++)
                 Trace += stackTrace.GetFrame(i).GetMethod().Name + " | ";
 
-            string Message = "[Exception] [ " + Trace + "] " + Ex.ToString();
+            string Message = "[Exception] [ " + Trace + "]\r\n" + Ex.ToString();
             WriteLog(Message);
         }
 

@@ -87,6 +87,19 @@ namespace ServerTests
                 World.GetWorld().Spawn(";struct_wood_foundation", TesterPlayer.X + Rand.Next(-10, 10), TesterPlayer.Y, TesterPlayer.Z + Rand.Next(-10, 10));
             }
             Log("Entities placed");
+
+            BlueprintUse_Test();
+            ChatReceived_Test();
+            ConsoleReceived_Test();
+            EntityDecay_Test();
+            EntityDeployed_Test();
+            EntityHurt_Test();
+            NPCHurt_Test();
+            NPCKilled_Test();
+            PlayerHurt_Test();
+            PlayerKilled_Test();
+            PlayerConnect_Test();
+            PlayerDisconnect_Test();
         }
 
         void Log(string MSG)

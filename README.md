@@ -17,6 +17,7 @@ Fougerite a fully compatible with Magma server mod, featuring better performance
 * Unpack dlls and install them to rust_server_Data\Managed directory.
 * Run Patcher.
 * Rename your Magma.ini config to Fougerite.ini.  
+* Copy your Plugins from the Save folder to: ServerFolder\Fougerite\ (Main Server's Folder, if Fougerite Folder doesn't exist, just create it).
 * Launch your server.  
 
 **WARNING:** If you using Magma plugins you must rename all calls to class "Magma" to "Fougerite":

@@ -66,10 +66,13 @@ namespace ServerTests
             if (cmd == "test" && args.Length == 1 && player.Admin)
             {
                 TesterPlayer = player;
-                switch (args[0])
+                switch (args[0].ToLower())
                 {
                     case "all":
                         TestAll();
+                        break;
+                    case "save":
+                        Server.GetServer().Save();
                         break;
                     default:
                         player.Message("Enter valid arg!");
@@ -80,12 +83,14 @@ namespace ServerTests
 
         void TestAll()
         {
+            Log("Testing");
+            int Range = 50; 
             Random Rand = new Random();
             for (int i = 0; i < 5; i++)
             {
-                World.GetWorld().Spawn(";deploy_wood_storage_large", TesterPlayer.X + Rand.Next(-10, 10), TesterPlayer.Y, TesterPlayer.Z + Rand.Next(-10, 10));
-                World.GetWorld().Spawn(";deploy_largewoodspikewall", TesterPlayer.X + Rand.Next(-10, 10), TesterPlayer.Y, TesterPlayer.Z + Rand.Next(-10, 10));
-                World.GetWorld().Spawn(";struct_wood_foundation", TesterPlayer.X + Rand.Next(-10, 10), TesterPlayer.Y, TesterPlayer.Z + Rand.Next(-10, 10));
+                World.GetWorld().Spawn(";deploy_wood_storage_large", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
+                World.GetWorld().Spawn(";deploy_largewoodspikewall", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
+                World.GetWorld().Spawn(";struct_wood_foundation", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
             }
             Log("Entities placed");
 
@@ -101,6 +106,12 @@ namespace ServerTests
             PlayerKilled_Test();
             PlayerConnect_Test();
             PlayerDisconnect_Test();
+            Say_Test();
+            PlayerBroadcast_Test();
+            Notice_Test();
+            Broadcast_Test();
+            Log_Test();
+            FindPlayer_Test();
             Log("Tested!");
         }
 
@@ -110,6 +121,130 @@ namespace ServerTests
         }
 
         //
+
+        void FindPlayer_Test()
+        {
+            Log("FindPlayer_Test: Test 1");
+            Fougerite.Player.FindByGameID("");
+
+            Log("FindPlayer_Test: Test 2");
+            Fougerite.Player.FindByGameID(null);
+
+            Log("FindPlayer_Test: Test 3");
+            Fougerite.Player.FindByName("");
+
+            Log("FindPlayer_Test: Test 4");
+            Fougerite.Player.FindByName(null);
+
+            Log("FindPlayer_Test: Test 5");
+            Fougerite.Player.FindByPlayerClient(null);
+
+            Log("FindPlayer_Test: Test 6");
+            Server.GetServer().FindPlayer("");
+
+            Log("FindPlayer_Test: Test 7");
+            Server.GetServer().FindPlayer("");
+        }
+
+        void Log_Test()
+        {
+            Log("Log_Test: Test 1");
+            Util.GetUtil().ConsoleLog("");
+
+            Log("Log_Test: Test 2");
+            Util.GetUtil().ConsoleLog(null);
+
+            Log("Log_Test: Test 3");
+            Util.GetUtil().Log("");
+
+            Log("Log_Test: Test 4");
+            Util.GetUtil().Log(null);
+        }
+
+        void Broadcast_Test()
+        {
+            Log("Broadcast_Test: Test 1");
+            Server.GetServer().Broadcast("");
+
+            Log("Broadcast_Test: Test 2");
+            Server.GetServer().Broadcast(null);
+
+            Log("Broadcast_Test: Test 3");
+            Server.GetServer().BroadcastFrom("", "");
+
+            Log("Broadcast_Test: Test 4");
+            Server.GetServer().BroadcastFrom("", null);
+
+            Log("Broadcast_Test: Test 5");
+            Server.GetServer().BroadcastFrom(null, "");
+
+            Log("Broadcast_Test: Test 6");
+            Server.GetServer().BroadcastFrom(null, null);
+
+            Log("Broadcast_Test: Test 7");
+            Server.GetServer().BroadcastNotice("");
+
+            Log("Broadcast_Test: Test 8");
+            Server.GetServer().BroadcastNotice(null);
+        }
+
+        void Notice_Test()
+        {
+            Log("Notice_Test: Test 1");
+            TesterPlayer.Notice("");
+
+            Log("Notice_Test: Test 2");
+            TesterPlayer.Notice(null);
+        }
+
+        void PlayerBroadcast_Test()
+        {
+            Log("PlayerBroadcast_Test: Test 1");
+            TesterPlayer.Message("");
+
+            Log("PlayerBroadcast_Test: Test 2");
+            TesterPlayer.Message(null);
+
+            Log("PlayerBroadcast_Test: Test 3");
+            TesterPlayer.MessageFrom("", null);
+
+            Log("PlayerBroadcast_Test: Test 4");
+            TesterPlayer.MessageFrom(null, "");
+
+            Log("PlayerBroadcast_Test: Test 5");
+            TesterPlayer.MessageFrom(null, null);
+        }
+
+        void Say_Test()
+        {
+            try
+            {
+                Log("Say_Test: Test 1");
+                Util.say(TesterPlayer.PlayerClient.netPlayer, TesterPlayer.Name, "");
+
+                Log("Say_Test: Test 2");
+                Util.say(TesterPlayer.PlayerClient.netPlayer, TesterPlayer.Name, null);
+
+                Log("Say_Test: Test 3");
+                Util.say(TesterPlayer.PlayerClient.netPlayer, TesterPlayer.Name, " ");
+
+                Log("Say_Test: Test 4");
+                Util.sayAll("");
+
+                Log("Say_Test: Test 5");
+                Util.sayAll(null);
+
+                Log("Say_Test: Test 6");
+                Util.sayUser(TesterPlayer.PlayerClient.netPlayer, "");
+                
+                Log("Say_Test: Test 7");
+                Util.sayUser(TesterPlayer.PlayerClient.netPlayer, null);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
 
         void BlueprintUse_Test()
         {

@@ -40,6 +40,7 @@ namespace ServerTests
             Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
             Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
+            Fougerite.Hooks.OnCommand += new Fougerite.Hooks.CommandHandlerDelegate(Command);
         }
 
         public override void DeInitialize()
@@ -55,6 +56,12 @@ namespace ServerTests
             Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
             Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
+            Fougerite.Hooks.OnCommand -= new Fougerite.Hooks.CommandHandlerDelegate(Command);
+        }
+
+        void Command(Fougerite.Player player, string text, string[] args)
+        {
+
         }
 
         void ChatReceived(ref ConsoleSystem.Arg arg)

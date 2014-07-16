@@ -337,7 +337,8 @@
                 Fougerite.Player item = new Fougerite.Player(user.playerClient);
                 Fougerite.Server.GetServer().Players.Add(item);
 
-                Logger.LogDebug("User Connected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
+                Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
+                                item.PlayerClient.netPlayer.ipAddress + ")");
                 if (OnPlayerConnected != null)
                     OnPlayerConnected(item);
                 connected = user.connected;
@@ -357,10 +358,11 @@
             try
             {
                 Fougerite.Player item = Fougerite.Player.FindByPlayerClient(user.playerClient);
-                if (item != null)
-                    Fougerite.Server.GetServer().Players.Remove(item);
+                if (item == null)
+                    return;
 
-                Logger.LogDebug("User Disconnected: " + user.displayName + " (" + user.userID.ToString() + " | " + user.networkPlayer.ipAddress + ")");
+                Fougerite.Server.GetServer().Players.Remove(item);
+                Logger.LogDebug("User Disconnected: " + item.Name + " (" + item.SteamID.ToString() + ")");
                 if (OnPlayerDisconnected != null)
                     OnPlayerDisconnected(item);
             }

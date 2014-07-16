@@ -266,6 +266,9 @@ namespace RustPP
                     return;
                 }
 
+                if (command == null)
+                    return;
+
                 if (command.IsOn(((Fougerite.Player)he.Attacker).PlayerClient.userID))
                 {
                     if (he.Entity != null)
@@ -274,7 +277,7 @@ namespace RustPP
                         {
                             if (!he.IsDecay)
                                 he.Entity.Destroy();
-                            else
+                            else if (Fougerite.Hooks.decayList.Contains(he.Entity))
                                 Fougerite.Hooks.decayList.Remove(he.Entity);
                         }
                         catch (Exception ex)

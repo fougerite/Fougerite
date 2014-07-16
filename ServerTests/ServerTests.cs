@@ -71,6 +71,11 @@ namespace ServerTests
                     case "all":
                         TestAll();
                         break;
+                    case "help":
+                        player.Message("Use in only on test server!");
+                        player.Message("/test all - testing all");
+                        player.Message("/test save - saving world");
+                        break;
                     case "save":
                         Server.GetServer().Save();
                         break;

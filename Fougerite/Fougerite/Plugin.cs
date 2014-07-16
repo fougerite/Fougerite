@@ -417,8 +417,6 @@ namespace Fougerite
 
         public void OnEntityDeployed(Fougerite.Player player, Entity entity)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
             if (entity == null)
                 throw new ArgumentNullException("entity");
             Invoke("On_EntityDeployed", player, entity);

@@ -34,13 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\bin\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\bin\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

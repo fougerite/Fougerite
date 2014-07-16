@@ -204,26 +204,22 @@
 
         public static void say(uLink.NetworkPlayer player, string playername, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(playername) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
         }
 
         public static void sayAll(string arg)
         {
-            if (!string.IsNullOrEmpty(arg))
-                ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(customName) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void SetStaticField(string className, string field, object val)

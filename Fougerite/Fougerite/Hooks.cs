@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Fougerite
 {
@@ -19,7 +20,6 @@ namespace Fougerite
         public static Hashtable talkerTimers = new Hashtable();
 
         public static event BlueprintUseHandlerDelagate OnBlueprintUse;
-        public static event ChatRecivedDelegate OnChatReceived;
         public static event ChatHandlerDelegate OnChat;
         public static event CommandHandlerDelegate OnCommand;
         public static event ConsoleHandlerDelegate OnConsoleReceived;
@@ -79,49 +79,100 @@ namespace Fougerite
 
         public static void ChatReceived(ref ConsoleSystem.Arg arg)
         {
+            Contract.Assume(arg != null);
+            
+            // These two follow from the fact that the chat.say has [User] attribute.
+            Contract.Assume(arg.argUser != null);
+            Contract.Assume(arg.argUser.connected);
+
+            // This one is a always true, because NetUser's user field is readonly and initialized in the constructor.
+            Contract.Assume(arg.argUser.user != null);
+
             try
             {
-                if (chat.enabled)
+                if (!chat.enabled) return;
+
+                // Check if the chat.say command has valid arguments.
+                if (arg.Args == null) return;
+                if (arg.Args.Length != 1) return;
+
+                // If there is a slash in the beginning, it's a chat command.
+                bool chatCommand = arg.Args[0].StartsWith("/");
+
+                if (chatCommand)
                 {
-                    if (arg == null)
-                        return;
+                    var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
+                    Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + arg.Args[0]);
 
-                    string item = Facepunch.Utility.String.QuoteSafe(arg.argUser.user.Displayname);
-                    string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
+                    var arg0 = arg.Args[0];
 
-                    if (arg.GetString(0).StartsWith("/"))
-                        Logger.LogDebug("[CHAT-CMD] " + item + " executed " + arg.ArgsStr); // arg.GetString(0)
+                    var index = arg0.IndexOf(' ');
+                    var command = arg0.Substring(0, index == -1 ? arg0.Length : index);
+                    var args = Facepunch.Utility.String.SplitQuotesStrings(arg0.Substring(index + 1));
 
-                    if (OnChatReceived != null)
-                        OnChatReceived(ref arg);
-                    if (arg == null)
-                        return;
-                    else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
-                        handleCommand(ref arg);
-                    else
-                    {
-                        ChatString text = new ChatString(str);
-                        if (OnChat != null)
-                            OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref text);
+                    if (OnCommand != null)
+                        OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), command, args);
+                }
+                else
+                {
+                    var chatString = new ChatString(arg.Args[0]);
 
-                        if (text != null)
-                        {
-                            str = Facepunch.Utility.String.QuoteSafe(text.NewText.Substring(1, text.NewText.Length - 2));
-                            if (str != "")
-                            {
-                                Fougerite.Data.GetData().chat_history.Add(str);
-                                Fougerite.Data.GetData().chat_history_username.Add(item);
-                                Logger.ChatLog(item, str);
-                                ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
-                            }
-                        }
-                    }
+                    if (OnChat != null) 
+                        OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref chatString);
+
+                    if (chatString == null) return;
+
+                    var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
+                    var quotedMessage = Facepunch.Utility.String.QuoteSafe(chatString.NewText);
+
+                    Fougerite.Data.GetData().chat_history.Add(quotedMessage);
+                    Fougerite.Data.GetData().chat_history_username.Add(quotedName);
+
+                    Logger.ChatLog(quotedName, quotedMessage);
+                    
+                    ConsoleNetworker.Broadcast("chat.add " + quotedName + " " + quotedMessage);
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
+        }
+
+        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
+        {
+            Contract.Assume(a != null);
+            Contract.Assume(a.Class != null);
+            Contract.Assume(a.Function != null);
+
+            try
+            {
+                bool external = a.argUser == null;
+                bool adminRights = (a.argUser != null && a.argUser.admin) || external;
+
+                if (OnConsoleReceived != null)
+                    OnConsoleReceived(ref a, external);
+
+                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
+                {
+                    if (adminRights)
+                    {
+                        PluginEngine.Instance().ReloadPlugins();
+                        ModuleManager.ReloadModules();
+                        a.ReplyWith("Fougerite: Reloaded!");
+                    }
+                }
+
+                if (string.IsNullOrEmpty(a.Reply))
+                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+            return false;
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
@@ -143,41 +194,10 @@ namespace Fougerite
             return false;
         }
 
-        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
-        {
-            try
-            {
-                if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
-                {
-                    a.ReplyWith("All Good!");
-                    return true;
-                }
-                bool external = a.argUser == null;
-                if (OnConsoleReceived != null)
-                    OnConsoleReceived(ref a, external);
-
-                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
-                {
-                    if (((a.argUser != null) && a.argUser.admin) || external)
-                    {
-                        PluginEngine.Instance().ReloadPlugins();
-                        ModuleManager.ReloadModules();
-                        a.ReplyWith("Fougerite: Reloaded!");
-                    }
-                }
-                if ((a.Reply == null) || (a.Reply == ""))
-                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return false;
-        }
-
         public static float EntityDecay(object entity, float dmg)
         {
+            Contract.Assume(entity != null);
+
             try
             {
                 DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
@@ -199,6 +219,8 @@ namespace Fougerite
 
         public static void EntityDeployed(object entity)
         {
+            Contract.Assume(entity != null);
+
             try
             {
                 Entity e = new Entity(entity);
@@ -215,6 +237,8 @@ namespace Fougerite
 
         public static void EntityHurt(object entity, ref DamageEvent e)
         {
+            Contract.Assume(entity != null);
+
             try
             {
                 HurtEvent he = new HurtEvent(ref e, new Entity(entity));
@@ -244,26 +268,6 @@ namespace Fougerite
                         damage2.health -= he.DamageAmount;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-        }
-
-        public static void handleCommand(ref ConsoleSystem.Arg arg)
-        {
-            try
-            {
-                string displayname = arg.argUser.user.Displayname;
-                string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
-                string text = strArray[0].Trim().Remove(0, 1);
-                string[] args = new string[strArray.Length - 1];
-                for (int i = 1; i < strArray.Length; i++)
-                    args[i - 1] = strArray[i].Trim();
-
-                if (OnCommand != null)
-                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
             }
             catch (Exception ex)
             {

@@ -4,15 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
 using Jint;
-using Jint.Expressions;
+using Jint.Parser;
+using Jint.Parser.Ast;
 
 namespace Fougerite
 {
     public class Plugin
     {
-        public JintEngine Engine
+        public Engine Engine
         {
             get;
             private set;
@@ -47,35 +47,30 @@ namespace Fougerite
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new JintEngine();
-            Engine.AllowClr(true);
-
-            InitGlobals();
-            Engine.Run(code);
+            Engine = new Engine(cfg => cfg.AllowClr())
+					.SetValue("Server", Fougerite.Server.GetServer())
+					.SetValue("Data", Fougerite.Data.GetData())
+					.SetValue("DataStore", DataStore.GetInstance())
+					.SetValue("Util", Util.GetUtil())
+					.SetValue("Web", new Web())
+					.SetValue("World", World.GetWorld())
+					.SetValue("Plugin", this)
+					.SetValue("Time", this)
+					.Execute(code)
+					;
             try
             {
-                Engine.CallFunction("On_PluginInit");
+                Engine.Invoke("On_PluginInit");
             }
             catch { }
         }
 
-        public void InitGlobals()
-        {
-            Engine.SetParameter("Server", Fougerite.Server.GetServer());
-            Engine.SetParameter("Data", Fougerite.Data.GetData());
-            Engine.SetParameter("DataStore", DataStore.GetInstance());
-            Engine.SetParameter("Util", Util.GetUtil());
-            Engine.SetParameter("Web", new Web());
-            Engine.SetParameter("Time", this);
-            Engine.SetParameter("World", World.GetWorld());
-            Engine.SetParameter("Plugin", this);
-        }
 
         private void Invoke(string func, params object[] obj)
         {
             try
             {
-                Engine.CallFunction(func, obj);
+                Engine.Invoke(func, obj);
             }
             catch (Exception ex)
             {
@@ -84,27 +79,20 @@ namespace Fougerite
             }
         }
 
-        public IEnumerable<FunctionDeclarationStatement> GetSourceCodeGlobalFunctions()
+        public IEnumerable<FunctionDeclaration> GetSourceCodeGlobalFunctions()
         {
-            foreach (Statement statement in JintEngine.Compile(Code, false).Statements)
-            {
-                if (statement.GetType() == typeof(FunctionDeclarationStatement))
-                {
-                    FunctionDeclarationStatement funcDecl = (FunctionDeclarationStatement)statement;
-                    if (funcDecl != null)
-                    {
-                        yield return funcDecl;
-                    }
-                }
-            }
+			JavaScriptParser parser = new JavaScriptParser();
+			foreach (FunctionDeclaration funcDecl in parser.Parse(Code).FunctionDeclarations) {
+				yield return funcDecl;
+			}
         }
 
         public void InstallHooks()
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("Found Function: " + funcDecl.Name);
-                switch (funcDecl.Name)
+                Logger.LogDebug("Found Function: " + funcDecl.Id.Name);
+                switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
                     case "On_PluginInit": Hooks.OnPluginInit += OnPluginInit; break;
@@ -136,8 +124,8 @@ namespace Fougerite
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Name);
-                switch (funcDecl.Name)
+                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Id.Name);
+                switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
                     case "On_PluginInit": Hooks.OnPluginInit -= OnPluginInit; break;

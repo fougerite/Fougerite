@@ -19,16 +19,24 @@
 
         public void ConsoleLog(string str, [Optional, DefaultParameterValue(false)] bool adminOnly)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
+            try
             {
-                if (!adminOnly)
+                foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 {
-                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    if (!adminOnly)
+                    {
+                        ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    }
+                    else if (player.Admin)
+                    {
+                        ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
+                    }
                 }
-                else if (player.Admin)
-                {
-                    ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug("ConsoleLog ex");
+                Logger.LogException(ex);
             }
         }
 
@@ -88,11 +96,6 @@
         public static string GetRootFolder()
         {
             return Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
-        }
-
-        public static string GetRustPPDirectory()
-        {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\save\RustPP\");
         }
 
         public static string GetServerFolder()
@@ -250,6 +253,13 @@
                 }
             }
             return (t != null);
+        }
+
+        public bool ContainsString(string str, string key)
+        {
+            if (str.Contains(key))
+                return true;
+            return false;
         }
     }
 }

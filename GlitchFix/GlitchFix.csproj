@@ -11,7 +11,9 @@
     <AssemblyName>GlitchFix</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,13 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\bin\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\bin\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -48,13 +48,6 @@
     <Compile Include="GlitchFixModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Fougerite\Fougerite.csproj">
-      <Project>{bd30e9d1-3322-48a4-b846-a969e32dc3f3}</Project>
-      <Name>Fougerite</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -63,4 +56,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\Fougerite\Fougerite.csproj">
+      <Project>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</Project>
+      <Name>Fougerite</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

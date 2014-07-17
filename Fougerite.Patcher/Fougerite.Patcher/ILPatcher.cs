@@ -26,7 +26,7 @@
         private void AntiDecay()
         {
             TypeDefinition type = rustAssembly.MainModule.GetType("EnvDecay");
-            TypeDefinition definition2 = rustAssembly.MainModule.GetType("StructureMaster");
+            // unused? TypeDefinition definition2 = rustAssembly.MainModule.GetType("StructureMaster");
 
             MethodDefinition awake = type.GetMethod("Awake");
             MethodDefinition doDecay = type.GetMethod("DoDecay");

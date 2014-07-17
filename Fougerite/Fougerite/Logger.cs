@@ -141,7 +141,13 @@ namespace Fougerite
         {
             if (showException)
                 Debug.LogException(Ex, Context);
-            string Message = "[Exception] " + Ex.ToString();
+
+            string Trace = "";
+            System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+            for (int i = 1; i < stackTrace.FrameCount; i++)
+                Trace += stackTrace.GetFrame(i).GetMethod().Name + " | ";
+
+            string Message = "[Exception] [ " + Trace + "]\r\n" + Ex.ToString();
             WriteLog(Message);
         }
 

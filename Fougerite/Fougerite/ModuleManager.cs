@@ -28,7 +28,7 @@ namespace Fougerite
         public static string ModulesFolder = @".\Modules\";
         //private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
-        private static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
+        public static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
 
         public static ReadOnlyCollection<ModuleContainer> Plugins
         {
@@ -125,16 +125,14 @@ namespace Fougerite
                 Logger.Log(string.Format(
                     "[Modules] Module {0} v{1} (by {2}) initiated.", CurrentModule.Plugin.Name, CurrentModule.Plugin.Version, CurrentModule.Plugin.Author));
             }
+
+            Hooks.ModulesLoaded();
         }
 
         internal static void UnloadModules()
         {
-            var ModuleUnloadWatches = new Dictionary<ModuleContainer, Stopwatch>();
             foreach (ModuleContainer ModuleContainer in Modules)
             {
-                Stopwatch UnloadWatch = new Stopwatch();
-                UnloadWatch.Start();
-
                 try
                 {
                     ModuleContainer.DeInitialize();
@@ -144,16 +142,10 @@ namespace Fougerite
                     Logger.LogError(string.Format(
                         "[Modules] Module \"{0}\" has thrown an exception while being deinitialized:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
-
-                UnloadWatch.Stop();
-                ModuleUnloadWatches.Add(ModuleContainer, UnloadWatch);
             }
 
             foreach (ModuleContainer ModuleContainer in Modules)
             {
-                Stopwatch UnloadWatch = ModuleUnloadWatches[ModuleContainer];
-                UnloadWatch.Start();
-
                 try
                 {
                     ModuleContainer.Dispose();
@@ -163,9 +155,14 @@ namespace Fougerite
                     Logger.LogError(string.Format(
                         "[Modules] Module \"{0}\" has thrown an exception while being disposed:\n{1}", ModuleContainer.Plugin.Name, ex));
                 }
-
-                UnloadWatch.Stop();
             }
+            Modules.Clear();
+        }
+
+        internal static void ReloadModules()
+        {
+            UnloadModules();
+            LoadModules();
         }
     }
 }

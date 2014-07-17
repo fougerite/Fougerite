@@ -452,11 +452,15 @@ namespace Fougerite
 
         public void OnPlayerConnected(Fougerite.Player player)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
             Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Fougerite.Player player)
         {
+            if (player == null)
+                throw new ArgumentNullException("player");
             Invoke("On_PlayerDisconnected", player);
         }
 

@@ -1,0 +1,18 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" ActiveRuntime="Mono 3.3.0 (6cd4ddc)&#xD;&#xA;Copyright)" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="..\RustPP\RustPPModule.cs">
+    <Files>
+      <File FileName="..\GlitchFix\GlitchFixModule.cs" Line="1" Column="1" />
+      <File FileName="Fougerite\Util.cs" Line="1" Column="1" />
+      <File FileName="..\RustPP\Hooks.cs" Line="20" Column="18" />
+      <File FileName="..\RustPP\Commands\ShareCommand.cs" Line="1" Column="1" />
+      <File FileName="..\RustPP\Commands\ChatCommand.cs" Line="1" Column="1" />
+      <File FileName="..\RustPP\Commands\InstaKOCommand.cs" Line="1" Column="1" />
+      <File FileName="..\RustPP\RustPPModule.cs" Line="207" Column="26" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

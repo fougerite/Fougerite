@@ -177,13 +177,19 @@
 
         public void TeleportTo(Fougerite.Player p)
         {
-            this.TeleportTo(p.X, p.Y, p.Z);
+            this.TeleportTo(p.Location);
         }
 
         public void TeleportTo(float x, float y, float z)
         {
-            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, new Vector3(x, y, z));
+			var vec = new Vector3(x, y, z);
+			this.TeleportTo(vec);
         }
+
+		public void TeleportTo(Vector3 vec)
+		{
+			RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, vec);
+		}
 
         public bool Admin
         {

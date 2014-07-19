@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Timers;
+using UnityEngine;
 using Module = Fougerite.Module;
 
 namespace Anticheat
@@ -66,12 +67,13 @@ namespace Anticheat
         bool NamesRestrict_BindName = false;
         bool NamesRestrict_AdminsOnly = false;
 
+        bool HighPingKicking_Enabled = false;
+        int HighPingKicking_Timer = 0;
+        int HighPingKicking_Time = 0;
+        int HighPingKicking_MaxPing = 0;
+
         bool RelogCooldown = false;
         int Cooldown = 0;
-
-        bool HighPingKicking = false;
-        int Time = 0;
-        int MaxPing = 0;
 
         bool GodModDetect = false;
         
@@ -117,6 +119,8 @@ namespace Anticheat
         }
 #endregion
 
+
+
         int GetIntSetting(string Section, string Name)
         {
             string Value = INIConfig.GetSetting(Section, Name);
@@ -132,14 +136,22 @@ namespace Anticheat
         }
 
 
+
         private Timer pingTimer;
+        private Timer takeCoordsTimer;
         void TimersInit()
         {
             pingTimer = new Timer();
-            pingTimer.Interval = 30000.0;
+            pingTimer.Interval = HighPingKicking_Timer * 1000;
             pingTimer.AutoReset = false;
             pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
             pingTimer.Start();
+
+            takeCoordsTimer = new Timer();
+            takeCoordsTimer.Interval = AntiSpeedHack_Timer * 1000;
+            takeCoordsTimer.AutoReset = false;
+            takeCoordsTimer.Elapsed += new ElapsedEventHandler(pingEvent);
+            takeCoordsTimer.Start();
         }
 
         private void pingEvent(object x, ElapsedEventArgs y)
@@ -148,57 +160,130 @@ namespace Anticheat
                     PlayerPingCheck(pl);
         }
 
-        void AnticheatInit()
+        private void takeCoordsEvent(object x, ElapsedEventArgs y)
         {
-
-
-		    DS.Flush("loginCooldown");
-
-		if (AntiSpeedHack_Enabled)
-        {
-			if (!AntiSpeedHack_TempWork)
+            Vector3 ZeroVector = new Vector3(0, 0, 0);
+            foreach (var pl in Server.GetServer().Players)
             {
-				if (HighPingKicking)
-					Plugin.KillAntiSpeedHack_Timer("checkPing");
-				SafeCreateAntiSpeedHack_Timer("takeCoords", AntiSpeedHack_Timer*1000);
-				Data.AddTableValue('Values', "AntiSpeedHack_EnabledWorking", 1);
-				for(var pl in Server.Players) {
-					Data.AddTableValue('lastCoords', "last "+pl.Name+" location", pl.Location);
-					Data.AddTableValue('AntiSpeedHack_Enabled', pl.Name, 0);
-					if (pl.Admin){
-						pl.MessageFrom("[AntiCheat]", "[color#00BB00]⇒ AntiSpeedHack Started. ⇐");
-					}
-				}
-			}
-			else {				
-				Data.GetData().AddTableValue("Values", "AntiSpeedHack_EnabledWorking", 1);
-				SafeCreateAntiSpeedHack_Timer("takeCoords", AntiSpeedHack_Timer*1000);
-				SafeCreateAntiSpeedHack_Timer("stopWork", AntiSpeedHack_WorkMins*60000);
-				for(var pl in Server.Players) {
-					Data.AddTableValue('lastCoords', "last "+pl.Name+" location", pl.Location);
-					Data.AddTableValue('AntiSpeedHack_Enabled', pl.Name, 0);
-					if (pl.Admin){
-						pl.MessageFrom("[AntiCheat]", "[color#00BB00]⇒ AntiSpeedHack Started. ⇐");
-					}
-				}
-			}
-		}
-		if (AntiAim == 1){
-			for(var pl in Server.Players) {
-				for(var i = 1; i <= CountAim; i++){
-					Data.AddTableValue('lastKillTo', i+"part "+pl.Name+" killed to", i);
-				}
-			}
-		}
-		if (AntiFlyHack == 1){
-			SafeCreateAntiSpeedHack_Timer("flyCheck", TimeFlyCheck*1000);
-			for(var pl in Server.Players) {
-				for(var i = 1; i <= CountFly; i++){
-					Data.AddTableValue('flyCheck', i+" Y "+pl.Name, i*100);
-					Data.AddTableValue('flyCheck', i+" location "+pl.Name, pl.Location);
-				}
-			}
-		}
+
+                if (!AntiSpeedHack_AdminCheck && pl.Admin)
+                    continue;
+                Vector3 lastLocation = (Vector3)DS.Get("lastCoords", pl.Name);
+                DS.Add("lastCoords", pl.Name, pl.Location);
+
+                if (lastLocation != ZeroVector && lastLocation != pl.Location)
+                {
+                    float distance = Math.Abs(Vector3.Distance(lastLocation, pl.Location));
+
+                    int Warned = (int)DS.Get("AntiSpeedHack", pl.Name);
+                    if (Warned == 1 &&
+                            ((distance > AntiSpeedHack_BanDist && (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) 
+                                && AntiSpeedHack_Ban) 
+                                || (distance > AntiSpeedHack_BanDist && !AntiSpeedHack_Tp && AntiSpeedHack_Ban)))
+                    {
+                        Server.GetServer().BroadcastFrom(EchoBotName,
+                            "[color#FF6666]" + pl.Name + " was banned (Moved " + distance.ToString("F2") + " meters)");
+                        pl.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
+                        BanCheater(pl, "Moved " + distance.ToString("F2") + "m");
+                    }
+                    else if (Warned == 1 &&
+                             (((distance > AntiSpeedHack_KickDist) && (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) &&
+                               (AntiSpeedHack_KickDist == 1)) ||
+                              (distance > AntiSpeedHack_KickDist && !AntiSpeedHack_Tp && AntiSpeedHack_KickDist == 1)))
+                    {
+                        Server.GetServer().BroadcastFrom(EchoBotName,
+                            "[color#FF6666]" + pl.Name + " was kicked (Moved " +
+                            distance.ToString("F2") + " meters, maybe lagged)");
+                        pl.MessageFrom(EchoBotName, "[color#FF2222]You have been kicked!");
+                        pl.Disconnect();
+                    }
+                    else if ((Warned == 1) &&
+                             ((distance > AntiSpeedHack_ChatDist && (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) &&
+                               AntiSpeedHack_Chat) ||
+                              (distance > AntiSpeedHack_ChatDist && !AntiSpeedHack_Tp && AntiSpeedHack_Chat)))
+                        Server.GetServer().BroadcastFrom(EchoBotName,
+                            "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
+                    else if ((Warned == 1) && (distance < AntiSpeedHack_ChatDist))
+                        DS.Add("AntiSpeedHack", pl.Name, 0);
+                    else if (Warned == 0 && distance > AntiSpeedHack_ChatDist)
+                        DS.Add("AntiSpeedHack", pl.Name, 1);
+                }
+            }
+        }
+
+
+
+        void BanCheater(Fougerite.Player player, string Log)
+        {
+            
+        }
+
+
+
+        private void AnticheatInit()
+        {
+            DS.Flush("loginCooldown");
+
+            if (AntiSpeedHack_Enabled)
+            {
+                if (!AntiSpeedHack_TempWork)
+                {
+                    if (HighPingKicking_Enabled)
+                        Plugin.KillAntiSpeedHack_Timer("checkPing");
+                    SafeCreateAntiSpeedHack_Timer("takeCoords", AntiSpeedHack_Timer*1000);
+                    Data.AddTableValue('Values', "AntiSpeedHack_EnabledWorking", 1);
+                    for (var pl in
+                    Server.Players)
+                    {
+                        Data.AddTableValue('lastCoords', "last " + pl.Name + " location", pl.Location);
+                        Data.AddTableValue('AntiSpeedHack_Enabled', pl.Name, 0);
+                        if (pl.Admin)
+                        {
+                            pl.MessageFrom("[AntiCheat]", "[color#00BB00]⇒ AntiSpeedHack Started. ⇐");
+                        }
+                    }
+                }
+                else
+                {
+                    Data.GetData().AddTableValue("Values", "AntiSpeedHack_EnabledWorking", 1);
+                    SafeCreateAntiSpeedHack_Timer("takeCoords", AntiSpeedHack_Timer*1000);
+                    SafeCreateAntiSpeedHack_Timer("stopWork", AntiSpeedHack_WorkMins*60000);
+                    for (var pl in
+                    Server.Players)
+                    {
+                        Data.AddTableValue('lastCoords', "last " + pl.Name + " location", pl.Location);
+                        Data.AddTableValue('AntiSpeedHack_Enabled', pl.Name, 0);
+                        if (pl.Admin)
+                        {
+                            pl.MessageFrom("[AntiCheat]", "[color#00BB00]⇒ AntiSpeedHack Started. ⇐");
+                        }
+                    }
+                }
+            }
+            if (AntiAim == 1)
+            {
+                for (var pl in
+                Server.Players)
+                {
+                    for (var i = 1; i <= CountAim; i++)
+                    {
+                        Data.AddTableValue('lastKillTo', i + "part " + pl.Name + " killed to", i);
+                    }
+                }
+            }
+            if (AntiFlyHack == 1)
+            {
+                SafeCreateAntiSpeedHack_Timer("flyCheck", TimeFlyCheck*1000);
+                for (var pl in
+                Server.Players)
+                {
+                    for (var i = 1; i <= CountFly; i++)
+                    {
+                        Data.AddTableValue('flyCheck', i + " Y " + pl.Name, i*100);
+                        Data.AddTableValue('flyCheck', i + " location " + pl.Name, pl.Location);
+                    }
+                }
+            }
         }
 
         void ConfigInit()
@@ -242,7 +327,7 @@ namespace Anticheat
                 RelogCooldown = GetBoolSetting("RelogCooldown", "Enable");
                 Cooldown = GetIntSetting("RelogCooldown", "Cooldown");
 
-                HighPingKicking = GetBoolSetting("HighPingAntiSpeedHack_KickDister", "Enable");
+                HighPingKicking_Enabled = GetBoolSetting("HighPingAntiSpeedHack_KickDister", "Enable");
                 Time = GetIntSetting("HighPingAntiSpeedHack_KickDister", "SecondsToCheck");
                 MaxPing = GetIntSetting("HighPingAntiSpeedHack_KickDister", "MaxPing");
 

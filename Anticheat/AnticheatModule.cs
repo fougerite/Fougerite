@@ -89,6 +89,7 @@ namespace Anticheat
 		public override void Initialize()
 		{
 			DS = DataStore.GetInstance();
+            DS.Flush("loginCooldown");
 			ConfigInit();
 			TimersInit();
 
@@ -148,7 +149,6 @@ namespace Anticheat
 
 
 		private Timer pingTimer;
-		private Timer takeCoordsTimer;
 		private Timer takeCoordsTimer;
 		void TimersInit()
 		{
@@ -261,28 +261,6 @@ namespace Anticheat
 		}
 
 
-
-		private void AnticheatInit()
-		{
-			DS.Flush("loginCooldown");
-
-			if (AntiSpeedHack_Enabled)
-					DS.Add("Values", "AntiSpeedHack_Working", 1);
-
-			if (AntiFlyHack == 1)
-			{
-				SafeCreateAntiSpeedHack_Timer("flyCheck", TimeFlyCheck*1000);
-				for (var pl in
-				Server.Players)
-				{
-					for (var i = 1; i <= CountFly; i++)
-					{
-						Data.AddTableValue('flyCheck', i + " Y " + pl.Name, i*100);
-						Data.AddTableValue('flyCheck', i + " location " + pl.Name, pl.Location);
-					}
-				}
-			}
-		}
 
 		void ConfigInit()
 		{

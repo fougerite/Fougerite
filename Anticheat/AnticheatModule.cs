@@ -10,6 +10,7 @@ using System.Text;
 using System.Timers;
 using UnityEngine;
 using Module = Fougerite.Module;
+using Player = Fougerite.Player;
 
 namespace Anticheat
 {
@@ -371,11 +372,25 @@ namespace Anticheat
 		{
 		}
 
-		void PlayerHurt(HurtEvent he)
-		{
-		}
+	    private void PlayerHurt(HurtEvent he)
+	    {
+	        if (GodModDetect)
+	        {
+	            var Damage = Math.Round(he.DamageAmount);
+	            Fougerite.Player Victim = (Fougerite.Player)he.Victim;
+	            if ((!Victim.Admin) && (Damage == 0))
+	            {
+                    Log("GOD: " + Victim.Name + ".  received 0 damage. Check him for GodMode!");
+	                foreach (var player in Server.GetServer().Players)
+                        if (player.Admin)
+                            player.MessageFrom(EchoBotName,
+	                            "[color#FFA500]" + Victim.Name + " received 0 damage. Check him for GodMode!");
 
-		void PlayerDisconnect(Fougerite.Player player)
+	            }
+	        }
+	    }
+
+	    void PlayerDisconnect(Fougerite.Player player)
 		{
 		}
 

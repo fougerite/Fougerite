@@ -421,7 +421,6 @@ namespace Anticheat
             if (player.Name.ToLower().IndexOf("admin") + 1 != 0 && !player.Admin)
             {
                 player.MessageFrom(EchoBotName, "[color#FF2222]Please, don't use \"Admin\" in your nickname.");
-                DS.Add("disconnected", player.Name, 1);
                 player.Disconnect();
                 return;
             }
@@ -430,7 +429,6 @@ namespace Anticheat
             {
                 player.MessageFrom("[AntiCheat]",
                     "[color#FF2222]You have illegal characters in your name. Please, change it.");
-                DS.Add("disconnected", player.Name, 1);
                 player.Disconnect();
                 return;
             }
@@ -450,7 +448,6 @@ namespace Anticheat
                     player.MessageFrom(EchoBotName,
                         "[color#FF2222]You have too many characters in your name. Please Change it. Maximum is " +
                         NamesRestrict_MaxLength);
-                    DS.Add("disconnected", player.Name, 1);
                     player.Disconnect();
                     Log("Nick: " + player.Name + ". Too many chars in name.");
                     return;
@@ -461,7 +458,6 @@ namespace Anticheat
                     player.MessageFrom(EchoBotName,
                         "[color#FF2222]You have not enough characters in your name. Please Change it. Minimum is " +
                         NamesRestrict_MinLength);
-                    DS.Add("disconnected", player.Name, 1);
                     player.Disconnect();
                     Log("Nick: " + player.Name + ". Low length of name.");
                     return;
@@ -471,7 +467,6 @@ namespace Anticheat
                     if (player.Name.IndexOf(Symbol) != -1)
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have invalid characters in your name");
-                        DS.Add("disconnected", player.Name, 1);
                         player.Disconnect();
                         Log("Nick: " + player.Name + ". Banned chars in name.");
                         return;
@@ -483,7 +478,6 @@ namespace Anticheat
                     {
                         player.MessageFrom(EchoBotName,
                             "[color#FF2222]This name isn't allowed. Please change your name.");
-                        DS.Add("disconnected", player.Name, 1);
                         player.Disconnect();
                         Log("Nick: " + player.Name + ". Banned name.");
                         return;
@@ -512,7 +506,6 @@ namespace Anticheat
                     else if (ID != player.SteamID && (player.Admin || !NamesRestrict_AdminsOnly))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]This nickname doesn't belong to you.");
-                        DS.Add("disconnected", player.Name, 1);
                         player.Disconnect();
                         Log("Nick: " + player.Name + ". Nick stealer.");
                         return;
@@ -531,7 +524,6 @@ namespace Anticheat
                         "[color#FF2222]You must wait " + Cooldown + " seconds before reconnecting. Remaining: " +
                         Remaining +
                         " seconds.");
-                    DS.Add("disconnected", player.Name, 1);
                     player.Disconnect();
                     return;
                 }
@@ -555,7 +547,6 @@ namespace Anticheat
             if (!string.IsNullOrEmpty(IpBanned))
             {
                 player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                DS.Add("disconnected", player.Name, 1);
                 player.Disconnect();
                 return;
             }
@@ -572,12 +563,9 @@ namespace Anticheat
             if (IdBanned != null)
             {
                 player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                DS.Add("disconnected", player.Name, 1);
                 player.Disconnect();
                 return;
             }
-
-            DS.Add("disconnected", player.Name, 0);
         }
 
         private void EntityHurt(HurtEvent he)

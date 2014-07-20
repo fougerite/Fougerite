@@ -41,9 +41,6 @@ namespace Anticheat
         private IniParser INIConfig;
         private bool AntiSpeedHack_Enabled = false;
         private int AntiSpeedHack_Timer = 0;
-        private bool AntiSpeedHack_TempWork = false;
-        private int AntiSpeedHack_WorkMins = 0;
-        private int AntiSpeedHack_RestMins = 0;
         private bool AntiSpeedHack_Chat = false;
         private bool AntiSpeedHack_Kick = false;
         private bool AntiSpeedHack_Ban = false;
@@ -293,9 +290,6 @@ namespace Anticheat
             {
                 AntiSpeedHack_Enabled = GetBoolSetting("AntiSpeedHack", "Enable");
                 AntiSpeedHack_Timer = GetIntSetting("AntiSpeedHack", "Timer");
-                AntiSpeedHack_TempWork = GetBoolSetting("AntiSpeedHack", "TempWork");
-                AntiSpeedHack_WorkMins = GetIntSetting("AntiSpeedHack", "WorkMins");
-                AntiSpeedHack_RestMins = GetIntSetting("AntiSpeedHack", "RestMins");
                 AntiSpeedHack_Chat = GetBoolSetting("AntiSpeedHack", "Chat");
                 AntiSpeedHack_KickDist = GetIntSetting("AntiSpeedHack", "KickDist");
                 AntiSpeedHack_Ban = GetBoolSetting("AntiSpeedHack", "Ban");

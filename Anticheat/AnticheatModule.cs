@@ -100,7 +100,8 @@ namespace Anticheat
 			Hooks.OnPlayerConnected += new Hooks.ConnectionHandlerDelegate(PlayerConnect);
 			Hooks.OnPlayerDisconnected += new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
 			Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(PlayerHurt);
-			Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
+            Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
 			Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
 			Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
 			Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
@@ -115,7 +116,8 @@ namespace Anticheat
 			Hooks.OnPlayerConnected -= new Hooks.ConnectionHandlerDelegate(PlayerConnect);
 			Hooks.OnPlayerDisconnected -= new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
 			Hooks.OnPlayerHurt -= new Hooks.HurtHandlerDelegate(PlayerHurt);
-			Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
+            Hooks.OnPlayerSpawned -= new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
 			Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
 			Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
 			Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
@@ -388,6 +390,12 @@ namespace Anticheat
 
 	            }
 	        }
+	    }
+
+        void PlayerSpawned(Fougerite.Player player, SpawnEvent se)
+	    {
+	        DS.Add("lastCoords", player.Name, player.Location);
+			DS.Add("AntiSpeedHack", player.Name, 0);
 	    }
 
 	    void PlayerDisconnect(Fougerite.Player player)

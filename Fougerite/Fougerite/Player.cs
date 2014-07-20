@@ -175,6 +175,11 @@
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
+        public void TeleportTo(Vector3 targetPosition)
+        {
+            this.TeleportTo(targetPosition.x, targetPosition.y, targetPosition.z);
+        }
+
         public void TeleportTo(Fougerite.Player p)
         {
             this.TeleportTo(p.X, p.Y, p.Z);

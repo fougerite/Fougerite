@@ -343,7 +343,7 @@ namespace Anticheat
             }
 
             int Warned = (int) DS.Get("ping", player.Name);
-            if (Warned == null || Warned == 0)
+            if (Warned == 0)
             {
                 player.MessageFrom(EchoBotName,
                     "[color#FF2222]Fix your ping (" + player.Ping + ") or you will be kicked!");

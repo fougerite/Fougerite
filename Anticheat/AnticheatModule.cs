@@ -144,7 +144,7 @@ namespace Anticheat
             int INT = 0;
             if (int.TryParse(Value, out INT))
                 return INT;
-            return int.MaxValue;
+            return int.MinValue;
         }
 
         private bool GetBoolSetting(string Section, string Name)
@@ -380,8 +380,18 @@ namespace Anticheat
         {
         }
 
-        private void PlayerKilled(DeathEvent event2)
+        private void PlayerKilled(DeathEvent even)
         {
+            if (!AntiAIM_Enabled)
+                return;
+
+
+        }
+
+        private int RangeOf(string weapon)
+        {
+            int range = GetIntSetting("Range", weapon);
+            return range;
         }
 
         private void EntityDecay(DecayEvent de)

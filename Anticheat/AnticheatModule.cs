@@ -76,7 +76,6 @@ namespace Anticheat
 
         private bool HighPingKicking_Enabled = false;
         private int HighPingKicking_Timer = 0;
-        private int HighPingKicking_Time = 0;
         private int HighPingKicking_MaxPing = 0;
 
         private bool RelogCooldown = false;
@@ -171,19 +170,23 @@ namespace Anticheat
 
         private void TimersInit()
         {
-            pingTimer = new Timer();
-            pingTimer.Interval = HighPingKicking_Timer*1000;
-            pingTimer.AutoReset = false;
-            pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
             if (HighPingKicking_Enabled)
+            {
+                pingTimer = new Timer();
+                pingTimer.Interval = HighPingKicking_Timer*1000;
+                pingTimer.AutoReset = false;
+                pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
                 pingTimer.Start();
+            }
 
-            takeCoordsTimer = new Timer();
-            takeCoordsTimer.Interval = AntiSpeedHack_Timer*1000;
-            takeCoordsTimer.AutoReset = false;
-            takeCoordsTimer.Elapsed += new ElapsedEventHandler(takeCoordsEvent);
             if (AntiSpeedHack_Enabled)
+            {
+                takeCoordsTimer = new Timer();
+                takeCoordsTimer.Interval = AntiSpeedHack_Timer*1000;
+                takeCoordsTimer.AutoReset = false;
+                takeCoordsTimer.Elapsed += new ElapsedEventHandler(takeCoordsEvent);
                 takeCoordsTimer.Start();
+            }
         }
 
         private void pingEvent(object x, ElapsedEventArgs y)
@@ -328,7 +331,7 @@ namespace Anticheat
                 Cooldown = GetIntSetting("RelogCooldown", "Cooldown");
 
                 HighPingKicking_Enabled = GetBoolSetting("HighPingAntiSpeedHack_KickDister", "Enable");
-                HighPingKicking_Time = GetIntSetting("HighPingAntiSpeedHack_KickDister", "SecondsToCheck");
+                HighPingKicking_Timer = GetIntSetting("HighPingAntiSpeedHack_KickDister", "SecondsToCheck");
                 HighPingKicking_MaxPing = GetIntSetting("HighPingAntiSpeedHack_KickDister", "MaxPing");
 
                 GodModDetect = GetBoolSetting("GodModDetect", "Enable");

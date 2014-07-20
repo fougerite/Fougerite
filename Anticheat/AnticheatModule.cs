@@ -414,6 +414,14 @@ namespace Anticheat
 
         private void PlayerDisconnect(Fougerite.Player player)
         {
+            if (RelogCooldown)
+                if (!player.Admin)
+                {
+                    var Time = System.Environment.TickCount;
+                    int Cooldown = (int)DS.Get("loginCooldown", player.Name);
+                    if (Cooldown == 0)
+                        DS.Add("loginCooldown", Player.Name, Time);
+                }
         }
 
         private void PlayerConnect(Fougerite.Player player)

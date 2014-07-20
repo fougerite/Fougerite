@@ -380,12 +380,36 @@ namespace Anticheat
         {
         }
 
-        private void PlayerKilled(DeathEvent even)
+        private void PlayerKilled(DeathEvent deathEvent)
         {
-            if (!AntiAIM_Enabled)
+            if (!AntiAIM_Enabled && !(deathEvent.Attacker is Fougerite.Player))
                 return;
 
+            Fougerite.Player player = (Fougerite.Player)deathEvent.Attacker;
+            Fougerite.Player victim = (Fougerite.Player)deathEvent.Victim;
 
+            string weapon = deathEvent.WeaponName;
+            if ((deathEvent.DamageType == "Bullet" 
+                    && (weapon == "HandCannon" && weapon == "Pipe Shotgun" && weapon == "Revolver" && weapon == "9mm Pistol" &&
+                    weapon == "P250" && weapon == "Shotgun" && weapon == "Bolt Action Rifle" && weapon == "M4" &&
+                    weapon == "MP5A4"))
+                || (deathEvent.DamageType == "Melee" && (int)(Math.Round(deathEvent.DamageAmount)) == 75 
+                                                     && string.IsNullOrEmpty(weapon)))
+            {
+                Vector3 attacker_location = player.Location;
+                Vector3 victim_location = ((Fougerite.Player) deathEvent.Victim).Location;
+                float distance = (float)Math.Round(Util.GetUtil().GetVectorsDistance(attacker_location, victim_location));
+                if (distance > RangeOf(weapon) && RangeOf(weapon) > 0)
+                {
+                    player.Kill();
+                    BanCheater(player, "AutoAIM. Gun: " + weapon + " Dist: " + distance);
+                    player.Disconnect();
+                    victim.TeleportTo(attacker_location);
+                    Server.GetServer()
+                        .BroadcastFrom(EchoBotName, player.Name + " shooted " + victim.Name + " from " + distance + "m.");
+                    Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
+                }
+            }
         }
 
         private int RangeOf(string weapon)

@@ -97,7 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnticheatModule.cs" />
-    <None Include="Anticheat.cfg" />
+    <None Include="Anticheat.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

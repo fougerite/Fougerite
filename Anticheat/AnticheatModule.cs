@@ -96,6 +96,13 @@ namespace Anticheat
 
         public override void Initialize()
         {
+            if(File.Exists("Anticheat.cfg"))
+                INIConfig = new IniParser("Anticheat.cfg");
+            else
+            {
+                Logger.LogError("Anticheat.cfg does not exist. Can't load module.");
+                return;
+            }
             DS = DataStore.GetInstance();
             DS.Flush("loginCooldown");
             ConfigInit();

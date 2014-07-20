@@ -420,7 +420,7 @@ namespace Anticheat
                     var Time = System.Environment.TickCount;
                     int Cooldown = (int)DS.Get("loginCooldown", player.Name);
                     if (Cooldown == 0)
-                        DS.Add("loginCooldown", Player.Name, Time);
+                        DS.Add("loginCooldown", player.Name, Time);
                 }
         }
 

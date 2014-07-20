@@ -214,8 +214,8 @@ namespace Anticheat
                     else if (Warned == 1 &&
                              (((distance > AntiSpeedHack_KickDist) &&
                                (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) &&
-                               (AntiSpeedHack_KickDist == 1)) ||
-                              (distance > AntiSpeedHack_KickDist && !AntiSpeedHack_Tp && AntiSpeedHack_KickDist == 1)))
+                               (AntiSpeedHack_Kick)) ||
+                              (distance > AntiSpeedHack_KickDist && !AntiSpeedHack_Tp && AntiSpeedHack_Kick)))
                     {
                         Server.GetServer().BroadcastFrom(EchoBotName,
                             "[color#FF6666]" + pl.Name + " was kicked (Moved " +

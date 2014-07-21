@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -6,11 +8,21 @@
 
     public class Entity
     {
-        private object _obj;
+        private readonly object _obj;
+
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(_obj != null);
+            Contract.Invariant(_obj as StructureComponent != null || _obj as DeployableObject != null);
+        }
 
         public Entity(object Obj)
         {
-            this.Object = Obj;
+            Contract.Requires(Obj != null);
+            Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
+
+            this._obj = Obj;
         }
 
         public void ChangeOwner(Fougerite.Player p)
@@ -199,10 +211,6 @@
             get
             {
                 return this._obj;
-            }
-            set
-            {
-                this._obj = value;
             }
         }
 

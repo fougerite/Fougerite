@@ -220,7 +220,3 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-
-# Build cruft
-*.userprefs
-patcherLog.txt

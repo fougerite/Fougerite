@@ -204,22 +204,26 @@
 
         public static void say(uLink.NetworkPlayer player, string playername, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
+            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(playername) && player != null)
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
         }
 
         public static void sayAll(string arg)
         {
-            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            if (!string.IsNullOrEmpty(arg))
+                ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            if (!string.IsNullOrEmpty(arg) && player != null)
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)
         {
-            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(customName) && player != null)
+                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void SetStaticField(string className, string field, object val)
@@ -239,25 +243,20 @@
         {
             lock (this.typeCache)
             {
-                if (!this.typeCache.TryGetValue (typeName, out t)) {
-                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-                        t = assembly.GetType (typeName);
-                        if (t != null) {
+                if (!this.typeCache.TryGetValue(typeName, out t))
+                {
+                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        t = assembly.GetType(typeName);
+                        if (t != null)
+                        {
                             break;
                         }
                     }
-                    this.typeCache [typeName] = t;
+                    this.typeCache[typeName] = t;
                 }
             }
             return (t != null);
-        }
-
-        public System.Type TryFindReturnType(string typeName)
-        {
-            System.Type t;
-            if(this.TryFindType (typeName, out t))
-                return t;
-            throw new Exception ("Type not found " + typeName);
         }
 
         public bool ContainsString(string str, string key)

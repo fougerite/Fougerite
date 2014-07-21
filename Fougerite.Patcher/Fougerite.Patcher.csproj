@@ -8,11 +8,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <AssemblyName>Fougerite.Patcher</AssemblyName>
     <OutputType>Exe</OutputType>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <UseMSBuildEngine>False</UseMSBuildEngine>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +37,8 @@
     <Compile Include="Fougerite.Patcher\TypeDefinitionExtensions.cs" />
     <Compile Include="Fougerite.Patcher\MethodDefinitionExtensions.cs" />
     <Compile Include="Fougerite.Patcher\FieldDefinitionExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Mono.Cecil">
       <HintPath>..\References\Mono.Cecil.dll</HintPath>
     </Reference>

@@ -239,20 +239,25 @@
         {
             lock (this.typeCache)
             {
-                if (!this.typeCache.TryGetValue(typeName, out t))
-                {
-                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        t = assembly.GetType(typeName);
-                        if (t != null)
-                        {
+                if (!this.typeCache.TryGetValue (typeName, out t)) {
+                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                        t = assembly.GetType (typeName);
+                        if (t != null) {
                             break;
                         }
                     }
-                    this.typeCache[typeName] = t;
+                    this.typeCache [typeName] = t;
                 }
             }
             return (t != null);
+        }
+
+        public System.Type TryFindReturnType(string typeName)
+        {
+            System.Type t;
+            if(this.TryFindType (typeName, out t))
+                return t;
+            throw new Exception ("Type not found " + typeName);
         }
 
         public bool ContainsString(string str, string key)

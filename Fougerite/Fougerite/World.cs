@@ -125,12 +125,22 @@
 
         public float GetGround(float x, float z)
         {
-            Vector3 origin = new Vector3(x, 2000f, z);
-            Vector3 direction = new Vector3(0f, -1f, 0f);
-            RaycastHit Hit;
-            Physics.Raycast(origin, direction, out Hit);
+            return GetGroundDist(x, float.MaxValue, z);
+        }
 
-            return Hit.distance;
+        public float GetGroundDist(Vector3 vector3)
+        {
+            return GetGroundDist(vector3.x, vector3.y, vector3.z);
+        }
+
+        public float GetGroundDist(float x, float y, float z)
+        {
+            Vector3 origin = new Vector3(x, y, z);
+            RaycastHit Hit;
+            
+            if (Physics.Raycast(origin, Vector3.down, out Hit))
+                return Hit.distance;
+            return float.NaN;
         }
 
         public static World GetWorld()

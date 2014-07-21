@@ -318,11 +318,6 @@ namespace Anticheat
                 AntiAIM_MaxDist = GetIntSetting("AntiAIM", "ShotMaxDistance");
                 AntiAIM_MaxKillDist = GetIntSetting("AntiAIM", "MaxKillDistance");
 
-                AntiFlyHack_Enabled = GetBoolSetting("AntiFlyHack", "Enable");
-                AntiFlyHack_MaxHeight = GetIntSetting("AntiFlyHack", "MaxHeight");
-                AntiFlyHack_TimeFlyCheck = GetIntSetting("AntiFlyHack", "TimeToCheck");
-                AntiFlyHack_CountFly = GetIntSetting("AntiFlyHack", "Detections");
-
                 NamesRestrict_Enabled = GetBoolSetting("Names", "Enable");
                 NamesRestrict_AllowedChars = INIConfig.GetSetting("Names", "AllowedChars");
                 NamesRestrict_MaxLength = GetIntSetting("Names", "MaxLength");
@@ -336,13 +331,15 @@ namespace Anticheat
                 RelogCooldown = GetBoolSetting("RelogCooldown", "Enable");
                 Cooldown = GetIntSetting("RelogCooldown", "Cooldown");
 
-                HighPingKicking_Enabled = GetBoolSetting("HighPingKicker", "Enable");
-                HighPingKicking_Timer = GetIntSetting("HighPingKicker", "SecondsToCheck");
-                HighPingKicking_MaxPing = GetIntSetting("HighPingKicker", "MaxPing");
+                HighPingKicking_Enabled = GetBoolSetting("AntiLagger", "Enable");
+                HighPingKicking_Timer = GetIntSetting("AntiLagger", "SecondsToCheck");
+                HighPingKicking_MaxPing = GetIntSetting("AntiLagger", "MaxPing");
 
                 GodModDetect = GetBoolSetting("GodModDetect", "Enable");
 
                 LogPlayers = GetBoolSetting("LogPlayers", "Enable");
+
+                Logger.LogDebug("[AC] Config inited!");
             }
             catch (Exception ex)
             {

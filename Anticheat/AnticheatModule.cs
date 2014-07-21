@@ -333,9 +333,9 @@ namespace Anticheat
                 RelogCooldown = GetBoolSetting("RelogCooldown", "Enable");
                 Cooldown = GetIntSetting("RelogCooldown", "Cooldown");
 
-                HighPingKicking_Enabled = GetBoolSetting("HighPingAntiSpeedHack_KickDister", "Enable");
-                HighPingKicking_Timer = GetIntSetting("HighPingAntiSpeedHack_KickDister", "SecondsToCheck");
-                HighPingKicking_MaxPing = GetIntSetting("HighPingAntiSpeedHack_KickDister", "MaxPing");
+                HighPingKicking_Enabled = GetBoolSetting("HighPingKicker", "Enable");
+                HighPingKicking_Timer = GetIntSetting("HighPingKicker", "SecondsToCheck");
+                HighPingKicking_MaxPing = GetIntSetting("HighPingKicker", "MaxPing");
 
                 GodModDetect = GetBoolSetting("GodModDetect", "Enable");
 

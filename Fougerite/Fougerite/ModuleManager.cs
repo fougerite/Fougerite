@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -72,6 +73,8 @@ namespace Fougerite
 
                     foreach (Type Type in Assembly.GetExportedTypes())
                     {
+                        Contract.Assert(Type != null);
+
                         if (!Type.IsSubclassOf(typeof(Module)) || !Type.IsPublic || Type.IsAbstract)
                             continue;
                         Logger.LogDebug("[Modules] Checked " + Type.FullName);
@@ -146,6 +149,8 @@ namespace Fougerite
 
             foreach (ModuleContainer ModuleContainer in Modules)
             {
+                Contract.Assert(ModuleContainer != null);
+
                 try
                 {
                     ModuleContainer.Dispose();

@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using Facepunch.Utility;
     using Fougerite.Events;
@@ -44,6 +46,9 @@
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
+            Contract.Requires(item != null);
+            Contract.Requires(bdb != null);
+
             Fougerite.Player player = Fougerite.Player.FindByPlayerClient(item.controllable.playerClient);
             if (player != null)
             {

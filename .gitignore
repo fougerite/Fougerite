@@ -220,5 +220,7 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-Fougerite/Fougerite.userprefs
-References/patcherLog.txt
+
+# Build cruft
+*.userprefs
+patcherLog.txt

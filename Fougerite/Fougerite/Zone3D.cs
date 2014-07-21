@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -7,27 +9,40 @@
 
     public class Zone3D
     {
-        private System.Collections.Generic.List<Vector2> _points;
+        private List<Vector2> _points;
         private bool _protected;
         private bool _pvp;
-        private System.Collections.Generic.List<Entity> tmpPoints;
+        private readonly List<Entity> tmpPoints;
+
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(_points != null);
+            Contract.Invariant(tmpPoints != null);
+        }
 
         public Zone3D(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             this.PVP = true;
             this.Protected = false;
-            this.tmpPoints = new System.Collections.Generic.List<Entity>();
-            this.Points = new System.Collections.Generic.List<Vector2>();
+            this.tmpPoints = new List<Entity>();
+            this.Points = new List<Vector2>();
             DataStore.GetInstance().Add("3DZonesList", name, this);
         }
 
         public bool Contains(Entity en)
         {
+            Contract.Requires(en != null);
+
             return this.Contains(new Vector3(en.X, en.Y, en.Z));
         }
 
         public bool Contains(Fougerite.Player p)
         {
+            Contract.Requires(p != null);
+
             return this.Contains(p.Location);
         }
 
@@ -50,11 +65,15 @@
 
         public static Zone3D Get(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             return (DataStore.GetInstance().Get("3DZonesList", name) as Zone3D);
         }
 
         public static Zone3D GlobalContains(Entity e)
         {
+            Contract.Requires(e != null);
+
             Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
             if (table != null)
             {
@@ -72,6 +91,8 @@
 
         public static Zone3D GlobalContains(Fougerite.Player p)
         {
+            Contract.Requires(p != null);
+
             Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
             if (table != null)
             {
@@ -142,6 +163,7 @@
             }
             set
             {
+                Contract.Requires(value != null);
                 this._points = value;
             }
         }

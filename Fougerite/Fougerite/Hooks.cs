@@ -49,31 +49,33 @@ namespace Fougerite
             Contract.Requires(item != null);
             Contract.Requires(bdb != null);
 
+            if (item.controllable == null)
+                throw new InvalidOperationException("IBlueprintItem's controllable is null.");
+
+            if (item.controllable.playerClient == null)
+                throw new InvalidOperationException("IBlueprintItem's playerClient is null.");
+
             Fougerite.Player player = Fougerite.Player.FindByPlayerClient(item.controllable.playerClient);
-            if (player != null)
+            if (player == null) return;
+
+            BPUseEvent ae = new BPUseEvent(bdb);
+            if (OnBlueprintUse != null)
+                OnBlueprintUse(player, ae);
+            if (ae.Cancel) return;
+
+            PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
+            if (internalInventory.BindBlueprint(bdb))
             {
-                BPUseEvent ae = new BPUseEvent(bdb);
-                if (OnBlueprintUse != null)
+                int count = 1;
+                if (item.Consume(ref count))
                 {
-                    OnBlueprintUse(player, ae);
+                    internalInventory.RemoveItem(item.slot);
                 }
-                if (!ae.Cancel)
-                {
-                    PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
-                    if (internalInventory.BindBlueprint(bdb))
-                    {
-                        int count = 1;
-                        if (item.Consume(ref count))
-                        {
-                            internalInventory.RemoveItem(item.slot);
-                        }
-                        player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
-                    }
-                    else
-                    {
-                        player.Notice("", "You already have this blueprint", 4f);
-                    }
-                }
+                player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
+            }
+            else
+            {
+                player.Notice("", "You already have this blueprint", 4f);
             }
         }
 
@@ -88,6 +90,8 @@ namespace Fougerite
             // This one is a always true, because NetUser's user field is readonly and initialized in the constructor.
             Contract.Assume(arg.argUser.user != null);
 
+            Contract.Assume(arg.argUser.playerClient);
+
             try
             {
                 if (!chat.enabled) return;
@@ -95,6 +99,8 @@ namespace Fougerite
                 // Check if the chat.say command has valid arguments.
                 if (arg.Args == null) return;
                 if (arg.Args.Length != 1) return;
+
+                Contract.Assume(arg.Args[0] != null);
 
                 // If there is a slash in the beginning, it's a chat command.
                 bool chatCommand = arg.Args[0].StartsWith("/");
@@ -150,9 +156,6 @@ namespace Fougerite
                 bool external = a.argUser == null;
                 bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
-                if (OnConsoleReceived != null)
-                    OnConsoleReceived(ref a, external);
-
                 if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
                 {
                     if (adminRights)
@@ -162,6 +165,8 @@ namespace Fougerite
                         a.ReplyWith("Fougerite: Reloaded!");
                     }
                 }
+                else if (OnConsoleReceived != null) 
+                    OnConsoleReceived(ref a, external);
 
                 if (string.IsNullOrEmpty(a.Reply))
                     a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");

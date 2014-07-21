@@ -92,6 +92,7 @@ namespace Anticheat
 
         public override void Initialize()
         {
+            Logger.LogDebug("[AC] Loading...");
             if(File.Exists(ModuleFolder + "\\Anticheat.cfg"))
                 INIConfig = new IniParser(ModuleFolder + "\\Anticheat.cfg");
             else
@@ -116,6 +117,7 @@ namespace Anticheat
             Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
             Hooks.OnChatReceived += new Hooks.ChatRecivedDelegate(ChatReceived);
+            Logger.LogDebug("[AC] Loaded!");
         }
 
         public override void DeInitialize()
@@ -176,6 +178,7 @@ namespace Anticheat
                 pingTimer.Start();
                 Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
             }
+            else Logger.LogDebug("[AC] HighPingKicking disabled");
 
             if (AntiSpeedHack_Enabled)
             {
@@ -186,6 +189,7 @@ namespace Anticheat
                 takeCoordsTimer.Start();
                 Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);
             }
+            else Logger.LogDebug("[AC] AntiSpeedHack disabled");
         }
 
         private void pingEvent(object x, ElapsedEventArgs y)

@@ -112,7 +112,8 @@ namespace Anticheat
             Hooks.OnPlayerDisconnected += new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
             Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(PlayerHurt);
             Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
-            Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
+            if (AntiAIM_Enabled)
+                Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
             Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
@@ -134,7 +135,8 @@ namespace Anticheat
             Hooks.OnPlayerDisconnected -= new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
             Hooks.OnPlayerHurt -= new Hooks.HurtHandlerDelegate(PlayerHurt);
             Hooks.OnPlayerSpawned -= new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
-            Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
+            if (AntiAIM_Enabled)
+                Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
             Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
@@ -392,7 +394,7 @@ namespace Anticheat
 
         private void PlayerKilled(DeathEvent deathEvent)
         {
-            if (!AntiAIM_Enabled && !(deathEvent.Attacker is Fougerite.Player))
+            if (!(deathEvent.Attacker is Fougerite.Player))
                 return;
 
             Fougerite.Player player = (Fougerite.Player)deathEvent.Attacker;

@@ -519,7 +519,7 @@ namespace Anticheat
                 }
 
                 foreach (char Symbol in player.Name)
-                    if (NamesRestrict_AllowedChars.IndexOf(Symbol) != -1)
+                    if (NamesRestrict_AllowedChars.IndexOf(Symbol) == -1)
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have invalid characters in your name");
                         Log("Nick: " + player.Name + ". Banned chars in name.");

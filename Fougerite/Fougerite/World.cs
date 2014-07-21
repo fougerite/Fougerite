@@ -127,7 +127,10 @@
         {
             Vector3 origin = new Vector3(x, 2000f, z);
             Vector3 direction = new Vector3(0f, -1f, 0f);
-            return Physics.RaycastAll(origin, direction)[0].point.y;
+            RaycastHit Hit;
+            Physics.Raycast(origin, direction, out Hit);
+
+            return Hit.distance;
         }
 
         public static World GetWorld()

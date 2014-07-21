@@ -128,7 +128,7 @@
 
         public float GetVectorsDistance(Vector3 v1, Vector3 v2)
         {
-            return TransformHelpers.Dist2D(v1, v2);
+            return Vector3.Distance(v1, v2); ;
         }
 
         public static Hashtable HashtableFromFile(string path)

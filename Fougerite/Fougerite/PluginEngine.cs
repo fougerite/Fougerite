@@ -47,7 +47,7 @@ namespace Fougerite
         {
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-			return String.Join("\r\n", strArray);
+            return String.Join("\r\n", strArray);
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)

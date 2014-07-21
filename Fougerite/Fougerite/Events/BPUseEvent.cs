@@ -1,4 +1,6 @@
-﻿namespace Fougerite.Events
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite.Events
 {
     using System;
 
@@ -7,8 +9,16 @@
         private BlueprintDataBlock _bdb;
         private bool _cancel;
 
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(_bdb != null);
+        }
+
         public BPUseEvent(BlueprintDataBlock bdb)
         {
+            Contract.Requires(bdb != null);
+
             this.DataBlock = bdb;
             this.Cancel = false;
         }
@@ -33,6 +43,7 @@
             }
             set
             {
+                Contract.Requires(value != null);
                 this._bdb = value;
             }
         }
@@ -41,6 +52,8 @@
         {
             get
             {
+                if (_bdb.resultItem == null)
+                    throw new InvalidOperationException("BlueprintDataBlock's resultItem field is null.");
                 return this._bdb.resultItem.name;
             }
         }

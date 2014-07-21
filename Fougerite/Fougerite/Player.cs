@@ -182,14 +182,13 @@
 
         public void TeleportTo(float x, float y, float z)
         {
-			var vec = new Vector3(x, y, z);
-			this.TeleportTo(vec);
+            this.TeleportTo(new Vector3(x, y, z));
         }
 
-		public void TeleportTo(Vector3 vec)
-		{
-			RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, vec);
-		}
+        public void TeleportTo(Vector3 vec3)
+        {
+            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, vec3);
+        }
 
         public bool Admin
         {

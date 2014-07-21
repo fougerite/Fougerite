@@ -173,7 +173,7 @@ namespace Anticheat
             {
                 pingTimer = new Timer();
                 pingTimer.Interval = HighPingKicking_Timer * 1000;
-                pingTimer.AutoReset = false;
+                pingTimer.AutoReset = true;
                 pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
                 pingTimer.Start();
                 Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
@@ -184,7 +184,7 @@ namespace Anticheat
             {
                 takeCoordsTimer = new Timer();
                 takeCoordsTimer.Interval = AntiSpeedHack_Timer * 1000;
-                takeCoordsTimer.AutoReset = false;
+                takeCoordsTimer.AutoReset = true;
                 takeCoordsTimer.Elapsed += new ElapsedEventHandler(takeCoordsEvent);
                 takeCoordsTimer.Start();
                 Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);

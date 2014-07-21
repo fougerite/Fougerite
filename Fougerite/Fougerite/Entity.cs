@@ -55,7 +55,7 @@
             System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
             foreach (StructureComponent component in (this.Object as StructureComponent)._master._structureComponents)
             {
-                if (component != this.Object as StructureComponent)
+                if (component != this.Object)
                 {
                     list.Add(new Entity(component));
                 }

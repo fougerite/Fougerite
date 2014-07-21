@@ -25,6 +25,42 @@
             }
         }
 
+        public static bool checkOwner(DeployableObject obj, Controllable controllable)
+        {
+            bool flag;
+            if (obj.ownerID == controllable.playerClient.userID)
+            {
+                return true;
+            }
+            try
+            {
+                SleepingBag bag1 = (SleepingBag)obj;
+                flag = false;
+            }
+            catch
+            {
+                try
+                {
+                    ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
+                    ArrayList list = (ArrayList)command.GetSharedDoors()[obj.ownerID];
+                    if (list == null)
+                    {
+                        return false;
+                    }
+                    if (list.Contains(controllable.playerClient.userID))
+                    {
+                        return true;
+                    }
+                    flag = false;
+                }
+                catch (Exception)
+                {
+                    flag = false;
+                }
+            }
+            return flag;
+        }
+
         public static bool decayDisabled()
         {
             try

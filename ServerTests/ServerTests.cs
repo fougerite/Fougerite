@@ -140,7 +140,7 @@ namespace ServerTests
             try
             {
                 Log("GetGround_Test: Test 1");
-                Log(World.GetWorld().GetGround(TesterPlayer.X, TesterPlayer.Z).ToString());
+                Log(World.GetWorld().GetGroundDist(TesterPlayer.Location).ToString());
 
                 Log("GetGround_Test: Test 2");
                 Vector3 origin = new Vector3(TesterPlayer.X, 2000f, TesterPlayer.Z);

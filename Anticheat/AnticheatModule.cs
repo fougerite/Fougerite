@@ -23,7 +23,7 @@ namespace Anticheat
 
         public override string Author
         {
-            get { return "port by Riketta, plugin by skippi, AntiAIM by dretax"; }
+            get { return "Riketta, Skippi, DreTaX"; }
         }
 
         public override string Description
@@ -122,6 +122,11 @@ namespace Anticheat
 
         public override void DeInitialize()
         {
+            pingTimer.Elapsed -= pingEvent;
+            pingTimer.Stop();
+            takeCoordsTimer.Elapsed -= takeCoordsEvent;
+            takeCoordsTimer.Stop();
+                
             Hooks.OnEntityDecay -= new Hooks.EntityDecayDelegate(EntityDecay);
             Hooks.OnDoorUse -= new Hooks.DoorOpenHandlerDelegate(DoorUse);
             Hooks.OnEntityHurt -= new Hooks.EntityHurtDelegate(EntityHurt);
@@ -173,9 +178,7 @@ namespace Anticheat
             {
                 pingTimer = new Timer();
                 pingTimer.Interval = HighPingKicking_Timer * 1000;
-                pingTimer.AutoReset = true;
-                pingTimer.Enabled = true;
-                pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
+                pingTimer.Elapsed += pingEvent;
                 pingTimer.Start();
                 Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
             }
@@ -185,9 +188,7 @@ namespace Anticheat
             {
                 takeCoordsTimer = new Timer();
                 takeCoordsTimer.Interval = AntiSpeedHack_Timer * 1000;
-                takeCoordsTimer.AutoReset = true;
-                takeCoordsTimer.Enabled = true;
-                takeCoordsTimer.Elapsed += new ElapsedEventHandler(takeCoordsEvent);
+                takeCoordsTimer.Elapsed += takeCoordsEvent;
                 takeCoordsTimer.Start();
                 Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);
             }

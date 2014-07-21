@@ -7,7 +7,7 @@
 
     public class RulesCommand : ChatCommand
     {
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("rules.txt")))
             {

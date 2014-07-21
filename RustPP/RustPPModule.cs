@@ -132,7 +132,7 @@ namespace RustPP
                 int num2;
                 if (int.TryParse(arg.GetString(0, "text").Trim(), out num2))
                 {
-                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(ref arg, num2);
+                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(arg, num2);
                 }
                 else
                 {
@@ -158,7 +158,7 @@ namespace RustPP
             else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
             {
                 if (Core.IsEnabled())
-                    Core.handleCommand(ref arg);
+                    Core.handleCommand(arg);
             }
         }
 

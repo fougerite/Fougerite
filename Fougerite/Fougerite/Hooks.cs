@@ -16,7 +16,7 @@
         public static System.Collections.Generic.List<object> decayList = new System.Collections.Generic.List<object>();
         public static Hashtable talkerTimers = new Hashtable();
 
-        public static event BlueprintUseHandlerDelagate OnBlueprintUse;
+        public static event BlueprintUseHandlerDelegate OnBlueprintUse;
         public static event ChatRecivedDelegate OnChatReceived;
         public static event ChatHandlerDelegate OnChat;
         public static event CommandHandlerDelegate OnCommand;
@@ -625,7 +625,7 @@
             return lists;
         }
 
-        public delegate void BlueprintUseHandlerDelagate(Fougerite.Player player, BPUseEvent ae);
+        public delegate void BlueprintUseHandlerDelegate(Fougerite.Player player, BPUseEvent ae);
         public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
         public delegate void ChatRecivedDelegate(ref ConsoleSystem.Arg arg);
         public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);

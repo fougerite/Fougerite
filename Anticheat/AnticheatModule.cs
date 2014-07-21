@@ -176,8 +176,7 @@ namespace Anticheat
         {
             if (HighPingKicking_Enabled)
             {
-                pingTimer = new Timer();
-                pingTimer.Interval = HighPingKicking_Timer * 1000;
+                pingTimer = new Timer(HighPingKicking_Timer * 1000);
                 pingTimer.Elapsed += pingEvent;
                 pingTimer.Start();
                 Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
@@ -186,8 +185,7 @@ namespace Anticheat
 
             if (AntiSpeedHack_Enabled)
             {
-                takeCoordsTimer = new Timer();
-                takeCoordsTimer.Interval = AntiSpeedHack_Timer * 1000;
+                takeCoordsTimer = new Timer(AntiSpeedHack_Timer * 1000);
                 takeCoordsTimer.Elapsed += takeCoordsEvent;
                 takeCoordsTimer.Start();
                 Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);

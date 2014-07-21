@@ -23,7 +23,7 @@ namespace Anticheat
 
         public override string Author
         {
-            get { return "Riketta (earlier skippi)"; }
+            get { return "port by Riketta, plugin by skippi, AntiAIM by dretax"; }
         }
 
         public override string Description

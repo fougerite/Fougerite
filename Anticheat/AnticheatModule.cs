@@ -240,8 +240,8 @@ namespace Anticheat
                             "[color#FF6666]" + pl.Name + " was kicked (Moved " +
                             distance.ToString("F2") + " meters, maybe lagged)");
                         pl.MessageFrom(EchoBotName, "[color#FF2222]You have been kicked!");
-                        pl.Disconnect();
                         Log("Kick: " + pl.Name + ". SpeedHack - may be lag");
+                        pl.Disconnect();
                     }
                     else if ((Warned == 1) &&
                              ((distance > AntiSpeedHack_ChatDist &&
@@ -290,8 +290,8 @@ namespace Anticheat
             iniBansIP.Save();
             iniBansID.Save();
             player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-            player.Disconnect();
             Log("BAN: " + player.Name + " " + ". " + StringLog);
+            player.Disconnect();
         }
 
 
@@ -366,8 +366,8 @@ namespace Anticheat
             {
                 player.MessageFrom(EchoBotName,
                     "[color#FF2222]Your ping is " + player.Ping + " but maximum allowed is " + HighPingKicking_MaxPing);
-                player.Disconnect();
                 Log("Kick: " + player.Name + ". Lagger");
+                player.Disconnect();
             }
         }
 
@@ -412,11 +412,11 @@ namespace Anticheat
                 {
                     player.Kill();
                     BanCheater(player, "AutoAIM. Gun: " + weapon + " Dist: " + distance);
+                    Server.GetServer()
+                    .BroadcastFrom(EchoBotName, player.Name + " shooted " + victim.Name + " from " + distance + "m.");
+                    Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
                     player.Disconnect();
                     victim.TeleportTo(attacker_location);
-                    Server.GetServer()
-                        .BroadcastFrom(EchoBotName, player.Name + " shooted " + victim.Name + " from " + distance + "m.");
-                    Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
                 }
             }
         }
@@ -503,8 +503,8 @@ namespace Anticheat
                     player.MessageFrom(EchoBotName,
                         "[color#FF2222]You have too many characters in your name. Please Change it. Maximum is " +
                         NamesRestrict_MaxLength);
-                    player.Disconnect();
                     Log("Nick: " + player.Name + ". Too many chars in name.");
+                    player.Disconnect();
                     return;
                 }
 
@@ -513,8 +513,8 @@ namespace Anticheat
                     player.MessageFrom(EchoBotName,
                         "[color#FF2222]You have not enough characters in your name. Please Change it. Minimum is " +
                         NamesRestrict_MinLength);
-                    player.Disconnect();
                     Log("Nick: " + player.Name + ". Low length of name.");
+                    player.Disconnect();
                     return;
                 }
 
@@ -522,8 +522,8 @@ namespace Anticheat
                     if (player.Name.IndexOf(Symbol) != -1)
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have invalid characters in your name");
-                        player.Disconnect();
                         Log("Nick: " + player.Name + ". Banned chars in name.");
+                        player.Disconnect();
                         return;
                     }
 
@@ -533,8 +533,8 @@ namespace Anticheat
                     {
                         player.MessageFrom(EchoBotName,
                             "[color#FF2222]This name isn't allowed. Please change your name.");
-                        player.Disconnect();
                         Log("Nick: " + player.Name + ". Banned name.");
+                        player.Disconnect();
                         return;
                     }
                 }
@@ -561,8 +561,8 @@ namespace Anticheat
                     else if (ID != player.SteamID && (player.Admin || !NamesRestrict_AdminsOnly))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]This nickname doesn't belong to you.");
-                        player.Disconnect();
                         Log("Nick: " + player.Name + ". Nick stealer.");
+                        player.Disconnect();
                         return;
                     }
                 }
@@ -582,7 +582,7 @@ namespace Anticheat
                     player.Disconnect();
                     return;
                 }
-                if (Time > Cooldown*1000 + Disconnected)
+                if (Time > Cooldown * 1000 + Disconnected)
                 {
                     DS.Remove("loginCooldown", player.Name);
                 }

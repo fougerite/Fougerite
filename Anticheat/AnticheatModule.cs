@@ -252,8 +252,8 @@ namespace Anticheat
         private void BanCheater(Fougerite.Player player, string StringLog)
         {
             IniParser iniBansIP;
-            if (File.Exists("BansIP.ini"))
-                iniBansIP = new IniParser("BansIP.ini");
+            if (File.Exists(ModuleFolder + "\\BansIP.ini"))
+                iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
             else
             {
                 Logger.LogError("BansIP.ini does not exist!");
@@ -261,8 +261,8 @@ namespace Anticheat
             }
 
             IniParser iniBansID;
-            if (File.Exists("BansID.ini"))
-                iniBansID = new IniParser("BansID.ini");
+            if (File.Exists(ModuleFolder + "\\BansID.ini"))
+                iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
             else
             {
                 Logger.LogError("BansID.ini does not exist!");
@@ -533,8 +533,8 @@ namespace Anticheat
                 if (NamesRestrict_BindName)
                 {
                     IniParser BoundNames;
-                    if (File.Exists("BoundNames.ini"))
-                        BoundNames = new IniParser("BoundNames.ini");
+                    if (File.Exists(ModuleFolder + "\\BoundNames.ini"))
+                        BoundNames = new IniParser(ModuleFolder + "\\BoundNames.ini");
                     else
                     {
                         Logger.LogError("BoundNames.ini does not exist!");
@@ -583,8 +583,8 @@ namespace Anticheat
 
 
             IniParser iniBansIP;
-            if (File.Exists("BansIP.ini"))
-                iniBansIP = new IniParser("BansIP.ini");
+            if (File.Exists(ModuleFolder + "\\BansIP.ini"))
+                iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
             else
             {
                 Logger.LogError("BansIP.ini does not exist!");
@@ -599,8 +599,8 @@ namespace Anticheat
             }
 
             IniParser iniBansID;
-            if (File.Exists("BansID.ini"))
-                iniBansID = new IniParser("BansID.ini");
+            if (File.Exists(ModuleFolder + "\\BansID.ini"))
+                iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
             else
             {
                 Logger.LogError("BansID.ini does not exist!");

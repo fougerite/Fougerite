@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -12,6 +13,9 @@ namespace Fougerite
 
         public static void Init(string ConfigPath)
         {
+            Contract.Requires(!string.IsNullOrEmpty(ConfigPath));
+            Contract.Ensures(FougeriteConfig != null);
+
             if (File.Exists(ConfigPath))
             {
                 FougeriteConfig = new IniParser(ConfigPath);
@@ -22,12 +26,20 @@ namespace Fougerite
 
         public static string GetValue(string Section, string Setting)
         {
+            Contract.Requires(!string.IsNullOrEmpty(Section));
+            Contract.Requires(!string.IsNullOrEmpty(Setting));
+
             return FougeriteConfig.GetSetting(Section, Setting);
         }
 
         public static bool GetBoolValue(string Section,string Setting)
         {
-            return Config.FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
+            Contract.Requires(!string.IsNullOrEmpty(Section));
+            Contract.Requires(!string.IsNullOrEmpty(Setting));
+
+            var val = FougeriteConfig.GetSetting(Section, Setting);
+
+            return val != null && val.ToLower() == "true";
         }
     }
 }

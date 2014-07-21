@@ -208,6 +208,12 @@ namespace Anticheat
             Vector3 ZeroVector = Vector3.zero;
             foreach (var pl in Server.GetServer().Players)
             {
+                if (!pl.PlayerClient.netPlayer.isConnected)
+                {
+                    Log("NotConnected: " + pl.Name);
+                    return;
+                }
+
                 Logger.LogDebug("[AC] Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
 
                 if (!AntiSpeedHack_AdminCheck && pl.Admin)
@@ -482,7 +488,7 @@ namespace Anticheat
 
             if (player.Name.IndexOf('=') + 1 != 0)
             {
-                player.MessageFrom("[AntiCheat]",
+                player.MessageFrom(EchoBotName,
                     "[color#FF2222]You have illegal characters in your name. Please, change it.");
                 player.Disconnect();
                 return;

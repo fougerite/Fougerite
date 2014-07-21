@@ -197,6 +197,7 @@ namespace Anticheat
             Vector3 ZeroVector = Vector3.zero;
             foreach (var pl in Server.GetServer().Players)
             {
+                Logger.LogDebug("AC Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
 
                 if (!AntiSpeedHack_AdminCheck && pl.Admin)
                     continue;

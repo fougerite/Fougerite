@@ -170,34 +170,38 @@ namespace Anticheat
             if (HighPingKicking_Enabled)
             {
                 pingTimer = new Timer();
-                pingTimer.Interval = HighPingKicking_Timer*1000;
+                pingTimer.Interval = HighPingKicking_Timer * 1000;
                 pingTimer.AutoReset = false;
                 pingTimer.Elapsed += new ElapsedEventHandler(pingEvent);
                 pingTimer.Start();
+                Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
             }
 
             if (AntiSpeedHack_Enabled)
             {
                 takeCoordsTimer = new Timer();
-                takeCoordsTimer.Interval = AntiSpeedHack_Timer*1000;
+                takeCoordsTimer.Interval = AntiSpeedHack_Timer * 1000;
                 takeCoordsTimer.AutoReset = false;
                 takeCoordsTimer.Elapsed += new ElapsedEventHandler(takeCoordsEvent);
                 takeCoordsTimer.Start();
+                Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);
             }
         }
 
         private void pingEvent(object x, ElapsedEventArgs y)
         {
+            Logger.LogDebug("[AC] pingEvent callback");
             foreach (var pl in Server.GetServer().Players)
                 PlayerPingCheck(pl);
         }
 
         private void takeCoordsEvent(object x, ElapsedEventArgs y)
         {
+            Logger.LogDebug("[AC] takeCoordsEvent callback");
             Vector3 ZeroVector = Vector3.zero;
             foreach (var pl in Server.GetServer().Players)
             {
-                Logger.LogDebug("AC Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
+                Logger.LogDebug("[AC] Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
 
                 if (!AntiSpeedHack_AdminCheck && pl.Admin)
                     continue;

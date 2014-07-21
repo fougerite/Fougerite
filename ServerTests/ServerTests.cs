@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
+using Random = System.Random;
 
 namespace ServerTests
 {
@@ -71,8 +73,12 @@ namespace ServerTests
                     case "all":
                         TestAll();
                         break;
+                    case "ground":
+                        GetGround_Test();
+                        break;
                     case "help":
                         player.Message("Use in only on test server!");
+                        player.Message("/test ground - testing Z coord");
                         player.Message("/test all - testing all");
                         player.Message("/test save - saving world");
                         break;
@@ -117,6 +123,7 @@ namespace ServerTests
             Broadcast_Test();
             Log_Test();
             FindPlayer_Test();
+            GetGround_Test();
             Log("Tested!");
         }
 
@@ -126,6 +133,25 @@ namespace ServerTests
         }
 
         //
+
+
+        void GetGround_Test()
+        {
+            try
+            {
+                Log("GetGround_Test: Test 1");
+                Log(World.GetWorld().GetGround(TesterPlayer.X, TesterPlayer.Z).ToString());
+
+                Log("GetGround_Test: Test 2");
+                Vector3 origin = new Vector3(TesterPlayer.X, 2000f, TesterPlayer.Z);
+                Vector3 direction = new Vector3(0f, -1f, 0f);
+                Log(Physics.RaycastAll(origin, direction)[0].point.y.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
 
         void FindPlayer_Test()
         {

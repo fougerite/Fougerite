@@ -47,7 +47,7 @@ namespace Fougerite
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr (typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(StructureComponent).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(StructureComponent).Assembly))
                     .SetValue("Server", Fougerite.Server.GetServer())
                     .SetValue("Data", Fougerite.Data.GetData())
                     .SetValue("DataStore", DataStore.GetInstance())

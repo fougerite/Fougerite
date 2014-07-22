@@ -259,6 +259,14 @@
             return (t != null);
         }
 
+        public System.Type TryFindReturnType(string typeName)
+        {
+            System.Type t;
+            if(this.TryFindType (typeName, out t))
+                return t;
+            throw new Exception ("Type not found " + typeName);
+        }
+		
         public bool ContainsString(string str, string key)
         {
             if (str.Contains(key))

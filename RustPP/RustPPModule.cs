@@ -50,24 +50,7 @@ namespace RustPP
 
             Core.Init();
 
-            try
-            {
-                Core.config = new IniParser(ConfigFile);
-
-                if ((Core.config != null) && Core.IsEnabled())
-                {
-                    timer = new System.Timers.Timer();
-                    timer.Interval = 30000.0;
-                    timer.AutoReset = false;
-                    timer.Elapsed += new ElapsedEventHandler(TimeEvent);
-                    TimedEvents.startEvents();
-                    timer.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            TimedEvents.startEvents();
 
             Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
             Fougerite.Hooks.OnDoorUse += new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
@@ -101,11 +84,6 @@ namespace RustPP
             Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             
             Logger.LogDebug("DeInitialized RPP");
-        }
-
-        void TimeEvent(object x, ElapsedEventArgs y)
-        {
-            TimedEvents.startEvents();
         }
 
         void ChatReceived(ref ConsoleSystem.Arg arg)

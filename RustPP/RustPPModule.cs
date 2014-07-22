@@ -68,8 +68,6 @@ namespace RustPP
         public override void DeInitialize()
         {
             Logger.LogDebug("DeInitialize RPP");
-            timer.Stop();
-            timer.Elapsed -= new ElapsedEventHandler(TimeEvent);
 
             Fougerite.Hooks.OnEntityDecay -= new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
             Fougerite.Hooks.OnDoorUse -= new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);

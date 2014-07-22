@@ -37,8 +37,6 @@ namespace RustPP
             return (RustPPModule.StaticModuleFolder + RustPPModule.ConfigsFolder + fileName);
         }
 
-        Timer timer;
-
         public static string ConfigFile;
         public static string ConfigsFolder;
         public static string StaticModuleFolder;
@@ -50,6 +48,20 @@ namespace RustPP
 
             Core.Init();
 
+            try
+            {
+                Core.config = new IniParser(ConfigFile);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            if (Core.config == null)
+            {
+                Logger.LogError("[RPP] Can't load config!");
+                return;
+            }
             TimedEvents.startEvents();
 
             Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
@@ -82,6 +94,11 @@ namespace RustPP
             Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             
             Logger.LogDebug("DeInitialized RPP");
+        }
+
+        void TimeEvent(object x, ElapsedEventArgs y)
+        {
+            TimedEvents.startEvents();
         }
 
         void ChatReceived(ref ConsoleSystem.Arg arg)

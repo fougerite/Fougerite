@@ -589,9 +589,7 @@ namespace Anticheat
                     return;
                 }
                 if (Time > Cooldown * 1000 + Disconnected)
-                {
                     DS.Remove("loginCooldown", player.Name);
-                }
             }
 
 
@@ -627,6 +625,8 @@ namespace Anticheat
                 player.Disconnect();
                 return;
             }
+
+            Logger.LogDebug("[AC] " + player.Name + "Connected!");
         }
 
         private void EntityHurt(HurtEvent he)

@@ -128,19 +128,27 @@
             return GetGroundDist(x, float.MaxValue, z);
         }
 
-        public float GetGroundDist(Vector3 vector3)
-        {
-            return GetGroundDist(vector3.x, vector3.y, vector3.z);
-        }
-
         public float GetGroundDist(float x, float y, float z)
         {
             Vector3 origin = new Vector3(x, y, z);
+            return GetGroundDist(origin);
+        }
+
+        public float GetGroundDist(Vector3 origin)
+        {
             RaycastHit Hit;
-            
-            if (Physics.Raycast(origin, Vector3.down, out Hit))
-                return Hit.distance;
-            return float.NaN;
+
+            float Distance = float.NaN;
+
+            // Deployable | Terrain | NoLayer
+            if (Physics.Raycast(origin, Vector3.down, out Hit, float.MaxValue, (1 << 10) | (1 << 19) | (1 << 0)))
+            {
+                Logger.LogDebug("GetGroundDist: " + Hit.transform.name + " - " + Hit.transform.tag);
+                Distance = Hit.distance;
+            }
+
+            Distance = (float) Math.Round(Distance - 1.5f, 2); // 1.5 - player height
+            return (Distance < 0.5f ? 0 : Distance); // if Distance < 0.5 we may say that he is grounded o_O
         }
 
         public static World GetWorld()

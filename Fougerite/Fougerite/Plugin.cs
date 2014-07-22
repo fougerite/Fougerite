@@ -59,9 +59,9 @@ namespace Fougerite
                     .SetValue("Time", this)
                     .Execute(code);
             Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
-                            typeof (UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-                            typeof (uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                            typeof (StructureComponent).Assembly.GetName().Name);
+                            typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
+                            typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
+                            typeof(StructureComponent).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");

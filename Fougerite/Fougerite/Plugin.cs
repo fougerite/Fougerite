@@ -48,20 +48,18 @@ namespace Fougerite
             Timers = new Dictionary<String, TimedEvent>();
 
             Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(StructureComponent).Assembly))
-                    .SetValue("Server", Fougerite.Server.GetServer())
-                    .SetValue("Data", Fougerite.Data.GetData())
-                    .SetValue("DataStore", DataStore.GetInstance())
-                    .SetValue("Datastore", DataStore.GetInstance())
-                    .SetValue("Util", Util.GetUtil())
-                    .SetValue("Web", new Web())
-                    .SetValue("World", World.GetWorld())
-                    .SetValue("Plugin", this)
-                    .SetValue("Time", this)
-                    .Execute(code);
+                .SetValue("Server", Fougerite.Server.GetServer())
+                .SetValue("Data", Fougerite.Data.GetData())
+                .SetValue("DataStore", DataStore.GetInstance())
+                .SetValue("Util", Util.GetUtil())
+                .SetValue("Web", new Web())
+                .SetValue("World", World.GetWorld())
+                .SetValue("Plugin", this)
+                .Execute(code);
             Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
-                            typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-                            typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                            typeof(StructureComponent).Assembly.GetName().Name);
+                typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
+                typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
+                typeof(PlayerInventory).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");

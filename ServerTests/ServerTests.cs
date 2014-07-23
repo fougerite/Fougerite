@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
+using Random = System.Random;
 
 namespace ServerTests
 {
@@ -14,20 +16,23 @@ namespace ServerTests
         {
             get { return "ServerTests"; }
         }
+
         public override string Author
         {
             get { return "Riketta"; }
         }
+
         public override string Description
         {
             get { return "Testing all hooks and events"; }
         }
+
         public override Version Version
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
-        Fougerite.Player TesterPlayer = null;
+        private Fougerite.Player TesterPlayer = null;
 
         public override void Initialize()
         {
@@ -60,8 +65,8 @@ namespace ServerTests
             Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             Fougerite.Hooks.OnCommand -= new Fougerite.Hooks.CommandHandlerDelegate(Command);
         }
-        
-        void Command(Fougerite.Player player, string cmd, string[] args)
+
+        private void Command(Fougerite.Player player, string cmd, string[] args)
         {
             if (cmd == "test" && args.Length == 1 && player.Admin)
             {
@@ -71,8 +76,20 @@ namespace ServerTests
                     case "all":
                         TestAll();
                         break;
+                    case "dump":
+                        ObjectsDump();
+                        break;
+                    case "target":
+                        Target_Test();
+                        break;
+                    case "ground":
+                        GetGround_Test();
+                        break;
                     case "help":
                         player.Message("Use in only on test server!");
+                        player.Message("/test dump - dump info about all objects to log");
+                        player.Message("/test target - info about targeted object");
+                        player.Message("/test ground - testing Z coord");
                         player.Message("/test all - testing all");
                         player.Message("/test save - saving world");
                         break;
@@ -86,16 +103,22 @@ namespace ServerTests
             }
         }
 
-        void TestAll()
+        private void TestAll()
         {
             Log("Testing");
-            int Range = 50; 
+            int Range = 50;
             Random Rand = new Random();
             for (int i = 0; i < 5; i++)
             {
-                World.GetWorld().Spawn(";deploy_wood_storage_large", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
-                World.GetWorld().Spawn(";deploy_largewoodspikewall", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
-                World.GetWorld().Spawn(";struct_wood_foundation", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1, TesterPlayer.Z + Rand.Next(-Range, Range));
+                World.GetWorld()
+                    .Spawn(";deploy_wood_storage_large", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1,
+                        TesterPlayer.Z + Rand.Next(-Range, Range));
+                World.GetWorld()
+                    .Spawn(";deploy_largewoodspikewall", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1,
+                        TesterPlayer.Z + Rand.Next(-Range, Range));
+                World.GetWorld()
+                    .Spawn(";struct_wood_foundation", TesterPlayer.X + Rand.Next(-Range, Range), TesterPlayer.Y - 1,
+                        TesterPlayer.Z + Rand.Next(-Range, Range));
             }
             Log("Entities placed");
 
@@ -117,15 +140,71 @@ namespace ServerTests
             Broadcast_Test();
             Log_Test();
             FindPlayer_Test();
+            GetGround_Test();
             Log("Tested!");
         }
 
-        void Log(string MSG)
+        private void Log(string MSG)
         {
             Logger.LogDebug("[Test] " + MSG);
         }
 
         //
+
+        private void ObjectsDump()
+        {
+            try
+            {
+                var goArray = UnityEngine.Object.FindObjectsOfType(typeof (GameObject));
+                Logger.LogDebug("[DUMP] ========== START ==========\n[DUMP] Length: " + goArray.Length);
+                for (var i = 0; i < goArray.Length; i++)
+                {
+                    GameObject GO = (GameObject) goArray[i];
+                    Logger.LogDebug("[DUMP]: " + GO.name + " - " + GO.tag + " - " +
+                                    GO.layer.ToString());
+                }
+                Logger.LogDebug("[DUMP] =========== END ===========");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        private void Target_Test()
+        {
+            try
+            {
+                Vector3 origin = TesterPlayer.Location;
+                RaycastHit Hit;
+
+                if (Physics.Raycast(origin, TesterPlayer.PlayerClient.transform.forward, out Hit, float.MaxValue))
+                    Logger.LogDebug("GetGroundDist: [" + Hit.distance + "] " + Hit.transform.name + " - " +
+                                    Hit.transform.tag + " - " + Hit.transform.gameObject.layer.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        void GetGround_Test()
+        {
+            try
+            {
+                Log("GetGround_Test: Test 1");
+                Log(World.GetWorld().GetGroundDist(TesterPlayer.Location).ToString());
+
+                Log("GetGround_Test: Test 2");
+                Vector3 origin = new Vector3(TesterPlayer.X, 2000f, TesterPlayer.Z);
+                Vector3 direction = new Vector3(0f, -1f, 0f);
+                Log(Physics.RaycastAll(origin, direction)[0].point.y.ToString());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
 
         void FindPlayer_Test()
         {

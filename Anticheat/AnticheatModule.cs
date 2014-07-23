@@ -676,7 +676,7 @@ namespace Anticheat
                         Logger.LogError("BansIP.ini does not exist!");
                         return;
                     }
-                    string IpBanned = (string) iniBansIP.GetSetting("Ips", player.IP);
+                    string IpBanned = iniBansIP.GetSetting("Ips", player.IP);
                     if (!string.IsNullOrEmpty(IpBanned))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
@@ -693,8 +693,8 @@ namespace Anticheat
                         Logger.LogError("BansID.ini does not exist!");
                         return;
                     }
-                    var IdBanned = iniBansID.GetSetting("Ids", player.SteamID);
-                    if (IdBanned != null)
+                    string IdBanned = iniBansID.GetSetting("Ids", player.SteamID);
+                    if (!string.IsNullOrEmpty(IdBanned))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
                         Logger.LogDebug("[AC] " + player.Name + " banned by ID!");

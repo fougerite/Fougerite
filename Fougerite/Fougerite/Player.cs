@@ -175,6 +175,35 @@
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
+        public void SafeTeleportTo(Fougerite.Player p, [Optional, DefaultParameterValue(1.5f)] float distance)
+        { 
+            Ray ray = p.PlayerClient.controllable.character.eyesRay;
+            Ray reflect = new Ray(ray.origin, Vector3.Reflect(ray.direction, ray.direction));
+            Vector3 target;
+            if (this.Admin) {
+                target = reflect.GetPoint(distance); // rcon admin teleports behind target player
+            } else {
+                target = ray.GetPoint(distance);     // non-admins teleport in front of target player
+            }
+            this.SafeTeleportTo(target.x, target.z);
+            this.ourPlayer.controllable.transform.LookAt(ray.origin);  // turn towards the target player
+        }
+
+        public void SafeTeleportTo(Vector3 target)
+        {
+            this.SafeTeleportTo(target.x, target.z);
+        }
+
+        public void SafeTeleportTo(float x, float z)
+        {
+            this.TeleportTo(x, World.GetWorld().GetGround(x, z), z);
+        }
+
+        public void TeleportTo(Vector3 target)
+        {
+            this.TeleportTo(target.x, target.y, target.z);
+        }
+
         public void TeleportTo(Fougerite.Player p)
         {
             this.TeleportTo(p.X, p.Y, p.Z);

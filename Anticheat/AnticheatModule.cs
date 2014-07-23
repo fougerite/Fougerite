@@ -494,156 +494,215 @@ namespace Anticheat
         {
             try
             {
-                if (player.Name.ToLower().IndexOf("admin") + 1 != 0 && !player.Admin)
+                try
                 {
-                    player.MessageFrom(EchoBotName, "[color#FF2222]Please, don't use \"Admin\" in your nickname.");
-                    Logger.LogDebug("[AC] " + player.Name + " using Admin name o_O");
-                    player.Disconnect();
-                    return;
-                }
-
-                if (player.Name.IndexOf('=') + 1 != 0)
-                {
-                    player.MessageFrom(EchoBotName,
-                        "[color#FF2222]You have illegal characters in your name. Please, change it.");
-                    Logger.LogDebug("[AC] " + player.Name + " illegal chars in name!");
-                    player.Disconnect();
-                    return;
-                }
-
-                if (AntiSpeedHack_Enabled)
-                {
-                    DS.Add("lastCoords", player.Name, player.Location);
-                    DS.Add("AntiSpeedHack", player.Name, 0);
-                }
-
-                if (NamesRestrict_Enabled)
-                {
-                    var name = player.Name;
-                    var len = player.Name.Length;
-                    if (len > NamesRestrict_MaxLength)
+                    if (AntiSpeedHack_Enabled)
                     {
-                        player.MessageFrom(EchoBotName,
-                            "[color#FF2222]You have too many characters in your name. Please Change it. Maximum is " +
-                            NamesRestrict_MaxLength);
-                        Log("Nick: " + player.Name + ". Too many chars in name.");
-                        player.Disconnect();
-                        return;
+                        DS.Add("lastCoords", player.Name, player.Location);
+                        DS.Add("AntiSpeedHack", player.Name, 0);
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("[AC] DS fill fail");
+                    Logger.LogException(ex);
+                }
 
-                    if (len < NamesRestrict_MinLength)
+                try
+                {
+                    if (NamesRestrict_Enabled)
                     {
-                        player.MessageFrom(EchoBotName,
-                            "[color#FF2222]You have not enough characters in your name. Please Change it. Minimum is " +
-                            NamesRestrict_MinLength);
-                        Log("Nick: " + player.Name + ". Low length of name.");
-                        player.Disconnect();
-                        return;
-                    }
+                        var name = player.Name;
+                        var len = player.Name.Length;
 
-                    foreach (char Symbol in player.Name)
-                        if (NamesRestrict_AllowedChars.IndexOf(Symbol) == -1)
+                        try
                         {
-                            player.MessageFrom(EchoBotName, "[color#FF2222]You have invalid characters in your name");
-                            Log("Nick: " + player.Name + ". Banned chars in name.");
-                            player.Disconnect();
-                            return;
+                            if (len > NamesRestrict_MaxLength)
+                            {
+                                player.MessageFrom(EchoBotName,
+                                    "[color#FF2222]You have too many characters in your name. Please Change it. Maximum is " +
+                                    NamesRestrict_MaxLength);
+                                Log("Nick: " + player.Name + ". Too many chars in name.");
+                                player.Disconnect();
+                                return;
+                            }
+
+                            if (len < NamesRestrict_MinLength)
+                            {
+                                player.MessageFrom(EchoBotName,
+                                    "[color#FF2222]You have not enough characters in your name. Please Change it. Minimum is " +
+                                    NamesRestrict_MinLength);
+                                Log("Nick: " + player.Name + ". Low length of name.");
+                                player.Disconnect();
+                                return;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("[AC] NameLenght fail");
+                            Logger.LogException(ex);
                         }
 
-                    for (var i = 0; i < BannedNames.Length; i++)
-                    {
-                        if (player.Name == BannedNames[i])
+                        try
                         {
+                            foreach (char Symbol in player.Name)
+                                if (NamesRestrict_AllowedChars.IndexOf(Symbol) == -1)
+                                {
+                                    player.MessageFrom(EchoBotName,
+                                        "[color#FF2222]You have invalid characters in your name");
+                                    Log("Nick: " + player.Name + ". Banned chars in name.");
+                                    player.Disconnect();
+                                    return;
+                                }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("[AC] Name Symbols fail");
+                            Logger.LogException(ex);
+                        }
+
+                        try
+                        {
+                            for (var i = 0; i < BannedNames.Length; i++)
+                                if (player.Name == BannedNames[i])
+                                {
+                                    player.MessageFrom(EchoBotName,
+                                        "[color#FF2222]This name isn't allowed. Please change your name.");
+                                    Log("Nick: " + player.Name + ". Banned name.");
+                                    player.Disconnect();
+                                    return;
+                                }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("[AC] BannedNames fail");
+                            Logger.LogException(ex);
+                        }
+
+                        try
+                        {
+                            if (NamesRestrict_BindName)
+                            {
+                                IniParser BoundNames;
+                                if (File.Exists(ModuleFolder + "\\BoundNames.ini"))
+                                    BoundNames = new IniParser(ModuleFolder + "\\BoundNames.ini");
+                                else
+                                {
+                                    Logger.LogError("BoundNames.ini does not exist!");
+                                    return;
+                                }
+
+                                Logger.LogDebug("[AC] I'm ok!");
+
+                                var Name = player.Name.ToLower();
+                                string ID = BoundNames.GetSetting("Names", Name);
+                                if (player.Admin || !NamesRestrict_AdminsOnly)
+                                {
+                                    Logger.LogDebug("[AC] I'm ok O_O!");
+
+                                    if (string.IsNullOrEmpty(ID))
+                                    {
+                                        player.MessageFrom(EchoBotName,
+                                            "[color#22AAFF]Nick " + player.Name + " was bound to your SteamID.");
+                                        BoundNames.AddSetting("Names", Name, player.SteamID);
+                                        BoundNames.Save();
+                                    }
+                                    else if (ID != player.SteamID)
+                                    {
+                                        player.MessageFrom(EchoBotName, "[color#FF2222]This nickname doesn't belong to you.");
+                                        Log("Nick: " + player.Name + ". Nick stealer.");
+                                        player.Disconnect();
+                                        return;
+                                    }
+                                    Logger.LogDebug("[AC] I'm dead :(");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError("[AC] BindName fail");
+                            Logger.LogException(ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("[AC] NickRestrict check fail");
+                    Logger.LogException(ex);
+                }
+
+                try
+                {
+                    if (RelogCooldown)
+                    {
+                        var Time = Environment.TickCount;
+
+                        object ObjCooldown = DS.Get("loginCooldown", player.Name);
+                        if (ObjCooldown == null)
+                            return;
+                        int Disconnected = (int) ObjCooldown;
+                        if (Time <= Cooldown * 1000 + Disconnected)
+                        {
+                            var Remaining = ((Cooldown*1000 - (Time - Disconnected))/1000).ToString("F2");
                             player.MessageFrom(EchoBotName,
-                                "[color#FF2222]This name isn't allowed. Please change your name.");
-                            Log("Nick: " + player.Name + ". Banned name.");
+                                "[color#FF2222]You must wait " + Cooldown + " seconds before reconnecting. Remaining: " +
+                                Remaining +
+                                " seconds.");
+                            Logger.LogDebug("[AC] " + player.Name + " connect cooldown " + Cooldown + " sec!");
                             player.Disconnect();
                             return;
                         }
-                    }
-                    if (NamesRestrict_BindName)
-                    {
-                        IniParser BoundNames;
-                        if (File.Exists(ModuleFolder + "\\BoundNames.ini"))
-                            BoundNames = new IniParser(ModuleFolder + "\\BoundNames.ini");
-                        else
-                        {
-                            Logger.LogError("BoundNames.ini does not exist!");
-                            return;
-                        }
-
-                        var Name = player.Name.ToLower();
-                        string ID = BoundNames.GetSetting("Names", Name);
-                        if (string.IsNullOrEmpty(ID.Trim()) && (player.Admin || !NamesRestrict_AdminsOnly))
-                        {
-                            player.MessageFrom(EchoBotName,
-                                "[color#22AAFF]Nick " + player.Name + " was bound to your SteamID.");
-                            BoundNames.AddSetting("Names", Name, player.SteamID);
-                            BoundNames.Save();
-                        }
-                        else if (ID != player.SteamID && (player.Admin || !NamesRestrict_AdminsOnly))
-                        {
-                            player.MessageFrom(EchoBotName, "[color#FF2222]This nickname doesn't belong to you.");
-                            Log("Nick: " + player.Name + ". Nick stealer.");
-                            player.Disconnect();
-                            return;
-                        }
+                        if (Time > Cooldown*1000 + Disconnected)
+                            DS.Remove("loginCooldown", player.Name);
                     }
                 }
-
-                if (RelogCooldown)
+                catch (Exception ex)
                 {
-                    var Time = Environment.TickCount;
-                    int Disconnected = (int) DS.Get("loginCooldown", player.Name);
-                    if (Time <= Cooldown*1000 + Disconnected)
+                    Logger.LogError("[AC] Cooldown check fail");
+                    Logger.LogException(ex);
+                }
+
+
+                try
+                {
+                    IniParser iniBansIP;
+                    if (File.Exists(ModuleFolder + "\\BansIP.ini"))
+                        iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                    else
                     {
-                        var Remaining = ((Cooldown*1000 - (Time - Disconnected))/1000).ToString("F2");
-                        player.MessageFrom(EchoBotName,
-                            "[color#FF2222]You must wait " + Cooldown + " seconds before reconnecting. Remaining: " +
-                            Remaining +
-                            " seconds.");
-                        Logger.LogDebug("[AC] " + player.Name + " connect cooldown " + Cooldown + " sec!");
+                        Logger.LogError("BansIP.ini does not exist!");
+                        return;
+                    }
+                    string IpBanned = (string) iniBansIP.GetSetting("Ips", player.IP);
+                    if (!string.IsNullOrEmpty(IpBanned))
+                    {
+                        player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
+                        Logger.LogDebug("[AC] " + player.Name + " banned by IP!");
                         player.Disconnect();
                         return;
                     }
-                    if (Time > Cooldown*1000 + Disconnected)
-                        DS.Remove("loginCooldown", player.Name);
-                }
 
-
-
-                IniParser iniBansIP;
-                if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                    iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
-                else
-                {
-                    Logger.LogError("BansIP.ini does not exist!");
-                    return;
+                    IniParser iniBansID;
+                    if (File.Exists(ModuleFolder + "\\BansID.ini"))
+                        iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                    else
+                    {
+                        Logger.LogError("BansID.ini does not exist!");
+                        return;
+                    }
+                    var IdBanned = iniBansID.GetSetting("Ids", player.SteamID);
+                    if (IdBanned != null)
+                    {
+                        player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
+                        Logger.LogDebug("[AC] " + player.Name + " banned by ID!");
+                        player.Disconnect();
+                        return;
+                    }
                 }
-                string IpBanned = (string) iniBansIP.GetSetting("Ips", player.IP);
-                if (!string.IsNullOrEmpty(IpBanned))
+                catch (Exception ex)
                 {
-                    player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                    Logger.LogDebug("[AC] " + player.Name + " banned by IP!");
-                    player.Disconnect();
-                    return;
-                }
-
-                IniParser iniBansID;
-                if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                    iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
-                else
-                {
-                    Logger.LogError("BansID.ini does not exist!");
-                    return;
-                }
-                var IdBanned = iniBansID.GetSetting("Ids", player.SteamID);
-                if (IdBanned != null)
-                {
-                    player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                    Logger.LogDebug("[AC] " + player.Name + " banned by ID!");
-                    player.Disconnect();
-                    return;
+                    Logger.LogError("[AC] Bans check fail");
+                    Logger.LogException(ex);
                 }
             }
             catch (Exception ex)

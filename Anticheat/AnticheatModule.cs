@@ -197,7 +197,6 @@ namespace Anticheat
 
         private void pingEvent(object x, ElapsedEventArgs y)
         {
-            Logger.LogDebug("[AC] pingEvent callback");
             foreach (var pl in Server.GetServer().Players)
                 if (pl != null)
                     PlayerPingCheck(pl);
@@ -205,7 +204,6 @@ namespace Anticheat
 
         private void takeCoordsEvent(object x, ElapsedEventArgs y)
         {
-            Logger.LogDebug("[AC] takeCoordsEvent callback");
             Vector3 ZeroVector = Vector3.zero;
             foreach (var pl in Server.GetServer().Players)
             {
@@ -230,6 +228,7 @@ namespace Anticheat
                 {
                     float distance = Math.Abs(Vector3.Distance(lastLocation, pl.Location));
 
+                    Logger.LogDebug("[AC] " + pl.Name + " speed is " + distance.ToString());
                     int Warned = (int) DS.Get("AntiSpeedHack", pl.Name);
                     if (Warned == 1 &&
                         ((distance > AntiSpeedHack_BanDist && (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp)
@@ -564,7 +563,8 @@ namespace Anticheat
                         try
                         {
                             for (var i = 0; i < BannedNames.Length; i++)
-                                if (player.Name == BannedNames[i])
+                            {
+                                if (player.Name.ToLower() == BannedNames[i].ToLower())
                                 {
                                     player.MessageFrom(EchoBotName,
                                         "[color#FF2222]This name isn't allowed. Please change your name.");
@@ -572,6 +572,9 @@ namespace Anticheat
                                     player.Disconnect();
                                     return;
                                 }
+
+                                Logger.LogDebug("[AC] BannedName: " + BannedNames[i]);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -594,9 +597,9 @@ namespace Anticheat
 
                                 Logger.LogDebug("[AC] I'm ok!");
 
-                                var Name = player.Name.ToLower();
+                                var Name = player.Name.ToLower(); 
                                 string ID = BoundNames.GetSetting("Names", Name);
-                                if (player.Admin || !NamesRestrict_AdminsOnly)
+                                if ((player.Admin && NamesRestrict_AdminsOnly) || !NamesRestrict_AdminsOnly)
                                 {
                                     Logger.LogDebug("[AC] I'm ok O_O!");
 

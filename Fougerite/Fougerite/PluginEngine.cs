@@ -47,7 +47,11 @@ namespace Fougerite
         {
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-            return String.Join("\r\n", strArray);
+            string scriptHeader = "var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, Datastore = DataStore;\r\n" +
+                                "var InvokeStatic = Util.InvokeStatic, IsNull = Util.IsNull, toLowerCase = Data.ToLower;\r\n";
+            if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))
+                return String.Join("\r\n", strArray);
+            return scriptHeader + String.Join("\r\n", strArray);
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)

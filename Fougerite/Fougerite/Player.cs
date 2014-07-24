@@ -204,7 +204,7 @@
 
         public void TeleportTo(Fougerite.Player p)
         {
-            this.TeleportTo(p.X, p.Y, p.Z);
+            this.TeleportTo(p.Location);
         }
 
         public void TeleportTo(Vector3 target)

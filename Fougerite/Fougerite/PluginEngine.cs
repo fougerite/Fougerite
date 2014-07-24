@@ -50,7 +50,7 @@ namespace Fougerite
             string scriptHeader = @"
                 var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;
                 var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;
-                var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), var Magma = importNamespace('Fougerite');
+                var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), Magma = importNamespace('Fougerite');
                 var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink');  
                 ";
             if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))

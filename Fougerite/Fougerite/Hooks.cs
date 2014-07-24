@@ -155,8 +155,8 @@
                 {
                     if (((a.argUser != null) && a.argUser.admin) || external)
                     {
-                        PluginEngine.Instance().ReloadPlugins();
                         ModuleManager.ReloadModules();
+                        PluginEngine.Instance().ReloadPlugins();
                         a.ReplyWith("Fougerite: Reloaded!");
                     }
                 }

@@ -37,8 +37,6 @@ namespace RustPP
             return (RustPPModule.StaticModuleFolder + RustPPModule.ConfigsFolder + fileName);
         }
 
-        Timer timer;
-
         public static string ConfigFile;
         public static string ConfigsFolder;
         public static string StaticModuleFolder;
@@ -53,21 +51,18 @@ namespace RustPP
             try
             {
                 Core.config = new IniParser(ConfigFile);
-
-                if ((Core.config != null) && Core.IsEnabled())
-                {
-                    timer = new System.Timers.Timer();
-                    timer.Interval = 30000.0;
-                    timer.AutoReset = false;
-                    timer.Elapsed += new ElapsedEventHandler(TimeEvent);
-                    TimedEvents.startEvents();
-                    timer.Start();
-                }
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
+
+            if (Core.config == null)
+            {
+                Logger.LogError("[RPP] Can't load config!");
+                return;
+            }
+            TimedEvents.startEvents();
 
             Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
             Fougerite.Hooks.OnDoorUse += new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
@@ -85,8 +80,6 @@ namespace RustPP
         public override void DeInitialize()
         {
             Logger.LogDebug("DeInitialize RPP");
-            timer.Stop();
-            timer.Elapsed -= new ElapsedEventHandler(TimeEvent);
 
             Fougerite.Hooks.OnEntityDecay -= new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
             Fougerite.Hooks.OnDoorUse -= new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);

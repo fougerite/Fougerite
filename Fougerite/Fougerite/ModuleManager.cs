@@ -157,6 +157,7 @@ namespace Fougerite
                 }
             }
             Modules.Clear();
+            Logger.LogDebug("All modules unloaded!");
         }
 
         internal static void ReloadModules()

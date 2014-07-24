@@ -47,7 +47,7 @@ namespace Fougerite
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(StructureComponent).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Fougerite.Plugin).Assembly))
                 .SetValue("Server", Fougerite.Server.GetServer())
                 .SetValue("Data", Fougerite.Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
@@ -59,7 +59,8 @@ namespace Fougerite
             Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                typeof(PlayerInventory).Assembly.GetName().Name);
+                typeof(PlayerInventory).Assembly.GetName().Name + "," + 
+                typeof(Fougerite.Plugin).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");

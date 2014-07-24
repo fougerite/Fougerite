@@ -47,8 +47,12 @@ namespace Fougerite
         {
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-            string scriptHeader = "var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;\r\n" +
-                "var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;\r\n";
+            string scriptHeader = @"
+                var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;
+                var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;
+                var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), var Magma = importNamespace('Fougerite');
+                var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink');  
+                ";
             if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))
                 return String.Join("\r\n", strArray);
             return scriptHeader + String.Join("\r\n", strArray);

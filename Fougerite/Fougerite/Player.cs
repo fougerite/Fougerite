@@ -177,16 +177,14 @@
 
         public void SafeTeleportTo(Fougerite.Player p, [Optional, DefaultParameterValue(1.5f)] float distance)
         { 
-            Ray ray = p.PlayerClient.controllable.character.eyesRay;
-            Ray reflect = new Ray(ray.origin, Vector3.Reflect(ray.direction, ray.direction));
             Vector3 target;
             if (this.Admin) {
-                target = reflect.GetPoint(distance); // rcon admin teleports behind target player
+                target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0, 0, -distance)); // rcon admin teleports behind target player
             } else {
-                target = ray.GetPoint(distance);     // non-admins teleport in front of target player
+                target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0, 0, distance)); // non-admin teleports in front of target player
             }
             this.SafeTeleportTo(target.x, target.z);
-            this.ourPlayer.controllable.transform.LookAt(ray.origin);  // turn towards the target player
+            this.ourPlayer.controllable.transform.LookAt(p.PlayerClient.controllable.transform.position);  // turn towards the target player
         }
 
         public void SafeTeleportTo(Vector3 target)
@@ -199,9 +197,9 @@
             this.TeleportTo(x, World.GetWorld().GetGround(x, z), z);
         }
 
-        public void TeleportTo(Vector3 target)
+        public void TeleportTo(float x, float y, float z)
         {
-            this.TeleportTo(target.x, target.y, target.z);
+            this.TeleportTo(new Vector3(x, y, z));
         }
 
         public void TeleportTo(Fougerite.Player p)
@@ -209,9 +207,14 @@
             this.TeleportTo(p.X, p.Y, p.Z);
         }
 
-        public void TeleportTo(float x, float y, float z)
+        public void TeleportTo(Vector3 target)
         {
-            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, new Vector3(x, y, z));
+            try {
+                RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);
+            } catch(NullReferenceException ex) {
+                Logger.LogDebug("TeleportTo(Vector3 target) ex");
+                Logger.LogException(ex);
+            }
         }
 
         public bool Admin

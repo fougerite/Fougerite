@@ -52,6 +52,17 @@ namespace Fougerite
                 var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;
                 var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), Magma = importNamespace('Fougerite');
                 var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink');  
+                var ParamsList = function ParamsList() {
+                    var list = System.Collections.Generic.List(System.Object);
+                    this.objs = new list();
+                };
+                ParamsList.prototype = {
+                    Remove: function Remove(o) { this.objs.Remove(o); },
+                    Get: function Get(i) { return this.objs[parseInt(i, 10)]; },
+                    Add: function Add(o) { this.objs.Add(o); },
+                    ToArray: function ToArray() { return this.objs.ToArray(); },
+                    get Length () { return this.objs.Count; }
+                };
                 ";
             if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))
                 return String.Join("\r\n", strArray);

@@ -32,7 +32,7 @@ namespace JintEngine
 
         private static JintEngineModule instance;
         private DirectoryInfo pluginDirectory;
-        private Dictionary<string, Plugin> plugins;
+        private Dictionary<string, JavascriptPlugin> plugins;
 
         public static JintEngineModule Instance()
         {
@@ -44,7 +44,7 @@ namespace JintEngine
         private JintEngineModule()
         {
             pluginDirectory = new DirectoryInfo(Util.GetFougeriteFolder());
-            plugins = new Dictionary<string, Plugin>();
+            plugins = new Dictionary<string, JavascriptPlugin>();
             ReloadPlugins();
         }        
 
@@ -132,7 +132,7 @@ namespace JintEngine
             {
                 String text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
-                Plugin plugin = new Plugin(dir, name, text);
+                JavascriptPlugin plugin = new JavascriptPlugin(dir, name, text);
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 

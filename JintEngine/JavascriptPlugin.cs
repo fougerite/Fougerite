@@ -14,7 +14,7 @@ namespace JintEngine
     using System.Reflection;
     using System.Timers;
 
-    public class Plugin
+    public class JavascriptPlugin
     {
         public Engine Engine
         {
@@ -45,7 +45,7 @@ namespace JintEngine
             private set;
         }
 
-        public Plugin(DirectoryInfo directory, string name, string code)
+        public JavascriptPlugin(DirectoryInfo directory, string name, string code)
         {
             Name = name;
             Code = code;

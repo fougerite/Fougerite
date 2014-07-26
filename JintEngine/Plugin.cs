@@ -1,15 +1,19 @@
-﻿using Fougerite.Events;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using Jint;
-using Jint.Parser;
-using Jint.Parser.Ast;
+using System.Text;
 
-namespace Fougerite
+namespace JintEngine
 {
+    using Jint;
+    using Jint.Parser;
+    using Jint.Parser.Ast;
+    using Fougerite;
+    using Fougerite.Events;
+    using System.Collections;
+    using System.IO;
+    using System.Reflection;
+    using System.Timers;
+
     public class Plugin
     {
         public Engine Engine
@@ -48,7 +52,7 @@ namespace Fougerite
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Fougerite.Plugin).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Fougerite.Hooks).Assembly))
                 .SetValue("Server", Fougerite.Server.GetServer())
                 .SetValue("Data", Fougerite.Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
@@ -61,7 +65,7 @@ namespace Fougerite
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
                 typeof(PlayerInventory).Assembly.GetName().Name + "," + 
-                typeof(Fougerite.Plugin).Assembly.GetName().Name);
+                typeof(Fougerite.Hooks).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");

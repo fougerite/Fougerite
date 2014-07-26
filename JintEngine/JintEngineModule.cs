@@ -2,24 +2,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
+using System.Reflection;
 
-namespace Fougerite
+namespace JintEngine
 {
-    public class PluginEngine
+    using Fougerite;
+
+    public class JintEngineModule : Module
     {
-        private static PluginEngine instance;
+        public override string Name
+        {
+            get { return "JintEngine"; }
+        }
+
+        public override string Author
+        {
+            get { return "Riketta, mikec, EquiFox & xEnt"; }
+        }
+
+        public override string Description
+        {
+            get { return "Jint Javascript Plugin Engine"; }
+        }
+
+        public override Version Version
+        {
+            get { return Assembly.GetExecutingAssembly().GetName().Version; }
+        }
+
+        private static JintEngineModule instance;
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
 
-        public static PluginEngine Instance()
+        public static JintEngineModule Instance()
         {
             if (instance == null)
-                instance = new PluginEngine();
+                instance = new JintEngineModule();
             return instance;
         }
 
-        private PluginEngine()
+        private JintEngineModule()
         {
             pluginDirectory = new DirectoryInfo(Util.GetFougeriteFolder());
             plugins = new Dictionary<string, Plugin>();

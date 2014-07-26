@@ -44,7 +44,6 @@
             Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
             Logger.Init();
             ModuleManager.LoadModules();
-            PluginEngine.Instance();
 
             Fougerite.Hooks.ServerStarted();
         }

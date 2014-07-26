@@ -51,7 +51,7 @@ namespace Fougerite
                 var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;
                 var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;
                 var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), Magma = importNamespace('Fougerite');
-                var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink');  
+                var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink'), RustPP = importNamespace('RustPP');  
                 var ParamsList = function ParamsList() {
                     var list = System.Collections.Generic.List(System.Object);
                     this.objs = new list();

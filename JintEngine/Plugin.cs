@@ -22,6 +22,7 @@ namespace Fougerite
             get;
             private set;
         }
+
         public string Code
         {
             get;

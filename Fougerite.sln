@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fougerite", "Fougerite\Foug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fougerite.Patcher", "Fougerite.Patcher\Fougerite.Patcher.csproj", "{935412BA-2118-488D-839A-AAB76E60BA8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JintEngine", "JintEngine\JintEngine.csproj", "{D303C351-CAF4-4A3E-910F-E6205EF525BF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RustPP", "RustPP\RustPP.csproj", "{EF61739C-9A45-479F-90DE-08D37F4EE653}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlitchFix", "GlitchFix\GlitchFix.csproj", "{6413D91E-A987-4C45-8B80-72E8C4D47CD2}"
@@ -29,6 +31,10 @@ Global
 		{935412BA-2118-488D-839A-AAB76E60BA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{935412BA-2118-488D-839A-AAB76E60BA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{935412BA-2118-488D-839A-AAB76E60BA8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D303C351-CAF4-4A3E-910F-E6205EF525BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D303C351-CAF4-4A3E-910F-E6205EF525BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D303C351-CAF4-4A3E-910F-E6205EF525BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D303C351-CAF4-4A3E-910F-E6205EF525BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -104,8 +104,6 @@
         {
             get
             {
-                // Dirty hack
-                Logger.LogDebug("[Players] Removed " + this.players.RemoveAll(null) + " null players!");
                 return this.players;
             }
         }

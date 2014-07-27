@@ -104,7 +104,7 @@ namespace Fougerite
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
-            Contract.Requires(np != null);
+            if (np == null) return null;
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
@@ -118,7 +118,7 @@ namespace Fougerite
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
-            Contract.Requires(pc != null);
+            if (pc == null) return null;
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {

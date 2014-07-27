@@ -17,7 +17,7 @@ namespace JintEngine
 
         public override string Author
         {
-            get { return "Riketta, mikec, EquiFox & xEnt"; }
+            get { return "Riketta, mikec"; }
         }
 
         public override string Description
@@ -30,17 +30,10 @@ namespace JintEngine
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
-        private static JintEngineModule instance;
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, JavascriptPlugin> plugins;
 
         public override void Initialize()
-        {
-            if (instance == null)
-                instance = new JintEngineModule();
-        }
-
-        private JintEngineModule()
         {
             pluginDirectory = new DirectoryInfo(ModuleFolder + "\\Plugins\\");
             plugins = new Dictionary<string, JavascriptPlugin>();

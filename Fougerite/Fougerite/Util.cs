@@ -155,23 +155,25 @@ namespace Fougerite
 
         public static Hashtable HashtableFromFile(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
+			Contract.Requires(!string.IsNullOrEmpty(path));
 
-            FileStream stream = new FileStream(path, FileMode.Open);
-            StreamReader reader = new StreamReader(stream);
-            BinaryFormatter formatter = new BinaryFormatter();
-            return (Hashtable)formatter.Deserialize(reader.BaseStream);
+            using (FileStream stream = new FileStream(path, FileMode.Open))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                return (Hashtable) formatter.Deserialize(stream);
+            }
         }
 
         public static void HashtableToFile(Hashtable ht, string path)
         {
-            Contract.Requires(ht != null);
+			Contract.Requires(ht != null);
             Contract.Requires(!string.IsNullOrEmpty(path));
 
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Create);
-            StreamWriter writer = new StreamWriter(stream);
-            formatter.Serialize(writer.BaseStream, ht);
+            using (FileStream stream = new FileStream(path, FileMode.Create))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, ht);
+            }
         }
 
         public Vector3 Infront(Fougerite.Player p, float length)

@@ -34,16 +34,15 @@ namespace JintEngine
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, JavascriptPlugin> plugins;
 
-        public static JintEngineModule Instance()
+        public override void Initialize()
         {
             if (instance == null)
                 instance = new JintEngineModule();
-            return instance;
         }
 
         private JintEngineModule()
         {
-            pluginDirectory = new DirectoryInfo(Util.GetFougeriteFolder());
+            pluginDirectory = new DirectoryInfo(ModuleFolder + "\\Plugins\\");
             plugins = new Dictionary<string, JavascriptPlugin>();
             ReloadPlugins();
         }        
@@ -109,6 +108,11 @@ namespace JintEngine
                 Logger.LogError("Can't unload " + name + ". Plugin is not loaded.");
                 throw new InvalidOperationException("Can't unload " + name + ". Plugin is not loaded.");
             }
+        }
+
+        public override void DeInitialize()
+        {
+            UnloadPlugins();
         }
 
         public void UnloadPlugins()

@@ -1,18 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.IO;
+using System.Timers;
 
 namespace JintEngine
 {
+    using Fougerite;
+    using Fougerite.Events;
     using Jint;
     using Jint.Parser;
     using Jint.Parser.Ast;
-    using Fougerite;
-    using Fougerite.Events;
-    using System.Collections;
-    using System.IO;
-    using System.Reflection;
-    using System.Timers;
 
     public class JavascriptPlugin
     {
@@ -52,9 +51,9 @@ namespace JintEngine
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Fougerite.Hooks).Assembly))
-                .SetValue("Server", Fougerite.Server.GetServer())
-                .SetValue("Data", Fougerite.Data.GetData())
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Hooks).Assembly))
+                .SetValue("Server", Server.GetServer())
+                .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("Web", new Web())
@@ -65,7 +64,7 @@ namespace JintEngine
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
                 typeof(PlayerInventory).Assembly.GetName().Name + "," + 
-                typeof(Fougerite.Hooks).Assembly.GetName().Name);
+                typeof(Hooks).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");
@@ -354,7 +353,7 @@ namespace JintEngine
 
         #region Hooks
 
-        public void OnBlueprintUse(Fougerite.Player player, BPUseEvent evt)
+        public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
             if (player == null) 
                 throw new ArgumentNullException("player");
@@ -363,7 +362,7 @@ namespace JintEngine
             Invoke("On_BlueprintUse", player, evt);
         }
 
-        public void OnChat(Fougerite.Player player, ref ChatString text)
+        public void OnChat(Player player, ref ChatString text)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
@@ -372,7 +371,7 @@ namespace JintEngine
             Invoke("On_Chat", player, text);
         }
 
-        public void OnCommand(Fougerite.Player player, string command, string[] args)
+        public void OnCommand(Player player, string command, string[] args)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
@@ -387,7 +386,7 @@ namespace JintEngine
         {
             if (arg == null)
                 throw new ArgumentNullException("arg");
-            Player player = Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient);
+            Player player = Player.FindByPlayerClient(arg.argUser.playerClient);
 
             if (!external)
                 Invoke("On_Console", player, arg);
@@ -395,7 +394,7 @@ namespace JintEngine
                 Invoke("On_Console", null, arg);
         }
 
-        public void OnDoorUse(Fougerite.Player player, DoorEvent evt)
+        public void OnDoorUse(Player player, DoorEvent evt)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
@@ -411,7 +410,7 @@ namespace JintEngine
             Invoke("On_EntityDecay", evt);
         }
 
-        public void OnEntityDeployed(Fougerite.Player player, Entity entity)
+        public void OnEntityDeployed(Player player, Entity entity)
         {
             if (entity == null)
                 throw new ArgumentNullException("entity");
@@ -446,21 +445,21 @@ namespace JintEngine
             Invoke("On_NPCKilled", evt);
         }
 
-        public void OnPlayerConnected(Fougerite.Player player)
+        public void OnPlayerConnected(Player player)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
             Invoke("On_PlayerConnected", player);
         }
 
-        public void OnPlayerDisconnected(Fougerite.Player player)
+        public void OnPlayerDisconnected(Player player)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
             Invoke("On_PlayerDisconnected", player);
         }
 
-        public void OnPlayerGathering(Fougerite.Player player, GatherEvent evt)
+        public void OnPlayerGathering(Player player, GatherEvent evt)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
@@ -483,7 +482,7 @@ namespace JintEngine
             Invoke("On_PlayerKilled", evt);
         }
 
-        public void OnPlayerSpawn(Fougerite.Player player, SpawnEvent evt)
+        public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
             if (player == null)
                 throw new ArgumentNullException("player");
@@ -492,7 +491,7 @@ namespace JintEngine
             Invoke("On_PlayerSpawning", player, evt);
         }
 
-        public void OnPlayerSpawned(Fougerite.Player player, SpawnEvent evt)
+        public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
             if (player == null)
                 throw new ArgumentNullException("player");

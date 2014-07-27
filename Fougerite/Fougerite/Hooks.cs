@@ -334,6 +334,11 @@
             bool connected = false;
             try
             {
+                if (user.playerClient == null)
+                {
+                    Logger.LogDebug("PlayerConnect user.playerClient is null");
+                    return false;
+                }
                 Fougerite.Player item = new Fougerite.Player(user.playerClient);
                 Fougerite.Server.GetServer().Players.Add(item);
 

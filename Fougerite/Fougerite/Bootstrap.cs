@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using Facepunch;
     using Rust.Steam;
@@ -38,11 +40,14 @@
             else
                 Fougerite.Data.PATH = Util.GetRootFolder() + @"\Fougerite\";
 
+            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
+            Logger.Init();
+
+            Contract.ContractFailed += (sender, args) => args.SetUnwind();
+
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
-            Logger.Init();
             ModuleManager.LoadModules();
             PluginEngine.Instance();
 

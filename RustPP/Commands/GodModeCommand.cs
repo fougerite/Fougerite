@@ -8,7 +8,7 @@
     {
         private System.Collections.Generic.List<ulong> userIDs = new System.Collections.Generic.List<ulong>();
 
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             if (!this.userIDs.Contains(Arguments.argUser.userID))
             {

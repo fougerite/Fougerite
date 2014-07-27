@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using Facepunch.Utility;
     using System;
@@ -14,15 +16,25 @@
 
     public class Util
     {
-        private Dictionary<string, System.Type> typeCache = new Dictionary<string, System.Type>();
+        private readonly Dictionary<string, System.Type> typeCache = new Dictionary<string, System.Type>();
         private static Util util;
+
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(typeCache != null);
+        }
 
         public void ConsoleLog(string str, [Optional, DefaultParameterValue(false)] bool adminOnly)
         {
+            Contract.Requires(str != null);
+
             try
             {
                 foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 {
+                    Contract.Assert(player != null);
+
                     if (!adminOnly)
                     {
                         ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
@@ -42,6 +54,9 @@
 
         public object CreateArrayInstance(string name, int size)
         {
+            Contract.Requires(name != null);
+            Contract.Requires(size >= 0);
+
             System.Type type;
             if (!this.TryFindType(name.Replace('.', '+'), out type))
             {
@@ -56,6 +71,8 @@
 
         public object CreateInstance(string name, params object[] args)
         {
+            Contract.Requires(name != null);
+
             System.Type type;
             if (!this.TryFindType(name.Replace('.', '+'), out type))
             {
@@ -80,11 +97,13 @@
 
         public void DestroyObject(GameObject go)
         {
+            Contract.Requires(go != null);
             NetCull.Destroy(go);
         }
 
         public static string GetAbsoluteFilePath(string fileName)
         {
+            Contract.Requires(!string.IsNullOrEmpty(fileName));
             return (GetFougeriteFolder() + fileName);
         }
 
@@ -105,6 +124,9 @@
 
         public object GetStaticField(string className, string field)
         {
+            Contract.Requires(!string.IsNullOrEmpty(className));
+            Contract.Requires(!string.IsNullOrEmpty(field));
+
             System.Type type;
             if (this.TryFindType(className.Replace('.', '+'), out type))
             {
@@ -133,6 +155,8 @@
 
         public static Hashtable HashtableFromFile(string path)
         {
+			Contract.Requires(!string.IsNullOrEmpty(path));
+
             using (FileStream stream = new FileStream(path, FileMode.Open))
             {
                 BinaryFormatter formatter = new BinaryFormatter();
@@ -142,6 +166,9 @@
 
         public static void HashtableToFile(Hashtable ht, string path)
         {
+			Contract.Requires(ht != null);
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             using (FileStream stream = new FileStream(path, FileMode.Create))
             {
                 BinaryFormatter formatter = new BinaryFormatter();
@@ -151,11 +178,19 @@
 
         public Vector3 Infront(Fougerite.Player p, float length)
         {
+            Contract.Requires(p != null);
+            Contract.Requires(!float.IsInfinity(length));
+            Contract.Requires(!float.IsNaN(length));
+
             return (p.PlayerClient.controllable.transform.position + ((Vector3)(p.PlayerClient.controllable.transform.forward * length)));
         }
 
         public object InvokeStatic(string className, string method, object[] args)
         {
+            Contract.Requires(!string.IsNullOrEmpty(className));
+            Contract.Requires(!string.IsNullOrEmpty(method));
+            Contract.Requires(args != null);
+
             System.Type type;
             if (!this.TryFindType(className.Replace('.', '+'), out type))
             {
@@ -181,55 +216,77 @@
 
         public void Log(string str)
         {
+            Contract.Requires(str != null);
             Logger.Log(str);
         }
 
         public Match Regex(string input, string match)
         {
+            Contract.Requires(input != null);
+            Contract.Requires(match != null);
+
             return new System.Text.RegularExpressions.Regex(input).Match(match);
         }
 
         public Quaternion RotateX(Quaternion q, float angle)
         {
+            Contract.Requires(!float.IsInfinity(angle));
+            Contract.Requires(!float.IsNaN(angle));
             return (q *= Quaternion.Euler(angle, 0f, 0f));
         }
 
         public Quaternion RotateY(Quaternion q, float angle)
         {
+            Contract.Requires(!float.IsInfinity(angle));
+            Contract.Requires(!float.IsNaN(angle));
             return (q *= Quaternion.Euler(0f, angle, 0f));
         }
 
         public Quaternion RotateZ(Quaternion q, float angle)
         {
+            Contract.Requires(!float.IsInfinity(angle));
+            Contract.Requires(!float.IsNaN(angle));
             return (q *= Quaternion.Euler(0f, 0f, angle));
         }
 
         public static void say(uLink.NetworkPlayer player, string playername, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(playername) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
+            Contract.Requires(player != null);
+            Contract.Requires(!string.IsNullOrEmpty(playername));
+            Contract.Requires(arg != null);
+
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
         }
 
         public static void sayAll(string arg)
         {
-            if (!string.IsNullOrEmpty(arg))
-                ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            Contract.Requires(arg != null);
+
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            Contract.Requires(player != null);
+            Contract.Requires(arg != null);
+
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public static void sayUser(uLink.NetworkPlayer player, string customName, string arg)
         {
-            if (!string.IsNullOrEmpty(arg) && !string.IsNullOrEmpty(customName) && player != null)
-                ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            Contract.Requires(player != null);
+            Contract.Requires(!string.IsNullOrEmpty(customName));
+            Contract.Requires(arg != null);
+
+            ConsoleNetworker.SendClientCommand(player, "chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void SetStaticField(string className, string field, object val)
         {
+            Contract.Requires(!string.IsNullOrEmpty(className));
+            Contract.Requires(!string.IsNullOrEmpty(field));
+
             System.Type type;
             if (this.TryFindType(className.Replace('.', '+'), out type))
             {
@@ -243,6 +300,8 @@
 
         public bool TryFindType(string typeName, out System.Type t)
         {
+            Contract.Requires(!string.IsNullOrEmpty(typeName));
+
             lock (this.typeCache)
             {
                 if (!this.typeCache.TryGetValue(typeName, out t))
@@ -271,6 +330,9 @@
 		
         public bool ContainsString(string str, string key)
         {
+            Contract.Requires(str != null);
+            Contract.Requires(!string.IsNullOrEmpty(key));
+
             if (str.Contains(key))
                 return true;
             return false;

@@ -5,7 +5,7 @@
 
     public class SpawnEvent
     {
-        private bool _atCamp;
+        private readonly bool _atCamp;
         private float _x;
         private float _y;
         private float _z;

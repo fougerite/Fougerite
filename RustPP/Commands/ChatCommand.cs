@@ -1,4 +1,6 @@
-﻿namespace RustPP.Commands
+﻿using System.Diagnostics.Contracts;
+
+namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -8,19 +10,36 @@
 
     public abstract class ChatCommand
     {
+        private static readonly List<ChatCommand> classInstances = new List<ChatCommand>();
+
         private string _adminFlags;
         private bool _adminRestricted;
         private string _cmd;
-        private static System.Collections.Generic.List<ChatCommand> classInstances = new System.Collections.Generic.List<ChatCommand>();
+
+        [ContractInvariantMethod]
+        private static void StaticInvariant()
+        {
+            Contract.Invariant(classInstances != null);
+            Contract.Invariant(Contract.ForAll(classInstances, command => command != null));
+            Contract.Invariant(Contract.ForAll(classInstances, command => command.Command != null));
+        }
 
         public static void AddCommand(string cmdString, ChatCommand command)
         {
+            Contract.Requires(!string.IsNullOrEmpty(cmdString));
+            Contract.Requires(command != null);
+
             command.Command = cmdString;
             classInstances.Add(command);
         }
 
-        public static void CallCommand(string cmd, ref ConsoleSystem.Arg arg, ref string[] chatArgs)
+        public static void CallCommand(string cmd, ConsoleSystem.Arg arg, string[] chatArgs)
         {
+            Contract.Requires(!string.IsNullOrEmpty(cmd));
+            Contract.Requires(arg != null);
+            Contract.Requires(arg.argUser != null);
+            Contract.Requires(chatArgs != null);
+
             foreach (ChatCommand command in classInstances)
             {
                 if (command.Command == cmd)
@@ -33,7 +52,7 @@
                             {
                                 if (arg.argUser.admin)
                                 {
-                                    command.Execute(ref arg, ref chatArgs);
+                                    command.Execute(arg, chatArgs);
                                 }
                                 else
                                 {
@@ -44,7 +63,7 @@
                             {
                                 if (Administrator.GetAdmin(arg.argUser.userID).HasPermission(command.AdminFlags))
                                 {
-                                    command.Execute(ref arg, ref chatArgs);
+                                    command.Execute(arg, chatArgs);
                                 }
                                 else
                                 {
@@ -58,7 +77,7 @@
                         }
                         else
                         {
-                            command.Execute(ref arg, ref chatArgs);
+                            command.Execute(arg, chatArgs);
                         }
                     }
                     else
@@ -70,7 +89,12 @@
             }
         }
 
-        public abstract void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments);
+        public virtual void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        {
+            Contract.Requires(Arguments != null);
+            Contract.Requires(ChatArguments != null);
+        }
+
         public static ChatCommand GetCommand(string cmdString)
         {
             foreach (ChatCommand command in classInstances)

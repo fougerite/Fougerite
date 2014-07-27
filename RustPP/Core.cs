@@ -64,7 +64,7 @@
             }
         }
 
-        public static void handleCommand(ref ConsoleSystem.Arg arg)
+        public static void handleCommand(ConsoleSystem.Arg arg)
         {
             string displayname = arg.argUser.user.Displayname;
             string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
@@ -74,7 +74,7 @@
             {
                 chatArgs[i - 1] = strArray[i];
             }
-            ChatCommand.CallCommand(cmd, ref arg, ref chatArgs);
+            ChatCommand.CallCommand(cmd, arg, chatArgs);
         }
 
         private static void InitializeCommands()

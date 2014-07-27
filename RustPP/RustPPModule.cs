@@ -199,9 +199,9 @@ namespace RustPP
 
         void PlayerKilled(DeathEvent event2)
         {
-            if (Core.IsEnabled() && !(event2.Attacker is NPC))
+            event2.DropItems = !RustPP.Hooks.KeepItem();
+            if (!(event2.Attacker is NPC)) // Not NPC
             {
-                event2.DropItems = !RustPP.Hooks.KeepItem();
                 Fougerite.Player attacker = event2.Attacker as Fougerite.Player;
                 Fougerite.Player victim = event2.Victim as Fougerite.Player;
                 if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))

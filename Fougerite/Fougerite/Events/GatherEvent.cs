@@ -10,12 +10,12 @@ namespace Fougerite.Events
         private bool _over;
         private int _qty;
         private readonly string _type;
+        
         private readonly ResourceTarget res;
 
         [ContractInvariantMethod]
         private void Invariant()
         {
-            Contract.Invariant(res != null);
             Contract.Invariant(_type != null);
             Contract.Invariant(_item != null);
             Contract.Invariant(_qty >= 0);
@@ -23,7 +23,7 @@ namespace Fougerite.Events
 
         public GatherEvent(ResourceTarget r, ItemDataBlock db, int qty)
         {
-            Contract.Requires(r != null);
+            // r can be null here.
             Contract.Requires(db != null);
             Contract.Requires(qty >= 0);
 

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlitchFix", "GlitchFix\Glit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTests", "ServerTests\ServerTests.csproj", "{50BE50A2-E63A-4928-9D23-7594418452EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anticheat", "Anticheat\Anticheat.csproj", "{D14D7F1B-53ED-4CAF-881C-0703E1743131}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D14D7F1B-53ED-4CAF-881C-0703E1743131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D14D7F1B-53ED-4CAF-881C-0703E1743131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D14D7F1B-53ED-4CAF-881C-0703E1743131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D14D7F1B-53ED-4CAF-881C-0703E1743131}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

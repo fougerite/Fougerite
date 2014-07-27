@@ -160,8 +160,8 @@ namespace Fougerite
                 {
                     if (adminRights)
                     {
-                        PluginEngine.Instance().ReloadPlugins();
                         ModuleManager.ReloadModules();
+                        PluginEngine.Instance().ReloadPlugins();
                         a.ReplyWith("Fougerite: Reloaded!");
                     }
                 }

@@ -218,9 +218,9 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void TeleportTo(Vector3 targetPosition)
+        public void TeleportTo(Vector3 vector3)
         {
-            this.TeleportTo(targetPosition.x, targetPosition.y, targetPosition.z);
+            this.TeleportTo(vector3.x, vector3.y, vector3.z);
         }
 
         public void TeleportTo(Fougerite.Player p)

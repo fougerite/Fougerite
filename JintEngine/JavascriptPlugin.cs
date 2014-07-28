@@ -51,7 +51,7 @@ namespace JintEngine
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Hooks).Assembly, typeof(JavascriptPlugin).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Hooks).Assembly))
                 .SetValue("Server", Server.GetServer())
                 .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
@@ -60,13 +60,11 @@ namespace JintEngine
                 .SetValue("World", World.GetWorld())
                 .SetValue("Plugin", this)
                 .Execute(code);
-            Logger.LogDebug("[JintEngine] AllowClr for Assemblies:");
-            Logger.LogDebug(" " +
+            Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                typeof(PlayerInventory).Assembly.GetName().Name + ", " + 
-                typeof(Hooks).Assembly.GetName().Name + ", " +
-                typeof(JavascriptPlugin).Assembly.GetName().Name);
+                typeof(PlayerInventory).Assembly.GetName().Name + "," + 
+                typeof(Hooks).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");
@@ -187,7 +185,7 @@ namespace JintEngine
             try
             {
                 path = ValidateRelativePath(path);
-                Logger.LogDebug("[JintEngine] CreateDir " + path);
+
                 if (path == null)
                     return false;
 
@@ -209,7 +207,7 @@ namespace JintEngine
         public IniParser GetIni(string path)
         {
             path = ValidateRelativePath(path + ".ini");
-            Logger.LogDebug("[JintEngine] GetIni " + path);
+
             if (path == null)
                 return null;
             
@@ -222,7 +220,7 @@ namespace JintEngine
         public bool IniExists(string path)
         {
             path = ValidateRelativePath(path + ".ini");
-            Logger.LogDebug("[JintEngine] IniExists " + path);
+
             if (path == null)
                 return false;
 
@@ -234,7 +232,7 @@ namespace JintEngine
             try
             {
                 path = ValidateRelativePath(path + ".ini");
-                Logger.LogDebug("[JintEngine] CreateIni " + path);
+
                 File.WriteAllText(path, "");
                 return new IniParser(path);
             }
@@ -248,7 +246,7 @@ namespace JintEngine
         public List<IniParser> GetInis(string path)
         {
             path = ValidateRelativePath(path);
-            Logger.LogDebug("[JintEngine] GetInis " + path);
+
             if (path == null)
                 return new List<IniParser>();
 
@@ -258,7 +256,7 @@ namespace JintEngine
         public void DeleteLog(string path)
         {
             path = ValidateRelativePath(path + ".ini");
-            Logger.LogDebug("[JintEngine] DeleteLog " + path);
+
             if (path == null)
                 return;
 

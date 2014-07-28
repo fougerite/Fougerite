@@ -5,7 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Timers;
 
-namespace JintEngine
+namespace JintPlugin
 {
     using Fougerite;
     using Fougerite.Events;
@@ -13,7 +13,7 @@ namespace JintEngine
     using Jint.Parser;
     using Jint.Parser.Ast;
 
-    public class JavascriptPlugin
+    public class Plugin
     {
         public Engine Engine
         {
@@ -44,7 +44,7 @@ namespace JintEngine
             private set;
         }
 
-        public JavascriptPlugin(DirectoryInfo directory, string name, string code)
+        public Plugin(DirectoryInfo directory, string name, string code)
         {
             Name = name;
             Code = code;

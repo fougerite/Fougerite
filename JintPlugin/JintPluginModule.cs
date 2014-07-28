@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace JintEngine
+namespace JintPlugin
 {
     using Fougerite;
 
-    public class JintEngineModule : Module
+    public class JintPluginModule : Module
     {
         public override string Name
         {
@@ -31,12 +31,12 @@ namespace JintEngine
         }
 
         private DirectoryInfo pluginDirectory;
-        private Dictionary<string, JavascriptPlugin> plugins;
+        private Dictionary<string, Plugin> plugins;
 
         public override void Initialize()
         {
             pluginDirectory = new DirectoryInfo(ModuleFolder + "\\Plugins\\");
-            plugins = new Dictionary<string, JavascriptPlugin>();
+            plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
         }        
 
@@ -129,7 +129,7 @@ namespace JintEngine
             {
                 String text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
-                JavascriptPlugin plugin = new JavascriptPlugin(dir, name, text);
+                Plugin plugin = new Plugin(dir, name, text);
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 

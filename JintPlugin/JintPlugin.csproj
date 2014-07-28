@@ -5,15 +5,15 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D303C351-CAF4-4A3E-910F-E6205EF525BF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>JintEngine</RootNamespace>
-    <AssemblyName>JintEngine</AssemblyName>
+    <RootNamespace>JintPlugin</RootNamespace>
+    <AssemblyName>JintPlugin</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\modules\JintEngine</OutputPath>
+    <OutputPath>..\bin\modules\JintPlugin</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -22,15 +22,15 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\modules\JintEngine</OutputPath>
+    <OutputPath>..\bin\modules\JintPlugin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="JintEngineModule.cs" />
-    <Compile Include="JavascriptPlugin.cs" />
+    <Compile Include="JintPluginModule.cs" />
+    <Compile Include="JintPlugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
@@ -73,7 +73,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>	
+  <ItemGroup>
     <None Include="Plugins\Drop++\Drop++.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

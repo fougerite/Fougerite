@@ -74,7 +74,6 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown += new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-            Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
         }
 
         public override void DeInitialize()
@@ -91,7 +90,6 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown -= new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-            Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             
             Logger.LogDebug("DeInitialized RPP");
         }
@@ -101,66 +99,51 @@ namespace RustPP
             TimedEvents.startEvents();
         }
 
-        void ChatReceived(ref ConsoleSystem.Arg arg)
-        {
-            string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
-
-            TeleportToCommand command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
-            if (command.GetTPWaitList().Contains(arg.argUser.userID))
-            {
-                int num;
-                if (int.TryParse(arg.GetString(0, "text").Trim(), out num))
-                {
-                    command.PartialNameTP(ref arg, num);
-                }
-                else
-                {
-                    Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
-                    command.GetTPWaitList().Remove(arg.argUser.userID);
-                }
-                arg = null;
-            }
-            else if (Core.banWaitList.Contains(arg.argUser.userID))
-            {
-                int num2;
-                if (int.TryParse(arg.GetString(0, "text").Trim(), out num2))
-                {
-                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(ref arg, num2);
-                }
-                else
-                {
-                    Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
-                    Core.banWaitList.Remove(arg.argUser.userID);
-                }
-                arg = null;
-            }
-            else if (Core.kickWaitList.Contains(arg.argUser.userID))
-            {
-                int num3;
-                if (int.TryParse(arg.GetString(0, "text").Trim(), out num3))
-                {
-                    (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(ref arg, num3);
-                }
-                else
-                {
-                    Util.sayUser(arg.argUser.networkPlayer, "Invalid Choice!");
-                    Core.kickWaitList.Remove(arg.argUser.userID);
-                }
-                arg = null;
-            }
-            else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
-            {
-                if (Core.IsEnabled())
-                    Core.handleCommand(ref arg);
-            }
-        }
-
         void Chat(Fougerite.Player p, ref ChatString text)
         {
+            string str = text.ToString().Trim();
+
+            var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
+            if (command.GetTPWaitList().Contains(p.PlayerClient.userID))
+            {
+                int num;
+                if (int.TryParse(str, out num)) command.PartialNameTP(p, num);
+                else
+                {
+                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    command.GetTPWaitList().Remove(p.PlayerClient.userID);
+                }
+            }
+            else if (Core.banWaitList.Contains(p.PlayerClient.userID))
+            {
+                int num2;
+                if (int.TryParse(str, out num2))
+                {
+                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(p, num2);
+                }
+                else
+                {
+                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    Core.banWaitList.Remove(p.PlayerClient.userID);
+                }
+            }
+            else if (Core.kickWaitList.Contains(p.PlayerClient.userID))
+            {
+                int num3;
+                if (int.TryParse(str, out num3))
+                {
+                    (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(p, num3);
+                }
+                else
+                {
+                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    Core.kickWaitList.Remove(p.PlayerClient.userID);
+                }
+            }
+
             if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
             {
                 text = null;
-                // text.NewText = "";
                 Util.sayUser(p.PlayerClient.netUser.networkPlayer, "You are muted.");
             }
         }
@@ -199,9 +182,9 @@ namespace RustPP
 
         void PlayerKilled(DeathEvent event2)
         {
-            if (Core.IsEnabled() && !(event2.Attacker is NPC))
+            event2.DropItems = !RustPP.Hooks.KeepItem();
+            if (!(event2.Attacker is NPC)) // Not NPC
             {
-                event2.DropItems = !RustPP.Hooks.KeepItem();
                 Fougerite.Player attacker = event2.Attacker as Fougerite.Player;
                 Fougerite.Player victim = event2.Victim as Fougerite.Player;
                 if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))

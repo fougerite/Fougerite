@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reflection;
 
@@ -11,8 +12,16 @@ namespace JintPlugin
     public class JintPluginModule : Module
     {
         public override string Name
+        private readonly DirectoryInfo pluginDirectory;
+        private readonly Dictionary<string, Plugin> plugins;
+
+        [ContractInvariantMethod]
+        private void Invariant()
         {
-            get { return "JintEngine"; }
+            Contract.Invariant(pluginDirectory != null);
+            Contract.Invariant(plugins != null);
+            Contract.Invariant(Contract.ForAll(plugins, pair => pair.Value != null));
+            Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
         }
 
         public override string Author
@@ -50,15 +59,21 @@ namespace JintPlugin
         }
         private String GetPluginDirectoryPath(String name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             return Path.Combine(pluginDirectory.FullName, name);
         }
         private String GetPluginScriptPath(String name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             return Path.Combine(GetPluginDirectoryPath(name), name + ".js");
         }
 
         private string GetPluginScriptText(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
             string scriptHeader = @"
@@ -85,11 +100,15 @@ namespace JintPlugin
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             Logger.Log("Unloading " + name + " plugin.");
 
             if (plugins.ContainsKey(name))
             {
                 var plugin = plugins[name];
+                Contract.Assert(plugin != null);
+
                 plugin.RemoveHooks();
                 plugin.KillTimers();
                 if (removeFromDict) plugins.Remove(name);
@@ -117,6 +136,8 @@ namespace JintPlugin
 
         private void LoadPlugin(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             Logger.Log("Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name))
@@ -138,6 +159,7 @@ namespace JintPlugin
             catch (Exception ex)
             {
                 string arg = name + " plugin could not be loaded.";
+                Contract.Assume(!string.IsNullOrEmpty(arg));
                 Server.GetServer().Broadcast(arg);
                 Logger.LogException(ex);
             }
@@ -145,6 +167,8 @@ namespace JintPlugin
 
         public void ReloadPlugin(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             UnloadPlugin(name);
             LoadPlugin(name);
         }

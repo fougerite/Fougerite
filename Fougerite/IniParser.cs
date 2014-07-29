@@ -1,85 +1,80 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 
 public class IniParser
 {
-    private string iniFilePath;
-    private Hashtable keyPairs = new Hashtable();
-    public string Name;
-    private System.Collections.Generic.List<SectionPair> tmpList = new System.Collections.Generic.List<SectionPair>();
+    private readonly string iniFilePath;
+    private readonly Hashtable keyPairs = new Hashtable();
+    private readonly List<SectionPair> tmpList = new List<SectionPair>();
+
+    public readonly string Name;
+
+    [ContractInvariantMethod]
+    private void Invariant()
+    {
+        Contract.Invariant(!string.IsNullOrEmpty(iniFilePath));
+        Contract.Invariant(keyPairs != null);
+        Contract.Invariant(tmpList != null);
+        Contract.Invariant(!string.IsNullOrEmpty(Name));
+    }
 
     public IniParser(string iniPath)
     {
-        TextReader reader = null;
-        string str = null;
+		Contract.Requires(!string.IsNullOrEmpty(iniPath));
         string str2 = null;
-        string[] strArray = null;
         this.iniFilePath = iniPath;
         this.Name = Path.GetFileNameWithoutExtension(iniPath);
-        if (File.Exists(iniPath))
+
+        if (!File.Exists(iniPath)) throw new FileNotFoundException("Unable to locate " + iniPath);
+
+        using (TextReader reader = new StreamReader(iniPath))
         {
-            try
+            for (string str = reader.ReadLine(); str != null; str = reader.ReadLine())
             {
-                try
+                str = str.Trim();
+                if (str == "") continue;
+
+                if (str.StartsWith("[") && str.EndsWith("]"))
+                    str2 = str.Substring(1, str.Length - 2);
+                else
                 {
-                    reader = new StreamReader(iniPath);
-                    for (str = reader.ReadLine(); str != null; str = reader.ReadLine())
+                    SectionPair pair;
+                    string[] strArray = str.Split(new char[] {'='}, 2);
+                    string str3 = null;
+                    if (str2 == null)
                     {
-                        str = str.Trim();
-                        if (str != "")
-                        {
-                            if (str.StartsWith("[") && str.EndsWith("]"))
-                            {
-                                str2 = str.Substring(1, str.Length - 2);
-                            }
-                            else
-                            {
-                                SectionPair pair;
-                                strArray = str.Split(new char[] { '=' }, 2);
-                                string str3 = null;
-                                if (str2 == null)
-                                {
-                                    str2 = "ROOT";
-                                }
-                                pair.Section = str2;
-                                pair.Key = strArray[0];
-                                if (strArray.Length > 1)
-                                {
-                                    str3 = strArray[1];
-                                }
-                                this.keyPairs.Add(pair, str3);
-                                this.tmpList.Add(pair);
-                            }
-                        }
+                        str2 = "ROOT";
                     }
-                }
-                catch (Exception exception)
-                {
-                    throw exception;
-                }
-                return;
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
+                    pair.Section = str2;
+                    pair.Key = strArray[0];
+                    if (strArray.Length > 1)
+                    {
+                        str3 = strArray[1];
+                    }
+                    this.keyPairs.Add(pair, str3);
+                    this.tmpList.Add(pair);
                 }
             }
         }
-        throw new FileNotFoundException("Unable to locate " + iniPath);
     }
 
     public void AddSetting(string sectionName, string settingName)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+        Contract.Requires(!string.IsNullOrEmpty(settingName));
+
         this.AddSetting(sectionName, settingName, null);
     }
 
     public void AddSetting(string sectionName, string settingName, string settingValue)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+        Contract.Requires(!string.IsNullOrEmpty(settingName));
+
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -110,6 +105,9 @@ public class IniParser
 
     public void DeleteSetting(string sectionName, string settingName)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+        Contract.Requires(!string.IsNullOrEmpty(settingName));
+
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -122,6 +120,8 @@ public class IniParser
 
     public string[] EnumSection(string sectionName)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+
         System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
         foreach (SectionPair pair in this.tmpList)
         {
@@ -135,6 +135,9 @@ public class IniParser
 
     public string GetSetting(string sectionName, string settingName)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+        Contract.Requires(!string.IsNullOrEmpty(settingName));
+
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -143,6 +146,8 @@ public class IniParser
 
     public bool isCommandOn(string cmdName)
     {
+        Contract.Requires(!string.IsNullOrEmpty(cmdName));
+
         string setting = this.GetSetting("Commands", cmdName);
         return ((setting == null) || (setting == "true"));
     }
@@ -154,6 +159,8 @@ public class IniParser
 
     public void SaveSettings(string newFilePath)
     {
+        Contract.Requires(!string.IsNullOrEmpty(newFilePath));
+
         ArrayList list = new ArrayList();
         string str = "";
         string str2 = "";
@@ -181,20 +188,16 @@ public class IniParser
             }
             str2 = str2 + "\r\n";
         }
-        try
-        {
-            TextWriter writer = new StreamWriter(newFilePath);
+
+        using (TextWriter writer = new StreamWriter(newFilePath))
             writer.Write(str2);
-            writer.Close();
-        }
-        catch (Exception exception)
-        {
-            throw exception;
-        }
     }
 
     public void SetSetting(string sectionName, string settingName, string value)
     {
+        Contract.Requires(!string.IsNullOrEmpty(sectionName));
+        Contract.Requires(!string.IsNullOrEmpty(settingName));
+
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;

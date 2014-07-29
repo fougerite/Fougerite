@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -6,12 +8,21 @@
 
     public class DataStore
     {
-        public Hashtable datastore = new Hashtable();
+        public readonly Hashtable datastore = new Hashtable();
         private static DataStore instance;
         public static string PATH = (Util.GetServerFolder() + @"..\FougeriteDatastore.ds");
 
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(datastore != null);
+        }
+
         public void Add(string tablename, object key, object val)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+            Contract.Requires(key != null);
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -30,6 +41,9 @@
 
         public bool ContainsKey(string tablename, object key)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+            Contract.Requires(key != null);
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -46,6 +60,8 @@
 
         public bool ContainsValue(string tablename, object val)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -62,6 +78,8 @@
 
         public int Count(string tablename)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -72,6 +90,8 @@
 
         public void Flush(string tablename)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             if (((Hashtable)this.datastore[tablename]) != null)
             {
                 this.datastore.Remove(tablename);
@@ -80,6 +100,9 @@
 
         public object Get(string tablename, object key)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+            Contract.Requires(key != null);
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -90,6 +113,8 @@
 
         public static DataStore GetInstance()
         {
+            Contract.Ensures(Contract.Result<DataStore>() != null);
+
             if (instance == null)
             {
                 instance = new DataStore();
@@ -99,6 +124,8 @@
 
         public Hashtable GetTable(string tablename)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -109,6 +136,8 @@
 
         public object[] Keys(string tablename)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -126,7 +155,11 @@
                 try
                 {
                     Hashtable hashtable = Util.HashtableFromFile(PATH);
-                    this.datastore = hashtable;
+
+                    this.datastore.Clear();
+                    foreach (DictionaryEntry entry in hashtable)
+                        this.datastore[entry.Key] = entry.Value;
+
                     Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
                 }
                 catch (Exception ex)
@@ -138,6 +171,9 @@
 
         public void Remove(string tablename, object key)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+            Contract.Requires(key != null);
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -156,6 +192,8 @@
 
         public object[] Values(string tablename)
         {
+            Contract.Requires(!string.IsNullOrEmpty(tablename));
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {

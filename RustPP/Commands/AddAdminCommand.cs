@@ -1,4 +1,6 @@
-﻿namespace RustPP.Commands
+﻿using System.Diagnostics.Contracts;
+
+namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP.Permissions;
@@ -6,7 +8,7 @@
 
     internal class AddAdminCommand : ChatCommand
     {
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)

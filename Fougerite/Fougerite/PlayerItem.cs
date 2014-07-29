@@ -1,24 +1,32 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using System;
 
     public class PlayerItem
     {
-        private Inventory internalInv;
-        private int internalSlot;
+        private readonly Inventory internalInv;
+        private readonly int internalSlot;
 
-        public PlayerItem()
+        [ContractInvariantMethod]
+        private void Invariant()
         {
+            Contract.Invariant(internalInv != null);
         }
 
-        public PlayerItem(ref Inventory inv, int slot)
+        public PlayerItem(Inventory inv, int slot)
         {
+            Contract.Requires(inv != null);
+
             this.internalInv = inv;
             this.internalSlot = slot;
         }
 
         public void Consume(int qty)
         {
+            Contract.Requires(qty > 0);
+
             if (!this.IsEmpty())
             {
                 this.RInventoryItem.Consume(ref qty);
@@ -44,6 +52,8 @@
 
         public bool TryCombine(PlayerItem pi)
         {
+            Contract.Requires(pi != null);
+
             if (this.IsEmpty() || pi.IsEmpty())
             {
                 return false;
@@ -53,6 +63,8 @@
 
         public bool TryStack(PlayerItem pi)
         {
+            Contract.Requires(pi != null);
+
             if (this.IsEmpty() || pi.IsEmpty())
             {
                 return false;
@@ -65,10 +77,6 @@
             get
             {
                 return this.GetItemRef();
-            }
-            set
-            {
-                this.RInventoryItem = value;
             }
         }
 

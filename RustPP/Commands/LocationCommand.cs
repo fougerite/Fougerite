@@ -6,7 +6,7 @@
 
     public class LocationCommand : ChatCommand
     {
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             string displayName;
             string str2 = "";

@@ -117,7 +117,6 @@ namespace Anticheat
             Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
-            Hooks.OnChatReceived += new Hooks.ChatRecivedDelegate(ChatReceived);
             Logger.LogDebug("[AC] Loaded!");
         }
 
@@ -140,7 +139,6 @@ namespace Anticheat
             Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
-            Hooks.OnChatReceived -= new Hooks.ChatRecivedDelegate(ChatReceived);
         }
 
         #endregion
@@ -381,10 +379,6 @@ namespace Anticheat
         }
 
         //
-
-        private void ChatReceived(ref ConsoleSystem.Arg arg)
-        {
-        }
 
         private void Chat(Fougerite.Player p, ref ChatString text)
         {

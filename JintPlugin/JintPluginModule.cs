@@ -11,10 +11,6 @@ namespace JintPlugin
 
     public class JintPluginModule : Module
     {
-        public override string Name
-        private readonly DirectoryInfo pluginDirectory;
-        private readonly Dictionary<string, Plugin> plugins;
-
         [ContractInvariantMethod]
         private void Invariant()
         {
@@ -22,6 +18,11 @@ namespace JintPlugin
             Contract.Invariant(plugins != null);
             Contract.Invariant(Contract.ForAll(plugins, pair => pair.Value != null));
             Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
+        }
+
+        public override string Name
+        {
+            get { return "JintPlugin"; }
         }
 
         public override string Author
@@ -44,7 +45,7 @@ namespace JintPlugin
 
         public override void Initialize()
         {
-            pluginDirectory = new DirectoryInfo(ModuleFolder + "\\Plugins\\");
+            pluginDirectory = new DirectoryInfo(Fougerite.Data.PATH);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
         }        

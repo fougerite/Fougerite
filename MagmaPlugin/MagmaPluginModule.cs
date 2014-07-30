@@ -5,11 +5,11 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reflection;
 
-namespace JintPlugin
+namespace MagmaPlugin
 {
     using Fougerite;
 
-    public class JintPluginModule : Module
+    public class MagmaPluginModule : Module
     {
         [ContractInvariantMethod]
         private void Invariant()
@@ -22,7 +22,7 @@ namespace JintPlugin
 
         public override string Name
         {
-            get { return "JintPlugin"; }
+            get { return "MagmaPlugin"; }
         }
 
         public override string Author
@@ -32,7 +32,7 @@ namespace JintPlugin
 
         public override string Description
         {
-            get { return "Jint Javascript Plugin Engine"; }
+            get { return "Legacy Magma Plugin Engine"; }
         }
 
         public override Version Version

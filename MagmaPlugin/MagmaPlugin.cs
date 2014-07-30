@@ -6,7 +6,7 @@ using System.Linq;
 using System.IO;
 using System.Timers;
 
-namespace JintPlugin
+namespace MagmaPlugin
 {
     using Fougerite;
     using Fougerite.Events;

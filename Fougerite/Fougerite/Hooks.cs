@@ -113,7 +113,7 @@ namespace Fougerite
                     var arg0 = arg.Args[0];
 
                     var index = arg0.IndexOf(' ');
-                    var command = arg0.Substring(0, index == -1 ? arg0.Length : index);
+                    var command = arg0.Substring(1, index == -1 ? arg0.Length : index);
                     var args = Facepunch.Utility.String.SplitQuotesStrings(arg0.Substring(index + 1));
 
                     if (OnCommand != null)

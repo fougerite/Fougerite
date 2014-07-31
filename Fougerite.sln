@@ -17,12 +17,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTests", "ServerTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anticheat", "Anticheat\Anticheat.csproj", "{D14D7F1B-53ED-4CAF-881C-0703E1743131}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagmaPlugin", "MagmaPlugin\MagmaPlugin.csproj", "{1FFA35A5-2073-4FBC-9453-E45ECD7BB70A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1FFA35A5-2073-4FBC-9453-E45ECD7BB70A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FFA35A5-2073-4FBC-9453-E45ECD7BB70A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FFA35A5-2073-4FBC-9453-E45ECD7BB70A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FFA35A5-2073-4FBC-9453-E45ECD7BB70A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50BE50A2-E63A-4928-9D23-7594418452EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,9 +57,6 @@ Global
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF61739C-9A45-479F-90DE-08D37F4EE653}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Fougerite\Fougerite.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

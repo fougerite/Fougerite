@@ -79,12 +79,8 @@ namespace Fougerite
             Contract.Requires(!string.IsNullOrEmpty(uid));
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.GameID == uid)
-                {
+                if (player != null && player.GameID == uid)
                     return player;
-                }
-            }
             return null;
         }
 
@@ -93,12 +89,8 @@ namespace Fougerite
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.Name == name)
-                {
+                if (player != null && player.Name == name)
                     return player;
-                }
-            }
             return null;
         }
 
@@ -107,12 +99,8 @@ namespace Fougerite
             if (np == null) return null;
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.ourPlayer.netPlayer == np)
-                {
+                if (player != null && player.ourPlayer.netPlayer == np)
                     return player;
-                }
-            }
             return null;
         }
 
@@ -121,12 +109,8 @@ namespace Fougerite
             if (pc == null) return null;
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.PlayerClient == pc)
-                {
+                if (player!= null && player.PlayerClient == pc)
                     return player;
-                }
-            }
             return null;
         }
 
@@ -135,12 +119,8 @@ namespace Fougerite
             Contract.Requires(!string.IsNullOrEmpty(uid));
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.SteamID == uid)
-                {
+                if (player != null && player.SteamID == uid)
                     return player;
-                }
-            }
             return null;
         }
 

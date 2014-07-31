@@ -20,50 +20,52 @@ namespace MagmaPlugin
             Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
         }
 
-        public override string Name
-        {
+        public override string Name {
             get { return "MagmaPlugin"; }
         }
 
-        public override string Author
-        {
-            get { return "Riketta, mikec"; }
+        public override string Author {
+            get { return "Riketta, mikec, EquiFox, xEnt"; }
         }
 
-        public override string Description
-        {
+        public override string Description {
             get { return "Legacy Magma Plugin Engine"; }
         }
 
-        public override Version Version
-        {
+        public override Version Version {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
+        private readonly string[] filters = new string[2] {
+            "system.io",
+            "system.xml"
+        };
 
         public override void Initialize()
         {
             pluginDirectory = new DirectoryInfo(Fougerite.Data.PATH);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
-        }        
+        }
 
         private IEnumerable<String> GetPluginNames()
         {
-            foreach (var dirInfo in pluginDirectory.GetDirectories())
-            {
+            foreach (var dirInfo in pluginDirectory.GetDirectories()) {
                 var path = Path.Combine(dirInfo.FullName, dirInfo.Name + ".js");
-                if (File.Exists(path)) yield return dirInfo.Name;
+                if (File.Exists(path))
+                    yield return dirInfo.Name;
             }
         }
+
         private String GetPluginDirectoryPath(String name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             return Path.Combine(pluginDirectory.FullName, name);
         }
+
         private String GetPluginScriptPath(String name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
@@ -77,49 +79,90 @@ namespace MagmaPlugin
 
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-            string scriptHeader = @"
-                var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;
-                var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;
-                var Rust = importNamespace('Rust'), Facepunch = importNamespace('Facepunch'), Magma = importNamespace('Fougerite');
-                var UnityEngine = importNamespace('UnityEngine'), uLink = importNamespace('uLink'), RustPP = importNamespace('RustPP');  
-                var ParamsList = function ParamsList() {
-                    var list = System.Collections.Generic.List(System.Object);
-                    this.objs = new list();
-                };
-                ParamsList.prototype = {
-                    Remove: function Remove(o) { this.objs.Remove(o); },
-                    Get: function Get(i) { return this.objs[parseInt(i, 10)]; },
-                    Add: function Add(o) { this.objs.Add(o); },
-                    ToArray: function ToArray() { return this.objs.ToArray(); },
-                    get Length () { return this.objs.Count; }
-                };
-                ";
-            if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))
-                return String.Join("\r\n", strArray);
-            return scriptHeader + String.Join("\r\n", strArray);
+            string script = "";
+            string legacy = "var Magma = Fougerite;\r\n";
+            foreach (string str1 in strArray) {
+                string str2 = str1.Replace("toLowerCase(", "Data.ToLower(").Replace("GetStaticField(", "Util.GetStaticField(").Replace("SetStaticField(", "Util.SetStaticField(").Replace("InvokeStatic(", "Util.InvokeStatic(").Replace("IsNull(", "Util.IsNull(").Replace("Datastore", "DataStore");
+                try {
+                    if (str2.Contains("new ")) {
+                        string[] strArray2 = str2.Split(new string[1] {
+                            "new "
+                        }, StringSplitOptions.None);
+                        if ((strArray2[0].Contains("\"") || strArray2[0].Contains("'")) && (strArray2[1].Contains("\"") || strArray2[1].Contains("'"))) {
+                            script = script + str2 + "\r\n";
+                            continue;
+                        } else if (str2.Contains("];")) {
+                            string str3 = str2.Split(new string[1] {
+                                "new "
+                            }, StringSplitOptions.None)[1].Split(new string[1] {
+                                "];"
+                            }, StringSplitOptions.None)[0];
+                            string str4 = str2.Replace("new " + str3, "").Replace("];", "");
+                            string str5 = str3.Split('[')[1];
+                            string str6 = str3.Split('[')[0];
+                            str2 = str4 + "Util.CreateArrayInstance('" + str6 + "', " + str5 + ");";
+                        } else {
+                            string str3 = str2.Split(new string[1] {
+                                "new "
+                            }, StringSplitOptions.None)[1].Split(new string[1] {
+                                ");"
+                            }, StringSplitOptions.None)[0];
+                            string str4 = str2.Replace("new " + str3, "").Replace(");", "");
+                            string str5 = str3.Split('(')[1];
+                            string str6 = str3.Split('(')[0];
+                            string str7 = str4 + "Util.CreateInstance('" + str6 + "'";
+                            if (str5 != "")
+                                str7 = str7 + ", " + str5;
+                            str2 = str7 + ");";
+                        }
+                    }
+                    script = script + str2 + "\r\n";
+                } catch (Exception ex) {
+                    Logger.LogException(ex);
+                    Logger.LogError("[MagmaPlugin] Couln't create instance at line -> " + str1);
+                    return legacy;
+                }
+            }
+            if (FilterPlugin(script)) {
+                Logger.Log("[MagmaPlugin] Loaded: " + path);
+                return legacy + script;
+            } else {
+                Logger.LogError("[MagmaPlugin] PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
+                return legacy;
+            }
+        }
+
+        public bool FilterPlugin(string script)
+        {
+            string str1 = script.ToLower();
+            foreach (string str2 in filters) {
+                if (str1.Contains(str2)) {
+                    Logger.LogError("[MagmaPlugin] Script cannot contain: " + str2);
+                    return false;
+                }
+            }
+            return true;
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.Log("Unloading " + name + " plugin.");
+            Logger.LogDebug("[MagmaPlugin] Unloading " + name + " plugin.");
 
-            if (plugins.ContainsKey(name))
-            {
+            if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
                 Contract.Assert(plugin != null);
 
                 plugin.RemoveHooks();
                 plugin.KillTimers();
-                if (removeFromDict) plugins.Remove(name);
+                if (removeFromDict)
+                    plugins.Remove(name);
 
-                Logger.Log(name + " plugin was unloaded successfuly.");
-            }
-            else
-            {
-                Logger.LogError("Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("Can't unload " + name + ". Plugin is not loaded.");
+                Logger.Log("[MagmaPlugin] " + name + " plugin was unloaded successfuly.");
+            } else {
+                Logger.LogError("[MagmaPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                throw new InvalidOperationException("[MagmaPlugin] Can't unload " + name + ". Plugin is not loaded.");
             }
         }
 
@@ -139,29 +182,25 @@ namespace MagmaPlugin
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.Log("Loading plugin " + name + ".");
+            Logger.LogDebug("[MagmaPlugin] Loading plugin " + name + ".");
 
-            if (plugins.ContainsKey(name))
-            {
-                Logger.LogError(name + " plugin is already loaded.");
-                throw new InvalidOperationException(name + " plugin is already loaded.");
+            if (plugins.ContainsKey(name)) {
+                Logger.LogError("[MagmaPlugin] " + name + " plugin is already loaded.");
+                throw new InvalidOperationException("[MagmaPlugin] " + name + " plugin is already loaded.");
             }
 
-            try
-            {
+            try {
                 String text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
                 Plugin plugin = new Plugin(dir, name, text);
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log(name + " plugin was loaded successfuly.");
-            }
-            catch (Exception ex)
-            {
+                Logger.Log("[MagmaPlugin] " + name + " plugin was loaded successfuly.");
+            } catch (Exception ex) {
                 string arg = name + " plugin could not be loaded.";
                 Contract.Assume(!string.IsNullOrEmpty(arg));
-                Server.GetServer().Broadcast(arg);
+                Server.GetServer().BroadcastFrom(Name, arg);
                 Logger.LogException(ex);
             }
         }

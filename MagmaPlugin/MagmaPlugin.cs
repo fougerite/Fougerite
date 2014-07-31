@@ -11,18 +11,14 @@ namespace MagmaPlugin
     using Fougerite;
     using Fougerite.Events;
     using Jint;
-    using Jint.Parser;
-    using Jint.Parser.Ast;
+    using Jint.Expressions;
 
     public class Plugin
     {
-        public readonly Engine Engine;
+        public readonly JintEngine Engine;
         public readonly string Name;
         public readonly string Code;
-
-
         public readonly DirectoryInfo RootDirectory;
-
         public readonly Dictionary<String, TimedEvent> Timers;
 
         [ContractInvariantMethod]
@@ -38,56 +34,60 @@ namespace MagmaPlugin
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
-            Contract.Requires(directory != null);
-            Contract.Requires(!string.IsNullOrEmpty(directory.FullName));
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(code != null);
-
             Name = name;
             Code = code;
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Hooks).Assembly))
-                .SetValue("Server", Server.GetServer())
-                .SetValue("Data", Data.GetData())
-                .SetValue("DataStore", DataStore.GetInstance())
-                .SetValue("Util", Util.GetUtil())
-                .SetValue("Web", new Web())
-                .SetValue("World", World.GetWorld())
-                .SetValue("Plugin", this)
-                .Execute(code);
-            Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
-                typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-                typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                typeof(PlayerInventory).Assembly.GetName().Name + "," + 
-                typeof(Hooks).Assembly.GetName().Name);
+            Engine = new JintEngine();
+            Engine.AllowClr(true);
+
+            InitGlobals();
+            Engine.Run(code);
             try
             {
-                Engine.Invoke("On_PluginInit");
+                Engine.CallFunction("On_PluginInit");
             }
             catch { }
         }
 
+        public void InitGlobals()
+        {
+            Engine.SetParameter("Server", Fougerite.Server.GetServer());
+            Engine.SetParameter("Data", Fougerite.Data.GetData());
+            Engine.SetParameter("DataStore", Fougerite.DataStore.GetInstance());
+            Engine.SetParameter("Util", Fougerite.Util.GetUtil());
+            Engine.SetParameter("Web", new Fougerite.Web());
+            Engine.SetParameter("Time", this);
+            Engine.SetParameter("World", Fougerite.World.GetWorld());
+            Engine.SetParameter("Plugin", this);
+        }
 
         private void Invoke(string func, params object[] obj)
         {
             try
             {
-                Engine.Invoke(func, obj);
+                Engine.CallFunction(func, obj);
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error invoking function " + func + " in " + Name + " plugin.");
+                Logger.LogError("[MagmaPlugin] Error invoking function " + func + " in " + Name + " plugin.");
                 Logger.LogException(ex);
             }
         }
 
-        public IEnumerable<FunctionDeclaration> GetSourceCodeGlobalFunctions()
+        public IEnumerable<FunctionDeclarationStatement> GetSourceCodeGlobalFunctions()
         {
-            JavaScriptParser parser = new JavaScriptParser();
-            foreach (FunctionDeclaration funcDecl in parser.Parse(Code).FunctionDeclarations) {
-                yield return funcDecl;
+            foreach (Statement statement in JintEngine.Compile(Code, false).Statements)
+            {
+                if (statement.GetType() == typeof(FunctionDeclarationStatement))
+                {
+                    FunctionDeclarationStatement funcDecl = (FunctionDeclarationStatement)statement;
+                    if (funcDecl != null)
+                    {
+                        yield return funcDecl;
+                    }
+                }
             }
         }
 
@@ -95,8 +95,8 @@ namespace MagmaPlugin
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("Found Function: " + funcDecl.Id.Name);
-                switch (funcDecl.Id.Name)
+                Logger.LogDebug("[MagmaPlugin] Found Function: " + funcDecl.Name);
+                switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
                     case "On_PluginInit": Hooks.OnPluginInit += OnPluginInit; break;
@@ -128,8 +128,8 @@ namespace MagmaPlugin
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Id.Name);
-                switch (funcDecl.Id.Name)
+                Logger.LogDebug("[MagmaPlugin] RemoveHooks, found function " + funcDecl.Name);
+                switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
                     case "On_PluginInit": Hooks.OnPluginInit -= OnPluginInit; break;
@@ -365,44 +365,6 @@ namespace MagmaPlugin
             return (long)span.TotalSeconds;
         }
 
-        public class ParamsList
-        {
-            private List<object> objs;
-
-            public int Length
-            {
-                get
-                {
-                    return this.objs.Count;
-                }
-            }
-
-            public ParamsList()
-            {
-                this.objs = new List<object>();
-            }
-
-            public void Add(object o)
-            {
-                this.objs.Add(o);
-            }
-
-            public void Remove(object o)
-            {
-                this.objs.Remove(o);
-            }
-
-            public object Get(int index)
-            {
-                return this.objs[index];
-            }
-
-            public object[] ToArray()
-            {
-                return this.objs.ToArray();
-            }
-        }
-
         #endregion
 
         #region Hooks
@@ -583,5 +545,43 @@ namespace MagmaPlugin
         }
 
         #endregion
+    }
+}
+
+public class ParamsList
+{
+    private List<object> objs;
+
+    public int Length
+    {
+        get
+        {
+            return this.objs.Count;
+        }
+    }
+
+    public ParamsList()
+    {
+        this.objs = new List<object>();
+    }
+
+    public void Add(object o)
+    {
+        this.objs.Add(o);
+    }
+
+    public void Remove(object o)
+    {
+        this.objs.Remove(o);
+    }
+
+    public object Get(int index)
+    {
+        return this.objs[index];
+    }
+
+    public object[] ToArray()
+    {
+        return this.objs.ToArray();
     }
 }

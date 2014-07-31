@@ -19,10 +19,7 @@ namespace JintPlugin
         public readonly Engine Engine;
         public readonly string Name;
         public readonly string Code;
-
-
         public readonly DirectoryInfo RootDirectory;
-
         public readonly Dictionary<String, TimedEvent> Timers;
 
         [ContractInvariantMethod]
@@ -48,7 +45,7 @@ namespace JintPlugin
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly, typeof(Hooks).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly)
                 .SetValue("Server", Server.GetServer())
                 .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
@@ -57,11 +54,10 @@ namespace JintPlugin
                 .SetValue("World", World.GetWorld())
                 .SetValue("Plugin", this)
                 .Execute(code);
-            Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
+            Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                typeof(PlayerInventory).Assembly.GetName().Name + "," + 
-                typeof(Hooks).Assembly.GetName().Name);
+                typeof(PlayerInventory).Assembly.GetName().Name);
             try
             {
                 Engine.Invoke("On_PluginInit");
@@ -78,7 +74,7 @@ namespace JintPlugin
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error invoking function " + func + " in " + Name + " plugin.");
+                Logger.LogError("[JintPlugin] Error invoking function " + func + " in " + Name + " plugin.");
                 Logger.LogException(ex);
             }
         }
@@ -95,7 +91,7 @@ namespace JintPlugin
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("Found Function: " + funcDecl.Id.Name);
+                Logger.LogDebug("[JintPlugin] Found Function: " + funcDecl.Id.Name);
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
@@ -128,7 +124,7 @@ namespace JintPlugin
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Id.Name);
+                Logger.LogDebug("[JintPlugin] RemoveHooks, found function " + funcDecl.Id.Name);
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;

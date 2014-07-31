@@ -84,7 +84,7 @@ namespace JintPlugin
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.Log("Unloading " + name + " plugin.");
+            Logger.LogDebug("[JintPlugin] Unloading " + name + " plugin.");
 
             if (plugins.ContainsKey(name))
             {
@@ -95,12 +95,12 @@ namespace JintPlugin
                 plugin.KillTimers();
                 if (removeFromDict) plugins.Remove(name);
 
-                Logger.Log(name + " plugin was unloaded successfuly.");
+                Logger.Log("[JintPlugin] " + name + " plugin was unloaded successfuly.");
             }
             else
             {
-                Logger.LogError("Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("Can't unload " + name + ". Plugin is not loaded.");
+                Logger.LogError("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                throw new InvalidOperationException("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
             }
         }
 
@@ -120,12 +120,12 @@ namespace JintPlugin
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.Log("Loading plugin " + name + ".");
+            Logger.LogDebug("[JintPlugin] Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name))
             {
-                Logger.LogError(name + " plugin is already loaded.");
-                throw new InvalidOperationException(name + " plugin is already loaded.");
+                Logger.LogError("[JintPlugin] " + name + " plugin is already loaded.");
+                throw new InvalidOperationException("[JintPlugin] " + name + " plugin is already loaded.");
             }
 
             try
@@ -136,13 +136,13 @@ namespace JintPlugin
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log(name + " plugin was loaded successfuly.");
+                Logger.Log("[JintPlugin] " + name + " plugin was loaded successfuly.");
             }
             catch (Exception ex)
             {
                 string arg = name + " plugin could not be loaded.";
                 Contract.Assume(!string.IsNullOrEmpty(arg));
-                Server.GetServer().Broadcast(arg);
+                Server.GetServer().BroadcastFrom(Name, arg);
                 Logger.LogException(ex);
             }
         }

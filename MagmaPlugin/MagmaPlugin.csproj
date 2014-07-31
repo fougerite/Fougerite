@@ -8,7 +8,7 @@
     <RootNamespace>MagmaPlugin</RootNamespace>
     <AssemblyName>MagmaPlugin</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -90,7 +90,7 @@
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=736440c9b414ea16, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Contracts">
       <HintPath>..\References\Microsoft.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.ID">

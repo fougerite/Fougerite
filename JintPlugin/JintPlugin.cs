@@ -45,7 +45,7 @@ namespace JintPlugin
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly)
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly))
                 .SetValue("Server", Server.GetServer())
                 .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())

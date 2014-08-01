@@ -182,7 +182,7 @@ namespace Fougerite
             Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
         }
 
-        public void Notice(string icon, string text, [Optional, DefaultParameterValue(4f)] float duration)
+        public void Notice(string icon, string text, float duration = 4f)
         {
             Contract.Requires(icon != null);
             Contract.Requires(text != null);
@@ -198,21 +198,39 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void TeleportTo(Vector3 vector3)
+        public void SafeTeleportTo(Fougerite.Player p, float distance = 1.5f)
+        { 
+            Vector3 target;
+            target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0.0f, 0.0f, (this.Admin ? -distance : distance))); // rcon admin teleports behind target player
+            this.SafeTeleportTo(target.x, target.z);
+            this.ourPlayer.controllable.transform.LookAt(p.PlayerClient.controllable.transform.position);  // turn towards the target player
+        }
+
+        public void SafeTeleportTo(Vector3 target)
         {
-            this.TeleportTo(vector3.x, vector3.y, vector3.z);
+            this.SafeTeleportTo(target.x, target.z);
+        }
+
+        public void SafeTeleportTo(float x, float z)
+        {
+            this.TeleportTo(x, World.GetWorld().GetGround(x, z), z);
+        }
+
+        public void TeleportTo(float x, float y, float z)
+        {
+            this.TeleportTo(new Vector3(x, y, z));
         }
 
         public void TeleportTo(Fougerite.Player p)
         {
             Contract.Requires(p != null);
 
-            this.TeleportTo(p.X, p.Y, p.Z);
+            this.TeleportTo(p.Location);
         }
 
-        public void TeleportTo(float x, float y, float z)
+        public void TeleportTo(Vector3 target)
         {
-            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, new Vector3(x, y, z));
+            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);
         }
 
         public bool Admin

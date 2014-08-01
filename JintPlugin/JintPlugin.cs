@@ -1,62 +1,60 @@
-﻿using Fougerite.Events;
+﻿using System.Diagnostics.Contracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Jint;
-using Jint.Parser;
-using Jint.Parser.Ast;
+using System.Timers;
 
-namespace Fougerite
+namespace JintPlugin
 {
+    using Fougerite;
+    using Fougerite.Events;
+    using Jint;
+    using Jint.Parser;
+    using Jint.Parser.Ast;
+
     public class Plugin
     {
-        public Engine Engine
-        {
-            get;
-            private set;
-        }
-        public string Name
-        {
-            get;
-            private set;
-        }
-        public string Code
-        {
-            get;
-            private set;
-        }
+        public readonly Engine Engine;
+        public readonly string Name;
+        public readonly string Code;
+        public readonly DirectoryInfo RootDirectory;
+        public readonly Dictionary<String, TimedEvent> Timers;
 
-        public DirectoryInfo RootDirectory
+        [ContractInvariantMethod]
+        private void Invariant()
         {
-            get;
-            private set;
-        }
-
-        public Dictionary<String, TimedEvent> Timers
-        {
-            get;
-            private set;
+            Contract.Invariant(Engine != null);
+            Contract.Invariant(!string.IsNullOrEmpty(Name));
+            Contract.Invariant(Code != null);
+            Contract.Invariant(RootDirectory != null);
+            Contract.Invariant(!string.IsNullOrEmpty(RootDirectory.FullName));
+            Contract.Invariant(Timers != null);
         }
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
+            Contract.Requires(directory != null);
+            Contract.Requires(!string.IsNullOrEmpty(directory.FullName));
+            Contract.Requires(!string.IsNullOrEmpty(name));
+            Contract.Requires(code != null);
+
             Name = name;
             Code = code;
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(StructureComponent).Assembly))
-                .SetValue("Server", Fougerite.Server.GetServer())
-                .SetValue("Data", Fougerite.Data.GetData())
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly))
+                .SetValue("Server", Server.GetServer())
+                .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("Web", new Web())
                 .SetValue("World", World.GetWorld())
                 .SetValue("Plugin", this)
                 .Execute(code);
-            Logger.LogDebug("[Plugin] AllowClr for Assemblies: " +
+            Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +
                 typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
                 typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
                 typeof(PlayerInventory).Assembly.GetName().Name);
@@ -76,7 +74,7 @@ namespace Fougerite
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error invoking function " + func + " in " + Name + " plugin.");
+                Logger.LogError("[JintPlugin] Error invoking function " + func + " in " + Name + " plugin.");
                 Logger.LogException(ex);
             }
         }
@@ -93,7 +91,7 @@ namespace Fougerite
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("Found Function: " + funcDecl.Id.Name);
+                Logger.LogDebug("[JintPlugin] Found Function: " + funcDecl.Id.Name);
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
@@ -126,7 +124,7 @@ namespace Fougerite
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("RemoveHooks, found function " + funcDecl.Id.Name);
+                Logger.LogDebug("[JintPlugin] RemoveHooks, found function " + funcDecl.Id.Name);
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
@@ -159,6 +157,8 @@ namespace Fougerite
 
         private static string NormalizePath(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             return Path.GetFullPath(new Uri(path).LocalPath)
                        .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                        .ToUpperInvariant();
@@ -166,6 +166,8 @@ namespace Fougerite
 
         private String ValidateRelativePath(String path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             String normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
             String rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
 
@@ -177,6 +179,8 @@ namespace Fougerite
 
         public bool CreateDir(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             try
             {
                 path = ValidateRelativePath(path);
@@ -201,6 +205,8 @@ namespace Fougerite
 
         public IniParser GetIni(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -214,6 +220,8 @@ namespace Fougerite
 
         public bool IniExists(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -224,6 +232,8 @@ namespace Fougerite
 
         public IniParser CreateIni(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             try
             {
                 path = ValidateRelativePath(path + ".ini");
@@ -240,6 +250,8 @@ namespace Fougerite
 
         public List<IniParser> GetInis(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             path = ValidateRelativePath(path);
 
             if (path == null)
@@ -250,6 +262,8 @@ namespace Fougerite
 
         public void DeleteLog(string path)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -261,6 +275,9 @@ namespace Fougerite
 
         public void Log(string path, string text)
         {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+            Contract.Requires(text != null);
+
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -348,40 +365,36 @@ namespace Fougerite
 
         #region Hooks
 
-        public void OnBlueprintUse(Fougerite.Player player, BPUseEvent evt)
+        public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
-            if (player == null) 
-                throw new ArgumentNullException("player");
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(player != null);
+            Contract.Requires(evt != null);
+
             Invoke("On_BlueprintUse", player, evt);
         }
 
-        public void OnChat(Fougerite.Player player, ref ChatString text)
+        public void OnChat(Player player, ref ChatString text)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (text == null)
-                throw new ArgumentNullException("text");
+            Contract.Requires(player != null);
+            Contract.Requires(text != null);
+
             Invoke("On_Chat", player, text);
         }
 
-        public void OnCommand(Fougerite.Player player, string command, string[] args)
+        public void OnCommand(Player player, string command, string[] args)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (command == null)
-                throw new ArgumentNullException("command");
-            if (args == null)
-                throw new ArgumentNullException("args");
+            Contract.Requires(player != null);
+            Contract.Requires(!string.IsNullOrEmpty(command));
+            Contract.Requires(args != null);
+
             Invoke("On_Command", player, command, args);
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
         {
-            if (arg == null)
-                throw new ArgumentNullException("arg");
-            Player player = Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient);
+            Contract.Requires(arg != null);
+
+            Player player = Player.FindByPlayerClient(arg.argUser.playerClient);
 
             if (!external)
                 Invoke("On_Console", player, arg);
@@ -389,109 +402,105 @@ namespace Fougerite
                 Invoke("On_Console", null, arg);
         }
 
-        public void OnDoorUse(Fougerite.Player player, DoorEvent evt)
+        public void OnDoorUse(Player player, DoorEvent evt)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(player != null);
+            Contract.Requires(evt != null);
+
             Invoke("On_DoorUse", player, evt);
         }
 
         public void OnEntityDecay(DecayEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_EntityDecay", evt);
         }
 
-        public void OnEntityDeployed(Fougerite.Player player, Entity entity)
+        public void OnEntityDeployed(Player player, Entity entity)
         {
-            if (entity == null)
-                throw new ArgumentNullException("entity");
+            Contract.Requires(entity != null);
+
             Invoke("On_EntityDeployed", player, entity);
         }
 
         public void OnEntityHurt(HurtEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_EntityHurt", evt);
         }
 
         public void OnItemsLoaded(ItemsBlocks items)
         {
-            if (items == null)
-                throw new ArgumentNullException("items");
+            Contract.Requires(items != null);
+
             Invoke("On_ItemsLoaded", items);
         }
 
         public void OnNPCHurt(HurtEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_NPCHurt", evt);
         }
 
         public void OnNPCKilled(DeathEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_NPCKilled", evt);
         }
 
-        public void OnPlayerConnected(Fougerite.Player player)
+        public void OnPlayerConnected(Player player)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
+            Contract.Requires(player != null);
+
             Invoke("On_PlayerConnected", player);
         }
 
-        public void OnPlayerDisconnected(Fougerite.Player player)
+        public void OnPlayerDisconnected(Player player)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
+            Contract.Requires(player != null);
+
             Invoke("On_PlayerDisconnected", player);
         }
 
-        public void OnPlayerGathering(Fougerite.Player player, GatherEvent evt)
+        public void OnPlayerGathering(Player player, GatherEvent evt)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(player != null);
+            Contract.Requires(evt != null);
+
             Invoke("On_PlayerGathering", player, evt);
         }
 
         public void OnPlayerHurt(HurtEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_PlayerHurt", evt);
         }
 
         public void OnPlayerKilled(DeathEvent evt)
         {
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(evt != null);
+
             Invoke("On_PlayerKilled", evt);
         }
 
-        public void OnPlayerSpawn(Fougerite.Player player, SpawnEvent evt)
+        public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(player != null);
+            Contract.Requires(evt != null);
+
             Invoke("On_PlayerSpawning", player, evt);
         }
 
-        public void OnPlayerSpawned(Fougerite.Player player, SpawnEvent evt)
+        public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
-            if (player == null)
-                throw new ArgumentNullException("player");
-            if (evt == null)
-                throw new ArgumentNullException("evt");
+            Contract.Requires(player != null);
+            Contract.Requires(evt != null);
+
             Invoke("On_PlayerSpawned", player, evt);
         }
 
@@ -512,6 +521,10 @@ namespace Fougerite
 
         public void OnTablesLoaded(Dictionary<string, LootSpawnList> lists)
         {
+            Contract.Requires(lists != null);
+            Contract.Requires(Contract.ForAll(lists, x => !string.IsNullOrEmpty(x.Key)));
+            Contract.Requires(Contract.ForAll(lists, x => x.Value != null));
+
             Invoke("On_TablesLoaded", lists);
         }
 

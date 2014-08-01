@@ -6,7 +6,7 @@
 
     public class HelpCommand : ChatCommand
     {
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             Util.sayUser(Arguments.argUser.networkPlayer, "RUST++ Mod");
             int num = 1;

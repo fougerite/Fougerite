@@ -8,7 +8,7 @@
 
     internal class KickCommand : ChatCommand
     {
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)
@@ -67,16 +67,16 @@
             }
         }
 
-        public void PartialNameKick(ref ConsoleSystem.Arg Arguments, int id)
+        public void PartialNameKick(Fougerite.Player p, int id)
         {
-            if (Core.kickWaitList.Contains(Arguments.argUser.userID))
+            if (Core.kickWaitList.Contains(p.PlayerClient.userID))
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.kickWaitList[Arguments.argUser.userID];
+                List<string> list = (List<string>)Core.kickWaitList[p.PlayerClient.userID];
                 string str = list[id];
                 if (id == 0)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled!");
-                    Core.kickWaitList.Remove(Arguments.argUser.userID);
+                    Util.sayUser(p.PlayerClient.netPlayer, "Cancelled!");
+                    Core.kickWaitList.Remove(p.PlayerClient.userID);
                 }
                 else
                 {
@@ -84,10 +84,10 @@
                     {
                         if (client.netUser.displayName == str)
                         {
-                            Core.kickWaitList.Remove(Arguments.argUser.userID);
-                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
+                            Core.kickWaitList.Remove(p.PlayerClient.userID);
+                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator!");
+                                Util.sayUser(p.PlayerClient.netPlayer, "You cannot kick an administrator!");
                             }
                             else
                             {
@@ -97,7 +97,7 @@
                             break;
                         }
                     }
-                    Core.kickWaitList.Remove(Arguments.argUser.userID);
+                    Core.kickWaitList.Remove(p.PlayerClient.userID);
                 }
             }
         }

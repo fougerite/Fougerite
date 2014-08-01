@@ -1,27 +1,51 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
-using UnityEngine;
+using System.Reflection;
 
-namespace Fougerite
+namespace JintPlugin
 {
-    public class PluginEngine
+    using Fougerite;
+
+    public class JintPluginModule : Module
     {
-        private static PluginEngine instance;
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(pluginDirectory != null);
+            Contract.Invariant(plugins != null);
+            Contract.Invariant(Contract.ForAll(plugins, pair => pair.Value != null));
+            Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
+        }
+
+        public override string Name
+        {
+            get { return "JintPlugin"; }
+        }
+
+        public override string Author
+        {
+            get { return "Riketta, mikec"; }
+        }
+
+        public override string Description
+        {
+            get { return "Jint Javascript Plugin Engine"; }
+        }
+
+        public override Version Version
+        {
+            get { return Assembly.GetExecutingAssembly().GetName().Version; }
+        }
+
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
 
-        public static PluginEngine Instance()
+        public override void Initialize()
         {
-            if (instance == null)
-                instance = new PluginEngine();
-            return instance;
-        }
-
-        private PluginEngine()
-        {
-            pluginDirectory = new DirectoryInfo(Util.GetFougeriteFolder());
+            pluginDirectory = new DirectoryInfo(Fougerite.Data.PATH);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
         }        
@@ -36,42 +60,53 @@ namespace Fougerite
         }
         private String GetPluginDirectoryPath(String name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             return Path.Combine(pluginDirectory.FullName, name);
         }
         private String GetPluginScriptPath(String name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             return Path.Combine(GetPluginDirectoryPath(name), name + ".js");
         }
 
         private string GetPluginScriptText(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-            string scriptHeader = "var Datastore = DataStore, IsNull = Util.IsNull, toLowerCase = Data.ToLower, Time = Plugin;\r\n" +
-                "var GetStaticField = Util.GetStaticField, SetStaticField = Util.SetStaticField, InvokeStatic = Util.InvokeStatic;\r\n";
-            if (strArray[0].Contains("Fougerite") || strArray[0].Contains("fougerite") || strArray[0].Contains("FOUGERITE"))
-                return String.Join("\r\n", strArray);
-            return scriptHeader + String.Join("\r\n", strArray);
+            return String.Join("\r\n", strArray);
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
-            Logger.Log("Unloading " + name + " plugin.");
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
+            Logger.LogDebug("[JintPlugin] Unloading " + name + " plugin.");
 
             if (plugins.ContainsKey(name))
             {
                 var plugin = plugins[name];
+                Contract.Assert(plugin != null);
+
                 plugin.RemoveHooks();
                 plugin.KillTimers();
                 if (removeFromDict) plugins.Remove(name);
 
-                Logger.Log(name + " plugin was unloaded successfuly.");
+                Logger.Log("[JintPlugin] " + name + " plugin was unloaded successfuly.");
             }
             else
             {
-                Logger.LogError("Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("Can't unload " + name + ". Plugin is not loaded.");
+                Logger.LogError("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                throw new InvalidOperationException("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
             }
+        }
+
+        public override void DeInitialize()
+        {
+            UnloadPlugins();
         }
 
         public void UnloadPlugins()
@@ -83,12 +118,14 @@ namespace Fougerite
 
         private void LoadPlugin(string name)
         {
-            Logger.Log("Loading plugin " + name + ".");
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
+            Logger.LogDebug("[JintPlugin] Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name))
             {
-                Logger.LogError(name + " plugin is already loaded.");
-                throw new InvalidOperationException(name + " plugin is already loaded.");
+                Logger.LogError("[JintPlugin] " + name + " plugin is already loaded.");
+                throw new InvalidOperationException("[JintPlugin] " + name + " plugin is already loaded.");
             }
 
             try
@@ -99,18 +136,21 @@ namespace Fougerite
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log(name + " plugin was loaded successfuly.");
+                Logger.Log("[JintPlugin] " + name + " plugin was loaded successfuly.");
             }
             catch (Exception ex)
             {
                 string arg = name + " plugin could not be loaded.";
-                Server.GetServer().Broadcast(arg);
+                Contract.Assume(!string.IsNullOrEmpty(arg));
+                Server.GetServer().BroadcastFrom(Name, arg);
                 Logger.LogException(ex);
             }
         }
 
         public void ReloadPlugin(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             UnloadPlugin(name);
             LoadPlugin(name);
         }

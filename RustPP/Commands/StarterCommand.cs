@@ -1,4 +1,6 @@
-﻿namespace RustPP.Commands
+﻿using System.Diagnostics.Contracts;
+
+namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -7,9 +9,9 @@
 
     public class StarterCommand : ChatCommand
     {
-        private Hashtable starterkits = new Hashtable();
+        private readonly Hashtable starterkits = new Hashtable();
 
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             bool flag = false;
             if (!this.starterkits.ContainsKey(Arguments.argUser.playerClient.userID))

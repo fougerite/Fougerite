@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Diagnostics.Contracts;
+
+namespace Fougerite
 {
     using Facepunch.Utility;
     using Fougerite.Events;
@@ -10,36 +12,50 @@
 
     public class Player
     {
-        private long connectedAt;
+        private readonly PlayerClient ourPlayer;
+        private readonly long connectedAt;
+
         private PlayerInv inv;
         private bool invError;
         private bool justDied;
-        private PlayerClient ourPlayer;
+        
 
-        public Player()
-        {
-            this.justDied = true;
-        }
+        //public Player()
+        //{
+        //    this.justDied = true;
+        //}
 
         public Player(PlayerClient client)
         {
+            Contract.Requires(client != null);
+
             this.justDied = true;
             this.ourPlayer = client;
             this.connectedAt = DateTime.UtcNow.Ticks;
             this.FixInventoryRef();
         }
 
+        [ContractInvariantMethod]
+        private void Invariant()
+        {
+            Contract.Invariant(ourPlayer != null);
+        }
+
         public void Disconnect()
         {
             NetUser netUser = this.ourPlayer.netUser;
-            if (netUser.connected && (netUser != null))
-            {
+
+            if (netUser == null)
+                throw new InvalidOperationException("Player's netUser is null.");
+
+            if (netUser.connected)
                 netUser.Kick(NetError.NoError, true);
-            }
         }
 
         public Fougerite.Player Find(string search)
         {
+            Contract.Requires(!string.IsNullOrEmpty(search));
+
             Fougerite.Player player = FindBySteamID(search);
             if (player != null)
             {
@@ -60,61 +76,51 @@
 
         public static Fougerite.Player FindByGameID(string uid)
         {
+            Contract.Requires(!string.IsNullOrEmpty(uid));
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.GameID == uid)
-                {
+                if (player != null && player.GameID == uid)
                     return player;
-                }
-            }
             return null;
         }
 
         public static Fougerite.Player FindByName(string name)
         {
+            Contract.Requires(!string.IsNullOrEmpty(name));
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.Name == name)
-                {
+                if (player != null && player.Name == name)
                     return player;
-                }
-            }
             return null;
         }
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
+            if (np == null) return null;
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.ourPlayer.netPlayer == np)
-                {
+                if (player != null && player.ourPlayer.netPlayer == np)
                     return player;
-                }
-            }
             return null;
         }
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
+            if (pc == null) return null;
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.PlayerClient == pc)
-                {
+                if (player!= null && player.PlayerClient == pc)
                     return player;
-                }
-            }
             return null;
         }
 
         public static Fougerite.Player FindBySteamID(string uid)
         {
+            Contract.Requires(!string.IsNullOrEmpty(uid));
+
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-            {
-                if (player.SteamID == uid)
-                {
+                if (player != null && player.SteamID == uid)
                     return player;
-                }
-            }
             return null;
         }
 
@@ -125,6 +131,8 @@
 
         private void Hooks_OnPlayerKilled(DeathEvent de)
         {
+            Contract.Requires(de != null);
+
             try
             {
                 Fougerite.Player victim = de.Victim as Fougerite.Player;
@@ -142,6 +150,8 @@
 
         public void InventoryNotice(string arg)
         {
+            Contract.Requires(arg != null);
+
             Rust.Notice.Inventory(this.ourPlayer.netPlayer, arg);
         }
 
@@ -152,26 +162,39 @@
 
         public void Message(string arg)
         {
+            Contract.Requires(arg != null);
+
             this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void MessageFrom(string playername, string arg)
         {
+            Contract.Requires(!string.IsNullOrEmpty(playername));
+            Contract.Requires(arg != null);
+
             this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(playername) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void Notice(string arg)
         {
+            Contract.Requires(arg != null);
+
             Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
         }
 
         public void Notice(string icon, string text, [Optional, DefaultParameterValue(4f)] float duration)
         {
+            Contract.Requires(icon != null);
+            Contract.Requires(text != null);
+            Contract.Requires(duration >= 0);
+
             Rust.Notice.Popup(this.PlayerClient.netPlayer, icon, text, duration);
         }
 
         public void SendCommand(string cmd)
         {
+            Contract.Requires(cmd != null);
+
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
@@ -296,7 +319,7 @@
         {
             get
             {
-                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
+                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() > 0);
             }
             set
             {

@@ -9,7 +9,7 @@
     {
         public static Hashtable tpWaitList = new Hashtable();
 
-        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
+        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
             if (ChatArguments == null)
             {
@@ -69,30 +69,30 @@
             return tpWaitList;
         }
 
-        public void PartialNameTP(ref ConsoleSystem.Arg Arguments, int choice)
+        public void PartialNameTP(Fougerite.Player p, int choice)
         {
-            if (tpWaitList.Contains(Arguments.argUser.userID))
+            if (!tpWaitList.Contains(p.PlayerClient.userID)) return;
+
+            List<string> list = (List<string>)tpWaitList[p.PlayerClient.userID];
+            string str = list[choice];
+            if (choice == 0)
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)tpWaitList[Arguments.argUser.userID];
-                string str = list[choice];
-                if (choice == 0)
+                Util.sayUser(p.PlayerClient.netPlayer, "Cancelled!");
+                tpWaitList.Remove(p.PlayerClient.userID);
+            }
+            else
+            {
+                ConsoleSystem.Arg arg;
+                if (list[0] == "ToTarget")
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Cancelled!");
-                    tpWaitList.Remove(Arguments.argUser.userID);
+                    arg = new ConsoleSystem.Arg("teleport.toplayer " + Facepunch.Utility.String.QuoteSafe(p.Name) + " " + Facepunch.Utility.String.QuoteSafe(str));
                 }
                 else
                 {
-                    if (list[0] == "ToTarget")
-                    {
-                        Arguments.Args = new string[] { Arguments.argUser.displayName, str };
-                    }
-                    else
-                    {
-                        Arguments.Args = new string[] { str, Arguments.argUser.displayName };
-                    }
-                    teleport.toplayer(ref Arguments);
-                    tpWaitList.Remove(Arguments.argUser.userID);
+                    arg = new ConsoleSystem.Arg("teleport.toplayer " + Facepunch.Utility.String.QuoteSafe(str) + " " + Facepunch.Utility.String.QuoteSafe(p.Name));
                 }
+                teleport.toplayer(ref arg);
+                tpWaitList.Remove(p.PlayerClient.userID);
             }
         }
     }

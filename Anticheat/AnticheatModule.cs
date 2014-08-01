@@ -117,7 +117,6 @@ namespace Anticheat
             Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
-            Hooks.OnChatReceived += new Hooks.ChatRecivedDelegate(ChatReceived);
             Logger.LogDebug("[AC] Loaded!");
         }
 
@@ -140,7 +139,6 @@ namespace Anticheat
             Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
             Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
             Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
-            Hooks.OnChatReceived -= new Hooks.ChatRecivedDelegate(ChatReceived);
         }
 
         #endregion
@@ -237,7 +235,6 @@ namespace Anticheat
                     {
                         Server.GetServer().BroadcastFrom(EchoBotName,
                             "[color#FF6666]" + pl.Name + " was banned (Moved " + distance.ToString("F2") + " meters)");
-                        pl.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
                         BanCheater(pl, "Moved " + distance.ToString("F2") + "m");
                     }
                     else if (Warned == 1 &&
@@ -250,7 +247,7 @@ namespace Anticheat
                             "[color#FF6666]" + pl.Name + " was kicked (Moved " +
                             distance.ToString("F2") + " meters, maybe lagged)");
                         pl.MessageFrom(EchoBotName, "[color#FF2222]You have been kicked!");
-                        Log("Kick: " + pl.Name + ". SpeedHack - may be lag");
+                        Log("Kick: " + pl.Name + ". SpeedHack - may be lag (" + pl.Ping + ")");
                         pl.Disconnect();
                     }
                     else if ((Warned == 1) &&
@@ -300,7 +297,7 @@ namespace Anticheat
             iniBansIP.Save();
             iniBansID.Save();
             player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-            Log("BAN: " + player.Name + " " + ". " + StringLog);
+            Log("BAN: " + player.Name + " " + ". " + StringLog + ". Ping: " + player.Ping);
             player.Disconnect();
         }
 
@@ -382,10 +379,6 @@ namespace Anticheat
         }
 
         //
-
-        private void ChatReceived(ref ConsoleSystem.Arg arg)
-        {
-        }
 
         private void Chat(Fougerite.Player p, ref ChatString text)
         {
@@ -684,6 +677,7 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
+                    else Logger.LogDebug(player.Name + " not banned! " + IpBanned);
 
                     IniParser iniBansID;
                     if (File.Exists(ModuleFolder + "\\BansID.ini"))
@@ -701,6 +695,7 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
+                    else Logger.LogDebug(player.Name + " not banned! " + IdBanned);
                 }
                 catch (Exception ex)
                 {

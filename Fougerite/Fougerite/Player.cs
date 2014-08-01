@@ -182,7 +182,7 @@ namespace Fougerite
             Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
         }
 
-        public void Notice(string icon, string text, [Optional, DefaultParameterValue(4f)] float duration)
+        public void Notice(string icon, string text, float duration = 4f)
         {
             Contract.Requires(icon != null);
             Contract.Requires(text != null);
@@ -198,14 +198,10 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void SafeTeleportTo(Fougerite.Player p, [Optional, DefaultParameterValue(1.5f)] float distance)
+        public void SafeTeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
             Vector3 target;
-            if (this.Admin) {
-                target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0, 0, -distance)); // rcon admin teleports behind target player
-            } else {
-                target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0, 0, distance)); // non-admin teleports in front of target player
-            }
+            target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0.0f, 0.0f, (this.Admin ? -distance : distance))); // rcon admin teleports behind target player
             this.SafeTeleportTo(target.x, target.z);
             this.ourPlayer.controllable.transform.LookAt(p.PlayerClient.controllable.transform.position);  // turn towards the target player
         }
@@ -227,17 +223,14 @@ namespace Fougerite
 
         public void TeleportTo(Fougerite.Player p)
         {
+            Contract.Requires(p != null);
+
             this.TeleportTo(p.Location);
         }
 
         public void TeleportTo(Vector3 target)
         {
-            try {
-                RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);
-            } catch(NullReferenceException ex) {
-                Logger.LogDebug("TeleportTo(Vector3 target) ex");
-                Logger.LogException(ex);
-            }
+            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);
         }
 
         public bool Admin

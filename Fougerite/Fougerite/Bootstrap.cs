@@ -49,7 +49,6 @@ namespace Fougerite
             Rust.Steam.Server.Official = false;
 
             ModuleManager.LoadModules();
-            PluginEngine.Instance();
 
             Fougerite.Hooks.ServerStarted();
         }

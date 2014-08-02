@@ -419,7 +419,7 @@ namespace Anticheat
                     .BroadcastFrom(EchoBotName, player.Name + " shooted " + victim.Name + " from " + distance + "m.");
                     Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
                     player.Disconnect();
-                    victim.TeleportTo(attacker_location);
+                    victim.TeleportTo(attacker_location.x, attacker_location.y, attacker_location.z);
                 }
             }
         }

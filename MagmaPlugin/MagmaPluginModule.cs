@@ -25,7 +25,7 @@ namespace MagmaPlugin
         }
 
         public override string Author {
-            get { return "Riketta, mikec, EquiFox, xEnt"; }
+            get { return "Riketta, mikec, EquiFox"; }
         }
 
         public override string Description {

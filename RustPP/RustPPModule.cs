@@ -74,6 +74,7 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown += new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
+            Fougerite.Hooks.OnCommandRaw += new Fougerite.Hooks.CommandRawHandlerDelegate(HandleCommand);
         }
 
         public override void DeInitialize()
@@ -90,6 +91,7 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown -= new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
             Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
             Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
+            Fougerite.Hooks.OnCommandRaw -= new Fougerite.Hooks.CommandRawHandlerDelegate(HandleCommand);
             
             Logger.LogDebug("DeInitialized RPP");
         }
@@ -97,6 +99,11 @@ namespace RustPP
         void TimeEvent(object x, ElapsedEventArgs y)
         {
             TimedEvents.startEvents();
+        }
+
+        void HandleCommand(ref ConsoleSystem.Arg arg)
+        {
+            Core.handleCommand(arg);
         }
 
         void Chat(Fougerite.Player p, ref ChatString text)

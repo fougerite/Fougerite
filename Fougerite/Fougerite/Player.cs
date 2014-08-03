@@ -200,10 +200,12 @@ namespace Fougerite
 
         public void SafeTeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
-            Vector3 target;
-            target = p.PlayerClient.controllable.transform.TransformPoint(new Vector3(0.0f, 0.0f, (this.Admin ? -distance : distance))); // rcon admin teleports behind target player
+            Contract.Requires(p.PlayerClient.controllable.transform != null);
+
+            Transform transform = p.PlayerClient.controllable.transform;                                                // get the target player's transform
+            Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
             this.SafeTeleportTo(target.x, target.z);
-            this.ourPlayer.controllable.transform.LookAt(p.PlayerClient.controllable.transform.position);  // turn towards the target player
+            this.ourPlayer.controllable.transform.LookAt(transform);                                                    // turn towards the target player's transform
         }
 
         public void SafeTeleportTo(Vector3 target)
@@ -223,9 +225,10 @@ namespace Fougerite
 
         public void TeleportTo(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
+            Contract.Requires(p.Location != null);
 
-            this.TeleportTo(p.Location);
+            Vector3 target = p.Location;
+            this.TeleportTo(target);
         }
 
         public void TeleportTo(Vector3 target)

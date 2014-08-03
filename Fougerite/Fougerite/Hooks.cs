@@ -81,67 +81,47 @@ namespace Fougerite
 
         public static void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            Contract.Assume(arg != null);
-            
             // These two follow from the fact that the chat.say has [User] attribute.
             Contract.Assume(arg.argUser != null);
             Contract.Assume(arg.argUser.connected);
 
             // This one is a always true, because NetUser's user field is readonly and initialized in the constructor.
             Contract.Assume(arg.argUser.user != null);
-
             Contract.Assume(arg.argUser.playerClient);
 
-            try
-            {
-                if (!chat.enabled) return;
+            if (!chat.enabled)
+                return;
 
-                // Check if the chat.say command has valid arguments.
-                if (arg.Args == null) return;
-                if (arg.Args.Length != 1) return;
+            var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
+            var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
 
-                Contract.Assume(arg.Args[0] != null);
+            // If there is a slash in the beginning, it's a chat command.
+            if (quotedMessage.Trim('"').StartsWith("/")) {
+                Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
 
-                // If there is a slash in the beginning, it's a chat command.
-                bool chatCommand = arg.Args[0].StartsWith("/");
+                string[] args = Facepunch.Utility.String.SplitQuotesStrings(quotedMessage.Trim('"'));
+                var command = args[0].TrimStart('/');
+                var cargs = new string[args.Length - 1];
+                Array.Copy(args, 1, cargs, 0, cargs.Length);
 
-                if (chatCommand)
-                {
-                    var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
-                    Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + arg.Args[0]);
+                if (OnCommand != null)
+                    OnCommand(new Player(arg.argUser.playerClient), command, cargs);
 
-                    var arg0 = arg.Args[0];
+            } else {
+                Logger.ChatLog(quotedName, quotedMessage);               
+                var chatstr = new ChatString(quotedMessage);
 
-                    var index = arg0.IndexOf(' ');
-                    var command = arg0.Substring(1, index == -1 ? arg0.Length : index);
-                    var args = Facepunch.Utility.String.SplitQuotesStrings(arg0.Substring(index + 1));
+                if(OnChat != null)
+                    OnChat(new Player(arg.argUser.playerClient), ref chatstr);
 
-                    if (OnCommand != null)
-                        OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), command, args);
-                }
-                else
-                {
-                    var chatString = new ChatString(arg.Args[0]);
+                string newchat = Facepunch.Utility.String.QuoteSafe(chatstr.NewText.Substring(1, chatstr.NewText.Length - 2)).Replace("\\\"", "" + '\u0022');
 
-                    if (OnChat != null) 
-                        OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref chatString);
+                if (string.IsNullOrEmpty(newchat))
+                    return;
 
-                    if (chatString == null) return;
-
-                    var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
-                    var quotedMessage = Facepunch.Utility.String.QuoteSafe(chatString.NewText);
-
-                    Fougerite.Data.GetData().chat_history.Add(quotedMessage);
-                    Fougerite.Data.GetData().chat_history_username.Add(quotedName);
-
-                    Logger.ChatLog(quotedName, quotedMessage);
-                    
-                    ConsoleNetworker.Broadcast("chat.add " + quotedName + " " + quotedMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
+                Fougerite.Data.GetData().chat_history.Add(newchat);
+                Fougerite.Data.GetData().chat_history_username.Add(quotedName);                                                   
+                ConsoleNetworker.Broadcast("chat.add " + quotedName + " " + newchat);
             }
         }
 

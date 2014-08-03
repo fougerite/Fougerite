@@ -101,7 +101,7 @@ namespace MagmaPlugin
                             string str5 = str3.Split('[')[1];
                             string str6 = str3.Split('[')[0];
                             str2 = str4 + "Util.CreateArrayInstance('" + str6 + "', " + str5 + ");";
-                        } else {
+                        } else if (str2.Contains(");")) {
                             string str3 = str2.Split(new string[1] {
                                 "new "
                             }, StringSplitOptions.None)[1].Split(new string[1] {

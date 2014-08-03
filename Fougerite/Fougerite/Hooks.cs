@@ -22,6 +22,7 @@ namespace Fougerite
         public static event BlueprintUseHandlerDelagate OnBlueprintUse;
         public static event ChatHandlerDelegate OnChat;
         public static event CommandHandlerDelegate OnCommand;
+        public static event CommandRawHandlerDelegate OnCommandRaw;
         public static event ConsoleHandlerDelegate OnConsoleReceived;
         public static event DoorOpenHandlerDelegate OnDoorUse;
         public static event EntityDecayDelegate OnEntityDecay;
@@ -98,6 +99,9 @@ namespace Fougerite
             // If there is a slash in the beginning, it's a chat command.
             if (quotedMessage.Trim('"').StartsWith("/")) {
                 Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
+
+                if (OnCommandRaw != null)
+                    OnCommandRaw(ref arg);
 
                 string[] args = Facepunch.Utility.String.SplitQuotesStrings(quotedMessage.Trim('"'));
                 var command = args[0].TrimStart('/');
@@ -523,6 +527,9 @@ namespace Fougerite
             OnCommand = delegate(Fougerite.Player param0, string param1, string[] param2)
             {
             };
+            OnCommandRaw = delegate(ref ConsoleSystem.Arg param0)
+            {
+            };
             OnPlayerConnected = delegate(Fougerite.Player param0)
             {
             };
@@ -627,6 +634,7 @@ namespace Fougerite
         public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
         public delegate void ChatRecivedDelegate(ref ConsoleSystem.Arg arg);
         public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);
+        public delegate void CommandRawHandlerDelegate(ref ConsoleSystem.Arg arg);
         public delegate void ConnectionHandlerDelegate(Fougerite.Player player);
         public delegate void ConsoleHandlerDelegate(ref ConsoleSystem.Arg arg, bool external);
         public delegate void DisconnectionHandlerDelegate(Fougerite.Player player);

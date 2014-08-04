@@ -111,9 +111,7 @@
     <Compile Include="Fougerite\PlayerInv.cs" />
     <Compile Include="Fougerite\Server.cs" />
     <Compile Include="Fougerite\Data.cs" />
-    <Compile Include="Fougerite\PluginEngine.cs" />
     <Compile Include="IniParser.cs" />
-    <Compile Include="Fougerite\Plugin.cs" />
     <Compile Include="Fougerite\Util.cs" />
     <Compile Include="Fougerite\Bootstrap.cs" />
     <Reference Include="Assembly-CSharp">

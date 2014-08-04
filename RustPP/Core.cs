@@ -18,7 +18,7 @@
         public static System.Collections.Generic.List<ulong> muteList = new System.Collections.Generic.List<ulong>();
         public static System.Collections.Generic.List<ulong> tempConnect = new System.Collections.Generic.List<ulong>();
         public static Dictionary<ulong, string> userCache;
-        public static string Version = "1.5.5";
+        public static string Version = "1.6.0";
         public static PList whiteList = new PList();
 
         public static void Init()

@@ -76,9 +76,6 @@
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="Jint">
-      <HintPath>..\References\Jint.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core">
       <HintPath>..\References\System.Core.dll</HintPath>
     </Reference>

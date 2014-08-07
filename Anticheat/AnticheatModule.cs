@@ -41,6 +41,7 @@ namespace Anticheat
         private IniParser INIConfig;
         private bool AntiSpeedHack_Enabled = false;
         private int AntiSpeedHack_Timer = 0;
+        private int AntiSpeedHack_Multipiler = 0;
         private bool AntiSpeedHack_Chat = false;
         private bool AntiSpeedHack_Kick = false;
         private bool AntiSpeedHack_Ban = false;
@@ -202,66 +203,79 @@ namespace Anticheat
 
         private void takeCoordsEvent(object x, ElapsedEventArgs y)
         {
-            Vector3 ZeroVector = Vector3.zero;
-            foreach (var pl in Server.GetServer().Players)
+            try
             {
-                if (pl == null || pl.PlayerClient.netPlayer == null || !pl.PlayerClient.netPlayer.isConnected)
+                Vector3 ZeroVector = Vector3.zero;
+                foreach (var pl in Server.GetServer().Players)
                 {
-                    Log("NotConnected: " + pl.Name);
-                    return;
-                }
-
-                Logger.LogDebug("[AC] Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
-
-                if (!AntiSpeedHack_AdminCheck && pl.Admin)
-                    continue;
-
-                object Coords = DS.Get("lastCoords", pl.Name);
-                if (Coords == null)
-                    return;
-                Vector3 lastLocation = (Vector3) Coords;
-                DS.Add("lastCoords", pl.Name, pl.Location);
-
-                if (lastLocation != ZeroVector && lastLocation != pl.Location)
-                {
-                    float distance = Math.Abs(Vector3.Distance(lastLocation, pl.Location));
-
-                    Logger.LogDebug("[AC] " + pl.Name + " speed is " + distance.ToString());
-                    int Warned = (int) DS.Get("AntiSpeedHack", pl.Name);
-                    if (Warned == 1 &&
-                        ((distance > AntiSpeedHack_BanDist && (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp)
-                          && AntiSpeedHack_Ban)
-                         || (distance > AntiSpeedHack_BanDist && !AntiSpeedHack_Tp && AntiSpeedHack_Ban)))
+                    if (pl == null || pl.PlayerClient.netPlayer == null || !pl.PlayerClient.netPlayer.isConnected)
                     {
-                        Server.GetServer().BroadcastFrom(EchoBotName,
-                            "[color#FF6666]" + pl.Name + " was banned (Moved " + distance.ToString("F2") + " meters)");
-                        BanCheater(pl, "Moved " + distance.ToString("F2") + "m");
+                        Log("[AC] NotConnected: " + pl.Name);
+                        return;
                     }
-                    else if (Warned == 1 &&
-                             (((distance > AntiSpeedHack_KickDist) &&
-                               (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) &&
-                               (AntiSpeedHack_Kick)) ||
-                              (distance > AntiSpeedHack_KickDist && !AntiSpeedHack_Tp && AntiSpeedHack_Kick)))
+
+//                Logger.LogDebug("[AC] Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
+
+                    if (!AntiSpeedHack_AdminCheck && pl.Admin)
+                        continue;
+
+                    object Coords = DS.Get("lastCoords", pl.Name);
+                    if (Coords == null)
+                        return;
+                    Vector3 lastLocation = (Vector3) Coords;
+                    DS.Add("lastCoords", pl.Name, pl.Location);
+
+                    if (lastLocation != ZeroVector && lastLocation != pl.Location)
                     {
-                        Server.GetServer().BroadcastFrom(EchoBotName,
-                            "[color#FF6666]" + pl.Name + " was kicked (Moved " +
-                            distance.ToString("F2") + " meters, maybe lagged)");
-                        pl.MessageFrom(EchoBotName, "[color#FF2222]You have been kicked!");
-                        Log("Kick: " + pl.Name + ". SpeedHack - may be lag (" + pl.Ping + ")");
-                        pl.Disconnect();
+                        float distance = Math.Abs(Vector3.Distance(lastLocation, pl.Location));
+
+                        Logger.LogDebug("[AC] " + pl.Name + " speed is " + distance.ToString());
+                        int Warned = (int) DS.Get("AntiSpeedHack", pl.Name);
+                        if (Warned == 1 &&
+                            ((distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Multipiler) &&
+                              (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp)
+                              && AntiSpeedHack_Ban)
+                             ||
+                             (distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                              AntiSpeedHack_Ban)))
+                        {
+                            Server.GetServer().BroadcastFrom(EchoBotName,
+                                "[color#FF6666]" + pl.Name + " was banned (Moved " + distance.ToString("F2") +
+                                " meters)");
+                            BanCheater(pl, "Moved " + distance.ToString("F2") + "m");
+                        }
+                        else if (Warned == 1 &&
+                                 (((distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Multipiler)) &&
+                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
+                                   (AntiSpeedHack_Kick)) ||
+                                  (distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                                   AntiSpeedHack_Kick)))
+                        {
+                            Server.GetServer().BroadcastFrom(EchoBotName,
+                                "[color#FF6666]" + pl.Name + " was kicked (Moved " +
+                                distance.ToString("F2") + " meters, maybe lagged)");
+                            pl.MessageFrom(EchoBotName, "[color#FF2222]You have been kicked!");
+                            Log("Kick: " + pl.Name + ". SpeedHack - may be lag (" + pl.Ping + ")");
+                            pl.Disconnect();
+                        }
+                        else if ((Warned == 1) &&
+                                 ((distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler) &&
+                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
+                                   AntiSpeedHack_Chat) ||
+                                  (distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                                   AntiSpeedHack_Chat)))
+                            Server.GetServer().BroadcastFrom(EchoBotName,
+                                "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
+                        else if ((Warned == 1) && (distance < AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler))
+                            DS.Add("AntiSpeedHack", pl.Name, 0);
+                        else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler)
+                            DS.Add("AntiSpeedHack", pl.Name, 1);
                     }
-                    else if ((Warned == 1) &&
-                             ((distance > AntiSpeedHack_ChatDist &&
-                               (distance < AntiSpeedHack_TpDist && AntiSpeedHack_Tp) &&
-                               AntiSpeedHack_Chat) ||
-                              (distance > AntiSpeedHack_ChatDist && !AntiSpeedHack_Tp && AntiSpeedHack_Chat)))
-                        Server.GetServer().BroadcastFrom(EchoBotName,
-                            "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
-                    else if ((Warned == 1) && (distance < AntiSpeedHack_ChatDist))
-                        DS.Add("AntiSpeedHack", pl.Name, 0);
-                    else if (Warned == 0 && distance > AntiSpeedHack_ChatDist)
-                        DS.Add("AntiSpeedHack", pl.Name, 1);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
         }
 
@@ -269,36 +283,43 @@ namespace Anticheat
 
         private void BanCheater(Fougerite.Player player, string StringLog)
         {
-            IniParser iniBansIP;
-            if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
-            else
+            try
             {
-                Logger.LogError("BansIP.ini does not exist!");
-                return;
-            }
+                IniParser iniBansIP;
+                if (File.Exists(ModuleFolder + "\\BansIP.ini"))
+                    iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                else
+                {
+                    Logger.LogError("BansIP.ini does not exist!");
+                    return;
+                }
 
-            IniParser iniBansID;
-            if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
-            else
+                IniParser iniBansID;
+                if (File.Exists(ModuleFolder + "\\BansID.ini"))
+                    iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                else
+                {
+                    Logger.LogError("BansID.ini does not exist!");
+                    return;
+                }
+
+                string Date = DateTime.Now.ToShortDateString();
+                string Time = DateTime.Now.ToShortTimeString();
+                ;
+                iniBansIP.AddSetting("Ips", player.IP,
+                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
+                iniBansID.AddSetting("Ids", player.SteamID,
+                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
+                iniBansIP.Save();
+                iniBansID.Save();
+                player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
+                Log("BAN: " + player.Name + " " + ". " + StringLog + ". Ping: " + player.Ping);
+                player.Disconnect();
+            }
+            catch (Exception ex)
             {
-                Logger.LogError("BansID.ini does not exist!");
-                return;
+                Logger.LogException(ex);
             }
-
-            string Date = DateTime.Now.ToShortDateString();
-            string Time = DateTime.Now.ToShortTimeString();
-            ;
-            iniBansIP.AddSetting("Ips", player.IP,
-                "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
-            iniBansID.AddSetting("Ids", player.SteamID,
-                "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
-            iniBansIP.Save();
-            iniBansID.Save();
-            player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-            Log("BAN: " + player.Name + " " + ". " + StringLog + ". Ping: " + player.Ping);
-            player.Disconnect();
         }
 
 
@@ -309,6 +330,7 @@ namespace Anticheat
             {
                 AntiSpeedHack_Enabled = GetBoolSetting("AntiSpeedHack", "Enable");
                 AntiSpeedHack_Timer = GetIntSetting("AntiSpeedHack", "Timer");
+                AntiSpeedHack_Multipiler = GetIntSetting("AntiSpeedHack", "Multipiler");
                 AntiSpeedHack_Chat = GetBoolSetting("AntiSpeedHack", "Chat");
                 AntiSpeedHack_KickDist = GetIntSetting("AntiSpeedHack", "KickDist");
                 AntiSpeedHack_Ban = GetBoolSetting("AntiSpeedHack", "Ban");
@@ -356,25 +378,33 @@ namespace Anticheat
 
         private void PlayerPingCheck(Fougerite.Player player)
         {
-            if (player.Ping < HighPingKicking_MaxPing)
+            try
             {
-                DS.Add("ping", player.Name, 0);
-                return;
-            }
+                if (player.Ping < HighPingKicking_MaxPing)
+                {
+                    DS.Add("ping", player.Name, 0);
+                    return;
+                }
 
-            int Warned = (int) DS.Get("ping", player.Name);
-            if (Warned == 0)
-            {
-                player.MessageFrom(EchoBotName,
-                    "[color#FF2222]Fix your ping (" + player.Ping + ") or you will be kicked!");
-                DS.Add("ping", player.Name, 1);
+                int Warned = (int) DS.Get("ping", player.Name);
+                if (Warned == 0)
+                {
+                    player.MessageFrom(EchoBotName,
+                        "[color#FF2222]Fix your ping (" + player.Ping + ") or you will be kicked!");
+                    DS.Add("ping", player.Name, 1);
+                }
+                else if (Warned == 1)
+                {
+                    player.MessageFrom(EchoBotName,
+                        "[color#FF2222]Your ping is " + player.Ping + " but maximum allowed is " +
+                        HighPingKicking_MaxPing);
+                    Log("Kick: " + player.Name + ". Lagger");
+                    player.Disconnect();
+                }
             }
-            else if (Warned == 1)
+            catch (Exception ex)
             {
-                player.MessageFrom(EchoBotName,
-                    "[color#FF2222]Your ping is " + player.Ping + " but maximum allowed is " + HighPingKicking_MaxPing);
-                Log("Kick: " + player.Name + ". Lagger");
-                player.Disconnect();
+                Logger.LogException(ex);
             }
         }
 
@@ -394,33 +424,44 @@ namespace Anticheat
 
         private void PlayerKilled(DeathEvent deathEvent)
         {
-            if (!(deathEvent.Attacker is Fougerite.Player))
-                return;
-
-            Fougerite.Player player = (Fougerite.Player)deathEvent.Attacker;
-            Fougerite.Player victim = (Fougerite.Player)deathEvent.Victim;
-
-            string weapon = deathEvent.WeaponName;
-            if ((deathEvent.DamageType == "Bullet" 
-                    && (weapon == "HandCannon" && weapon == "Pipe Shotgun" && weapon == "Revolver" && weapon == "9mm Pistol" &&
-                    weapon == "P250" && weapon == "Shotgun" && weapon == "Bolt Action Rifle" && weapon == "M4" &&
-                    weapon == "MP5A4"))
-                || (deathEvent.DamageType == "Melee" && (int)(Math.Round(deathEvent.DamageAmount)) == 75 
-                                                     && string.IsNullOrEmpty(weapon)))
+            try
             {
-                Vector3 attacker_location = player.Location;
-                Vector3 victim_location = ((Fougerite.Player) deathEvent.Victim).Location;
-                float distance = (float)Math.Round(Util.GetUtil().GetVectorsDistance(attacker_location, victim_location));
-                if (distance > RangeOf(weapon) && RangeOf(weapon) > 0)
+                if (!(deathEvent.Attacker is Fougerite.Player))
+                    return;
+
+                Fougerite.Player player = (Fougerite.Player) deathEvent.Attacker;
+                Fougerite.Player victim = (Fougerite.Player) deathEvent.Victim;
+
+                string weapon = deathEvent.WeaponName;
+                if ((deathEvent.DamageType == "Bullet"
+                     &&
+                     (weapon == "HandCannon" && weapon == "Pipe Shotgun" && weapon == "Revolver" &&
+                      weapon == "9mm Pistol" &&
+                      weapon == "P250" && weapon == "Shotgun" && weapon == "Bolt Action Rifle" && weapon == "M4" &&
+                      weapon == "MP5A4"))
+                    || (deathEvent.DamageType == "Melee" && (int) (Math.Round(deathEvent.DamageAmount)) == 75
+                        && string.IsNullOrEmpty(weapon)))
                 {
-                    player.Kill();
-                    BanCheater(player, "AutoAIM. Gun: " + weapon + " Dist: " + distance);
-                    Server.GetServer()
-                    .BroadcastFrom(EchoBotName, player.Name + " shooted " + victim.Name + " from " + distance + "m.");
-                    Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
-                    player.Disconnect();
-                    victim.TeleportTo(attacker_location.x, attacker_location.y, attacker_location.z);
+                    Vector3 attacker_location = player.Location;
+                    Vector3 victim_location = ((Fougerite.Player) deathEvent.Victim).Location;
+                    float distance =
+                        (float) Math.Round(Util.GetUtil().GetVectorsDistance(attacker_location, victim_location));
+                    if (distance > RangeOf(weapon) && RangeOf(weapon) > 0)
+                    {
+                        player.Kill();
+                        BanCheater(player, "AutoAIM. Gun: " + weapon + " Dist: " + distance);
+                        Server.GetServer()
+                            .BroadcastFrom(EchoBotName,
+                                player.Name + " shooted " + victim.Name + " from " + distance + "m.");
+                        Log("AutoAIM: " + player.Name + ". Gun: " + weapon + " Dist: " + distance);
+                        player.Disconnect();
+                        victim.TeleportTo(attacker_location.x, attacker_location.y, attacker_location.z);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
         }
 
@@ -440,19 +481,27 @@ namespace Anticheat
 
         private void PlayerHurt(HurtEvent he)
         {
-            if (GodModDetect)
+            try
             {
-                var Damage = Math.Round(he.DamageAmount);
-                Fougerite.Player Victim = (Fougerite.Player) he.Victim;
-                if ((!Victim.Admin) && (Damage == 0))
+                if (GodModDetect)
                 {
-                    Log("GOD: " + Victim.Name + ".  received 0 damage. Check him for GodMode!");
-                    foreach (var player in Server.GetServer().Players)
-                        if (player.Admin)
-                            player.MessageFrom(EchoBotName,
-                                "[color#FFA500]" + Victim.Name + " received 0 damage. Check him for GodMode!");
+                    var Damage = Math.Round(he.DamageAmount);
+                    Fougerite.Player Victim = (Fougerite.Player) he.Victim;
+                    if ((!Victim.Admin) && (Damage == 0))
+                    {
+                        Log("GOD: " + Victim.Name + ".  received 0 damage. Check him for GodMode!");
+                        foreach (var player in Server.GetServer().Players)
+                            if (player.Admin)
+                                player.MessageFrom(EchoBotName,
+                                    "[color#FFA500]" + Victim.Name + " received 0 damage. Check him for GodMode!");
 
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("[AC] GodDetect crash");
+                Logger.LogException(ex);
             }
         }
 
@@ -466,7 +515,6 @@ namespace Anticheat
         {
             try
             {
-
                 if (RelogCooldown)
                     if (!player.Admin)
                     {

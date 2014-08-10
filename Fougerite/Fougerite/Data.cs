@@ -15,7 +15,6 @@ namespace Fougerite
         private static Fougerite.Data data;
         public static Hashtable inifiles = new Hashtable();
         public Hashtable Fougerite_shared_data = new Hashtable();
-        public static string PATH;
 
         [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
@@ -78,15 +77,11 @@ namespace Fougerite
             return hashtable[key];
         }
 
-        public void Init()
-        {
-            this.Load();
-        }
-
+        [Obsolete("Modules hosting plugins must implement Load() plugin config", false)]
         public void Load()
         {
             inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(PATH))
+            foreach (string str in Directory.GetDirectories(Util.GetPublicFolder()))
             {
                 string path = "";
                 foreach (string str3 in Directory.GetFiles(str))

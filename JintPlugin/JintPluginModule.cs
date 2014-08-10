@@ -42,10 +42,11 @@ namespace JintPlugin
 
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
+        public static Hashtable inifiles = new Hashtable();
 
         public override void Initialize()
         {
-            pluginDirectory = new DirectoryInfo(Fougerite.Data.PATH);
+            pluginDirectory = new DirectoryInfo(ModuleFolder);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
         }        
@@ -162,7 +163,24 @@ namespace JintPlugin
             foreach (var name in GetPluginNames())
                 LoadPlugin(name);
 
-            Data.GetData().Load();
+            inifiles.Clear();
+            foreach (string str in Directory.GetDirectories(ModuleFolder))
+            {
+                string path = "";
+                foreach (string str3 in Directory.GetFiles(str))
+                {
+                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
+                    {
+                        path = str3;
+                    }
+                }
+                if (path != "")
+                {
+                    string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
+                    inifiles.Add(key, new IniParser(path));
+                    Logger.LogDebug("[JintPlugin] Loaded Config: " + key);
+                }
+            }
         }
     }
 }

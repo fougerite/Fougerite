@@ -41,10 +41,10 @@ namespace GlitchFix
                 {
                     var name = Entity.Name;
                     bool GiveBack = Config.GetSetting("Settings", "giveback").ToLower() == "true";
+                    var two = Util.GetUtil().CreateVector(Entity.X, Entity.Y, Entity.Z);
                     foreach (Entity ent in World.GetWorld().Entities)
                     {
                         var one = Util.GetUtil().CreateVector(ent.X, ent.Y, ent.Z);
-                        var two = Util.GetUtil().CreateVector(Entity.X, Entity.Y, Entity.Z);
                         var dist = Util.GetUtil().GetVectorsDistance(one, two);
 
                         if (ent.Name == "WoodRamp" || ent.Name == "MetalRamp")

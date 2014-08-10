@@ -101,16 +101,18 @@ namespace Fougerite
             NetCull.Destroy(go);
         }
 
+        public static string NormalizePath(string path)
+        {
+            string normal = path.Replace(@"\\", @"\").Replace(@"//", @"/").Trim();
+            Logger.LogDebug(@"[Util] """ + path + @""" to """ + normal + @"""");
+            return normal;
+        }
+
         public static string GetAbsoluteFilePath(string fileName)
         {
             Contract.Requires(!string.IsNullOrEmpty(fileName));
-            return (GetFougeriteFolder() + fileName);
-        }
-
-        public static string GetFougeriteFolder()
-        {
-            return Fougerite.Data.PATH;
-        }
+            return Path.Combine(Config.GetPublicFolder(), fileName);
+        }         
 
         public static string GetRootFolder()
         {
@@ -119,7 +121,7 @@ namespace Fougerite
 
         public static string GetServerFolder()
         {
-            return (Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))) + @"\rust_server_Data\");
+            return Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))), "rust_server_Data");
         }
 
         public object GetStaticField(string className, string field)

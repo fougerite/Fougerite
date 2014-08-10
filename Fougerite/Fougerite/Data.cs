@@ -81,7 +81,7 @@ namespace Fougerite
         public void Load()
         {
             inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(Util.GetPublicFolder()))
+            foreach (string str in Directory.GetDirectories(Config.GetPublicFolder()))
             {
                 string path = "";
                 foreach (string str3 in Directory.GetFiles(str))

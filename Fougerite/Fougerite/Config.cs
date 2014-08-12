@@ -17,6 +17,7 @@ namespace Fougerite
         {
             Contract.Requires(!string.IsNullOrEmpty(DirectoryConfigPath));
             Contract.Ensures(FougeriteDirectoryConfig != null);
+            Contract.Ensures(FougeriteConfig != null);
 
             if (File.Exists(DirectoryConfigPath))
             {
@@ -26,9 +27,6 @@ namespace Fougerite
             else Debug.Log("DirectoryConfig " + DirectoryConfigPath + " NOT loaded!");
 
             string ConfigPath = Path.Combine(GetPublicFolder(), "Fougerite.cfg");
-
-            Contract.Requires(!string.IsNullOrEmpty(ConfigPath));
-            Contract.Ensures(FougeriteConfig != null);
 
             if (File.Exists(ConfigPath))
             {

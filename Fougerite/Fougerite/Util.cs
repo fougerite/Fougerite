@@ -337,5 +337,22 @@ namespace Fougerite
                 return true;
             return false;
         }
+        
+        public Entity GetEntityatCoords(Vector3 GivenEntity)
+        {
+            World world = World.GetWorld();
+            foreach (var ent in world.Entities)
+            {
+                var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
+                var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
+                if (Distance < 0.1f) return ent;
+            }
+            return null;
+        }
+
+        public Entity GetEntityatCoords(float x, float y, float z)
+        {
+            return GetEntityatCoords(new Vector3(x, y, z));
+        }
     }
 }

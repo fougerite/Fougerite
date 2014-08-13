@@ -208,9 +208,18 @@ namespace Anticheat
                 Vector3 ZeroVector = Vector3.zero;
                 foreach (var pl in Server.GetServer().Players)
                 {
-                    if (pl == null || pl.PlayerClient.netPlayer == null || !pl.PlayerClient.netPlayer.isConnected)
+                    try
                     {
-                        Log("[AC] NotConnected: " + pl.Name);
+
+                        if (pl == null || pl.PlayerClient.netPlayer == null || !pl.PlayerClient.netPlayer.isConnected)
+                        {
+                            Log("[AC] NotConnected: " + pl.Name);
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException(ex);
                         return;
                     }
 

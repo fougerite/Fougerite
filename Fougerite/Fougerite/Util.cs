@@ -343,9 +343,12 @@ namespace Fougerite
             World world = World.GetWorld();
             foreach (var ent in world.Entities)
             {
-                var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
-                var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
-                if (Distance < 0.1f) return ent;
+                if (ent.Name != "MetalDoor" && ent.Name != "WoodDoor")
+                {
+                    var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
+                    var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
+                    if (Distance < 0.1f) return ent;
+                }
             }
             return null;
         }

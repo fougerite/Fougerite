@@ -354,5 +354,25 @@ namespace Fougerite
         {
             return GetEntityatCoords(new Vector3(x, y, z));
         }
+        
+        public Entity GetDooratCoords(Vector3 GivenEntity)
+        {
+            World world = World.GetWorld();
+            foreach (var ent in world.Entities)
+            {
+                if (ent.Name == "MetalDoor" || ent.Name == "WoodDoor")
+                {
+                    var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
+                    var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
+                    if (Distance < 2f) return ent;
+                }
+            }
+            return null;
+        }
+
+        public Entity GetDooratCoords(float x, float y, float z)
+        {
+            return GetDooratCoords(new Vector3(x, y, z));
+        }
     }
 }

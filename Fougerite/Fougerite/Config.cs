@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Fougerite
 {
-    class Config
+    public class Config
     {
         public static IniParser FougeriteDirectoryConfig;
         public static IniParser FougeriteConfig;

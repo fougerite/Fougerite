@@ -13,8 +13,10 @@ namespace Fougerite
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
         private static Fougerite.Data data;
-        public static Hashtable inifiles = new Hashtable();
         public Hashtable Fougerite_shared_data = new Hashtable();
+
+        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
+        public static Hashtable inifiles = new Hashtable();
 
         [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
@@ -38,6 +40,7 @@ namespace Fougerite
             }
         }
 
+        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public string GetConfigValue(string config, string section, string key)
         {
             Contract.Requires(!string.IsNullOrEmpty(config));
@@ -77,7 +80,7 @@ namespace Fougerite
             return hashtable[key];
         }
 
-        [Obsolete("Modules hosting plugins must implement Load() plugin config", false)]
+        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public void Load()
         {
             inifiles.Clear();
@@ -100,6 +103,7 @@ namespace Fougerite
             }
         }
 
+        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public void OverrideConfig(string config, string section, string key, string value)
         {
             Contract.Requires(!string.IsNullOrEmpty(config));

@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System;
+using System.Net;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +13,10 @@ namespace JintPlugin
     using Fougerite;
     using Fougerite.Events;
     using Jint;
+    using Jint.Native;
     using Jint.Parser;
     using Jint.Parser.Ast;
+    using POSIX;
 
     public class Plugin
     {
@@ -47,7 +51,6 @@ namespace JintPlugin
 
             Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly))
                 .SetValue("Server", Server.GetServer())
-                .SetValue("Data", Data.GetData())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("Web", new Web())
@@ -164,12 +167,12 @@ namespace JintPlugin
                        .ToUpperInvariant();
         }
 
-        private String ValidateRelativePath(String path)
+        private string ValidateRelativePath(string path)
         {
             Contract.Requires(!string.IsNullOrEmpty(path));
 
-            String normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
-            String rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
+            string normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
+            string rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
 
             if (!normalizedPath.StartsWith(rootDirNormalizedPath))
                 return null;
@@ -184,88 +187,48 @@ namespace JintPlugin
             try
             {
                 path = ValidateRelativePath(path);
-
                 if (path == null)
                     return false;
 
                 if (Directory.Exists(path))
-                    return false;
+                    return true;
 
                 Directory.CreateDirectory(path);
-
                 return true;
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
-
             return false;
         }
 
-        public IniParser GetIni(string path)
+        public void ToJsonFile(string path, string json)
+        {
+            Contract.Requires(!string.IsNullOrEmpty(path));
+            Contract.Requires(!string.IsNullOrEmpty(json));
+
+            path = ValidateRelativePath(path + ".json");
+            File.WriteAllText(path, json);
+        }
+
+        public string FromJsonFile(string path)
         {
             Contract.Requires(!string.IsNullOrEmpty(path));
 
-            path = ValidateRelativePath(path + ".ini");
-
-            if (path == null)
-                return null;
-            
+            string json = @"";
+            path = ValidateRelativePath(path + ".json");
             if (File.Exists(path))
-                return new IniParser(path);
+                json = File.ReadAllText(path);
 
-            return null;
-        }
-
-        public bool IniExists(string path)
-        {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
-            path = ValidateRelativePath(path + ".ini");
-
-            if (path == null)
-                return false;
-
-            return File.Exists(path);
-        }
-
-        public IniParser CreateIni(string path)
-        {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
-            try
-            {
-                path = ValidateRelativePath(path + ".ini");
-
-                File.WriteAllText(path, "");
-                return new IniParser(path);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return null;
-        }
-
-        public List<IniParser> GetInis(string path)
-        {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
-            path = ValidateRelativePath(path);
-
-            if (path == null)
-                return new List<IniParser>();
-
-            return Directory.GetFiles(path).Select(p => new IniParser(p)).ToList();
+            return json;
         }
 
         public void DeleteLog(string path)
         {
             Contract.Requires(!string.IsNullOrEmpty(path));
 
-            path = ValidateRelativePath(path + ".ini");
-
+            path = ValidateRelativePath(path + ".log");
             if (path == null)
                 return;
 
@@ -278,12 +241,39 @@ namespace JintPlugin
             Contract.Requires(!string.IsNullOrEmpty(path));
             Contract.Requires(text != null);
 
-            path = ValidateRelativePath(path + ".ini");
-
+            path = ValidateRelativePath(path + ".log");
             if (path == null)
                 return;
 
             File.AppendAllText(path, "[" + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "] " + text + "\r\n");
+        }
+
+        public void RotateLog(string logfile, int max = 6)
+        {
+            logfile = ValidateRelativePath(logfile + ".log");
+            if (logfile == null)
+                return;
+
+            string pathh, pathi;
+            int i, h;
+            for (i = max, h = i - 1; i > 1; i--, h--) {
+                pathi = ValidateRelativePath(logfile + i + ".log");
+                pathh = ValidateRelativePath(logfile + h + ".log");
+
+                try {
+                    if (!File.Exists(pathi))
+                        File.Create(pathi);
+
+                    if (!File.Exists(pathh)) {
+                        File.Replace(logfile, pathi, null);
+                    } else {
+                        File.Replace(pathh, pathi, null);
+                    }
+                } catch (Exception ex) {
+                    Logger.LogError("[JintPlugin] RotateLog " + logfile + ", " + pathh + ", " + pathi + ", " + ex);
+                    continue;
+                }
+            }
         }
 
         #endregion
@@ -340,27 +330,76 @@ namespace JintPlugin
 
         #region Other functions.
 
-        public string GetDate()
+        public string Today()
         {
             return DateTime.Now.ToShortDateString();
         }
 
-        public int GetTicks()
+        public int Ticks()
         {
             return Environment.TickCount;
         }
 
-        public string GetTime()
+        public string ClockTime()
         {
             return DateTime.Now.ToShortTimeString();
         }
 
-        public long GetTimestamp()
+        public int TimeStamp()
         {
-            TimeSpan span = (TimeSpan)(DateTime.UtcNow - new DateTime(0x7b2, 1, 1, 0, 0, 0));
-            return (long)span.TotalSeconds;
+            return Time.NowStamp;
         }
 
+        public int TimeSince(int when)
+        {
+            return Time.ElapsedStampSince(when);
+        }
+
+        #endregion
+
+        #region Web
+        public string GET(string url)
+        {
+            Contract.Requires(!string.IsNullOrEmpty(url));
+
+            using (System.Net.WebClient client = new System.Net.WebClient())
+            {
+                return client.DownloadString(url);
+            }
+        }
+
+        public string POSTJson(string url, string json)
+        {
+            Contract.Requires(!string.IsNullOrEmpty(url));
+            Contract.Requires(!string.IsNullOrEmpty(json));
+
+            using (WebClient client = new WebClient())
+            {
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                byte[] bytes = client.UploadData(url, "POST", Encoding.ASCII.GetBytes(json));
+                return Encoding.UTF8.GetString(bytes);
+            }
+        }
+
+        public string POSTJsonFile(string url, string path)
+        {
+            Contract.Requires(!string.IsNullOrEmpty(url));
+            Contract.Requires(!string.IsNullOrEmpty(path));
+
+            path = ValidateRelativePath(path + ".json");
+            if (!File.Exists(path)) {
+                Logger.LogError("[JintPlugin] JsonFile not found: " + path);
+                return null;
+            }
+
+            string json = File.ReadAllText(path);
+            using (WebClient client = new WebClient())
+            {
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                byte[] bytes = client.UploadData(url, "POST", Encoding.ASCII.GetBytes(json));
+                return Encoding.UTF8.GetString(bytes);
+            }
+        }
         #endregion
 
         #region Hooks

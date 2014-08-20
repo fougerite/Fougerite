@@ -59,13 +59,14 @@ namespace JintPlugin
                 if (File.Exists(path)) yield return dirInfo.Name;
             }
         }
-        private String GetPluginDirectoryPath(String name)
+
+        private string GetPluginDirectoryPath(string name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             return Path.Combine(pluginDirectory.FullName, name);
         }
-        private String GetPluginScriptPath(String name)
+        private string GetPluginScriptPath(string name)
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
@@ -77,8 +78,7 @@ namespace JintPlugin
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             string path = GetPluginScriptPath(name);
-            string[] strArray = File.ReadAllLines(path);
-            return String.Join("\r\n", strArray);
+            return File.ReadAllText(path);
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
@@ -131,7 +131,7 @@ namespace JintPlugin
 
             try
             {
-                String text = GetPluginScriptText(name);
+                string text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
                 Plugin plugin = new Plugin(dir, name, text);
                 plugin.InstallHooks();
@@ -163,24 +163,6 @@ namespace JintPlugin
             foreach (var name in GetPluginNames())
                 LoadPlugin(name);
 
-            inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(ModuleFolder))
-            {
-                string path = "";
-                foreach (string str3 in Directory.GetFiles(str))
-                {
-                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
-                    {
-                        path = str3;
-                    }
-                }
-                if (path != "")
-                {
-                    string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
-                    inifiles.Add(key, new IniParser(path));
-                    Logger.LogDebug("[JintPlugin] Loaded Config: " + key);
-                }
-            }
         }
     }
 }

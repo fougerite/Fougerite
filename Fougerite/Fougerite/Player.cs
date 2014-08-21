@@ -129,7 +129,7 @@ namespace Fougerite
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
 		
-		public bool HasBlueprint(BlueprintDataBlock dataBlock)
+	public bool HasBlueprint(BlueprintDataBlock dataBlock)
         {
             PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
             if (invent.KnowsBP(dataBlock))

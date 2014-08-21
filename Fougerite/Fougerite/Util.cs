@@ -337,6 +337,13 @@ namespace Fougerite
                 return true;
             return false;
         }
+		
+		public ItemDataBlock ConvertNameToData(string name)
+        {
+            ItemDataBlock byName = DatablockDictionary.GetByName(name);
+            if (byName != null) return byName;
+            return null;
+        }
         
         public Entity GetEntityatCoords(Vector3 GivenEntity)
         {

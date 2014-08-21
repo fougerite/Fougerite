@@ -1,30 +1,40 @@
-﻿namespace Fougerite
+namespace Fougerite
 {
     using System;
 
     public class EntityInv
     {
-        private Inventory _inv;
-        private EntityItem[] _items;
-        private Fougerite.Entity entity;
+        private readonly Fougerite.Entity entity;
+		private readonly EntityItem[] _items;
+		private readonly Inventory _inv;
 
-        public EntityInv(Fougerite.Entity entity)
-        {
-            this.entity = entity;
-            this._inv = entity.DirectInventory;
-            //this.InitItems();
-        }
+        public EntityInv(object Obj)
+		{
+			this.entity = new Entity(Obj);
+
+			DeployableObject deployable = (DeployableObject)Obj;
+			Inventory inv = (Inventory)deployable.GetComponent<Inventory>();
+			this._inv = inv;
+
+			this._items = new EntityItem[inv.slotCount];
+			for (var i = 0; i < inv.slotCount; i++)
+				this._items [i] = new EntityItem(this._inv, i);
+		}
+
+		public EntityInv (string empty = "")
+		{
+		}
 
         public void AddItem(string name)
         {
             this.AddItem(name, 1);
         }
 
-        public void AddItem(string name, int amount)
-        {
-            ItemDataBlock byName = DatablockDictionary.GetByName(name);
-            if (byName != null) this._inv.AddItemAmount(byName, amount);
-        }
+		public void AddItem(string name, int amount)
+		{
+			ItemDataBlock item = DatablockDictionary.GetByName(name);
+			this._inv.AddItemAmount (item, amount);
+		}
 
         public void AddItemTo(string name, int slot)
         {
@@ -41,146 +51,110 @@
             }
         }
 
-        public void Clear()
-        {
-            foreach (EntityItem item in this.Items)
-            {
-                this._inv.RemoveItem(item.RInventoryItem);
-            }
-        }
+		public void ClearAll ()
+		{
+			this._inv.Clear();
+		}
 
-        public void ClearAll()
-        {
-            this._inv.Clear();
-        }
+		private int GetFreeSlots ()
+		{
+			int num = 0;
+			for (int i = 0; i < this._inv.slotCount; i++)
+			{
+				if (this._inv.IsSlotFree(i))
+				{
+					num++;
+				}
+			}
+			return num;
+		}
 
-        private int GetFreeSlots()
-        {
-            int num = 0;
-            for (int i = 0; i < this._inv.slotCount; i++)
-            {
-                if (this._inv.IsSlotFree(i))
-                {
-                    num++;
-                }
-            }
-            return num;
-        }
-
-        public bool HasItem(string name)
-        {
-            return this.HasItem(name, 1);
-        }
-
-        public bool HasItem(string name, int number)
-        {
-            int num = 0;
-            foreach (EntityItem item in this.Items)
-            {
-                if (item.Name == name)
-                {
-                    if (item.UsesLeft >= number)
-                    {
-                        return true;
-                    }
-                    num += item.UsesLeft;
-                }
-            }
-            return (num >= number);
-        }
-
-        //Todo: Needs to be worked out  (Make SlotCount not to be undefined)
-        /*private void InitItems()
-        {
-            int slotc = this._inv.slotCount;
-            this.Items = new EntityItem[slotc];
-            for (int i = 0; i < slotc; i++)
-            {
-                if (i < slotc) this.Items[i] = new EntityItem(ref this._inv, i);
-            }
-        }*/
+		public bool HasItem(string name, int amount = 1)
+		{
+			int num = 0;
+			foreach (EntityItem item in this.Items)
+			{
+				if (item.Name == name)
+					num += item.UsesLeft;
+			}
+			return (num >= amount);
+		}
 
         public void MoveItem(int s1, int s2)
         {
             this._inv.MoveItemAtSlotToEmptySlot(this._inv, s1, s2);
         }
 
-        public void RemoveItem(EntityItem pi)
-        {
-            foreach (EntityItem item in this.Items)
-            {
-                if (item == pi)
-                {
-                    this._inv.RemoveItem(pi.RInventoryItem);
-                    return;
-                }
-            }
-        }
+		public void RemoveItem (string name, int amount = 1)
+		{
+			foreach (EntityItem item in this.Items)
+			{
+				if (item.Name == name)
+				{
+					if (item.UsesLeft > amount)
+					{
+						this._inv.RemoveItem(item.RInventoryItem);
+						this.AddItem(item.Name, (item.UsesLeft - amount));
+						return;
+					}
+					else if (item.UsesLeft == amount)
+					{
+						this._inv.RemoveItem(item.RInventoryItem);
+						return;
+					}
+					else
+					{
+						this._inv.RemoveItem(item.RInventoryItem);
+						amount -= item.UsesLeft;
+					}
+				}	
+			}
+		}
 
-        public void RemoveItem(int slot)
-        {
-            this._inv.RemoveItem(slot);
-        }
+		public void RemoveItem (int slot, int amount = 1)
+		{
+			EntityItem item = this.Items [slot];
+			if (item == null)
+				return;
+			if (item.UsesLeft > amount)
+			{
+				this._inv.RemoveItem (item.RInventoryItem);
+				this.AddItem (item.Name, (item.UsesLeft - amount));
+				return;
+			}
+			this._inv.RemoveItem (item.RInventoryItem);
+		}
 
-        public void RemoveItem(string name, int number)
-        {
-            int qty = number;
-            foreach (EntityItem item in this.Items)
-            {
-                if (item.Name == name)
-                {
-                    if (item.UsesLeft > qty)
-                    {
-                        item.Consume(qty);
-                        qty = 0;
-                        break;
-                    }
-                    qty -= item.UsesLeft;
-                    if (qty < 0)
-                    {
-                        qty = 0;
-                    }
-                    this._inv.RemoveItem(item.Slot);
-                    if (qty == 0)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
+		public int FreeSlots
+		{
+			get
+			{
+				return this.GetFreeSlots();
+			}
+		}
 
-        public void RemoveItemAll(string name)
-        {
-            this.RemoveItem(name, 0x1869f);
-        }
+		public int SlotCount
+		{
+			get
+			{
+				return this._inv.slotCount;
+			}
+		}
 
-        //Todo: Needs to be worked out (Make SlotCount not to be undefined)
-        /*public int FreeSlots
-        {
-            get
-            {
-                return this.GetFreeSlots();
-            }
-        }
+		public Inventory InternalInventory
+		{
+			get
+			{
+				return this._inv;
+			}
+		}
 
-        public int SlotCount
-        {
-            get
-            {
-                return this._inv.slotCount;
-            }
-        }*/
-
-        public EntityItem[] Items
-        {
-            get
-            {
-                return this._items;
-            }
-            set
-            {
-                this._items = value;
-            }
-        }
+		public EntityItem[] Items
+		{
+			get
+			{
+				return this._items;
+			}
+		}
     }
 }

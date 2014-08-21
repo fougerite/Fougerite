@@ -190,7 +190,7 @@ namespace Fougerite
             }
         }
 		
-		public Inventory DirectInventory
+	public Inventory DirectInventory
         {
             get
             {

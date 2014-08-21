@@ -189,6 +189,25 @@ namespace Fougerite
                 return 0;
             }
         }
+		
+		public Inventory DirectInventory
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                    return (Inventory)this.GetObject<DeployableObject>().GetComponent<Inventory>();
+                return (Inventory)null;
+            }
+        }
+
+        public EntityInv Inventory
+        {
+            get
+            {
+                this.inv = new EntityInv(this);
+                return this.inv;
+            }
+        }
 
         public string Name
         {

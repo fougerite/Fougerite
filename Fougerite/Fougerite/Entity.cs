@@ -24,7 +24,7 @@ namespace Fougerite
             Contract.Requires(Obj != null);
             Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
 
-            this._obj = Obj;
+            this.Object = Obj;
             var deployable = (DeployableObject)Obj;
             var inventory = deployable.GetComponent<Inventory>();
             if (inventory != null && deployable != null)
@@ -195,27 +195,14 @@ namespace Fougerite
                 return 0;
             }
         }
-		
-	public Inventory DirectInventory
-        {
-            get
-            {
-                if (this.IsDeployableObject() && hasInventory)
-                    return (Inventory)this.GetObject<DeployableObject>().GetComponent<Inventory>();
-                return (Inventory)null;
-            }
-        }
 
         public EntityInv Inventory
         {
             get
             {
-                if (this.IsDeployableObject() && hasInventory)
-                {
-                    this.inv = new EntityInv(this);
-                    return this.inv;
-                }
-                return null;
+                if (this.IsDeployableObject())
+                    return new EntityInv(this._obj);
+                return new EntityInv(String.Empty);
             }
         }
 

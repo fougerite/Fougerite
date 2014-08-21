@@ -43,6 +43,10 @@ public class IniParser
                 else
                 {
                     SectionPair pair;
+
+                    if (str.StartsWith(";"))
+                        str = str.Replace("=", "%eq%") + @"=%comment%";
+
                     string[] strArray = str.Split(new char[] {'='}, 2);
                     string str3 = null;
                     if (str2 == null)
@@ -95,6 +99,9 @@ public class IniParser
         System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
         foreach (SectionPair pair in this.tmpList)
         {
+            if (pair.Key.StartsWith(";"))  // don't count comments
+                continue;
+
             if (!list.Contains(pair.Section))
             {
                 list.Add(pair.Section);
@@ -125,6 +132,9 @@ public class IniParser
         System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
         foreach (SectionPair pair in this.tmpList)
         {
+            if (pair.Key.StartsWith(";"))
+                continue;
+
             if (pair.Section == sectionName)
             {
                 list.Add(pair.Key);
@@ -179,11 +189,14 @@ public class IniParser
                 if (pair2.Section == str3)
                 {
                     str = (string)this.keyPairs[pair2];
-                    if (str != null)
-                    {
-                        str = "=" + str;
+                    if (str != null) {
+                        if (str == "%comment%") {
+                            str = "";
+                        } else {
+                            str = "=" + str;
+                        }
                     }
-                    str2 = str2 + pair2.Key + str + "\r\n";
+                    str2 = str2 + pair2.Key.Replace("%eq%", "=") + str + "\r\n";
                 }
             }
             str2 = str2 + "\r\n";

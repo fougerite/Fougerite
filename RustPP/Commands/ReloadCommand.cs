@@ -10,8 +10,7 @@
     public class ReloadCommand : ChatCommand
     {
         public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
-        {
-            Fougerite.Data.GetData().Load();
+        {           
             TimedEvents.startEvents();
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("admins.xml")))
             {

@@ -94,8 +94,9 @@ namespace Anticheat
         public override void Initialize()
         {
             Logger.LogDebug("[AC] Loading...");
-            if(File.Exists(ModuleFolder + "\\Anticheat.cfg"))
-                INIConfig = new IniParser(ModuleFolder + "\\Anticheat.cfg");
+            string ConfigFile = Path.Combine(ModuleFolder, "Anticheat.cfg");
+            if(File.Exists(ConfigFile))
+                INIConfig = new IniParser(ConfigFile);
             else
             {
                 Logger.LogError("Anticheat.cfg does not exist. Can't load module.");
@@ -295,8 +296,9 @@ namespace Anticheat
             try
             {
                 IniParser iniBansIP;
-                if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                    iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                string ConfigFile = Path.Combine(ModuleFolder, "BansIP.ini");
+                if (File.Exists(ConfigFile))
+                    iniBansIP = new IniParser(ConfigFile);
                 else
                 {
                     Logger.LogError("BansIP.ini does not exist!");
@@ -304,8 +306,9 @@ namespace Anticheat
                 }
 
                 IniParser iniBansID;
-                if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                    iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                ConfigFile = Path.Combine(ModuleFolder,  "BansIP.ini");
+                if (File.Exists(ConfigFile))
+                    iniBansID = new IniParser(ConfigFile);
                 else
                 {
                     Logger.LogError("BansID.ini does not exist!");
@@ -637,11 +640,11 @@ namespace Anticheat
                             if (NamesRestrict_BindName)
                             {
                                 IniParser BoundNames;
-                                if (File.Exists(ModuleFolder + "\\BoundNames.ini"))
-                                    BoundNames = new IniParser(ModuleFolder + "\\BoundNames.ini");
+                                if (File.Exists(Path.Combine(ModuleFolder, "BoundNames.ini")))
+                                    BoundNames = new IniParser(Path.Combine(ModuleFolder, "BoundNames.ini"));
                                 else
                                 {
-                                    Logger.LogError("BoundNames.ini does not exist!");
+                                    Logger.LogError(Path.Combine(ModuleFolder, "BoundNames.ini") + " does not exist!");
                                     return;
                                 }
 
@@ -719,8 +722,9 @@ namespace Anticheat
                 try
                 {
                     IniParser iniBansIP;
-                    if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                        iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                    string ConfigFile = Path.Combine(ModuleFolder, "BansIP.ini");
+                    if (File.Exists(ConfigFile))
+                        iniBansIP = new IniParser(ConfigFile);
                     else
                     {
                         Logger.LogError("BansIP.ini does not exist!");
@@ -737,8 +741,9 @@ namespace Anticheat
                     else Logger.LogDebug(player.Name + " not banned! " + IpBanned);
 
                     IniParser iniBansID;
-                    if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                        iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                    ConfigFile = Path.Combine(ModuleFolder, "BansID.ini");                    
+                    if (File.Exists(ConfigFile))
+                        iniBansID = new IniParser(ConfigFile);
                     else
                     {
                         Logger.LogError("BansID.ini does not exist!");

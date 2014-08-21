@@ -42,10 +42,11 @@ namespace MagmaPlugin
             "system.io",
             "system.xml"
         };
+        public static Hashtable inifiles = new Hashtable();
 
         public override void Initialize()
         {
-            pluginDirectory = new DirectoryInfo(Fougerite.Data.PATH);
+            pluginDirectory = new DirectoryInfo(ModuleFolder);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
         }
@@ -119,15 +120,15 @@ namespace MagmaPlugin
                     script = script + str2 + "\r\n";
                 } catch (Exception ex) {
                     Logger.LogException(ex);
-                    Logger.LogError("[MagmaPlugin] Couln't create instance at line -> " + str1);
+                    Logger.LogError("[Magma] Couln't create instance at line -> " + str1);
                     return legacy;
                 }
             }
             if (FilterPlugin(script)) {
-                Logger.Log("[MagmaPlugin] Loaded: " + path);
+                Logger.Log("[Magma] Loaded: " + path);
                 return legacy + script;
             } else {
-                Logger.LogError("[MagmaPlugin] PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
+                Logger.LogError("[Magma] PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
                 return legacy;
             }
         }
@@ -137,7 +138,7 @@ namespace MagmaPlugin
             string str1 = script.ToLower();
             foreach (string str2 in filters) {
                 if (str1.Contains(str2)) {
-                    Logger.LogError("[MagmaPlugin] Script cannot contain: " + str2);
+                    Logger.LogError("[Magma] Script cannot contain: " + str2);
                     return false;
                 }
             }
@@ -148,7 +149,7 @@ namespace MagmaPlugin
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.LogDebug("[MagmaPlugin] Unloading " + name + " plugin.");
+            Logger.LogDebug("[Magma] Unloading " + name + " plugin.");
 
             if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
@@ -159,10 +160,10 @@ namespace MagmaPlugin
                 if (removeFromDict)
                     plugins.Remove(name);
 
-                Logger.Log("[MagmaPlugin] " + name + " plugin was unloaded successfuly.");
+                Logger.Log("[Magma] " + name + " plugin was unloaded successfuly.");
             } else {
-                Logger.LogError("[MagmaPlugin] Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("[MagmaPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                Logger.LogError("[Magma] Can't unload " + name + ". Plugin is not loaded.");
+                throw new InvalidOperationException("[Magma] Can't unload " + name + ". Plugin is not loaded.");
             }
         }
 
@@ -182,11 +183,11 @@ namespace MagmaPlugin
         {
             Contract.Requires(!string.IsNullOrEmpty(name));
 
-            Logger.LogDebug("[MagmaPlugin] Loading plugin " + name + ".");
+            Logger.LogDebug("[Magma] Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name)) {
-                Logger.LogError("[MagmaPlugin] " + name + " plugin is already loaded.");
-                throw new InvalidOperationException("[MagmaPlugin] " + name + " plugin is already loaded.");
+                Logger.LogError("[Magma] " + name + " plugin is already loaded.");
+                throw new InvalidOperationException("[Magma] " + name + " plugin is already loaded.");
             }
 
             try {
@@ -196,7 +197,7 @@ namespace MagmaPlugin
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log("[MagmaPlugin] " + name + " plugin was loaded successfuly.");
+                Logger.Log("[Magma] " + name + " plugin was loaded successfuly.");
             } catch (Exception ex) {
                 string arg = name + " plugin could not be loaded.";
                 Contract.Assume(!string.IsNullOrEmpty(arg));
@@ -220,7 +221,24 @@ namespace MagmaPlugin
             foreach (var name in GetPluginNames())
                 LoadPlugin(name);
 
-            Data.GetData().Load();
+            inifiles.Clear();
+            foreach (string str in Directory.GetDirectories(ModuleFolder))
+            {
+                string path = "";
+                foreach (string str3 in Directory.GetFiles(str))
+                {
+                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
+                    {
+                        path = str3;
+                    }
+                }
+                if (path != "")
+                {
+                    string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
+                    inifiles.Add(key, new IniParser(path));
+                    Logger.LogDebug("[Magma] Loaded Config: " + key);
+                }
+            }        
         }
     }
 }

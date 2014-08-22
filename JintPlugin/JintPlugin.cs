@@ -376,7 +376,7 @@ namespace JintPlugin
             using (WebClient client = new WebClient())
             {
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                byte[] bytes = client.UploadData(url, "POST", Encoding.ASCII.GetBytes(json));
+                byte[] bytes = client.UploadData(url, "POST", Encoding.UTF8.GetBytes(json));
                 return Encoding.UTF8.GetString(bytes);
             }
         }
@@ -396,7 +396,7 @@ namespace JintPlugin
             using (WebClient client = new WebClient())
             {
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
-                byte[] bytes = client.UploadData(url, "POST", Encoding.ASCII.GetBytes(json));
+                byte[] bytes = client.UploadData(url, "POST", Encoding.UTF8.GetBytes(json));
                 return Encoding.UTF8.GetString(bytes);
             }
         }

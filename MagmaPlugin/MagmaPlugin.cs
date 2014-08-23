@@ -164,8 +164,7 @@ namespace MagmaPlugin
             Contract.Requires(!string.IsNullOrEmpty(path));
 
             return Path.GetFullPath(new Uri(path).LocalPath)
-                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                       .ToUpperInvariant();
+                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private String ValidateRelativePath(String path)

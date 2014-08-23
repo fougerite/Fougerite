@@ -53,7 +53,6 @@ namespace JintPlugin
                 .SetValue("Server", Server.GetServer())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
-                .SetValue("Web", new Web())
                 .SetValue("World", World.GetWorld())
                 .SetValue("Plugin", this)
                 .Execute(code);
@@ -163,8 +162,7 @@ namespace JintPlugin
             Contract.Requires(!string.IsNullOrEmpty(path));
 
             return Path.GetFullPath(new Uri(path).LocalPath)
-                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                       .ToUpperInvariant();
+                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private string ValidateRelativePath(string path)

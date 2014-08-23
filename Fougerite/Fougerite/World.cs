@@ -365,10 +365,13 @@ namespace Fougerite
         {
             get
             {
-                return EnvironmentControlCenter.Singleton.GetTime();
+                float hour = EnvironmentControlCenter.Singleton.GetTime();
+                Contract.Requires(hour >= 0f && hour <= 24f);
+                return hour;
             }
             set
             {
+                Contract.Requires(value >= 0f && value <= 24f);
                 EnvironmentControlCenter.Singleton.SetTime(value);
             }
         }

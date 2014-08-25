@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Google.ProtocolBuffers.Collections;
 using Rust;
 using Fougerite;
 using Fougerite.Events;
@@ -51,6 +52,7 @@ namespace Anticheat
         private int AntiSpeedHack_BanDist = 0;
         private int AntiSpeedHack_TpDist = 0;
         private bool AntiSpeedHack_AdminCheck = false;
+        private int AntiSpeedHack_WarnLimit = 3;
 
         private bool AntiAIM_Enabled = false;
         private bool AntiAIM_HeadshotsOnly = false;
@@ -93,9 +95,11 @@ namespace Anticheat
 
         public override void Initialize()
         {
-            Logger.LogDebug("[AC] Loading...");
-            if(File.Exists(ModuleFolder + "\\Anticheat.cfg"))
-                INIConfig = new IniParser(ModuleFolder + "\\Anticheat.cfg");
+
+            Logger.LogDebug(ConsolePrefix + " Loading...");
+            string ConfigFile = Path.Combine(ModuleFolder, "Anticheat.cfg");
+            if(File.Exists(ConfigFile))
+                INIConfig = new IniParser(ConfigFile);
             else
             {
                 Logger.LogError("Anticheat.cfg does not exist. Can't load module.");
@@ -106,19 +110,19 @@ namespace Anticheat
             ConfigInit();
             TimersInit();
 
-            Hooks.OnEntityDecay += new Hooks.EntityDecayDelegate(EntityDecay);
-            Hooks.OnDoorUse += new Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Hooks.OnEntityHurt += new Hooks.EntityHurtDelegate(EntityHurt);
-            Hooks.OnPlayerConnected += new Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Hooks.OnPlayerDisconnected += new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(PlayerHurt);
-            Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnEntityDecay += EntityDecay;
+            Hooks.OnDoorUse += DoorUse;
+            Hooks.OnEntityHurt += EntityHurt;
+            Hooks.OnPlayerConnected += PlayerConnect;
+            Hooks.OnPlayerDisconnected += PlayerDisconnect;
+            Hooks.OnPlayerHurt += PlayerHurt;
+            Hooks.OnPlayerSpawned += PlayerSpawned;
             if (AntiAIM_Enabled)
-                Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
-            Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
-            Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
-            Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
-            Logger.LogDebug("[AC] Loaded!");
+                Hooks.OnPlayerKilled += PlayerKilled;
+            Hooks.OnServerShutdown += ServerShutdown;
+            Hooks.OnShowTalker += ShowTalker;
+            Hooks.OnChat += Chat;
+            Logger.LogDebug(ConsolePrefix + " Loaded!");
         }
 
         public override void DeInitialize()
@@ -128,18 +132,18 @@ namespace Anticheat
             takeCoordsTimer.Elapsed -= takeCoordsEvent;
             takeCoordsTimer.Stop();
                 
-            Hooks.OnEntityDecay -= new Hooks.EntityDecayDelegate(EntityDecay);
-            Hooks.OnDoorUse -= new Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Hooks.OnEntityHurt -= new Hooks.EntityHurtDelegate(EntityHurt);
-            Hooks.OnPlayerConnected -= new Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Hooks.OnPlayerDisconnected -= new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Hooks.OnPlayerHurt -= new Hooks.HurtHandlerDelegate(PlayerHurt);
-            Hooks.OnPlayerSpawned -= new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnEntityDecay -= EntityDecay;
+            Hooks.OnDoorUse -= DoorUse;
+            Hooks.OnEntityHurt -= EntityHurt;
+            Hooks.OnPlayerConnected -= PlayerConnect;
+            Hooks.OnPlayerDisconnected -= PlayerDisconnect;
+            Hooks.OnPlayerHurt -= PlayerHurt;
+            Hooks.OnPlayerSpawned -= PlayerSpawned;
             if (AntiAIM_Enabled)
-                Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
-            Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
-            Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
-            Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
+                Hooks.OnPlayerKilled -= PlayerKilled;
+            Hooks.OnServerShutdown -= ServerShutdown;
+            Hooks.OnShowTalker -= ShowTalker;
+            Hooks.OnChat -= Chat;
         }
 
         #endregion
@@ -160,9 +164,6 @@ namespace Anticheat
             return INIConfig.GetSetting(Section, Name).ToLower() == "true";
         }
 
-
-
-
         private void Log(string Msg)
         {
             Logger.Log(ConsolePrefix + " " + Msg);
@@ -180,18 +181,18 @@ namespace Anticheat
                 pingTimer = new Timer(HighPingKicking_Timer * 1000);
                 pingTimer.Elapsed += pingEvent;
                 pingTimer.Start();
-                Logger.LogDebug("[AC] pingTimer started - interval " + HighPingKicking_Timer);
+                Logger.LogDebug(ConsolePrefix + " pingTimer started - interval " + HighPingKicking_Timer);
             }
-            else Logger.LogDebug("[AC] HighPingKicking disabled");
+            else Logger.LogDebug(ConsolePrefix + " HighPingKicking disabled");
 
             if (AntiSpeedHack_Enabled)
             {
                 takeCoordsTimer = new Timer(AntiSpeedHack_Timer * 1000);
                 takeCoordsTimer.Elapsed += takeCoordsEvent;
                 takeCoordsTimer.Start();
-                Logger.LogDebug("[AC] takeCoordsTimer started - interval " + AntiSpeedHack_Timer);
+                Logger.LogDebug(ConsolePrefix + " takeCoordsTimer started - interval " + AntiSpeedHack_Timer);
             }
-            else Logger.LogDebug("[AC] AntiSpeedHack disabled");
+            else Logger.LogDebug(ConsolePrefix + " AntiSpeedHack disabled");
         }
 
         private void pingEvent(object x, ElapsedEventArgs y)
@@ -213,7 +214,7 @@ namespace Anticheat
 
                         if (pl == null || pl.PlayerClient.netPlayer == null || !pl.PlayerClient.netPlayer.isConnected)
                         {
-                            Log("[AC] NotConnected: " + pl.Name);
+                            Log(ConsolePrefix + " NotConnected: " + pl.Name);
                             return;
                         }
                     }
@@ -223,7 +224,7 @@ namespace Anticheat
                         return;
                     }
 
-//                Logger.LogDebug("[AC] Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
+//                Logger.LogDebug(ConsolePrefix + " Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
 
                     if (!AntiSpeedHack_AdminCheck && pl.Admin)
                         continue;
@@ -238,9 +239,10 @@ namespace Anticheat
                     {
                         float distance = Math.Abs(Vector3.Distance(lastLocation, pl.Location));
 
-                        Logger.LogDebug("[AC] " + pl.Name + " speed is " + distance.ToString());
+                        Logger.LogDebug(ConsolePrefix + " " + pl.Name + " speed is " + distance.ToString());
                         int Warned = (int) DS.Get("AntiSpeedHack", pl.Name);
-                        if (Warned == 1 &&
+
+                        if (Warned == AntiSpeedHack_WarnLimit &&
                             ((distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Multipiler) &&
                               (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp)
                               && AntiSpeedHack_Ban)
@@ -253,7 +255,8 @@ namespace Anticheat
                                 " meters)");
                             BanCheater(pl, "Moved " + distance.ToString("F2") + "m");
                         }
-                        else if (Warned == 1 &&
+                        /////
+                        else if (Warned == AntiSpeedHack_WarnLimit &&
                                  (((distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Multipiler)) &&
                                    (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
                                    (AntiSpeedHack_Kick)) ||
@@ -267,7 +270,8 @@ namespace Anticheat
                             Log("Kick: " + pl.Name + ". SpeedHack - may be lag (" + pl.Ping + ")");
                             pl.Disconnect();
                         }
-                        else if ((Warned == 1) &&
+                        /////
+                        else if ((Warned == AntiSpeedHack_WarnLimit) &&
                                  ((distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler) &&
                                    (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
                                    AntiSpeedHack_Chat) ||
@@ -275,10 +279,13 @@ namespace Anticheat
                                    AntiSpeedHack_Chat)))
                             Server.GetServer().BroadcastFrom(EchoBotName,
                                 "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
-                        else if ((Warned == 1) && (distance < AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler))
+                        else if ((Warned == AntiSpeedHack_WarnLimit) && (distance < AntiSpeedHack_ChatDist * AntiSpeedHack_Multipiler))
                             DS.Add("AntiSpeedHack", pl.Name, 0);
                         else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler)
-                            DS.Add("AntiSpeedHack", pl.Name, 1);
+                        {
+                            DS.Add("AntiSpeedHack", pl.Name, Warned + 1);
+                            pl.TeleportTo(lastLocation);
+                        }
                     }
                 }
             }
@@ -295,8 +302,9 @@ namespace Anticheat
             try
             {
                 IniParser iniBansIP;
-                if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                    iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                string ConfigFile = Path.Combine(ModuleFolder, "BansIP.ini");
+                if (File.Exists(ConfigFile))
+                    iniBansIP = new IniParser(ConfigFile);
                 else
                 {
                     Logger.LogError("BansIP.ini does not exist!");
@@ -304,8 +312,9 @@ namespace Anticheat
                 }
 
                 IniParser iniBansID;
-                if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                    iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                ConfigFile = Path.Combine(ModuleFolder,  "BansIP.ini");
+                if (File.Exists(ConfigFile))
+                    iniBansID = new IniParser(ConfigFile);
                 else
                 {
                     Logger.LogError("BansID.ini does not exist!");
@@ -349,6 +358,7 @@ namespace Anticheat
                 AntiSpeedHack_BanDist = GetIntSetting("AntiSpeedHack", "BanDistance");
                 AntiSpeedHack_TpDist = GetIntSetting("AntiSpeedHack", "TeleportDistance");
                 AntiSpeedHack_AdminCheck = GetBoolSetting("AntiSpeedHack", "AdminCheck");
+                AntiSpeedHack_WarnLimit = GetIntSetting("AntiSpeedHack", "WarnLimit");
 
                 AntiAIM_Enabled = GetBoolSetting("AntiAIM", "Enable");
                 AntiAIM_CountAIM = GetIntSetting("AntiAIM", "ShotsCount");
@@ -377,7 +387,7 @@ namespace Anticheat
 
                 LogPlayers = GetBoolSetting("LogPlayers", "Enable");
 
-                Logger.LogDebug("[AC] Config inited!");
+                Logger.LogDebug(ConsolePrefix + " Config inited!");
             }
             catch (Exception ex)
             {
@@ -509,7 +519,7 @@ namespace Anticheat
             }
             catch (Exception ex)
             {
-                Logger.LogError("[AC] GodDetect crash");
+                Logger.LogError(ConsolePrefix + " GodDetect crash");
                 Logger.LogException(ex);
             }
         }
@@ -553,7 +563,7 @@ namespace Anticheat
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[AC] DS fill fail");
+                    Logger.LogError(ConsolePrefix + " DS fill fail");
                     Logger.LogException(ex);
                 }
 
@@ -588,7 +598,7 @@ namespace Anticheat
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogError("[AC] NameLenght fail");
+                            Logger.LogError(ConsolePrefix + " NameLenght fail");
                             Logger.LogException(ex);
                         }
 
@@ -606,7 +616,7 @@ namespace Anticheat
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogError("[AC] Name Symbols fail");
+                            Logger.LogError(ConsolePrefix + " Name Symbols fail");
                             Logger.LogException(ex);
                         }
 
@@ -623,12 +633,12 @@ namespace Anticheat
                                     return;
                                 }
 
-                                Logger.LogDebug("[AC] BannedName: " + BannedNames[i]);
+                                Logger.LogDebug(ConsolePrefix + " BannedName: " + BannedNames[i]);
                             }
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogError("[AC] BannedNames fail");
+                            Logger.LogError(ConsolePrefix + " BannedNames fail");
                             Logger.LogException(ex);
                         }
 
@@ -637,21 +647,21 @@ namespace Anticheat
                             if (NamesRestrict_BindName)
                             {
                                 IniParser BoundNames;
-                                if (File.Exists(ModuleFolder + "\\BoundNames.ini"))
-                                    BoundNames = new IniParser(ModuleFolder + "\\BoundNames.ini");
+                                if (File.Exists(Path.Combine(ModuleFolder, "BoundNames.ini")))
+                                    BoundNames = new IniParser(Path.Combine(ModuleFolder, "BoundNames.ini"));
                                 else
                                 {
-                                    Logger.LogError("BoundNames.ini does not exist!");
+                                    Logger.LogError(Path.Combine(ModuleFolder, "BoundNames.ini") + " does not exist!");
                                     return;
                                 }
 
-                                Logger.LogDebug("[AC] I'm ok!");
+                                Logger.LogDebug(ConsolePrefix + " I'm ok!");
 
                                 var Name = player.Name.ToLower(); 
                                 string ID = BoundNames.GetSetting("Names", Name);
                                 if ((player.Admin && NamesRestrict_AdminsOnly) || !NamesRestrict_AdminsOnly)
                                 {
-                                    Logger.LogDebug("[AC] I'm ok O_O!");
+                                    Logger.LogDebug(ConsolePrefix + " I'm ok O_O!");
 
                                     if (string.IsNullOrEmpty(ID))
                                     {
@@ -667,20 +677,20 @@ namespace Anticheat
                                         player.Disconnect();
                                         return;
                                     }
-                                    Logger.LogDebug("[AC] I'm dead :(");
+                                    Logger.LogDebug(ConsolePrefix + " I'm dead :(");
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
-                            Logger.LogError("[AC] BindName fail");
+                            Logger.LogError(ConsolePrefix + " BindName fail");
                             Logger.LogException(ex);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[AC] NickRestrict check fail");
+                    Logger.LogError(ConsolePrefix + " NickRestrict check fail");
                     Logger.LogException(ex);
                 }
 
@@ -701,7 +711,7 @@ namespace Anticheat
                                 "[color#FF2222]You must wait " + Cooldown + " seconds before reconnecting. Remaining: " +
                                 Remaining +
                                 " seconds.");
-                            Logger.LogDebug("[AC] " + player.Name + " connect cooldown " + Cooldown + " sec!");
+                            Logger.LogDebug(ConsolePrefix + " " + player.Name + " connect cooldown " + Cooldown + " sec!");
                             player.Disconnect();
                             return;
                         }
@@ -711,7 +721,7 @@ namespace Anticheat
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[AC] Cooldown check fail");
+                    Logger.LogError(ConsolePrefix + " Cooldown check fail");
                     Logger.LogException(ex);
                 }
 
@@ -719,8 +729,9 @@ namespace Anticheat
                 try
                 {
                     IniParser iniBansIP;
-                    if (File.Exists(ModuleFolder + "\\BansIP.ini"))
-                        iniBansIP = new IniParser(ModuleFolder + "\\BansIP.ini");
+                    string ConfigFile = Path.Combine(ModuleFolder, "BansIP.ini");
+                    if (File.Exists(ConfigFile))
+                        iniBansIP = new IniParser(ConfigFile);
                     else
                     {
                         Logger.LogError("BansIP.ini does not exist!");
@@ -730,15 +741,16 @@ namespace Anticheat
                     if (!string.IsNullOrEmpty(IpBanned))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                        Logger.LogDebug("[AC] " + player.Name + " banned by IP!");
+                        Logger.LogDebug(ConsolePrefix + " " + player.Name + " banned by IP!");
                         player.Disconnect();
                         return;
                     }
                     else Logger.LogDebug(player.Name + " not banned! " + IpBanned);
 
                     IniParser iniBansID;
-                    if (File.Exists(ModuleFolder + "\\BansID.ini"))
-                        iniBansID = new IniParser(ModuleFolder + "\\BansID.ini");
+                    ConfigFile = Path.Combine(ModuleFolder, "BansID.ini");                    
+                    if (File.Exists(ConfigFile))
+                        iniBansID = new IniParser(ConfigFile);
                     else
                     {
                         Logger.LogError("BansID.ini does not exist!");
@@ -748,7 +760,7 @@ namespace Anticheat
                     if (!string.IsNullOrEmpty(IdBanned))
                     {
                         player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
-                        Logger.LogDebug("[AC] " + player.Name + " banned by ID!");
+                        Logger.LogDebug(ConsolePrefix + " " + player.Name + " banned by ID!");
                         player.Disconnect();
                         return;
                     }
@@ -756,7 +768,7 @@ namespace Anticheat
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[AC] Bans check fail");
+                    Logger.LogError(ConsolePrefix + " Bans check fail");
                     Logger.LogException(ex);
                 }
             }
@@ -765,7 +777,7 @@ namespace Anticheat
                 Logger.LogException(ex);
             }
 
-            Logger.LogDebug("[AC] " + player.Name + " Connected!");
+            Logger.LogDebug(ConsolePrefix + " " + player.Name + " Connected!");
         }
 
         private void EntityHurt(HurtEvent he)

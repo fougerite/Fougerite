@@ -2,6 +2,7 @@
 using Fougerite;
 using Fougerite.Events;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
@@ -30,8 +31,8 @@ namespace GlitchFix
         IniParser Config;
         public override void Initialize()
         {
-            Config = new IniParser(ModuleFolder + @"\GlitchFix.cfg");
-            Fougerite.Hooks.OnEntityDeployed += new Fougerite.Hooks.EntityDeployedDelegate(EntityDeployed);
+            Config = new IniParser(Path.Combine(ModuleFolder, "GlitchFix.cfg"));
+            Fougerite.Hooks.OnEntityDeployed += EntityDeployed;
         }
 
         void EntityDeployed(Fougerite.Player Player, Fougerite.Entity Entity)

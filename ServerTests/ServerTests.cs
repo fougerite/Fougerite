@@ -36,32 +36,32 @@ namespace ServerTests
 
         public override void Initialize()
         {
-            Fougerite.Hooks.OnEntityDecay += new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
-            Fougerite.Hooks.OnDoorUse += new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Fougerite.Hooks.OnEntityHurt += new Fougerite.Hooks.EntityHurtDelegate(EntityHurt);
-            Fougerite.Hooks.OnPlayerConnected += new Fougerite.Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Fougerite.Hooks.OnPlayerDisconnected += new Fougerite.Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Fougerite.Hooks.OnPlayerHurt += new Fougerite.Hooks.HurtHandlerDelegate(PlayerHurt);
-            Fougerite.Hooks.OnPlayerKilled += new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
-            Fougerite.Hooks.OnServerShutdown += new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
-            Fougerite.Hooks.OnShowTalker += new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
-            Fougerite.Hooks.OnChat += new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-            Fougerite.Hooks.OnCommand += new Fougerite.Hooks.CommandHandlerDelegate(Command);
+            Fougerite.Hooks.OnEntityDecay += EntityDecay;
+            Fougerite.Hooks.OnDoorUse += DoorUse;
+            Fougerite.Hooks.OnEntityHurt += EntityHurt;
+            Fougerite.Hooks.OnPlayerConnected += PlayerConnect;
+            Fougerite.Hooks.OnPlayerDisconnected += PlayerDisconnect;
+            Fougerite.Hooks.OnPlayerHurt += PlayerHurt;
+            Fougerite.Hooks.OnPlayerKilled += PlayerKilled;
+            Fougerite.Hooks.OnServerShutdown += ServerShutdown;
+            Fougerite.Hooks.OnShowTalker += ShowTalker;
+            Fougerite.Hooks.OnChat += Chat;
+            Fougerite.Hooks.OnCommand += Command;
         }
 
         public override void DeInitialize()
         {
-            Fougerite.Hooks.OnEntityDecay -= new Fougerite.Hooks.EntityDecayDelegate(EntityDecay);
-            Fougerite.Hooks.OnDoorUse -= new Fougerite.Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Fougerite.Hooks.OnEntityHurt -= new Fougerite.Hooks.EntityHurtDelegate(EntityHurt);
-            Fougerite.Hooks.OnPlayerConnected -= new Fougerite.Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Fougerite.Hooks.OnPlayerDisconnected -= new Fougerite.Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Fougerite.Hooks.OnPlayerHurt -= new Fougerite.Hooks.HurtHandlerDelegate(PlayerHurt);
-            Fougerite.Hooks.OnPlayerKilled -= new Fougerite.Hooks.KillHandlerDelegate(PlayerKilled);
-            Fougerite.Hooks.OnServerShutdown -= new Fougerite.Hooks.ServerShutdownDelegate(ServerShutdown);
-            Fougerite.Hooks.OnShowTalker -= new Fougerite.Hooks.ShowTalkerDelegate(ShowTalker);
-            Fougerite.Hooks.OnChat -= new Fougerite.Hooks.ChatHandlerDelegate(Chat);
-            Fougerite.Hooks.OnCommand -= new Fougerite.Hooks.CommandHandlerDelegate(Command);
+            Fougerite.Hooks.OnEntityDecay -= EntityDecay;
+            Fougerite.Hooks.OnDoorUse -= DoorUse;
+            Fougerite.Hooks.OnEntityHurt -= EntityHurt;
+            Fougerite.Hooks.OnPlayerConnected -= PlayerConnect;
+            Fougerite.Hooks.OnPlayerDisconnected -= PlayerDisconnect;
+            Fougerite.Hooks.OnPlayerHurt -= PlayerHurt;
+            Fougerite.Hooks.OnPlayerKilled -= PlayerKilled;
+            Fougerite.Hooks.OnServerShutdown -= ServerShutdown;
+            Fougerite.Hooks.OnShowTalker -= ShowTalker;
+            Fougerite.Hooks.OnChat -= Chat;
+            Fougerite.Hooks.OnCommand -= Command;
         }
 
         private void Command(Fougerite.Player player, string cmd, string[] args)

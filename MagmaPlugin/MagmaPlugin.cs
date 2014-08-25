@@ -54,7 +54,7 @@ namespace MagmaPlugin
         public void InitGlobals()
         {
             Engine.SetParameter("Server", Fougerite.Server.GetServer());
-            Engine.SetParameter("Data", Fougerite.Data.GetData());
+            Engine.SetParameter("Data", Magma.Data.GetData());
             Engine.SetParameter("DataStore", Fougerite.DataStore.GetInstance());
             Engine.SetParameter("Util", Fougerite.Util.GetUtil());
             Engine.SetParameter("Web", new Fougerite.Web());
@@ -164,8 +164,7 @@ namespace MagmaPlugin
             Contract.Requires(!string.IsNullOrEmpty(path));
 
             return Path.GetFullPath(new Uri(path).LocalPath)
-                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                       .ToUpperInvariant();
+                       .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private String ValidateRelativePath(String path)
@@ -545,43 +544,5 @@ namespace MagmaPlugin
         }
 
         #endregion
-    }
-}
-
-public class ParamsList
-{
-    private List<object> objs;
-
-    public int Length
-    {
-        get
-        {
-            return this.objs.Count;
-        }
-    }
-
-    public ParamsList()
-    {
-        this.objs = new List<object>();
-    }
-
-    public void Add(object o)
-    {
-        this.objs.Add(o);
-    }
-
-    public void Remove(object o)
-    {
-        this.objs.Remove(o);
-    }
-
-    public object Get(int index)
-    {
-        return this.objs[index];
-    }
-
-    public object[] ToArray()
-    {
-        return this.objs.ToArray();
     }
 }

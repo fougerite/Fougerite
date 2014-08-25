@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace Fougerite
+namespace Magma
 {
+    using Fougerite;
     using Facepunch.Utility;
     using System;
     using System.Collections;
@@ -12,13 +13,10 @@ namespace Fougerite
     {
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
-        private static Fougerite.Data data;
+        private static Magma.Data data;
+        public static Hashtable inifiles = new Hashtable();
         public Hashtable Fougerite_shared_data = new Hashtable();
 
-        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
-        public static Hashtable inifiles = new Hashtable();
-
-        [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
         {
             Contract.Requires(tablename != null);
@@ -40,7 +38,6 @@ namespace Fougerite
             }
         }
 
-        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public string GetConfigValue(string config, string section, string key)
         {
             Contract.Requires(!string.IsNullOrEmpty(config));
@@ -55,18 +52,17 @@ namespace Fougerite
             return parser.GetSetting(section, key);
         }
 
-        public static Fougerite.Data GetData()
+        public static Magma.Data GetData()
         {
             Contract.Ensures(Contract.Result<Data>() != null);
 
             if (data == null)
             {
-                data = new Fougerite.Data();
+                data = new Magma.Data();
             }
             return data;
         }
 
-        [Obsolete("Replaced with DataStore.Get", false)]
         public object GetTableValue(string tablename, object key)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
@@ -80,11 +76,10 @@ namespace Fougerite
             return hashtable[key];
         }
 
-        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public void Load()
         {
             inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(Config.GetPublicFolder()))
+            foreach (string str in Directory.GetDirectories(Fougerite.Config.GetPublicFolder()))
             {
                 string path = "";
                 foreach (string str3 in Directory.GetFiles(str))
@@ -100,20 +95,6 @@ namespace Fougerite
                     inifiles.Add(key, new IniParser(path));
                     Logger.LogDebug("Loaded Config: " + key);
                 }
-            }
-        }
-
-        [Obsolete("Modules hosting plugins will manage plugin config files", false)]
-        public void OverrideConfig(string config, string section, string key, string value)
-        {
-            Contract.Requires(!string.IsNullOrEmpty(config));
-            Contract.Requires(!string.IsNullOrEmpty(section));
-            Contract.Requires(!string.IsNullOrEmpty(key));
-
-            IniParser parser = (IniParser)inifiles[config.ToLower()];
-            if (parser != null)
-            {
-                parser.SetSetting(section, key, value);
             }
         }
 

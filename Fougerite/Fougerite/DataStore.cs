@@ -10,7 +10,7 @@ namespace Fougerite
     {
         public readonly Hashtable datastore = new Hashtable();
         private static DataStore instance;
-        public static string PATH = (Util.GetServerFolder() + @"..\FougeriteDatastore.ds");
+        public static string PATH = Path.Combine(Config.GetPublicFolder(), "FougeriteDatastore.ds");
 
         [ContractInvariantMethod]
         private void Invariant()

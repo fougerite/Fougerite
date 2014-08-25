@@ -110,18 +110,18 @@ namespace Anticheat
             ConfigInit();
             TimersInit();
 
-            Hooks.OnEntityDecay += new Hooks.EntityDecayDelegate(EntityDecay);
-            Hooks.OnDoorUse += new Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Hooks.OnEntityHurt += new Hooks.EntityHurtDelegate(EntityHurt);
-            Hooks.OnPlayerConnected += new Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Hooks.OnPlayerDisconnected += new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Hooks.OnPlayerHurt += new Hooks.HurtHandlerDelegate(PlayerHurt);
-            Hooks.OnPlayerSpawned += new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnEntityDecay += EntityDecay;
+            Hooks.OnDoorUse += DoorUse;
+            Hooks.OnEntityHurt += EntityHurt;
+            Hooks.OnPlayerConnected += PlayerConnect;
+            Hooks.OnPlayerDisconnected += PlayerDisconnect;
+            Hooks.OnPlayerHurt += PlayerHurt;
+            Hooks.OnPlayerSpawned += PlayerSpawned;
             if (AntiAIM_Enabled)
-                Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(PlayerKilled);
-            Hooks.OnServerShutdown += new Hooks.ServerShutdownDelegate(ServerShutdown);
-            Hooks.OnShowTalker += new Hooks.ShowTalkerDelegate(ShowTalker);
-            Hooks.OnChat += new Hooks.ChatHandlerDelegate(Chat);
+                Hooks.OnPlayerKilled += PlayerKilled;
+            Hooks.OnServerShutdown += ServerShutdown;
+            Hooks.OnShowTalker += ShowTalker;
+            Hooks.OnChat += Chat;
             Logger.LogDebug(ConsolePrefix + " Loaded!");
         }
 
@@ -132,18 +132,18 @@ namespace Anticheat
             takeCoordsTimer.Elapsed -= takeCoordsEvent;
             takeCoordsTimer.Stop();
                 
-            Hooks.OnEntityDecay -= new Hooks.EntityDecayDelegate(EntityDecay);
-            Hooks.OnDoorUse -= new Hooks.DoorOpenHandlerDelegate(DoorUse);
-            Hooks.OnEntityHurt -= new Hooks.EntityHurtDelegate(EntityHurt);
-            Hooks.OnPlayerConnected -= new Hooks.ConnectionHandlerDelegate(PlayerConnect);
-            Hooks.OnPlayerDisconnected -= new Hooks.DisconnectionHandlerDelegate(PlayerDisconnect);
-            Hooks.OnPlayerHurt -= new Hooks.HurtHandlerDelegate(PlayerHurt);
-            Hooks.OnPlayerSpawned -= new Hooks.PlayerSpawnHandlerDelegate(PlayerSpawned);
+            Hooks.OnEntityDecay -= EntityDecay;
+            Hooks.OnDoorUse -= DoorUse;
+            Hooks.OnEntityHurt -= EntityHurt;
+            Hooks.OnPlayerConnected -= PlayerConnect;
+            Hooks.OnPlayerDisconnected -= PlayerDisconnect;
+            Hooks.OnPlayerHurt -= PlayerHurt;
+            Hooks.OnPlayerSpawned -= PlayerSpawned;
             if (AntiAIM_Enabled)
-                Hooks.OnPlayerKilled -= new Hooks.KillHandlerDelegate(PlayerKilled);
-            Hooks.OnServerShutdown -= new Hooks.ServerShutdownDelegate(ServerShutdown);
-            Hooks.OnShowTalker -= new Hooks.ShowTalkerDelegate(ShowTalker);
-            Hooks.OnChat -= new Hooks.ChatHandlerDelegate(Chat);
+                Hooks.OnPlayerKilled -= PlayerKilled;
+            Hooks.OnServerShutdown -= ServerShutdown;
+            Hooks.OnShowTalker -= ShowTalker;
+            Hooks.OnChat -= Chat;
         }
 
         #endregion

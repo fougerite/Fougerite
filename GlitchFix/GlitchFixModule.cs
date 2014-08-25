@@ -32,7 +32,7 @@ namespace GlitchFix
         public override void Initialize()
         {
             Config = new IniParser(Path.Combine(ModuleFolder, "GlitchFix.cfg"));
-            Fougerite.Hooks.OnEntityDeployed += new Fougerite.Hooks.EntityDeployedDelegate(EntityDeployed);
+            Fougerite.Hooks.OnEntityDeployed += EntityDeployed;
         }
 
         void EntityDeployed(Fougerite.Player Player, Fougerite.Entity Entity)

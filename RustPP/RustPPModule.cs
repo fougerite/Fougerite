@@ -34,17 +34,15 @@ namespace RustPP
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            return (RustPPModule.StaticModuleFolder + RustPPModule.ConfigsFolder + fileName);
+            return Path.Combine(ConfigsFolder, fileName);
         }
 
         public static string ConfigFile;
         public static string ConfigsFolder;
-        public static string StaticModuleFolder;
         public override void Initialize()
         {
-            ConfigsFolder = @"\Configs\";
-            ConfigFile = ModuleFolder + ConfigsFolder + "\\Rust++.cfg";
-            StaticModuleFolder = ModuleFolder;
+            ConfigsFolder = ModuleFolder;
+            ConfigFile = Path.Combine(ConfigsFolder, "Rust++.cfg");
 
             Core.Init();
 

@@ -35,12 +35,8 @@ namespace Fougerite
 
         public void Start()
         {
-            if (File.Exists(Util.GetServerFolder() + @"\FougeriteDirectory.cfg"))
-                Fougerite.Data.PATH = new IniParser(Util.GetServerFolder() + @"\FougeriteDirectory.cfg").GetSetting("Settings", "Directory");
-            else
-                Fougerite.Data.PATH = Util.GetRootFolder() + @"\Fougerite\";
-
-            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
+            string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
+            Config.Init(FougeriteDirectoryConfig);
             Logger.Init();
 
             Contract.ContractFailed += (sender, args) => args.SetUnwind();

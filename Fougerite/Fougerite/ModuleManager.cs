@@ -26,7 +26,9 @@ namespace Fougerite
     public class ModuleManager
     {
         public static readonly Version ApiVersion = new Version(1, 0, 0, 0);
-        public static string ModulesFolder = @".\Modules\";
+        public static string ModulesFolder = Config.GetModulesFolder();
+        public static string PublicFolder = Config.GetPublicFolder();
+
         //private static bool IsIgnoreVersion = true;
         private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
         public static readonly List<ModuleContainer> Modules = new List<ModuleContainer>();
@@ -48,9 +50,15 @@ namespace Fougerite
             DirectoryInfo[] DirectoryInfos = new DirectoryInfo(ModulesFolder).GetDirectories();
             foreach (DirectoryInfo DirInfo in DirectoryInfos)
             {
-                FileInfo FileInfo = new FileInfo(DirInfo.FullName + "\\" + DirInfo.Name + ".dll");
+                FileInfo FileInfo = new FileInfo(Path.Combine(DirInfo.FullName, DirInfo.Name + ".dll"));
                 if (!FileInfo.Exists)
                     continue;
+
+                if (Array.IndexOf(Config.FougeriteConfig.EnumSection("Modules"), DirInfo.Name) == -1) {
+                    Logger.LogDebug(string.Format("[Modules] {0} is not configured to be loaded.", DirInfo.Name));
+                    continue;
+                }
+
                 Logger.LogDebug("[Modules] Module Found: " + FileInfo.Name);
                 string FileNameWithoutExtension = Path.GetFileNameWithoutExtension(FileInfo.Name);
                 if (IgnoredModules.Contains(FileNameWithoutExtension))
@@ -93,7 +101,7 @@ namespace Fougerite
                         if (PluginInstance != null)
                         {
                             ModuleContainer Container = new ModuleContainer(PluginInstance);
-                            Container.Plugin.ModuleFolder = Path.GetDirectoryName(FileInfo.FullName);
+                            Container.Plugin.ModuleFolder = Path.Combine(PublicFolder, Config.GetValue("Modules", DirInfo.Name).TrimStart(new char[]{'\\','/'}).Trim());
                             Modules.Add(Container);
                             Logger.LogDebug("[Modules] Module added: " + FileInfo.Name);
                             break;

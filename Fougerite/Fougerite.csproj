@@ -112,6 +112,8 @@
     <Compile Include="Fougerite\Server.cs" />
     <Compile Include="Fougerite\Data.cs" />
     <Compile Include="IniParser.cs" />
+    <Compile Include="KeyValues.cs" />
+    <Compile Include="KeyValuesData.cs" />
     <Compile Include="Fougerite\Util.cs" />
     <Compile Include="Fougerite\Bootstrap.cs" />
     <Reference Include="Assembly-CSharp">
@@ -129,6 +131,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Fougerite.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="FougeriteDirectory.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

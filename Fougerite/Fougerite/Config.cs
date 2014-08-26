@@ -11,11 +11,21 @@ namespace Fougerite
     public class Config
     {
         public static IniParser FougeriteConfig;
+        public static IniParser FougeriteDirectoryConfig;
 
-        public static void Init(string ConfigPath)
+        public static void Init(string ConfigDirPath)
         {
-            Contract.Requires(!string.IsNullOrEmpty(ConfigPath));
+            Contract.Requires(!string.IsNullOrEmpty(ConfigDirPath));
             Contract.Ensures(FougeriteConfig != null);
+
+            if (File.Exists(ConfigDirPath))
+            {
+                FougeriteDirectoryConfig = new IniParser(ConfigDirPath);
+                Debug.Log("DirectoryConfig " + ConfigDirPath + " loaded!");
+            }
+            else Debug.Log("DirectoryConfig " + ConfigDirPath + " NOT loaded!");
+
+            string ConfigPath = Path.Combine(GetPublicFolder(), "Fougerite.cfg");
 
             if (File.Exists(ConfigPath))
             {
@@ -48,7 +58,7 @@ namespace Fougerite
 
             Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
             string path =
-                root.Replace(GetValue("Settings", "ModulesFolder"), Util.GetRootFolder()) +
+                root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "ModulesFolder"), Util.GetRootFolder()) +
                 @"\";
             return Util.NormalizePath(path);
 
@@ -58,7 +68,7 @@ namespace Fougerite
         {
             Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
             string path =
-                root.Replace(GetValue("Settings", "PublicFolder"), Util.GetRootFolder()) +
+                root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "PublicFolder"), Util.GetRootFolder()) +
                 @"\";
             return Util.NormalizePath(path);
         }

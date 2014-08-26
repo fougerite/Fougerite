@@ -35,7 +35,7 @@ namespace Fougerite
 
         public void Start()
         {
-            string FougeriteConfig = Path.Combine(Util.GetServerFolder(), "Fougerite.cfg");
+            string FougeriteConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
             Config.Init(FougeriteConfig);
             Logger.Init();
 

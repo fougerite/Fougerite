@@ -42,7 +42,6 @@ namespace Anticheat
         private IniParser INIConfig;
         private bool AntiSpeedHack_Enabled = false;
         private int AntiSpeedHack_Timer = 0;
-        private int AntiSpeedHack_Multipiler = 0;
         private bool AntiSpeedHack_Chat = false;
         private bool AntiSpeedHack_Kick = false;
         private bool AntiSpeedHack_Ban = false;
@@ -224,8 +223,6 @@ namespace Anticheat
                         return;
                     }
 
-//                Logger.LogDebug(ConsolePrefix + " Coords: " + pl.Name + " - " + pl.Location.x + " : " + pl.Location.y + " : " + pl.Location.z);
-
                     if (!AntiSpeedHack_AdminCheck && pl.Admin)
                         continue;
 
@@ -243,11 +240,11 @@ namespace Anticheat
                         int Warned = (int) DS.Get("AntiSpeedHack", pl.Name);
 
                         if (Warned == AntiSpeedHack_WarnLimit &&
-                            ((distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Multipiler) &&
-                              (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp)
+                            ((distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Timer) &&
+                              (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Timer) && AntiSpeedHack_Tp)
                               && AntiSpeedHack_Ban)
                              ||
-                             (distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                             (distance > (AntiSpeedHack_BanDist*AntiSpeedHack_Timer) && !AntiSpeedHack_Tp &&
                               AntiSpeedHack_Ban)))
                         {
                             Server.GetServer().BroadcastFrom(EchoBotName,
@@ -257,10 +254,10 @@ namespace Anticheat
                         }
                         /////
                         else if (Warned == AntiSpeedHack_WarnLimit &&
-                                 (((distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Multipiler)) &&
-                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
+                                 (((distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Timer)) &&
+                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Timer) && AntiSpeedHack_Tp) &&
                                    (AntiSpeedHack_Kick)) ||
-                                  (distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                                  (distance > (AntiSpeedHack_KickDist*AntiSpeedHack_Timer) && !AntiSpeedHack_Tp &&
                                    AntiSpeedHack_Kick)))
                         {
                             Server.GetServer().BroadcastFrom(EchoBotName,
@@ -272,21 +269,21 @@ namespace Anticheat
                         }
                         /////
                         else if ((Warned == AntiSpeedHack_WarnLimit) &&
-                                 ((distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler) &&
-                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Multipiler) && AntiSpeedHack_Tp) &&
+                                 ((distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Timer) &&
+                                   (distance < (AntiSpeedHack_TpDist*AntiSpeedHack_Timer) && AntiSpeedHack_Tp) &&
                                    AntiSpeedHack_Chat) ||
-                                  (distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler) && !AntiSpeedHack_Tp &&
+                                  (distance > (AntiSpeedHack_ChatDist*AntiSpeedHack_Timer) && !AntiSpeedHack_Tp &&
                                    AntiSpeedHack_Chat)))
                             Server.GetServer().BroadcastFrom(EchoBotName,
                                 "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
-                        else if ((Warned == AntiSpeedHack_WarnLimit) && (distance < AntiSpeedHack_ChatDist * AntiSpeedHack_Multipiler))
+                        else if ((Warned == AntiSpeedHack_WarnLimit) && (distance < AntiSpeedHack_ChatDist * AntiSpeedHack_Timer))
                             DS.Add("AntiSpeedHack", pl.Name, 0);
-                        else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler)
+                        else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Timer)
                         {
-                            Log("Warn: " + pl.Name + ". Moved " + distance);
-                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warned + 1 + "warning! He moved " + distance);
-                            DS.Add("AntiSpeedHack", pl.Name, Warned + 1);
                             pl.TeleportTo(lastLocation);
+                            DS.Add("AntiSpeedHack", pl.Name, Warned + 1);
+                            Log("Warn: " + pl.Name + ". Moved " + distance);
+                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warned + 1 + "warning! He moved " + distance.ToString("F2"));
                         }
                     }
                 }
@@ -350,7 +347,6 @@ namespace Anticheat
             {
                 AntiSpeedHack_Enabled = GetBoolSetting("AntiSpeedHack", "Enable");
                 AntiSpeedHack_Timer = GetIntSetting("AntiSpeedHack", "Timer");
-                AntiSpeedHack_Multipiler = GetIntSetting("AntiSpeedHack", "Multipiler");
                 AntiSpeedHack_Chat = GetBoolSetting("AntiSpeedHack", "Chat");
                 AntiSpeedHack_KickDist = GetIntSetting("AntiSpeedHack", "KickDist");
                 AntiSpeedHack_Ban = GetBoolSetting("AntiSpeedHack", "Ban");
@@ -634,8 +630,6 @@ namespace Anticheat
                                     player.Disconnect();
                                     return;
                                 }
-
-                                Logger.LogDebug(ConsolePrefix + " BannedName: " + BannedNames[i]);
                             }
                         }
                         catch (Exception ex)
@@ -657,14 +651,10 @@ namespace Anticheat
                                     return;
                                 }
 
-                                Logger.LogDebug(ConsolePrefix + " I'm ok!");
-
                                 var Name = player.Name.ToLower(); 
                                 string ID = BoundNames.GetSetting("Names", Name);
                                 if ((player.Admin && NamesRestrict_AdminsOnly) || !NamesRestrict_AdminsOnly)
                                 {
-                                    Logger.LogDebug(ConsolePrefix + " I'm ok O_O!");
-
                                     if (string.IsNullOrEmpty(ID))
                                     {
                                         player.MessageFrom(EchoBotName,
@@ -679,7 +669,6 @@ namespace Anticheat
                                         player.Disconnect();
                                         return;
                                     }
-                                    Logger.LogDebug(ConsolePrefix + " I'm dead :(");
                                 }
                             }
                         }

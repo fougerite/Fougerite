@@ -283,8 +283,8 @@ namespace Anticheat
                             pl.TeleportTo(lastLocation);
                             int Warn = Warned + 1;
                             DS.Add("AntiSpeedHack", pl.Name, Warn);
-                            Log("Warn: " + pl.Name + ". Moved " + distance.ToString("F2") + ". Count: " + Warn);
-                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warn + "warning! He moved " + distance.ToString("F2"));
+                            Log("Warn: " + pl.Name + ". Moved " + distance.ToString("F2") + ". Count: " + Warn + ". Ping: " + pl.Ping);
+                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warn + " warning! Moved " + distance.ToString("F2"));
                         }
                     }
                 }

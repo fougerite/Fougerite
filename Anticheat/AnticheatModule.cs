@@ -283,6 +283,8 @@ namespace Anticheat
                             DS.Add("AntiSpeedHack", pl.Name, 0);
                         else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Multipiler)
                         {
+                            Log("Warn: " + pl.Name + ". Moved " + distance);
+                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warned + 1 + "warning! He moved " + distance);
                             DS.Add("AntiSpeedHack", pl.Name, Warned + 1);
                             pl.TeleportTo(lastLocation);
                         }

@@ -35,8 +35,8 @@ namespace Fougerite
 
         public void Start()
         {
-            string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
-            Config.Init(FougeriteDirectoryConfig);
+            string FougeriteConfig = Path.Combine(Util.GetServerFolder(), "Fougerite.cfg");
+            Config.Init(FougeriteConfig);
             Logger.Init();
 
             Contract.ContractFailed += (sender, args) => args.SetUnwind();

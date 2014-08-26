@@ -278,12 +278,13 @@ namespace Anticheat
                                 "[color#FF6666]" + pl.Name + " moved " + distance.ToString("F2") + " meters!");
                         else if ((Warned == AntiSpeedHack_WarnLimit) && (distance < AntiSpeedHack_ChatDist * AntiSpeedHack_Timer))
                             DS.Add("AntiSpeedHack", pl.Name, 0);
-                        else if (Warned == 0 && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Timer)
+                        else if (Warned < AntiSpeedHack_WarnLimit && distance > AntiSpeedHack_ChatDist*AntiSpeedHack_Timer)
                         {
                             pl.TeleportTo(lastLocation);
-                            DS.Add("AntiSpeedHack", pl.Name, Warned + 1);
-                            Log("Warn: " + pl.Name + ". Moved " + distance);
-                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warned + 1 + "warning! He moved " + distance.ToString("F2"));
+                            int Warn = Warned + 1;
+                            DS.Add("AntiSpeedHack", pl.Name, Warn);
+                            Log("Warn: " + pl.Name + ". Moved " + distance.ToString("F2") + ". Count: " + Warn);
+                            Server.GetServer().BroadcastFrom(EchoBotName, pl.Name + " get " + Warn + "warning! He moved " + distance.ToString("F2"));
                         }
                     }
                 }

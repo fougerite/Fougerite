@@ -45,39 +45,22 @@ namespace Fougerite
 
         public static string GetModulesFolder()
         {
-            try
-            {
-                Debug.Log(GetValue("Settings", "ModulesFolder"));
-                Debug.Log(Util.GetRootFolder());
 
-                Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
-                string path =
-                    root.Replace(GetValue("Settings", "ModulesFolder"), Util.GetRootFolder()) +
-                    @"\";
-                return Util.NormalizePath(path);
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("112112 " + ex);
-            }
-            return "";
+            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
+            string path =
+                root.Replace(GetValue("Settings", "ModulesFolder"), Util.GetRootFolder()) +
+                @"\";
+            return Util.NormalizePath(path);
+
         }
 
         public static string GetPublicFolder()
         {
-            try
-            {
-                Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
-                string path =
-                    root.Replace(GetValue("Settings", "PublicFolder"), Util.GetRootFolder()) +
-                    @"\";
-                return Util.NormalizePath(path);
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("2123 " + ex);
-            }
-            return "";
+            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
+            string path =
+                root.Replace(GetValue("Settings", "PublicFolder"), Util.GetRootFolder()) +
+                @"\";
+            return Util.NormalizePath(path);
         }
     }
 }

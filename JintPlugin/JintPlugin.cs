@@ -1,14 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Text;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Timers;
-
-namespace JintPlugin
+﻿namespace JintPlugin
 {
+    using System;
+    using System.Net;
+    using System.Text;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Timers;
     using Fougerite;
     using Fougerite.Events;
     using Jint;
@@ -37,6 +34,7 @@ namespace JintPlugin
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
+                .SetValue("Entities", new Entities())
                 .SetValue("Plugin", this)
                 .Execute(code);
             Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +

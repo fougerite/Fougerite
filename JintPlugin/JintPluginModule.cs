@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-
-namespace JintPlugin
+﻿namespace JintPlugin
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
     using Fougerite;
 
-    public class JintPluginModule : Module
+    public class JintPluginModule : Fougerite.Module
     {
         public override string Name
         {

@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Fougerite;
 
 namespace MagmaPlugin
 {
-    public class MagmaPluginModule : Fougerite.Module
+    using Fougerite;
+
+    public class MagmaPluginModule : Module
     {
         public override string Name {
             get { return "MagmaPlugin"; }

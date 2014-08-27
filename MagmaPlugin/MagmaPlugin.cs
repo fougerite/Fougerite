@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,17 +19,6 @@ namespace MagmaPlugin
         public readonly string Code;
         public readonly DirectoryInfo RootDirectory;
         public readonly Dictionary<String, TimedEvent> Timers;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(Engine != null);
-            Contract.Invariant(!string.IsNullOrEmpty(Name));
-            Contract.Invariant(Code != null);
-            Contract.Invariant(RootDirectory != null);
-            Contract.Invariant(!string.IsNullOrEmpty(RootDirectory.FullName));
-            Contract.Invariant(Timers != null);
-        }
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
@@ -161,16 +149,12 @@ namespace MagmaPlugin
 
         private static string NormalizePath(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             return Path.GetFullPath(new Uri(path).LocalPath)
                        .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private String ValidateRelativePath(String path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             String normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
             String rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
 
@@ -182,8 +166,6 @@ namespace MagmaPlugin
 
         public bool CreateDir(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             try
             {
                 path = ValidateRelativePath(path);
@@ -208,8 +190,6 @@ namespace MagmaPlugin
 
         public IniParser GetIni(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -223,8 +203,6 @@ namespace MagmaPlugin
 
         public bool IniExists(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -235,8 +213,6 @@ namespace MagmaPlugin
 
         public IniParser CreateIni(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             try
             {
                 path = ValidateRelativePath(path + ".ini");
@@ -253,8 +229,6 @@ namespace MagmaPlugin
 
         public List<IniParser> GetInis(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path);
 
             if (path == null)
@@ -265,8 +239,6 @@ namespace MagmaPlugin
 
         public void DeleteLog(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -278,9 +250,6 @@ namespace MagmaPlugin
 
         public void Log(string path, string text)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-            Contract.Requires(text != null);
-
             path = ValidateRelativePath(path + ".ini");
 
             if (path == null)
@@ -370,33 +339,21 @@ namespace MagmaPlugin
 
         public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_BlueprintUse", player, evt);
         }
 
         public void OnChat(Player player, ref ChatString text)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(text != null);
-
             Invoke("On_Chat", player, text);
         }
 
         public void OnCommand(Player player, string command, string[] args)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(!string.IsNullOrEmpty(command));
-            Contract.Requires(args != null);
-
             Invoke("On_Command", player, command, args);
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
         {
-            Contract.Requires(arg != null);
-
             Player player = Player.FindByPlayerClient(arg.argUser.playerClient);
 
             if (!external)
@@ -407,103 +364,71 @@ namespace MagmaPlugin
 
         public void OnDoorUse(Player player, DoorEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_DoorUse", player, evt);
         }
 
         public void OnEntityDecay(DecayEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_EntityDecay", evt);
         }
 
         public void OnEntityDeployed(Player player, Entity entity)
         {
-            Contract.Requires(entity != null);
-
             Invoke("On_EntityDeployed", player, entity);
         }
 
         public void OnEntityHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_EntityHurt", evt);
         }
 
         public void OnItemsLoaded(ItemsBlocks items)
         {
-            Contract.Requires(items != null);
-
             Invoke("On_ItemsLoaded", items);
         }
 
         public void OnNPCHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_NPCHurt", evt);
         }
 
         public void OnNPCKilled(DeathEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_NPCKilled", evt);
         }
 
         public void OnPlayerConnected(Player player)
         {
-            Contract.Requires(player != null);
-
             Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Player player)
         {
-            Contract.Requires(player != null);
-
             Invoke("On_PlayerDisconnected", player);
         }
 
         public void OnPlayerGathering(Player player, GatherEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerGathering", player, evt);
         }
 
         public void OnPlayerHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerHurt", evt);
         }
 
         public void OnPlayerKilled(DeathEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerKilled", evt);
         }
 
         public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerSpawning", player, evt);
         }
 
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerSpawned", player, evt);
         }
 
@@ -524,10 +449,6 @@ namespace MagmaPlugin
 
         public void OnTablesLoaded(Dictionary<string, LootSpawnList> lists)
         {
-            Contract.Requires(lists != null);
-            Contract.Requires(Contract.ForAll(lists, x => !string.IsNullOrEmpty(x.Key)));
-            Contract.Requires(Contract.ForAll(lists, x => x.Value != null));
-
             Invoke("On_TablesLoaded", lists);
         }
 

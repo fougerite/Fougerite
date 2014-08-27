@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System;
+﻿using System;
 using System.Net;
 using System.Text;
 using System.Collections;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Timers;
+
 
 namespace JintPlugin
 {
@@ -26,24 +26,8 @@ namespace JintPlugin
         public readonly DirectoryInfo RootDirectory;
         public readonly Dictionary<String, TimedEvent> Timers;
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(Engine != null);
-            Contract.Invariant(!string.IsNullOrEmpty(Name));
-            Contract.Invariant(Code != null);
-            Contract.Invariant(RootDirectory != null);
-            Contract.Invariant(!string.IsNullOrEmpty(RootDirectory.FullName));
-            Contract.Invariant(Timers != null);
-        }
-
         public Plugin(DirectoryInfo directory, string name, string code)
         {
-            Contract.Requires(directory != null);
-            Contract.Requires(!string.IsNullOrEmpty(directory.FullName));
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(code != null);
-
             Name = name;
             Code = code;
             RootDirectory = directory;
@@ -66,7 +50,6 @@ namespace JintPlugin
             }
             catch { }
         }
-
 
         private void Invoke(string func, params object[] obj)
         {
@@ -159,16 +142,12 @@ namespace JintPlugin
 
         private static string NormalizePath(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             return Path.GetFullPath(new Uri(path).LocalPath)
                        .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private string ValidateRelativePath(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             string normalizedPath = NormalizePath(Path.Combine(RootDirectory.FullName, path));
             string rootDirNormalizedPath = NormalizePath(RootDirectory.FullName);
 
@@ -180,8 +159,6 @@ namespace JintPlugin
 
         public bool CreateDir(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             try
             {
                 path = ValidateRelativePath(path);
@@ -203,17 +180,12 @@ namespace JintPlugin
 
         public void ToJsonFile(string path, string json)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-            Contract.Requires(!string.IsNullOrEmpty(json));
-
             path = ValidateRelativePath(path + ".json");
             File.WriteAllText(path, json);
         }
 
         public string FromJsonFile(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             string json = @"";
             path = ValidateRelativePath(path + ".json");
             if (File.Exists(path))
@@ -224,8 +196,6 @@ namespace JintPlugin
 
         public void DeleteLog(string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path + ".log");
             if (path == null)
                 return;
@@ -236,9 +206,6 @@ namespace JintPlugin
 
         public void Log(string path, string text)
         {
-            Contract.Requires(!string.IsNullOrEmpty(path));
-            Contract.Requires(text != null);
-
             path = ValidateRelativePath(path + ".log");
             if (path == null)
                 return;
@@ -358,8 +325,6 @@ namespace JintPlugin
         #region Web
         public string GET(string url)
         {
-            Contract.Requires(!string.IsNullOrEmpty(url));
-
             using (System.Net.WebClient client = new System.Net.WebClient())
             {
                 return client.DownloadString(url);
@@ -368,9 +333,6 @@ namespace JintPlugin
 
         public string POSTJson(string url, string json)
         {
-            Contract.Requires(!string.IsNullOrEmpty(url));
-            Contract.Requires(!string.IsNullOrEmpty(json));
-
             using (WebClient client = new WebClient())
             {
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -381,9 +343,6 @@ namespace JintPlugin
 
         public string POSTJsonFile(string url, string path)
         {
-            Contract.Requires(!string.IsNullOrEmpty(url));
-            Contract.Requires(!string.IsNullOrEmpty(path));
-
             path = ValidateRelativePath(path + ".json");
             if (!File.Exists(path)) {
                 Logger.LogError("[JintPlugin] JsonFile not found: " + path);
@@ -404,33 +363,21 @@ namespace JintPlugin
 
         public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_BlueprintUse", player, evt);
         }
 
         public void OnChat(Player player, ref ChatString text)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(text != null);
-
             Invoke("On_Chat", player, text);
         }
 
         public void OnCommand(Player player, string command, string[] args)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(!string.IsNullOrEmpty(command));
-            Contract.Requires(args != null);
-
             Invoke("On_Command", player, command, args);
         }
 
         public void OnConsole(ref ConsoleSystem.Arg arg, bool external)
         {
-            Contract.Requires(arg != null);
-
             Player player = Player.FindByPlayerClient(arg.argUser.playerClient);
 
             if (!external)
@@ -441,103 +388,71 @@ namespace JintPlugin
 
         public void OnDoorUse(Player player, DoorEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_DoorUse", player, evt);
         }
 
         public void OnEntityDecay(DecayEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_EntityDecay", evt);
         }
 
         public void OnEntityDeployed(Player player, Entity entity)
         {
-            Contract.Requires(entity != null);
-
             Invoke("On_EntityDeployed", player, entity);
         }
 
         public void OnEntityHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_EntityHurt", evt);
         }
 
         public void OnItemsLoaded(ItemsBlocks items)
         {
-            Contract.Requires(items != null);
-
             Invoke("On_ItemsLoaded", items);
         }
 
         public void OnNPCHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_NPCHurt", evt);
         }
 
         public void OnNPCKilled(DeathEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_NPCKilled", evt);
         }
 
         public void OnPlayerConnected(Player player)
         {
-            Contract.Requires(player != null);
-
             Invoke("On_PlayerConnected", player);
         }
 
         public void OnPlayerDisconnected(Player player)
         {
-            Contract.Requires(player != null);
-
             Invoke("On_PlayerDisconnected", player);
         }
 
         public void OnPlayerGathering(Player player, GatherEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerGathering", player, evt);
         }
 
         public void OnPlayerHurt(HurtEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerHurt", evt);
         }
 
         public void OnPlayerKilled(DeathEvent evt)
         {
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerKilled", evt);
         }
 
         public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerSpawning", player, evt);
         }
 
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
-            Contract.Requires(player != null);
-            Contract.Requires(evt != null);
-
             Invoke("On_PlayerSpawned", player, evt);
         }
 
@@ -558,10 +473,6 @@ namespace JintPlugin
 
         public void OnTablesLoaded(Dictionary<string, LootSpawnList> lists)
         {
-            Contract.Requires(lists != null);
-            Contract.Requires(Contract.ForAll(lists, x => !string.IsNullOrEmpty(x.Key)));
-            Contract.Requires(Contract.ForAll(lists, x => x.Value != null));
-
             Invoke("On_TablesLoaded", lists);
         }
 

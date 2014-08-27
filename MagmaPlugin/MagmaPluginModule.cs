@@ -1,25 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reflection;
+using Fougerite;
 
 namespace MagmaPlugin
 {
-    using Fougerite;
-
-    public class MagmaPluginModule : Module
+    public class MagmaPluginModule : Fougerite.Module
     {
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(pluginDirectory != null);
-            Contract.Invariant(plugins != null);
-            Contract.Invariant(Contract.ForAll(plugins, pair => pair.Value != null));
-            Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
-        }
-
         public override string Name {
             get { return "MagmaPlugin"; }
         }
@@ -62,22 +51,16 @@ namespace MagmaPlugin
 
         private String GetPluginDirectoryPath(String name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             return Path.Combine(pluginDirectory.FullName, name);
         }
 
         private String GetPluginScriptPath(String name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             return Path.Combine(GetPluginDirectoryPath(name), name + ".js");
         }
 
         private string GetPluginScriptText(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
             string script = "";
@@ -147,13 +130,10 @@ namespace MagmaPlugin
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             Logger.LogDebug("[Magma] Unloading " + name + " plugin.");
 
             if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
-                Contract.Assert(plugin != null);
 
                 plugin.RemoveHooks();
                 plugin.KillTimers();
@@ -181,8 +161,6 @@ namespace MagmaPlugin
 
         private void LoadPlugin(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             Logger.LogDebug("[Magma] Loading plugin " + name + ".");
 
             if (plugins.ContainsKey(name)) {
@@ -200,7 +178,6 @@ namespace MagmaPlugin
                 Logger.Log("[Magma] " + name + " plugin was loaded successfuly.");
             } catch (Exception ex) {
                 string arg = name + " plugin could not be loaded.";
-                Contract.Assume(!string.IsNullOrEmpty(arg));
                 Server.GetServer().BroadcastFrom(Name, arg);
                 Logger.LogException(ex);
             }
@@ -208,8 +185,6 @@ namespace MagmaPlugin
 
         public void ReloadPlugin(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             UnloadPlugin(name);
             LoadPlugin(name);
         }

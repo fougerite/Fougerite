@@ -1,14 +1,12 @@
-﻿using System.Diagnostics.Contracts;
+﻿using Fougerite;
+using Facepunch.Utility;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Magma
 {
-    using Fougerite;
-    using Facepunch.Utility;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-
     public class Data
     {
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
@@ -19,9 +17,6 @@ namespace Magma
 
         public void AddTableValue(string tablename, object key, object val)
         {
-            Contract.Requires(tablename != null);
-            Contract.Requires(key != null);
-
             Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
@@ -40,10 +35,6 @@ namespace Magma
 
         public string GetConfigValue(string config, string section, string key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(config));
-            Contract.Requires(!string.IsNullOrEmpty(section));
-            Contract.Requires(!string.IsNullOrEmpty(key));
-
             IniParser parser = (IniParser)inifiles[config.ToLower()];
             if (parser == null)
             {
@@ -54,8 +45,6 @@ namespace Magma
 
         public static Magma.Data GetData()
         {
-            Contract.Ensures(Contract.Result<Data>() != null);
-
             if (data == null)
             {
                 data = new Magma.Data();
@@ -65,9 +54,6 @@ namespace Magma
 
         public object GetTableValue(string tablename, object key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
-
             Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
             if (hashtable == null)
             {
@@ -100,43 +86,31 @@ namespace Magma
 
         public string[] SplitQuoteStrings(string str)
         {
-            Contract.Requires(str != null);
-
             return Facepunch.Utility.String.SplitQuotesStrings(str);
         }
 
         public int StrLen(string str)
         {
-            Contract.Requires(str != null);
-
             return str.Length;
         }
 
         public string Substring(string str, int from, int length)
         {
-            Contract.Requires(str != null);
-            Contract.Requires(from >= 0);
-            Contract.Requires(length >= 0);
-            Contract.Requires(from + length < str.Length);
-
             return str.Substring(from, length);
         }
 
         public int ToInt(string num)
         {
-            Contract.Requires(num != null);
             return int.Parse(num);
         }
 
         public string ToLower(string str)
         {
-            Contract.Requires(str != null);
-            return str.ToLower();
+             return str.ToLower();
         }
 
         public string ToUpper(string str)
         {
-            Contract.Requires(str != null);
             return str.ToUpper();
         }
     }

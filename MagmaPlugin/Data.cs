@@ -1,12 +1,13 @@
-﻿using Fougerite;
-using Facepunch.Utility;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Magma
 {
+    using Fougerite;
+    using Facepunch.Utility;
+
     public class Data
     {
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();

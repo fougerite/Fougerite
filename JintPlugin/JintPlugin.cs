@@ -7,7 +7,6 @@ using System.Linq;
 using System.IO;
 using System.Timers;
 
-
 namespace JintPlugin
 {
     using Fougerite;

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Contracts;
+using System.Diagnostics.Contracts;
 
 namespace Fougerite
 {
@@ -35,8 +35,8 @@ namespace Fougerite
 
         public void Start()
         {
-            string FougeriteConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
-            Config.Init(FougeriteConfig);
+            string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
+            Config.Init(FougeriteDirectoryConfig);
             Logger.Init();
 
             Contract.ContractFailed += (sender, args) => args.SetUnwind();

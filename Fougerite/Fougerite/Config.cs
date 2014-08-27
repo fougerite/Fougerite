@@ -10,20 +10,21 @@ namespace Fougerite
 {
     public class Config
     {
-        public static IniParser FougeriteConfig;
         public static IniParser FougeriteDirectoryConfig;
+        public static IniParser FougeriteConfig;
 
-        public static void Init(string ConfigDirPath)
+        public static void Init(string DirectoryConfigPath)
         {
-            Contract.Requires(!string.IsNullOrEmpty(ConfigDirPath));
+            Contract.Requires(!string.IsNullOrEmpty(DirectoryConfigPath));
+            Contract.Ensures(FougeriteDirectoryConfig != null);
             Contract.Ensures(FougeriteConfig != null);
 
-            if (File.Exists(ConfigDirPath))
+            if (File.Exists(DirectoryConfigPath))
             {
-                FougeriteDirectoryConfig = new IniParser(ConfigDirPath);
-                Debug.Log("DirectoryConfig " + ConfigDirPath + " loaded!");
+                FougeriteDirectoryConfig = new IniParser(DirectoryConfigPath);
+                Debug.Log("DirectoryConfig " + DirectoryConfigPath + " loaded!");
             }
-            else Debug.Log("DirectoryConfig " + ConfigDirPath + " NOT loaded!");
+            else Debug.Log("DirectoryConfig " + DirectoryConfigPath + " NOT loaded!");
 
             string ConfigPath = Path.Combine(GetPublicFolder(), "Fougerite.cfg");
 
@@ -55,21 +56,15 @@ namespace Fougerite
 
         public static string GetModulesFolder()
         {
-
-            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
-            string path =
-                root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "ModulesFolder"), Util.GetRootFolder()) +
-                @"\";
+            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);             
+            string path = root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "ModulesFolder"), Util.GetRootFolder()) + @"\";
             return Util.NormalizePath(path);
-
         }
 
         public static string GetPublicFolder()
         {
-            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);
-            string path =
-                root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "PublicFolder"), Util.GetRootFolder()) +
-                @"\";
+            Regex root = new Regex(@"^%RootFolder%", RegexOptions.IgnoreCase);             
+            string path = root.Replace(FougeriteDirectoryConfig.GetSetting("Settings", "PublicFolder"), Util.GetRootFolder()) + @"\";
             return Util.NormalizePath(path);
         }
     }

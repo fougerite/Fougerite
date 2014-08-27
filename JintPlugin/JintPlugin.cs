@@ -34,7 +34,7 @@
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
-                .SetValue("Entities", new Entities())
+                .SetValue("Entities", new Lookup())
                 .SetValue("Plugin", this)
                 .Execute(code);
             Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +

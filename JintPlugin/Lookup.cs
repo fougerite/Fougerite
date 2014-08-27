@@ -5,7 +5,7 @@
     using System.Linq;
     using UnityEngine;
 
-    public class Entities
+    public class Lookup
     {
         public static Lookup<string, StructureMaster> Structures
         {

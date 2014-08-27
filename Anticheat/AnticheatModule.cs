@@ -528,7 +528,6 @@ namespace Anticheat
                     if (!player.Admin)
                     {
                         var Time = System.Environment.TickCount;
-                        int Cooldown = (int)DS.Get("loginCooldown", player.SteamID.ToString());
                         if (Cooldown == 0)
                             DS.Add("loginCooldown", player.SteamID.ToString(), Time);
                     }

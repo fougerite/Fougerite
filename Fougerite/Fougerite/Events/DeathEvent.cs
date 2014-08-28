@@ -20,7 +20,6 @@
             }
             set
             {
-                Logger.LogDebug("[DropItems] DropItems is now " + value.ToString());
                 this._drop = value;
             }
         }

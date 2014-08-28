@@ -271,7 +271,10 @@ namespace Anticheat
                         // If alert, but not time to ban
                         if (Warned < AntiSpeedHack_WarnLimit && distance > AntiSpeedHack_KickDist * AntiSpeedHack_Timer)
                         {
+                            // Cause TP back may be seems as cheat
+                            DS.Add("lastCoords", pl.SteamID.ToString(), LastVector3Location);
                             pl.TeleportTo(LastVector3Location);
+
                             int WarnLevel = Warned + 1;
                             DS.Add("AntiSpeedHack", pl.SteamID.ToString(), WarnLevel);
                             Log("Warn: " + pl.Name + ". Moved " + distance.ToString("F2") + ". Count: " + WarnLevel + ". Ping: " + pl.Ping);

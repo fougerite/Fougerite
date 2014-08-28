@@ -578,7 +578,6 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
-                    else Logger.LogDebug(player.Name + " not banned! " + IpBanned);
 
                     IniParser iniBansID;
                     ConfigFile = Path.Combine(ModuleFolder, "BansID.ini");
@@ -597,7 +596,6 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
-                    else Logger.LogDebug(player.Name + " not banned! " + IdBanned);
                 }
                 catch (Exception ex)
                 {

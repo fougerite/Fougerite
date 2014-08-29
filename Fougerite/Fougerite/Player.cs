@@ -89,7 +89,7 @@ namespace Fougerite
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.Name == name)
+                if (player != null && player.Name.ToLower() == name.ToLower())
                     return player;
             return null;
         }

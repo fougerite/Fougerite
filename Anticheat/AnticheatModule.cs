@@ -317,11 +317,14 @@ namespace Anticheat
 
                 string Date = DateTime.Now.ToShortDateString();
                 string Time = DateTime.Now.ToShortTimeString();
-                ;
-                iniBansIP.AddSetting("Ips", player.IP,
-                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
-                iniBansID.AddSetting("Ids", player.SteamID,
-                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
+                
+                string BanMessage = 
+                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + 
+                        ", Reason: " + StringLog + ", Ping: " + player.Ping;
+
+                iniBansIP.AddSetting("Ips", player.IP, BanMessage);
+                iniBansID.AddSetting("Ids", player.SteamID, BanMessage;
+
                 iniBansIP.Save();
                 iniBansID.Save();
                 player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");

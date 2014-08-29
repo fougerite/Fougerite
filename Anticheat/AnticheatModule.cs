@@ -271,7 +271,10 @@ namespace Anticheat
                         // If alert, but not time to ban
                         if (Warned < AntiSpeedHack_WarnLimit && distance > AntiSpeedHack_KickDist * AntiSpeedHack_Timer)
                         {
+                            // Cause TP back may be seems as cheat
+                            DS.Add("lastCoords", pl.SteamID.ToString(), LastVector3Location);
                             pl.TeleportTo(LastVector3Location);
+
                             int WarnLevel = Warned + 1;
                             DS.Add("AntiSpeedHack", pl.SteamID.ToString(), WarnLevel);
                             Log("Warn: " + pl.Name + ". Moved " + distance.ToString("F2") + ". Count: " + WarnLevel + ". Ping: " + pl.Ping);
@@ -314,11 +317,14 @@ namespace Anticheat
 
                 string Date = DateTime.Now.ToShortDateString();
                 string Time = DateTime.Now.ToShortTimeString();
-                ;
-                iniBansIP.AddSetting("Ips", player.IP,
-                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
-                iniBansID.AddSetting("Ids", player.SteamID,
-                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + ", Reason: " + StringLog);
+                
+                string BanMessage = 
+                    "Nickname: " + player.Name + ", Date: " + Date + ", Time: " + Time + 
+                        ", Reason: " + StringLog + ", Ping: " + player.Ping;
+
+                iniBansIP.AddSetting("Ips", player.IP, BanMessage);
+                iniBansID.AddSetting("Ids", player.SteamID, BanMessage;
+
                 iniBansIP.Save();
                 iniBansID.Save();
                 player.MessageFrom(EchoBotName, "[color#FF2222]You have been banned.");
@@ -575,7 +581,6 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
-                    else Logger.LogDebug(player.Name + " not banned! " + IpBanned);
 
                     IniParser iniBansID;
                     ConfigFile = Path.Combine(ModuleFolder, "BansID.ini");
@@ -594,7 +599,6 @@ namespace Anticheat
                         player.Disconnect();
                         return;
                     }
-                    else Logger.LogDebug(player.Name + " not banned! " + IdBanned);
                 }
                 catch (Exception ex)
                 {

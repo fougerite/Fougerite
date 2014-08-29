@@ -132,7 +132,6 @@
             try
             {
                 string keepitems = Core.config.GetSetting("Settings", "keepitems").ToLower();
-                Logger.LogDebug("[keepitems] is " + keepitems);
                 return keepitems == "true";
             }
             catch

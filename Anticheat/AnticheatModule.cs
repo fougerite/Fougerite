@@ -323,7 +323,7 @@ namespace Anticheat
                         ", Reason: " + StringLog + ", Ping: " + player.Ping;
 
                 iniBansIP.AddSetting("Ips", player.IP, BanMessage);
-                iniBansID.AddSetting("Ids", player.SteamID, BanMessage;
+                iniBansID.AddSetting("Ids", player.SteamID, BanMessage);
 
                 iniBansIP.Save();
                 iniBansID.Save();

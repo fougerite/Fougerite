@@ -260,12 +260,20 @@ namespace Fougerite
 			ConsoleNetworker.SendClientCommand(player, "chat.add " + playername + " " + arg);
 		}
 
-		public static void sayAll(string arg)
+		public static void sayAll(string customName, string arg)
 		{
+            Contract.Requires(!string.IsNullOrEmpty(customName));
 			Contract.Requires(arg != null);
 
-			ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
 		}
+
+        public static void sayAll(string arg)
+        {
+            Contract.Requires(arg != null);
+
+            ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+        }
 
 		public static void sayUser(uLink.NetworkPlayer player, string arg)
 		{

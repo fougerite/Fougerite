@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Timers;
-
-namespace MagmaPlugin
+﻿namespace MagmaPlugin
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.IO;
+    using System.Timers;
     using Fougerite;
     using Fougerite.Events;
     using Jint;
@@ -42,7 +41,7 @@ namespace MagmaPlugin
         public void InitGlobals()
         {
             Engine.SetParameter("Server", Fougerite.Server.GetServer());
-            Engine.SetParameter("Data", Magma.Data.GetData());
+            Engine.SetParameter("Data", MagmaPlugin.Data.GetData());
             Engine.SetParameter("DataStore", Fougerite.DataStore.GetInstance());
             Engine.SetParameter("Util", Fougerite.Util.GetUtil());
             Engine.SetParameter("Web", new Fougerite.Web());

@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-
-namespace MagmaPlugin
+﻿namespace MagmaPlugin
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
     using Fougerite;
 
-    public class MagmaPluginModule : Module
+    public class MagmaPluginModule : Fougerite.Module
     {
         public override string Name {
             get { return "MagmaPlugin"; }
         }
 
         public override string Author {
-            get { return "Riketta, mikec, EquiFox"; }
+            get { return "Riketta, mikec, xEnt, EquiFox"; }
         }
 
         public override string Description {
@@ -211,10 +210,11 @@ namespace MagmaPlugin
                 if (path != "")
                 {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
-                    inifiles.Add(key, new IniParser(path));
-                    Logger.LogDebug("[Magma] Loaded Config: " + key);
+                    inifiles.Add(key, path);
+                    Logger.LogDebug("[Magma] Loaded Config Path: " + key + "=" + path);
                 }
-            }        
+            }
+            Data.GetData().Load(inifiles);
         }
     }
 }

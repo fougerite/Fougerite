@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-
-namespace Magma
+﻿namespace MagmaPlugin
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
     using Fougerite;
     using Facepunch.Utility;
 
@@ -12,9 +11,8 @@ namespace Magma
     {
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
-        private static Magma.Data data;
-        public static Hashtable inifiles = new Hashtable();
-        public Hashtable Fougerite_shared_data = new Hashtable();
+        private static MagmaPlugin.Data data;
+        private Hashtable inifiles = new Hashtable();
 
         public void AddTableValue(string tablename, object key, object val)
         {
@@ -44,11 +42,11 @@ namespace Magma
             return parser.GetSetting(section, key);
         }
 
-        public static Magma.Data GetData()
+        public static MagmaPlugin.Data GetData()
         {
             if (data == null)
             {
-                data = new Magma.Data();
+                data = new MagmaPlugin.Data();
             }
             return data;
         }
@@ -63,26 +61,13 @@ namespace Magma
             return hashtable[key];
         }
 
-        public void Load()
+        public void Load(Hashtable ht)
         {
             inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(Fougerite.Config.GetPublicFolder()))
-            {
-                string path = "";
-                foreach (string str3 in Directory.GetFiles(str))
-                {
-                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
-                    {
-                        path = str3;
-                    }
-                }
-                if (path != "")
-                {
-                    string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
-                    inifiles.Add(key, new IniParser(path));
-                    Logger.LogDebug("Loaded Config: " + key);
-                }
+            foreach (DictionaryEntry de in ht) {
+                inifiles.Add(de.Key as string, new IniParser(de.Value as string));
             }
+            Logger.LogDebug("[MagmaPlugin.Data] Loaded plugin configs");
         }
 
         public string[] SplitQuoteStrings(string str)

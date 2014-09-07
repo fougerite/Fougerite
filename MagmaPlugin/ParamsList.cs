@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-public class ParamsList
+internal class ParamsList
 {
     private List<object> objs;
 
-    public int Length
+    internal int Length
     {
         get
         {
@@ -12,27 +12,27 @@ public class ParamsList
         }
     }
 
-    public ParamsList()
+    internal ParamsList()
     {
         this.objs = new List<object>();
     }
 
-    public void Add(object o)
+    internal void Add(object o)
     {
         this.objs.Add(o);
     }
 
-    public void Remove(object o)
+    internal void Remove(object o)
     {
         this.objs.Remove(o);
     }
 
-    public object Get(int index)
+    internal object Get(int index)
     {
         return this.objs[index];
     }
 
-    public object[] ToArray()
+    internal object[] ToArray()
     {
         return this.objs.ToArray();
     }

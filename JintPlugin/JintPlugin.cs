@@ -273,6 +273,11 @@
             return timer;
         }
 
+        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
+        {
+            return this.CreateTimer(name, timeoutDelay, args.ToArray<object>());
+        }
+
         public void KillTimer(string name)
         {
             TimedEvent timer = GetTimer(name);

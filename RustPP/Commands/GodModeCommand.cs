@@ -13,12 +13,12 @@
             if (!this.userIDs.Contains(Arguments.argUser.userID))
             {
                 this.userIDs.Add(Arguments.argUser.userID);
-                Util.sayUser(Arguments.argUser.networkPlayer, "God mode has been activated!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "God mode has been activated!");
             }
             else
             {
                 this.userIDs.Remove(Arguments.argUser.userID);
-                Util.sayUser(Arguments.argUser.networkPlayer, "God mode has been deactivated!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "God mode has been deactivated!");
             }
         }
 

@@ -13,7 +13,7 @@
         {
             if (ChatArguments == null)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tpto \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tpto \"playerName\"");
             }
             else
             {
@@ -25,7 +25,7 @@
                 str = str.Trim();
                 if (!(str != ""))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere \"playerName\"");
                 }
                 else
                 {
@@ -39,7 +39,7 @@
                             {
                                 Arguments.Args = new string[] { Arguments.argUser.displayName, client.netUser.displayName };
                                 teleport.toplayer(ref Arguments);
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You have teleported to " + client.netUser.displayName);
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported to " + client.netUser.displayName);
                                 return;
                             }
                             list.Add(client.netUser.displayName);
@@ -47,18 +47,18 @@
                     }
                     if (list.Count != 0)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                         for (int j = 1; j < list.Count; j++)
                         {
-                            Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "0 - Cancel");
-                        Util.sayUser(Arguments.argUser.networkPlayer, "Please enter the number matching the player you were looking for.");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
                         tpWaitList.Add(Arguments.argUser.userID, list);
                     }
                     else
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                     }
                 }
             }
@@ -77,7 +77,7 @@
             string str = list[choice];
             if (choice == 0)
             {
-                Util.sayUser(p.PlayerClient.netPlayer, "Cancelled!");
+                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
                 tpWaitList.Remove(p.PlayerClient.userID);
             }
             else

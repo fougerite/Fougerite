@@ -28,7 +28,7 @@
                         {
                             if (userID == key)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Why would you share with yourself?");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Why would you share with yourself?");
                                 return;
                             }
                             ArrayList list = (ArrayList)shared_doors[key];
@@ -36,7 +36,7 @@
                             {
                                 if (list.Contains(userID))
                                 {
-                                    Util.sayUser(Arguments.argUser.networkPlayer, "Doors were already shared with " + client.netUser.displayName);
+                                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Doors were already shared with " + client.netUser.displayName);
                                     return;
                                 }
                             }
@@ -46,17 +46,17 @@
                                 shared_doors.Add(key, list);
                             }
                             list.Add(userID);
-                            Util.sayUser(Arguments.argUser.networkPlayer, "You have shared all doors with " + client.netUser.displayName);
-                            Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " has shared all doors with you");
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have shared all doors with " + client.netUser.displayName);
+                            Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " has shared all doors with you");
                             return;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:  /share \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Sharing Doors Usage:  /share \"playerName\"");
             }
         }
 

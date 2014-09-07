@@ -34,11 +34,11 @@ namespace RustPP.Commands
                     FriendList list = (FriendList)command.GetFriendsLists()[Arguments.argUser.userID];
                     if (client == null)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + name);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + name);
                     }
                     else if (Arguments.argUser.userID == client.userID)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You can't add yourself as a friend!");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You can't add yourself as a friend!");
                     }
                     else
                     {
@@ -46,7 +46,7 @@ namespace RustPP.Commands
                         {
                             if (list.isFriendWith(client.userID))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You are already friend with " + client.netUser.displayName + ".");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You are already friend with " + client.netUser.displayName + ".");
                                 return;
                             }
                         }
@@ -56,13 +56,13 @@ namespace RustPP.Commands
                         }
                         list.AddFriend(client.netUser.displayName, client.userID);
                         command.GetFriendsLists()[Arguments.argUser.userID] = list;
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You have added " + client.netUser.displayName + " to your friend list.");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have added " + client.netUser.displayName + " to your friend list.");
                     }
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:  /addfriend \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Friends Management Usage:  /addfriend \"playerName\"");
             }
         }
     }

@@ -22,15 +22,15 @@ namespace RustPP.Commands
                 if (!Core.muteList.Contains(client.userID))
                 {
                     Core.muteList.Add(client.userID);
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " has been muted!");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " has been muted!");
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is already muted.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already muted.");
                 }
                 return;
             }
-            Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
             
         }
     }

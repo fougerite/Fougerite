@@ -13,11 +13,11 @@
             if (!Administrator.IsAdmin(Arguments.argUser.userID))
             {
                 Administrator.AddAdmin(new Administrator(Arguments.argUser.userID, Arguments.argUser.displayName, MasterAdminPreset));
-                Util.sayUser(Arguments.argUser.networkPlayer, "You are now a Master Administrator!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You are now a Master Administrator!");
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "You are already an administrator!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You are already an administrator!");
             }
         }
     }

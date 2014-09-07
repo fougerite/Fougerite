@@ -45,8 +45,8 @@
                                                 if (!admin.HasPermission(str6))
                                                 {
                                                     admin.Flags.Add(str6);
-                                                    Util.sayUser(Arguments.argUser.networkPlayer, "The " + str6 + " Permissions has been added to " + client.netUser.displayName);
-                                                    Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " gave you the " + str6 + " permission.");
+                                                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "The " + str6 + " Permissions has been added to " + client.netUser.displayName);
+                                                    Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " gave you the " + str6 + " permission.");
                                                     if (str6 == "RCON")
                                                     {
                                                         client.netUser.admin = true;
@@ -62,8 +62,8 @@
                                             {
                                                 string properName = Administrator.GetProperName(flag);
                                                 administrator2.Flags.Add(properName);
-                                                Util.sayUser(Arguments.argUser.networkPlayer, "The " + properName + " Permissions has been added to " + client.netUser.displayName);
-                                                Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " gave you the " + properName + " permission.");
+                                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "The " + properName + " Permissions has been added to " + client.netUser.displayName);
+                                                Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " gave you the " + properName + " permission.");
                                                 if (properName == "RCON")
                                                 {
                                                     client.netUser.admin = true;
@@ -71,29 +71,29 @@
                                             }
                                             else
                                             {
-                                                Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " already has this permission.");
+                                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " already has this permission.");
                                             }
                                         }
                                         else
                                         {
-                                            Util.sayUser(Arguments.argUser.networkPlayer, flag + " is not a valid flag.");
+                                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, flag + " is not a valid flag.");
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator!");
+                                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is not an administrator!");
                                 }
                                 return;
                             }
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str2);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
                     }
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "AddFlag Usage:  /addflag flag1 flag2...");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "AddFlag Usage:  /addflag flag1 flag2...");
             }
         }
     }

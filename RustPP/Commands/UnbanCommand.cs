@@ -23,7 +23,7 @@
                     {
                         if (player.DisplayName.ToLower() == str.ToLower())
                         {
-                            Util.sayUser(Arguments.argUser.networkPlayer, player.DisplayName + " has been unbanned.");
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, player.DisplayName + " has been unbanned.");
                             Core.blackList.Remove(player.UserID);
                         }
                         else
@@ -31,12 +31,12 @@
                             num2++;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, str + " is not banned.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str + " is not banned.");
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Unban Usage:  /unban \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Unban Usage:  /unban \"playerName\"");
             }
         }
     }

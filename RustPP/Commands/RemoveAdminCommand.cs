@@ -26,7 +26,7 @@
                         {
                             if (userID == num3)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously? You can't unadmin yourself...");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Seriously? You can't unadmin yourself...");
                             }
                             else if (Administrator.IsAdmin(userID))
                             {
@@ -35,17 +35,17 @@
                             }
                             else
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator.");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is not an administrator.");
                             }
                             return;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Remove Admin Usage:  /unadmin \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Remove Admin Usage:  /unadmin \"playerName\"");
             }
         }
     }

@@ -26,7 +26,7 @@
                         {
                             if (userID == num3)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Why would you unshare with yourself?");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Why would you unshare with yourself?");
                                 return;
                             }
                             ShareCommand command = (ShareCommand)ChatCommand.GetCommand("share");
@@ -34,18 +34,18 @@
                             if ((list != null) && list.Contains(userID))
                             {
                                 list.Remove(userID);
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You have stopped sharing doors with " + client.netUser.displayName);
-                                Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " has stopped sharing doors with you");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have stopped sharing doors with " + client.netUser.displayName);
+                                Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " has stopped sharing doors with you");
                                 return;
                             }
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Sharing Doors Usage:  /unshare \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Sharing Doors Usage:  /unshare \"playerName\"");
             }
         }
     }

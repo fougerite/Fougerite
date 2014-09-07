@@ -19,7 +19,7 @@ namespace RustPP.Commands
                 }
                 if (strText == string.Empty)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Please enter a valid message.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter a valid message.");
                 }
                 else
                 {
@@ -32,7 +32,7 @@ namespace RustPP.Commands
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Announce Usage:  /announce \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Announce Usage:  /announce \"message\"");
             }
         }
     }

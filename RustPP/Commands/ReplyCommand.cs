@@ -37,16 +37,16 @@
                             return;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + key);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + key);
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "There's nobody to answer.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "There's nobody to answer.");
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Reply Command Usage:  /r \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Reply Command Usage:  /r \"message\"");
             }
         }
 

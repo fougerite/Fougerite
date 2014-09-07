@@ -27,12 +27,12 @@
                 if (!Core.whiteList.Contains(client.userID))
                 {
                     Core.whiteList.Add(client.userID, client.netUser.displayName);
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " has been added to the whitelist.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " has been added to the whitelist.");
                     Helper.CreateSaves();
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is already on the whitelist.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already on the whitelist.");
                 }
             }
         }

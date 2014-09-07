@@ -29,8 +29,8 @@
                     Character.FindByUser(client.userID, out character);
                     IDBase victim = character;
                     TakeDamage.Kill(Arguments.argUser.playerClient, victim, null);
-                    Util.sayUser(Arguments.argUser.networkPlayer, "You killed " + client.netUser.displayName);
-                    Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " killed you with his admin power.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You killed " + client.netUser.displayName);
+                    Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " killed you with his admin power.");
                 }
                 catch (Exception ex)
                 {

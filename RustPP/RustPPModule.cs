@@ -115,7 +115,7 @@ namespace RustPP
                 if (int.TryParse(str, out num)) command.PartialNameTP(p, num);
                 else
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     command.GetTPWaitList().Remove(p.PlayerClient.userID);
                 }
             }
@@ -128,7 +128,7 @@ namespace RustPP
                 }
                 else
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     Core.banWaitList.Remove(p.PlayerClient.userID);
                 }
             }
@@ -141,7 +141,7 @@ namespace RustPP
                 }
                 else
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, "Invalid Choice!");
+                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     Core.kickWaitList.Remove(p.PlayerClient.userID);
                 }
             }
@@ -149,7 +149,7 @@ namespace RustPP
             if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
             {
                 text = null;
-                Util.sayUser(p.PlayerClient.netUser.networkPlayer, "You are muted.");
+                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You are muted.");
             }
         }
 

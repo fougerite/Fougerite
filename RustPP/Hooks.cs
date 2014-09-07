@@ -16,7 +16,7 @@
                 if (Core.config.GetSetting("Settings", "pvp_death_broadcast").ToLower() == "true")
                 {
                     char ch = '⊕';
-                    Util.sayAll(killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
+                    Util.sayAll(Core.Name, killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
                 }
             }
             catch (Exception ex)
@@ -173,7 +173,7 @@
                     {
                         if (client.userID != user.userID)
                         {
-                            Util.sayUser(client.netPlayer, user.displayName + " has joined the server");
+                            Util.sayUser(client.netPlayer, Core.Name, user.displayName + " has joined the server");
                         }
                     }
                 }
@@ -198,7 +198,7 @@
                     {
                         if (client.userID != user.userID)
                         {
-                            Util.sayUser(client.netPlayer, user.displayName + " has left the server");
+                            Util.sayUser(client.netPlayer, Core.Name, user.displayName + " has left the server");
                         }
                     }
                 }

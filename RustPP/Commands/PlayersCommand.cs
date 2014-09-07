@@ -7,7 +7,7 @@
     {
         public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
-            Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { PlayerClient.All.Count, " Player", (PlayerClient.All.Count > 1) ? "s" : "", " Online: " }));
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] { PlayerClient.All.Count, " Player", (PlayerClient.All.Count > 1) ? "s" : "", " Online: " }));
             int num = 0;
             int num2 = 0;
             string str = "";
@@ -23,7 +23,7 @@
                 if (num == 6)
                 {
                     num = 0;
-                    Util.sayUser(Arguments.argUser.networkPlayer, str.Substring(0, str.Length - 2));
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str.Substring(0, str.Length - 2));
                     str = "";
                 }
                 else
@@ -33,7 +33,7 @@
             }
             if (num != 0)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, str.Substring(0, str.Length - 2));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str.Substring(0, str.Length - 2));
             }
         }
     }

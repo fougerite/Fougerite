@@ -15,7 +15,7 @@
         {
             for (int i = 0; i < int.Parse(Core.config.GetSetting("Settings", "notice_messages_amount")); i++)
             {
-                Util.sayAll(Core.config.GetSetting("Settings", "notice" + (i + 1)));
+                Util.sayAll(Core.Name, Core.config.GetSetting("Settings", "notice" + (i + 1)));
             }
         }
 
@@ -61,7 +61,7 @@
         {
             if (time == 0)
             {
-                Util.sayAll("Server Shutdown NOW!");
+                Util.sayAll(Core.Name, "Server Shutdown NOW!");
                 try
                 {
                     AvatarSaveProc.SaveAll();
@@ -76,7 +76,7 @@
             }
             else
             {
-                Util.sayAll("Server Shutting down in " + time + " seconds");
+                Util.sayAll(Core.Name, "Server Shutting down in " + time + " seconds");
             }
             time -= 10;
         }

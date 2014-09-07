@@ -18,7 +18,7 @@
             str = str.Trim();
             if ((ChatArguments == null) && !(str == ""))
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Ban Usage:  /ban \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Ban Usage:  /ban \"playerName\"");
             }
             else if (str != "")
             {
@@ -30,14 +30,14 @@
                     {
                         if (Arguments.argUser.userID == client.userID)
                         {
-                            Util.sayUser(Arguments.argUser.networkPlayer, "You can't ban yourself.");
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You can't ban yourself.");
                             return;
                         }
                         if (client.netUser.displayName.ToLower() == str.ToLower())
                         {
                             if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot ban an administrator!");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You cannot ban an administrator!");
                             }
                             else
                             {
@@ -53,19 +53,19 @@
                 }
                 if (list.Count != 1)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                     for (int j = 1; j < list.Count; j++)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "0 - Cancel");
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Please enter the number matching the player you were looking for.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
                     Core.banWaitList.Add(Arguments.argUser.userID, list);
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
         }
@@ -78,7 +78,7 @@
                 string str = list[id];
                 if (id == 0)
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, "Cancelled!");
+                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
                     Core.banWaitList.Remove(p.PlayerClient.userID);
                 }
                 else
@@ -90,7 +90,7 @@
                             Core.banWaitList.Remove(p.PlayerClient.userID);
                             if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(p.PlayerClient.netPlayer, "You cannot ban an administrator!");
+                                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot ban an administrator!");
                             }
                             else
                             {

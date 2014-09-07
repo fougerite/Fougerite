@@ -83,11 +83,11 @@ namespace RustPP.Social
             }
             if (list.Count > 0)
             {
-                Util.sayUser(arg.argUser.networkPlayer, string.Concat(new object[] { "You currently have ", list.Count, " friend", (list.Count > 1) ? "s" : "", " online." }));
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Concat(new object[] { "You currently have ", list.Count, " friend", (list.Count > 1) ? "s" : "", " online." }));
             }
             else
             {
-                Util.sayUser(arg.argUser.networkPlayer, "None of your friend is playing right now.");
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name, "None of your friend is playing right now.");
             }
             foreach (string str in list2)
             {
@@ -108,7 +108,7 @@ namespace RustPP.Social
                 if (num == 6)
                 {
                     num = 0;
-                    Util.sayUser(arg.argUser.networkPlayer, str2.Substring(0, str2.Length - 3));
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
                     str2 = "";
                 }
                 else
@@ -118,7 +118,7 @@ namespace RustPP.Social
             }
             if (num != 0)
             {
-                Util.sayUser(arg.argUser.networkPlayer, str2.Substring(0, str2.Length - 3));
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
             }
         }
 

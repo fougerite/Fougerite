@@ -29,23 +29,25 @@
             RootDirectory = directory;
             Timers = new Dictionary<String, TimedEvent>();
 
-            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly, typeof(uLink.NetworkPlayer).Assembly, typeof(PlayerInventory).Assembly))
+            Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly,
+                typeof(uLink.NetworkPlayer).Assembly,
+                typeof(PlayerInventory).Assembly,
+                typeof(Fougerite.Player).Assembly))
                 .SetValue("Server", Server.GetServer())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
-                .SetValue("Entities", new LookUp())
+                .SetValue("LookUp", LookUp.GetLookUp())
                 .SetValue("Plugin", this)
                 .Execute(code);
             Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +
-                typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-                typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-                typeof(PlayerInventory).Assembly.GetName().Name);
-            try
-            {
+            typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
+            typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
+            typeof(PlayerInventory).Assembly.GetName().Name);
+            try {
                 Engine.Invoke("On_PluginInit");
+            } catch {
             }
-            catch { }
         }
 
         private void Invoke(string func, params object[] obj)

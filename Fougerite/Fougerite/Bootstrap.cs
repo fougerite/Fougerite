@@ -44,9 +44,12 @@ namespace Fougerite
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            ModuleManager.LoadModules();
-
-            Fougerite.Hooks.ServerStarted();
+            if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
+                Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
+            } else {
+                ModuleManager.LoadModules();
+                Fougerite.Hooks.ServerStarted();
+            }
         }
     }
 }

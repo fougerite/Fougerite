@@ -13,6 +13,7 @@ namespace Fougerite
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
         private static Fougerite.Data data;
+        private static DataStore ds = DataStore.GetInstance();
         public Hashtable Fougerite_shared_data = new Hashtable();
 
         [Obsolete("Modules hosting plugins will manage plugin config files", false)]
@@ -24,35 +25,13 @@ namespace Fougerite
             Contract.Requires(tablename != null);
             Contract.Requires(key != null);
 
-            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
-            if (hashtable == null)
-            {
-                hashtable = new Hashtable();
-                DataStore.GetInstance().datastore.Add(tablename, hashtable);
-            }
-            if (hashtable.ContainsKey(key))
-            {
-                hashtable[key] = val;
-            }
-            else
-            {
-                hashtable.Add(key, val);
-            }
+            ds.Add(tablename, key, val);
         }
 
         [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public string GetConfigValue(string config, string section, string key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(config));
-            Contract.Requires(!string.IsNullOrEmpty(section));
-            Contract.Requires(!string.IsNullOrEmpty(key));
-
-            IniParser parser = (IniParser)inifiles[config.ToLower()];
-            if (parser == null)
-            {
-                return "Config does not exist";
-            }
-            return parser.GetSetting(section, key);
+            return null;
         }
 
         public static Fougerite.Data GetData()
@@ -66,55 +45,24 @@ namespace Fougerite
             return data;
         }
 
-        [Obsolete("Replaced with DataStore.Get", false)]
         public object GetTableValue(string tablename, object key)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
             Contract.Requires(key != null);
 
-            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
-            if (hashtable == null)
-            {
-                return null;
-            }
-            return hashtable[key];
+            return ds.Get(tablename, key);
         }
 
         [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public void Load()
         {
-            inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(Config.GetPublicFolder()))
-            {
-                string path = "";
-                foreach (string str3 in Directory.GetFiles(str))
-                {
-                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
-                    {
-                        path = str3;
-                    }
-                }
-                if (path != "")
-                {
-                    string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
-                    inifiles.Add(key, new IniParser(path));
-                    Logger.LogDebug("Loaded Config: " + key);
-                }
-            }
+            return;
         }
 
         [Obsolete("Modules hosting plugins will manage plugin config files", false)]
         public void OverrideConfig(string config, string section, string key, string value)
         {
-            Contract.Requires(!string.IsNullOrEmpty(config));
-            Contract.Requires(!string.IsNullOrEmpty(section));
-            Contract.Requires(!string.IsNullOrEmpty(key));
-
-            IniParser parser = (IniParser)inifiles[config.ToLower()];
-            if (parser != null)
-            {
-                parser.SetSetting(section, key, value);
-            }
+            return;
         }
 
         public string[] SplitQuoteStrings(string str)

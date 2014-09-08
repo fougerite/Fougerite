@@ -12,24 +12,12 @@
         public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
         public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
         private static MagmaPlugin.Data data;
+        private DataStore ds = DataStore.GetInstance();
         private Hashtable inifiles = new Hashtable();
 
         public void AddTableValue(string tablename, object key, object val)
         {
-            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
-            if (hashtable == null)
-            {
-                hashtable = new Hashtable();
-                DataStore.GetInstance().datastore.Add(tablename, hashtable);
-            }
-            if (hashtable.ContainsKey(key))
-            {
-                hashtable[key] = val;
-            }
-            else
-            {
-                hashtable.Add(key, val);
-            }
+            this.ds.Add(tablename, key, val); 
         }
 
         public string GetConfigValue(string config, string section, string key)
@@ -53,12 +41,7 @@
 
         public object GetTableValue(string tablename, object key)
         {
-            Hashtable hashtable = (Hashtable)DataStore.GetInstance().datastore[tablename];
-            if (hashtable == null)
-            {
-                return null;
-            }
-            return hashtable[key];
+            return this.ds.Get(tablename, key);
         }
 
         public void Load(Hashtable ht)

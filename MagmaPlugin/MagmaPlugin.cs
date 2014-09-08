@@ -297,7 +297,7 @@
 
         public TimedEvent CreateTimer(string name, int timeoutDelay, ParamsList args)
         {
-            return this.CreateTimer(name, timeoutDelay, args.ToArray<object>());
+            return this.CreateTimer(name, timeoutDelay, args.ToArray());
         }
 
         public void KillTimer(string name)

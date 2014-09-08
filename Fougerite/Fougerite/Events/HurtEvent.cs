@@ -36,37 +36,37 @@
             this.DamageEvent = d;
             this.WeaponData = null;
             this.IsDecay = false;
-			string weaponName = "Unknown";
-			if (d.extraData != null)
-			{
-				WeaponImpact extraData = d.extraData as WeaponImpact;
-				this.WeaponData = extraData;
-				if (extraData.dataBlock != null)
-				{
-					weaponName = extraData.dataBlock.name;
-				}
-			}
-			else
-			{
-				if (d.attacker.id is TimedExplosive) {
-					weaponName = "Explosive Charge";
-				} else if (d.attacker.id is TimedGrenade) {
-					weaponName = "F1 Grenade";
-				} else if (d.attacker.id.ToString().Contains("MutantBear")) {
-					weaponName = "Mutant Bear Claw";
-				} else if (d.attacker.id.ToString().Contains("Bear")) {
-					weaponName = "Bear Claw";
-				} else if (d.attacker.id.ToString().Contains("MutantWolf")) {
-					weaponName = "Mutant Wolf Claw";
-				} else if (d.attacker.id.ToString().Contains("Wolf")) {
-					weaponName = "Wolf Claw";
-				} else if (d.attacker.id.Equals(d.victim.id)) {
-					weaponName = String.Format("Self ({0})", DamageType);
-				} else {
-					weaponName = "Hunting Bow";
-				}
-			}
-			this.WeaponName = weaponName;
+            string weaponName = "Unknown";
+            if (d.extraData != null)
+            {
+                WeaponImpact extraData = d.extraData as WeaponImpact;
+                this.WeaponData = extraData;
+                if (extraData.dataBlock != null)
+                {
+                    weaponName = extraData.dataBlock.name;
+                }
+            }
+            else
+            {
+                if (d.attacker.id is TimedExplosive) {
+                    weaponName = "Explosive Charge";
+                } else if (d.attacker.id is TimedGrenade) {
+                    weaponName = "F1 Grenade";
+                } else if (d.attacker.id.ToString().Contains("MutantBear")) {
+                    weaponName = "Mutant Bear Claw";
+                } else if (d.attacker.id.ToString().Contains("Bear")) {
+                    weaponName = "Bear Claw";
+                } else if (d.attacker.id.ToString().Contains("MutantWolf")) {
+                    weaponName = "Mutant Wolf Claw";
+                } else if (d.attacker.id.ToString().Contains("Wolf")) {
+                    weaponName = "Wolf Claw";
+                } else if (d.attacker.id.Equals(d.victim.id)) {
+                    weaponName = String.Format("Self ({0})", DamageType);
+                } else {
+                    weaponName = "Hunting Bow";
+                }
+            }
+            this.WeaponName = weaponName;
         }
 
         public HurtEvent(ref DamageEvent d, Fougerite.Entity en)

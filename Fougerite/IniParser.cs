@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 public class IniParser
@@ -96,18 +97,7 @@ public class IniParser
 
     public int Count()
     {
-        System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-        foreach (SectionPair pair in this.tmpList)
-        {
-            if (pair.Key.StartsWith(";"))  // don't count comments
-                continue;
-
-            if (!list.Contains(pair.Section))
-            {
-                list.Add(pair.Section);
-            }
-        }
-        return list.Count;
+        return this.Sections.Length;
     }
 
     public void DeleteSetting(string sectionName, string settingName)
@@ -141,6 +131,17 @@ public class IniParser
             }
         }
         return list.ToArray();
+    }
+
+    public string[] Sections
+    {
+        get
+        {
+            return (from pair in this.tmpList
+                        group pair by pair.Section into bySection
+                        from IGrouping<string, SectionPair> g in bySection
+                        select g.Key).ToArray<string>();
+        }
     }
 
     public string GetSetting(string sectionName, string settingName)

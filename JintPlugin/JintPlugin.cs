@@ -21,6 +21,7 @@
         public readonly string Code;
         public readonly DirectoryInfo RootDirectory;
         public readonly Dictionary<String, TimedEvent> Timers;
+        private readonly string brktname = "[Jint]";
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
@@ -58,7 +59,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError("[JintPlugin] Error invoking function " + func + " in " + Name + " plugin.");
+                Logger.LogError(string.Format("{0} Error invoking function {1} in {2} plugin.", brktname, func, Name));
                 Logger.LogException(ex);
             }
         }
@@ -75,7 +76,7 @@
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("[JintPlugin] Found Function: " + funcDecl.Id.Name);
+                Logger.LogDebug(string.Format("{0} Found Function: {1}", brktname, funcDecl.Id.Name));
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
@@ -108,7 +109,7 @@
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("[JintPlugin] RemoveHooks, found function " + funcDecl.Id.Name);
+                Logger.LogDebug(string.Format("{0} RemoveHooks, found function {1}", brktname, funcDecl.Id.Name));
                 switch (funcDecl.Id.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
@@ -349,7 +350,7 @@
         {
             path = ValidateRelativePath(path + ".json");
             if (!File.Exists(path)) {
-                Logger.LogError("[JintPlugin] JsonFile not found: " + path);
+                Logger.LogError(string.Format("{0} JsonFile not found: {1}", brktname, path));
                 return null;
             }
 

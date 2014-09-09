@@ -18,6 +18,7 @@
         public readonly string Code;
         public readonly DirectoryInfo RootDirectory;
         public readonly Dictionary<String, TimedEvent> Timers;
+        private readonly string brktname = "[Magma]";
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
@@ -58,7 +59,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError("[MagmaPlugin] Error invoking function " + func + " in " + Name + " plugin.");
+                Logger.LogError(string.Format("{0} Error invoking function {1} in {2} plugin.", brktname, func, Name));
                 Logger.LogException(ex);
             }
         }
@@ -82,7 +83,7 @@
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("[MagmaPlugin] Found Function: " + funcDecl.Name);
+                Logger.LogDebug(string.Format("{0} Found Function: {1}", brktname, funcDecl.Name));
                 switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
@@ -115,7 +116,7 @@
         {
             foreach (var funcDecl in GetSourceCodeGlobalFunctions())
             {
-                Logger.LogDebug("[MagmaPlugin] RemoveHooks, found function " + funcDecl.Name);
+                Logger.LogDebug(string.Format("{0} RemoveHooks, found function {1}", brktname, funcDecl.Name));
                 switch (funcDecl.Name)
                 {
                     case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;

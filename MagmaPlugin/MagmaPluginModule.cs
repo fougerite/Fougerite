@@ -9,19 +9,23 @@
 
     public class MagmaPluginModule : Fougerite.Module
     {
-        public override string Name {
+        public override string Name
+        {
             get { return "MagmaPlugin"; }
         }
 
-        public override string Author {
+        public override string Author
+        {
             get { return "Riketta, mikec, xEnt, EquiFox"; }
         }
 
-        public override string Description {
+        public override string Description
+        {
             get { return "Legacy Magma Plugin Engine"; }
         }
 
-        public override Version Version {
+        public override Version Version
+        {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
 
@@ -32,6 +36,7 @@
             "system.xml"
         };
         public static Hashtable inifiles = new Hashtable();
+        private readonly string brktname = "[Magma]";
 
         public override void Initialize()
         {
@@ -76,42 +81,42 @@
                             script = script + str2 + "\r\n";
                             continue;
                         } else if (str2.Contains("];")) {
-                            string str3 = str2.Split(new string[1] {
-                                "new "
-                            }, StringSplitOptions.None)[1].Split(new string[1] {
-                                "];"
-                            }, StringSplitOptions.None)[0];
-                            string str4 = str2.Replace("new " + str3, "").Replace("];", "");
-                            string str5 = str3.Split('[')[1];
-                            string str6 = str3.Split('[')[0];
-                            str2 = str4 + "Util.CreateArrayInstance('" + str6 + "', " + str5 + ");";
-                        } else if (str2.Contains(");")) {
-                            string str3 = str2.Split(new string[1] {
-                                "new "
-                            }, StringSplitOptions.None)[1].Split(new string[1] {
-                                ");"
-                            }, StringSplitOptions.None)[0];
-                            string str4 = str2.Replace("new " + str3, "").Replace(");", "");
-                            string str5 = str3.Split('(')[1];
-                            string str6 = str3.Split('(')[0];
-                            string str7 = str4 + "Util.CreateInstance('" + str6 + "'";
-                            if (str5 != "")
-                                str7 = str7 + ", " + str5;
-                            str2 = str7 + ");";
-                        }
+                                string str3 = str2.Split(new string[1] {
+                                    "new "
+                                }, StringSplitOptions.None)[1].Split(new string[1] {
+                                    "];"
+                                }, StringSplitOptions.None)[0];
+                                string str4 = str2.Replace("new " + str3, "").Replace("];", "");
+                                string str5 = str3.Split('[')[1];
+                                string str6 = str3.Split('[')[0];
+                                str2 = str4 + "Util.CreateArrayInstance('" + str6 + "', " + str5 + ");";
+                            } else if (str2.Contains(");")) {
+                                    string str3 = str2.Split(new string[1] {
+                                        "new "
+                                    }, StringSplitOptions.None)[1].Split(new string[1] {
+                                        ");"
+                                    }, StringSplitOptions.None)[0];
+                                    string str4 = str2.Replace("new " + str3, "").Replace(");", "");
+                                    string str5 = str3.Split('(')[1];
+                                    string str6 = str3.Split('(')[0];
+                                    string str7 = str4 + "Util.CreateInstance('" + str6 + "'";
+                                    if (str5 != "")
+                                        str7 = str7 + ", " + str5;
+                                    str2 = str7 + ");";
+                                }
                     }
                     script = script + str2 + "\r\n";
                 } catch (Exception ex) {
                     Logger.LogException(ex);
-                    Logger.LogError("[Magma] Couln't create instance at line -> " + str1);
+                    Logger.LogError(string.Format("{0} Couln't create instance at line -> {1}", brktname, str1));
                     return legacy;
                 }
             }
             if (FilterPlugin(script)) {
-                Logger.Log("[Magma] Loaded: " + path);
+                Logger.LogDebug(string.Format("{0} Loaded: {1}", brktname, path));
                 return legacy + script;
             } else {
-                Logger.LogError("[Magma] PERMISSION DENIED. Failed to load " + path + " due to restrictions on the API");
+                Logger.LogError(string.Format("{0} SKIPPED: May not load {1} due to restrictions on the API", brktname, path));
                 return legacy;
             }
         }
@@ -121,7 +126,7 @@
             string str1 = script.ToLower();
             foreach (string str2 in filters) {
                 if (str1.Contains(str2)) {
-                    Logger.LogError("[Magma] Script cannot contain: " + str2);
+                    Logger.LogError(string.Format("{0} Script may not contain: {1}", brktname, str2));
                     return false;
                 }
             }
@@ -130,7 +135,7 @@
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
-            Logger.LogDebug("[Magma] Unloading " + name + " plugin.");
+            Logger.LogDebug(string.Format("{0} Unloading {1} plugin.", brktname, name));
 
             if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
@@ -140,10 +145,10 @@
                 if (removeFromDict)
                     plugins.Remove(name);
 
-                Logger.Log("[Magma] " + name + " plugin was unloaded successfuly.");
+                Logger.Log(string.Format("{0} {1} plugin was unloaded successfuly.", brktname, name));
             } else {
-                Logger.LogError("[Magma] Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("[Magma] Can't unload " + name + ". Plugin is not loaded.");
+                Logger.LogError(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
             }
         }
 
@@ -161,11 +166,11 @@
 
         private void LoadPlugin(string name)
         {
-            Logger.LogDebug("[Magma] Loading plugin " + name + ".");
+            Logger.LogDebug(string.Format("{1} Loading plugin {1}.", brktname, name));
 
             if (plugins.ContainsKey(name)) {
-                Logger.LogError("[Magma] " + name + " plugin is already loaded.");
-                throw new InvalidOperationException("[Magma] " + name + " plugin is already loaded.");
+                Logger.LogError(string.Format("{0} {1} plugin is already loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} {1} plugin is already loaded.", brktname, name));
             }
 
             try {
@@ -175,10 +180,9 @@
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log("[Magma] " + name + " plugin was loaded successfuly.");
+                Logger.Log(string.Format("{0} {1} plugin was loaded successfuly.", brktname, name));
             } catch (Exception ex) {
-                string arg = name + " plugin could not be loaded.";
-                Server.GetServer().BroadcastFrom(Name, arg);
+                Logger.LogError(string.Format("{0} {1} plugin could not be loaded.", brktname, name));
                 Logger.LogException(ex);
             }
         }
@@ -197,21 +201,16 @@
                 LoadPlugin(name);
 
             inifiles.Clear();
-            foreach (string str in Directory.GetDirectories(ModuleFolder))
-            {
+            foreach (string str in Directory.GetDirectories(ModuleFolder)) {
                 string path = "";
-                foreach (string str3 in Directory.GetFiles(str))
-                {
-                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str)))
-                    {
+                foreach (string str3 in Directory.GetFiles(str)) {
+                    if (Path.GetFileName(str3).Contains(".cfg") && Path.GetFileName(str3).Contains(Path.GetFileName(str))) {
                         path = str3;
                     }
                 }
-                if (path != "")
-                {
+                if (path != "") {
                     string key = Path.GetFileName(path).Replace(".cfg", "").ToLower();
-                    inifiles.Add(key, path);
-                    Logger.LogDebug("[Magma] Loaded Config Path: " + key + "=" + path);
+                    inifiles.Add(key, path);                   
                 }
             }
             Data.GetData().Load(inifiles);

@@ -32,6 +32,7 @@
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
         public static Hashtable inifiles = new Hashtable();
+        private readonly string brktname = "[Jint]";
 
         public override void Initialize()
         {
@@ -66,7 +67,7 @@
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
-            Logger.LogDebug("[JintPlugin] Unloading " + name + " plugin.");
+            Logger.LogDebug(string.Format("{0} Unloading {1}  plugin.", brktname, name));
 
             if (plugins.ContainsKey(name))
             {
@@ -76,12 +77,12 @@
                 plugin.KillTimers();
                 if (removeFromDict) plugins.Remove(name);
 
-                Logger.Log("[JintPlugin] " + name + " plugin was unloaded successfuly.");
+                Logger.Log(string.Format("{0} {1} plugin was unloaded successfuly.", brktname, name));
             }
             else
             {
-                Logger.LogError("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                Logger.LogError(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
             }
         }
 
@@ -99,12 +100,12 @@
 
         private void LoadPlugin(string name)
         {
-            Logger.LogDebug("[JintPlugin] Loading plugin " + name + ".");
+            Logger.LogDebug(string.Format("{0} Loading plugin {1}.", brktname, name));
 
             if (plugins.ContainsKey(name))
             {
-                Logger.LogError("[JintPlugin] " + name + " plugin is already loaded.");
-                throw new InvalidOperationException("[JintPlugin] " + name + " plugin is already loaded.");
+                Logger.LogError(string.Format("{0} {1} plugin is already loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} {1} plugin is already loaded.", brktname, name));
             }
 
             try
@@ -115,12 +116,11 @@
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log("[JintPlugin] " + name + " plugin was loaded successfuly.");
+                Logger.Log(string.Format("{0} {1} plugin was loaded successfuly.", brktname, name));
             }
             catch (Exception ex)
             {
-                string arg = name + " plugin could not be loaded.";
-                Server.GetServer().BroadcastFrom(Name, arg);
+                Logger.LogError(string.Format("{0} {1} plugin could not be loaded.", brktname, name));
                 Logger.LogException(ex);
             }
         }

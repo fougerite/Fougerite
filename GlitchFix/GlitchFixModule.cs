@@ -27,6 +27,10 @@ namespace GlitchFix
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
+        public override uint Order
+        {
+            get { return 2; }
+        }
 
         IniParser Config;
         public override void Initialize()

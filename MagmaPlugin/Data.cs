@@ -50,7 +50,7 @@
             foreach (DictionaryEntry de in ht) {
                 inifiles.Add(de.Key as string, new IniParser(de.Value as string));
             }
-            Logger.LogDebug("[MagmaPlugin.Data] Loaded plugin configs");
+            Logger.LogDebug("[Magma] Loaded plugin configs");
         }
 
         public string[] SplitQuoteStrings(string str)

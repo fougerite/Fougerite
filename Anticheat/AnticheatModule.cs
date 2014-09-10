@@ -36,6 +36,10 @@ namespace Anticheat
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
+        public override uint Order
+        {
+            get { return 1; }
+        }
 
         #region Config Fields
 

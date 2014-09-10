@@ -28,6 +28,10 @@
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
+        public override uint Order
+        {
+            get { return 3; }
+        }
 
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;

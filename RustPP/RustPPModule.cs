@@ -25,7 +25,7 @@ namespace RustPP
         }
         public override string Description
         {
-            get { return ""; }
+            get { return "Rust++ Legacy Module"; }
         }
         public override Version Version
         {
@@ -35,6 +35,11 @@ namespace RustPP
         public static string GetAbsoluteFilePath(string fileName)
         {
             return Path.Combine(ConfigsFolder, fileName);
+        }
+
+        public override uint Order
+        {
+            get { return 0; }
         }
 
         public static string ConfigFile;

@@ -104,7 +104,6 @@ namespace Fougerite
 		public static string NormalizePath(string path)
 		{
 			string normal = path.Replace(@"\\", @"\").Replace(@"//", @"/").Trim();
-			Logger.LogDebug(@"[Util] """ + path + @""" to """ + normal + @"""");
 			return normal;
 		}
 

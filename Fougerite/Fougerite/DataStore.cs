@@ -104,14 +104,7 @@ namespace Fougerite
                 hashtable = new Hashtable();
                 this.datastore.Add(tablename, hashtable);
             }
-            if (hashtable.ContainsKey(key))
-            {
-                hashtable[StringifyIfVector3(key)] = StringifyIfVector3(val);
-            }
-            else
-            {
-                hashtable.Add(StringifyIfVector3(key), StringifyIfVector3(val));
-            }
+            hashtable[StringifyIfVector3(key)] = StringifyIfVector3(val);
         }
 
         public bool ContainsKey(string tablename, object key)
@@ -122,13 +115,7 @@ namespace Fougerite
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
-                foreach (object obj2 in hashtable.Keys)
-                {
-                    if (obj2 == StringifyIfVector3(key))
-                    {
-                        return true;
-                    }
-                }
+                return hashtable.ContainsKey(StringifyIfVector3(key));
             }
             return false;
         }
@@ -140,13 +127,7 @@ namespace Fougerite
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
-                foreach (object obj2 in hashtable.Values)
-                {
-                    if (obj2 == StringifyIfVector3(val))
-                    {
-                        return true;
-                    }
-                }
+                return hashtable.ContainsValue(StringifyIfVector3(val));
             }
             return false;
         }

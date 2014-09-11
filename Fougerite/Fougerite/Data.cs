@@ -22,9 +22,6 @@ namespace Fougerite
         [Obsolete("Replaced with DataStore.Add", false)]
         public void AddTableValue(string tablename, object key, object val)
         {
-            Contract.Requires(tablename != null);
-            Contract.Requires(key != null);
-
             ds.Add(tablename, key, val);
         }
 
@@ -47,9 +44,6 @@ namespace Fougerite
 
         public object GetTableValue(string tablename, object key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
-
             return ds.Get(tablename, key);
         }
 

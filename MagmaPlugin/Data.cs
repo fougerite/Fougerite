@@ -17,11 +17,14 @@
 
         public void AddTableValue(string tablename, object key, object val)
         {
-            this.ds.Add(tablename, key, val); 
+            ds.Add(tablename, key, val); 
         }
 
         public string GetConfigValue(string config, string section, string key)
         {
+            if (key == null)
+                return null;
+
             IniParser parser = (IniParser)inifiles[config.ToLower()];
             if (parser == null)
             {
@@ -41,7 +44,7 @@
 
         public object GetTableValue(string tablename, object key)
         {
-            return this.ds.Get(tablename, key);
+            return ds.Get(tablename, key);
         }
 
         public void Load(Hashtable ht)

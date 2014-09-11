@@ -22,36 +22,40 @@ namespace Fougerite
 
         private object StringifyIfVector3(object keyorval)
         {
-            if (keyorval != null) {
-                try {
-                    if (typeof(Vector3).Equals(keyorval.GetType())) {
-                        return "Vector3," +
-                        ((Vector3)keyorval).x.ToString() + "," +
-                        ((Vector3)keyorval).y.ToString() + "," +
-                        ((Vector3)keyorval).z.ToString();
-                    }
-                } catch (Exception ex) {
-                    Logger.LogException(ex);
+            if (keyorval == null)
+                return keyorval;
+
+            try {
+                if (typeof(Vector3).Equals(keyorval.GetType())) {
+                    return "Vector3," +
+                    ((Vector3)keyorval).x.ToString("G9") + "," +
+                    ((Vector3)keyorval).y.ToString("G9") + "," +
+                    ((Vector3)keyorval).z.ToString("G9");
                 }
+            } catch (Exception ex) {
+                Logger.LogException(ex);
             }
             return keyorval;
         }
 
         private object ParseIfVector3String(object keyorval)
         {
-            if (keyorval != null) {
-                try {
+            if (keyorval == null)
+                return keyorval;
+
+            try {
+                if (typeof(string).Equals(keyorval.GetType())) {
                     if ((keyorval as string).StartsWith("Vector3,")) {
                         string[] v3array = (keyorval as string).Split(new char[] { ',' });
-                        Vector3 parse = new Vector3(Single.Parse(v3array[1] as string), 
-                                            Single.Parse(v3array[2] as string),
-                                            Single.Parse(v3array[3] as string));
+                        Vector3 parse = new Vector3(Single.Parse(v3array[1]), 
+                                            Single.Parse(v3array[2]),
+                                            Single.Parse(v3array[3]));
                         return parse;
                     }
-                } catch (Exception ex) {
-                    Logger.LogException(ex);
                 }
-            }
+            } catch (Exception ex) {
+                Logger.LogException(ex);
+            }          
             return keyorval;
         }
 
@@ -66,7 +70,8 @@ namespace Fougerite
                 Hashtable ht = (Hashtable)this.datastore[section];
                 foreach (object setting in ht.Keys) {
                     try {
-                        string key = "null", val = "null";
+                        string key = "NullReference";
+                        string val = "NullReference";
                         if (setting != null) {
                             if (setting.GetType().GetMethod("ToString", Type.EmptyTypes) == null) {
                                 key = "type:" + setting.GetType().ToString();
@@ -96,7 +101,9 @@ namespace Fougerite
         public void Add(string tablename, object key, object val)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
+
+            if (key == null)
+                key = "NullReference";
 
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
@@ -110,7 +117,9 @@ namespace Fougerite
         public bool ContainsKey(string tablename, object key)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
+
+            if (key == null)
+                return false;
 
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
@@ -157,7 +166,9 @@ namespace Fougerite
         public object Get(string tablename, object key)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
+
+            if (key == null)
+                return null;
 
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
@@ -232,7 +243,9 @@ namespace Fougerite
         public void Remove(string tablename, object key)
         {
             Contract.Requires(!string.IsNullOrEmpty(tablename));
-            Contract.Requires(key != null);
+
+            if (key == null)
+                return;
 
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)

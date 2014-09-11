@@ -170,7 +170,7 @@
 
         private void LoadPlugin(string name)
         {
-            Logger.LogDebug(string.Format("{1} Loading plugin {1}.", brktname, name));
+            Logger.LogDebug(string.Format("{0} Loading plugin {1}.", brktname, name));
 
             if (plugins.ContainsKey(name)) {
                 Logger.LogError(string.Format("{0} {1} plugin is already loaded.", brktname, name));

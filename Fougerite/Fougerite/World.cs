@@ -148,6 +148,16 @@ namespace Fougerite
             return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
         }
 
+        public float GetTerrainHeight(Vector3 target)
+        {
+            return Terrain.activeTerrain.SampleHeight(target);
+        }
+
+        public float GetTerrainHeight(float x, float y, float z)
+        {
+            return GetTerrainHeight(new Vector3(x, y, z));
+        }
+
         public float GetGroundDist(float x, float y, float z)
         {
             Vector3 origin = new Vector3(x, y, z);

@@ -80,10 +80,6 @@ namespace RustPP.Commands
                             command.Execute(arg, chatArgs);
                         }
                     }
-                    else
-                    {
-                        Util.sayUser(arg.argUser.networkPlayer, Core.Name, "This feature has been disabled on this server.");
-                    }
                     break;
                 }
             }

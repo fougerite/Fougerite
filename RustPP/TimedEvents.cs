@@ -35,6 +35,7 @@
                 AvatarSaveProc.SaveAll();
                 ServerSaveManager.AutoSave();
                 Helper.CreateSaves();
+                DataStore.GetInstance().Save();
             }
             catch (Exception ex)
             {
@@ -67,6 +68,7 @@
                     AvatarSaveProc.SaveAll();
                     ServerSaveManager.AutoSave();
                     Helper.CreateSaves();
+                    DataStore.GetInstance().Save();
                 }
                 catch (Exception ex)
                 {

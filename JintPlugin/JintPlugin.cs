@@ -32,19 +32,17 @@
 
             Engine = new Engine(cfg => cfg.AllowClr(typeof(UnityEngine.GameObject).Assembly,
                 typeof(uLink.NetworkPlayer).Assembly,
-                typeof(PlayerInventory).Assembly,
-                typeof(Fougerite.Player).Assembly))
+                typeof(PlayerInventory).Assembly))
                 .SetValue("Server", Server.GetServer())
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
-                .SetValue("LookUp", LookUp.GetLookUp())
+                .SetValue("Lookup", LookUp.GetLookUp())
                 .SetValue("Plugin", this)
                 .Execute(code);
-            Logger.LogDebug("[JintPlugin] AllowClr for Assemblies: " +
+            Logger.LogDebug("{0} AllowClr for Assemblies: {1} {2}" +
             typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-            typeof(uLink.NetworkPlayer).Assembly.GetName().Name + ", " +
-            typeof(PlayerInventory).Assembly.GetName().Name);
+            typeof(uLink.NetworkPlayer).Assembly.GetName().Name);
             try {
                 Engine.Invoke("On_PluginInit");
             } catch {

@@ -39,7 +39,7 @@ namespace RustPP
 
         public override uint Order
         {
-            get { return 0; }
+            get { return uint.MinValue; }
         }
 
         public static string ConfigFile;

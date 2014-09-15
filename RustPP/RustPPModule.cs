@@ -76,7 +76,7 @@ namespace RustPP
             Fougerite.Hooks.OnPlayerKilled += PlayerKilled;
             Fougerite.Hooks.OnServerShutdown += ServerShutdown;
             Fougerite.Hooks.OnShowTalker += ShowTalker;
-            Fougerite.Hooks.OnChat += Chat;
+            Fougerite.Hooks.OnChatRaw += ChatReceived;
             Fougerite.Hooks.OnCommandRaw += HandleCommand;
         }
 
@@ -93,7 +93,7 @@ namespace RustPP
             Fougerite.Hooks.OnPlayerKilled -= PlayerKilled;
             Fougerite.Hooks.OnServerShutdown -= ServerShutdown;
             Fougerite.Hooks.OnShowTalker -= ShowTalker;
-            Fougerite.Hooks.OnChat -= Chat;
+            Fougerite.Hooks.OnChatRaw -= ChatReceived;
             Fougerite.Hooks.OnCommandRaw -= HandleCommand;
             
             Logger.LogDebug("DeInitialized RPP");
@@ -109,9 +109,10 @@ namespace RustPP
             Core.handleCommand(arg);
         }
 
-        void Chat(Fougerite.Player p, ref ChatString text)
+        void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            string str = text.ToString().Trim();
+            string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
+            Fougerite.Player p = new Fougerite.Player(arg.argUser.playerClient);
 
             var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
             if (command.GetTPWaitList().Contains(p.PlayerClient.userID))
@@ -123,6 +124,7 @@ namespace RustPP
                     Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     command.GetTPWaitList().Remove(p.PlayerClient.userID);
                 }
+                arg = null;
             }
             else if (Core.banWaitList.Contains(p.PlayerClient.userID))
             {
@@ -136,6 +138,7 @@ namespace RustPP
                     Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     Core.banWaitList.Remove(p.PlayerClient.userID);
                 }
+                arg = null;
             }
             else if (Core.kickWaitList.Contains(p.PlayerClient.userID))
             {
@@ -149,11 +152,12 @@ namespace RustPP
                     Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
                     Core.kickWaitList.Remove(p.PlayerClient.userID);
                 }
+                arg = null;
             }
 
             if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
             {
-                text = null;
+                arg = null;
                 Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You are muted.");
             }
         }

@@ -130,6 +130,14 @@ namespace Fougerite
         {
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
+		
+	public bool HasBlueprint(BlueprintDataBlock dataBlock)
+        {
+            PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
+            if (invent.KnowsBP(dataBlock))
+                return true;
+            return false;
+        }
 
         private void Hooks_OnPlayerKilled(DeathEvent de)
         {

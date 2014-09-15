@@ -9,6 +9,8 @@ namespace Fougerite
     public class Entity
     {
         private readonly object _obj;
+        private EntityInv inv;
+        private bool hasInventory = false;
 
         [ContractInvariantMethod]
         private void Invariant()
@@ -23,6 +25,10 @@ namespace Fougerite
             Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
 
             this._obj = Obj;
+            var deployable = (DeployableObject)Obj;
+            var inventory = deployable.GetComponent<Inventory>();
+            if (inventory != null && deployable != null)
+                hasInventory = true;
         }
 
         public void ChangeOwner(Fougerite.Player p)
@@ -187,6 +193,16 @@ namespace Fougerite
                     return this.GetObject<StructureComponent>().GetInstanceID();
                 }
                 return 0;
+            }
+        }
+
+        public EntityInv Inventory
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                    return new EntityInv(this._obj);
+                return new EntityInv(String.Empty);
             }
         }
 

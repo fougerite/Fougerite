@@ -19,8 +19,9 @@ namespace Fougerite
         public static System.Collections.Generic.List<object> decayList = new System.Collections.Generic.List<object>();
         public static Hashtable talkerTimers = new Hashtable();
 
-        public static event BlueprintUseHandlerDelagate OnBlueprintUse;
+        public static event BlueprintUseHandlerDelegate OnBlueprintUse;
         public static event ChatHandlerDelegate OnChat;
+        public static event ChatRawHandlerDelegate OnChatRaw;
         public static event CommandHandlerDelegate OnCommand;
         public static event CommandRawHandlerDelegate OnCommandRaw;
         public static event ConsoleHandlerDelegate OnConsoleReceived;
@@ -82,21 +83,21 @@ namespace Fougerite
 
         public static void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            // These two follow from the fact that the chat.say has [User] attribute.
-            Contract.Assume(arg.argUser != null);
-            Contract.Assume(arg.argUser.connected);
-
-            // This one is a always true, because NetUser's user field is readonly and initialized in the constructor.
-            Contract.Assume(arg.argUser.user != null);
-            Contract.Assume(arg.argUser.playerClient);
-
             if (!chat.enabled)
+                return;
+
+            if (arg == null)
                 return;
 
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
             var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
 
-            // If there is a slash in the beginning, it's a chat command.
+            if (OnChatRaw != null)
+                OnChatRaw(ref arg);
+
+            if (arg == null)
+                return;
+
             if (quotedMessage.Trim('"').StartsWith("/")) {
                 Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
 
@@ -338,14 +339,15 @@ namespace Fougerite
                 }
                 Fougerite.Player item = new Fougerite.Player(user.playerClient);
                 Fougerite.Server.GetServer().Players.Add(item);
-
                 Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
                                 item.PlayerClient.netPlayer.ipAddress + ")");
                 if (OnPlayerConnected != null)
                     OnPlayerConnected(item);
-                connected = user.connected;
 
-                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                connected = user.connected;
+                if (Fougerite.Config.GetValue("Fougerite", "tellversion") != "false")
+                    item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+
                 return connected;
             }
             catch (Exception ex)
@@ -524,6 +526,9 @@ namespace Fougerite
             OnChat = delegate(Fougerite.Player param0, ref ChatString param1)
             {
             };
+            OnChatRaw = delegate(ref ConsoleSystem.Arg param0)
+            {
+            };
             OnCommand = delegate(Fougerite.Player param0, string param1, string[] param2)
             {
             };
@@ -630,9 +635,9 @@ namespace Fougerite
             return lists;
         }
 
-        public delegate void BlueprintUseHandlerDelagate(Fougerite.Player player, BPUseEvent ae);
+        public delegate void BlueprintUseHandlerDelegate(Fougerite.Player player, BPUseEvent ae);
         public delegate void ChatHandlerDelegate(Fougerite.Player player, ref ChatString text);
-        public delegate void ChatRecivedDelegate(ref ConsoleSystem.Arg arg);
+        public delegate void ChatRawHandlerDelegate(ref ConsoleSystem.Arg arg);
         public delegate void CommandHandlerDelegate(Fougerite.Player player, string text, string[] args);
         public delegate void CommandRawHandlerDelegate(ref ConsoleSystem.Arg arg);
         public delegate void ConnectionHandlerDelegate(Fougerite.Player player);

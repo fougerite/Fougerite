@@ -37,7 +37,7 @@
                         {
                             if (!list.isFriendWith(name))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You are not friends with " + name);
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You are not friends with " + name);
                                 return;
                             }
                             list.RemoveFriend(name);
@@ -47,13 +47,13 @@
                         {
                             if (!list.isFriendWith(client.userID))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You are not friends with " + name);
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You are not friends with " + name);
                                 return;
                             }
                             list.RemoveFriend(client.userID);
                             realName = client.netUser.displayName;
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You have removed " + realName + " from your friends list.");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have removed " + realName + " from your friends list.");
                         if (list.HasFriends())
                         {
                             command.GetFriendsLists()[Arguments.argUser.userID] = list;
@@ -65,13 +65,13 @@
                     }
                     else
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You currently have no friends.");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You currently have no friends.");
                     }
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Friends Management Usage:  /unfriend \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Friends Management Usage:  /unfriend \"playerName\"");
             }
         }
     }

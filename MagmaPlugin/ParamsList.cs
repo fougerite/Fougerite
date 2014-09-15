@@ -34,6 +34,6 @@ public class ParamsList
 
     public object[] ToArray()
     {
-        return this.objs.ToArray();
+        return this.objs.ToArray<object>();
     }
 }

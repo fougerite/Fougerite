@@ -7,13 +7,13 @@ public class rustpp : ConsoleSystem
     [Admin]
     public static void day(ref ConsoleSystem.Arg arg)
     {
-        World.GetWorld().Time = 12f;
+        World.GetWorld().Time = 6f;
     }
 
     [Admin]
     public static void night(ref ConsoleSystem.Arg arg)
     {
-        World.GetWorld().Time = 0f;
+        World.GetWorld().Time = 18f;
     }
 
     [Admin]

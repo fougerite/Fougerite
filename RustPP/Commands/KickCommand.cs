@@ -18,7 +18,7 @@
             str = str.Trim();
             if ((ChatArguments == null) && !(str == ""))
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Kick Usage:  /kick \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Kick Usage:  /kick \"playerName\"");
             }
             else if (str != "")
             {
@@ -32,11 +32,11 @@
                         {
                             if (Arguments.argUser.userID == client.userID)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You can't kick yourself.");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You can't kick yourself.");
                             }
                             else if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You cannot kick an administrator!");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You cannot kick an administrator!");
                             }
                             else
                             {
@@ -51,18 +51,18 @@
                 }
                 if (list.Count != 1)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                     for (int j = 1; j < list.Count; j++)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "0 - Cancel");
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Please enter the number matching the player you were looking for.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
                     Core.kickWaitList.Add(Arguments.argUser.userID, list);
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
         }
@@ -75,7 +75,7 @@
                 string str = list[id];
                 if (id == 0)
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, "Cancelled!");
+                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
                     Core.kickWaitList.Remove(p.PlayerClient.userID);
                 }
                 else
@@ -87,7 +87,7 @@
                             Core.kickWaitList.Remove(p.PlayerClient.userID);
                             if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(p.PlayerClient.netPlayer, "You cannot kick an administrator!");
+                                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot kick an administrator!");
                             }
                             else
                             {

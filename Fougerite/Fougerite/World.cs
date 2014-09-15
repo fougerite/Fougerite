@@ -144,7 +144,18 @@ namespace Fougerite
 
         public float GetGround(float x, float z)
         {
-            return GetGroundDist(x, float.MaxValue, z);
+            Vector3 above = new Vector3(x, 2000f, z);
+            return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+        }
+
+        public float GetTerrainHeight(Vector3 target)
+        {
+            return Terrain.activeTerrain.SampleHeight(target);
+        }
+
+        public float GetTerrainHeight(float x, float y, float z)
+        {
+            return GetTerrainHeight(new Vector3(x, y, z));
         }
 
         public float GetGroundDist(float x, float y, float z)
@@ -153,14 +164,43 @@ namespace Fougerite
             return GetGroundDist(origin);
         }
 
+        [Flags]
+        public enum Layers
+        {
+            Default = 0,
+            TransparentFX = 1,
+            IgnoreRaycast = 2,
+            Water = 4,
+            NGUILayer = 8,
+            NGUILayer2D = 9,
+            Static = 10,
+            Sprite = 11,
+            CULL500 = 12,
+            ViewModel = 13,
+            GrassDisplacement = 14,
+            CharacterCollision = 16,
+            Hitbox = 17,
+            Debris = 18,
+            Terrain = 19,
+            Mechanical = 20,
+            RayOnly = 21,
+            MeshBatched = 22,
+            Skybox = 23,
+            Zone = 26,
+            Ragdoll = 27,
+            Vehicle = 28,
+            PlayerClip = 29,
+            GameUI = 31
+        }
+
         public float GetGroundDist(Vector3 origin)
         {
             RaycastHit Hit;
 
             float Distance = float.NaN;
 
-            // Deployable | Terrain | NoLayer
-            if (Physics.Raycast(origin, Vector3.down, out Hit, float.MaxValue, (1 << 10) | (1 << 19) | (1 << 0)))
+            Layers mask = Layers.Static | Layers.Terrain;
+            if (Physics.Raycast(origin, Vector3.down, out Hit, float.MaxValue, (int)mask))
             {
                 Logger.LogDebug("GetGroundDist: " + Hit.transform.name + " - " + Hit.transform.tag);
                 Distance = Hit.distance;
@@ -334,7 +374,7 @@ namespace Fougerite
             }
         }
 
-        public IEnumerable<Entity> Entities
+        public List<Entity> Entities
         {
             get
             {
@@ -345,7 +385,7 @@ namespace Fougerite
                 IEnumerable<Entity> deployables =
                     UnityEngine.Object.FindObjectsOfType<DeployableObject>()
                     .Select(sc => new Entity(sc));
-                return structures.Concat(deployables);
+                return structures.Concat(deployables).ToList<Entity>();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Contracts;
+using System.Diagnostics.Contracts;
 
 namespace Fougerite
 {
@@ -11,7 +11,7 @@ namespace Fougerite
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.4";
+        public static string Version = "1.0.5(MC5)";
 
         public static void AttachBootstrap()
         {
@@ -19,7 +19,7 @@ namespace Fougerite
             {
                 Bootstrap bootstrap = new Bootstrap();
                 new GameObject(bootstrap.GetType().FullName).AddComponent(bootstrap.GetType());
-                Debug.Log("Loaded: Fougerite");
+                Debug.Log(string.Format("<><[ Fougerite v{0} ]><>", Fougerite.Bootstrap.Version));
             }
             catch (Exception ex)
             {
@@ -44,9 +44,13 @@ namespace Fougerite
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            ModuleManager.LoadModules();
-
-            Fougerite.Hooks.ServerStarted();
+            // look for the string 'false' to disable.  not a bool check
+            if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
+                Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
+            } else {
+                ModuleManager.LoadModules();
+                Fougerite.Hooks.ServerStarted();
+            }
         }
     }
 }

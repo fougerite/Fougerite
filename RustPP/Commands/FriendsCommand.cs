@@ -13,7 +13,7 @@
         {
             if (!friendsLists.ContainsKey(Arguments.argUser.userID))
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "You currently have no friend.");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You currently have no friend.");
             }
             else
             {

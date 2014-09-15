@@ -28,11 +28,11 @@ namespace RustPP.Commands
                         {
                             if (userID == num3)
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, "Seriously? You are already an admin...");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Seriously? You are already an admin...");
                             }
                             else if (Administrator.IsAdmin(userID))
                             {
-                                Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is already an administrator.");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already an administrator.");
                             }
                             else
                             {
@@ -42,12 +42,12 @@ namespace RustPP.Commands
                             return;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "AddAdmin Usage:  /addadmin \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "AddAdmin Usage:  /addadmin \"playerName\"");
             }
         }
     }

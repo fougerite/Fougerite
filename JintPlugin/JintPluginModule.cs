@@ -1,25 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Reflection;
-
-namespace JintPlugin
+﻿namespace JintPlugin
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
     using Fougerite;
 
-    public class JintPluginModule : Module
+    public class JintPluginModule : Fougerite.Module
     {
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(pluginDirectory != null);
-            Contract.Invariant(plugins != null);
-            Contract.Invariant(Contract.ForAll(plugins, pair => pair.Value != null));
-            Contract.Invariant(Contract.ForAll(plugins, pair => !string.IsNullOrEmpty(pair.Key)));
-        }
-
         public override string Name
         {
             get { return "JintPlugin"; }
@@ -43,65 +32,56 @@ namespace JintPlugin
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
         public static Hashtable inifiles = new Hashtable();
+        private readonly string brktname = "[Jint]";
 
         public override void Initialize()
         {
             pluginDirectory = new DirectoryInfo(ModuleFolder);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
-        }        
+        }
 
         private IEnumerable<String> GetPluginNames()
         {
-            foreach (var dirInfo in pluginDirectory.GetDirectories())
-            {
+            foreach (var dirInfo in pluginDirectory.GetDirectories()) {
                 var path = Path.Combine(dirInfo.FullName, dirInfo.Name + ".js");
-                if (File.Exists(path)) yield return dirInfo.Name;
+                if (File.Exists(path))
+                    yield return dirInfo.Name;
             }
         }
 
         private string GetPluginDirectoryPath(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             return Path.Combine(pluginDirectory.FullName, name);
         }
+
         private string GetPluginScriptPath(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             return Path.Combine(GetPluginDirectoryPath(name), name + ".js");
         }
 
         private string GetPluginScriptText(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             string path = GetPluginScriptPath(name);
             return File.ReadAllText(path);
         }
 
         public void UnloadPlugin(string name, bool removeFromDict = true)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
+            Logger.LogDebug(string.Format("{0} Unloading {1}  plugin.", brktname, name));
 
-            Logger.LogDebug("[JintPlugin] Unloading " + name + " plugin.");
-
-            if (plugins.ContainsKey(name))
-            {
+            if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
-                Contract.Assert(plugin != null);
 
                 plugin.RemoveHooks();
                 plugin.KillTimers();
-                if (removeFromDict) plugins.Remove(name);
+                if (removeFromDict)
+                    plugins.Remove(name);
 
-                Logger.Log("[JintPlugin] " + name + " plugin was unloaded successfuly.");
-            }
-            else
-            {
-                Logger.LogError("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
-                throw new InvalidOperationException("[JintPlugin] Can't unload " + name + ". Plugin is not loaded.");
+                Logger.Log(string.Format("{0} {1} plugin was unloaded successfuly.", brktname, name));
+            } else {
+                Logger.LogError(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
             }
         }
 
@@ -119,39 +99,29 @@ namespace JintPlugin
 
         private void LoadPlugin(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
+            Logger.LogDebug(string.Format("{0} Loading plugin {1}.", brktname, name));
 
-            Logger.LogDebug("[JintPlugin] Loading plugin " + name + ".");
-
-            if (plugins.ContainsKey(name))
-            {
-                Logger.LogError("[JintPlugin] " + name + " plugin is already loaded.");
-                throw new InvalidOperationException("[JintPlugin] " + name + " plugin is already loaded.");
+            if (plugins.ContainsKey(name)) {
+                Logger.LogError(string.Format("{0} {1} plugin is already loaded.", brktname, name));
+                throw new InvalidOperationException(string.Format("{0} {1} plugin is already loaded.", brktname, name));
             }
 
-            try
-            {
+            try {
                 string text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
                 Plugin plugin = new Plugin(dir, name, text);
                 plugin.InstallHooks();
                 plugins[name] = plugin;
 
-                Logger.Log("[JintPlugin] " + name + " plugin was loaded successfuly.");
-            }
-            catch (Exception ex)
-            {
-                string arg = name + " plugin could not be loaded.";
-                Contract.Assume(!string.IsNullOrEmpty(arg));
-                Server.GetServer().BroadcastFrom(Name, arg);
+                Logger.Log(string.Format("{0} {1} plugin was loaded successfuly.", brktname, name));
+            } catch (Exception ex) {
+                Logger.LogError(string.Format("{0} {1} plugin could not be loaded.", brktname, name));
                 Logger.LogException(ex);
             }
         }
 
         public void ReloadPlugin(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             UnloadPlugin(name);
             LoadPlugin(name);
         }

@@ -23,7 +23,7 @@
             {
                 if (!Administrator.IsAdmin(Arguments.argUser.userID))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Only administrators can ask for another player's location.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Only administrators can ask for another player's location.");
                     return;
                 }
                 displayName = str2;
@@ -32,7 +32,7 @@
             {
                 string strValue = string.Concat(new object[] { "Location: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z });
                 Arguments.ReplyWith(strValue);
-                Util.sayUser(Arguments.argUser.networkPlayer, string.Concat(new object[] { (str2 == "") ? "Your" : (displayName + "'s"), " Location Is: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z }));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] { (str2 == "") ? "Your" : (displayName + "'s"), " Location Is: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z }));
             }
         }
     }

@@ -146,7 +146,7 @@ namespace RustPP.Permissions
                     NetUser user = NetUser.FindByUserID(administrator.UserID);
                     if (user != null)
                     {
-                        Util.sayUser(user.networkPlayer, "Admins", msg);
+                        Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
                     }
                 }
                 catch (Exception ex)

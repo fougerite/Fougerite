@@ -20,7 +20,7 @@
             {
                 Logger.LogException(ex);
             }
-            Util.sayUser(Arguments.argUser.networkPlayer, "You have spawned an Admin Loadout!");
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have spawned an Admin Loadout!");
         }
     }
 }

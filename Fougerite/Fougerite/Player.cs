@@ -6,6 +6,8 @@ namespace Fougerite
     using Fougerite.Events;
     using Rust;
     using System;
+    using System.Linq;
+    using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using uLink;
     using UnityEngine;
@@ -89,7 +91,7 @@ namespace Fougerite
             Contract.Requires(!string.IsNullOrEmpty(name));
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.Name == name)
+                if (player != null && player.Name.ToLower() == name.ToLower())
                     return player;
             return null;
         }
@@ -206,24 +208,45 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void SafeTeleportTo(Fougerite.Player p, float distance = 1.5f)
+        public void TeleportToAndFace(Fougerite.Player p, float distance = 1.5f)
         { 
             Contract.Requires(p.PlayerClient.controllable.transform != null);
 
-            Transform transform = p.PlayerClient.controllable.transform;                                                // get the target player's transform
+            if (this == p) // lol
+                return;
+
+            Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
             Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
-            this.SafeTeleportTo(target.x, target.z);
-            this.ourPlayer.controllable.transform.LookAt(transform);                                                    // turn towards the target player's transform
+            this.TeleportTo(target);
+            this.ourPlayer.controllable.transform.LookAt(transform);                                                // turn towards the target player's transform
         }
 
-        public void SafeTeleportTo(Vector3 target)
+        public void SafeTeleportTo(float x, float y, float z)
         {
-            this.SafeTeleportTo(target.x, target.z);
+            this.SafeTeleportTo(new Vector3(x, y, z));
         }
 
         public void SafeTeleportTo(float x, float z)
         {
-            this.TeleportTo(x, World.GetWorld().GetGround(x, z), z);
+            this.SafeTeleportTo(new Vector3(x, 0f, z));
+        }
+
+        public void SafeTeleportTo(Vector3 target)
+        {
+            float height = Terrain.activeTerrain.SampleHeight(target);
+            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
+                                                where s.containedBounds.Contains(target)
+                                                select s;
+            if (height > target.y)
+                target.y = height;
+
+            if (structures.Count() >= 1) {
+                this.TeleportTo(target);
+                System.Threading.Thread.Sleep(800);
+                this.TeleportTo(target.x, target.y, target.z);
+                return;
+            }
+            this.TeleportTo(target);
         }
 
         public void TeleportTo(float x, float y, float z)
@@ -235,8 +258,10 @@ namespace Fougerite
         {
             Contract.Requires(p.Location != null);
 
-            Vector3 target = p.Location;
-            this.TeleportTo(target);
+            if (this == p) // lol
+                return;
+                
+            this.TeleportTo(p.Location);
         }
 
         public void TeleportTo(Vector3 target)

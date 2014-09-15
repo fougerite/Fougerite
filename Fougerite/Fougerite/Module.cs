@@ -52,11 +52,11 @@ namespace Fougerite
             set;
         }
 
-        public int Order
+        public virtual uint Order
         {
-            get;
-            set;
+            get { return uint.MaxValue; }
         }
+
         public virtual string UpdateURL
         {
             get

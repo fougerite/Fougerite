@@ -44,34 +44,34 @@
                                             {
                                                 string properName = Administrator.GetProperName(flag);
                                                 admin.Flags.Remove(properName);
-                                                Util.sayUser(Arguments.argUser.networkPlayer, "The " + properName + " Permissions has been removed from " + client.netUser.displayName);
-                                                Util.sayUser(client.netPlayer, Arguments.argUser.displayName + " removed you the " + properName + " permission.");
+                                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "The " + properName + " Permissions has been removed from " + client.netUser.displayName);
+                                                Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " removed you the " + properName + " permission.");
                                             }
                                             else
                                             {
-                                                Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " doesn't have this permission.");
+                                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " doesn't have this permission.");
                                             }
                                         }
                                         else
                                         {
-                                            Util.sayUser(Arguments.argUser.networkPlayer, flag + " is not a valid flag.");
+                                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, flag + " is not a valid flag.");
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator!");
+                                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is not an administrator!");
                                 }
                                 return;
                             }
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str2);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
                     }
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "RemoveFlag Usage:  /unflag flag1 flag2...");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "RemoveFlag Usage:  /unflag flag1 flag2...");
             }
         }
     }

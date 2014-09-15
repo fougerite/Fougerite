@@ -7,7 +7,7 @@
     {
         public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
-            Util.sayUser(Arguments.argUser.networkPlayer, "Ping: " + Arguments.argUser.networkPlayer.lastPing);
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Ping: " + Arguments.argUser.networkPlayer.lastPing);
         }
     }
 }

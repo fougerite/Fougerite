@@ -10,7 +10,7 @@
         {
             if (ChatArguments == null)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere \"playerName\"");
             }
             else
             {
@@ -22,7 +22,7 @@
                 str = str.Trim();
                 if (!(str != ""))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, "Teleport Usage:  /tphere \"playerName\"");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere \"playerName\"");
                 }
                 else
                 {
@@ -33,7 +33,7 @@
                             Arguments.Args = new string[] { client.netUser.displayName, Arguments.argUser.displayName };
                             teleport.toplayer(ref Arguments);
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "You have teleported all players to your location");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported all players to your location");
                     }
                     System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
                     list.Add("TargetToHere");
@@ -45,7 +45,7 @@
                             {
                                 Arguments.Args = new string[] { client2.netUser.displayName, Arguments.argUser.displayName };
                                 teleport.toplayer(ref Arguments);
-                                Util.sayUser(Arguments.argUser.networkPlayer, "You have teleported " + client2.netUser.displayName + " to your location");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported " + client2.netUser.displayName + " to your location");
                                 return;
                             }
                             list.Add(client2.netUser.displayName);
@@ -53,19 +53,19 @@
                     }
                     if (list.Count > 1)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
                         for (int j = 1; j < list.Count; j++)
                         {
-                            Util.sayUser(Arguments.argUser.networkPlayer, j + " - " + list[j]);
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
                         }
-                        Util.sayUser(Arguments.argUser.networkPlayer, "0 - Cancel");
-                        Util.sayUser(Arguments.argUser.networkPlayer, "Please enter the number matching the player you were looking for.");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
                         TeleportToCommand command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
                         command.GetTPWaitList().Add(Arguments.argUser.userID, list);
                     }
                     else
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
                     }
                 }
             }

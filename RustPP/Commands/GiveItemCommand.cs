@@ -35,12 +35,12 @@
                             return;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, "No player found with the name: " + str2);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "Spawn Item usage:  /give \"playerName\" \"itemName\" \"quantity\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /give \"playerName\" \"itemName\" \"quantity\"");
             }
         }
     }

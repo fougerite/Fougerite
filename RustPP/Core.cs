@@ -20,6 +20,7 @@
         public static Dictionary<ulong, string> userCache;
         public static string Version = "1.6.0";
         public static PList whiteList = new PList();
+        public static string Name = "Rust++";
 
         public static void Init()
         {
@@ -194,7 +195,7 @@
                     string setting = config.GetSetting("Settings", "motd" + num);
                     if (setting != null)
                     {
-                        Util.sayUser(player, setting);
+                        Util.sayUser(player, Core.Name, setting);
                         num++;
                     }
                     else

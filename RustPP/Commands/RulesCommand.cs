@@ -13,12 +13,12 @@
             {
                 foreach (string str in File.ReadAllLines(RustPPModule.GetAbsoluteFilePath("rules.txt")))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str);
                 }
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, "No rules are currently set.");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No rules are currently set.");
             }
         }
     }

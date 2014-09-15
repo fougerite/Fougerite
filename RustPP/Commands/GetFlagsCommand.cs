@@ -26,11 +26,11 @@
             {
                 if (!Administrator.IsAdmin(client.userID))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + " is not an administrator.");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is not an administrator.");
                 }
                 else
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, client.netUser.displayName + "'s Flags:");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + "'s Flags:");
                     int num2 = 0;
                     int num3 = 0;
                     string str2 = "";
@@ -46,7 +46,7 @@
                         if (num2 == 6)
                         {
                             num2 = 0;
-                            Util.sayUser(Arguments.argUser.networkPlayer, str2.Substring(0, str2.Length - 3));
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
                             str2 = "";
                         }
                         else
@@ -56,7 +56,7 @@
                     }
                     if (num2 != 0)
                     {
-                        Util.sayUser(Arguments.argUser.networkPlayer, str2.Substring(0, str2.Length - 3));
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
                     }
                 }
             }

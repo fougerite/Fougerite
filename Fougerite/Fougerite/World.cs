@@ -374,7 +374,7 @@ namespace Fougerite
             }
         }
 
-        public IEnumerable<Entity> Entities
+        public List<Entity> Entities
         {
             get
             {
@@ -385,7 +385,7 @@ namespace Fougerite
                 IEnumerable<Entity> deployables =
                     UnityEngine.Object.FindObjectsOfType<DeployableObject>()
                     .Select(sc => new Entity(sc));
-                return structures.Concat(deployables);
+                return structures.Concat(deployables).ToList<Entity>();
             }
         }
 

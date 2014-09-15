@@ -24,7 +24,7 @@ namespace Fougerite
             Contract.Requires(Obj != null);
             Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
 
-            this.Object = Obj;
+            this._obj = Obj;
             var deployable = (DeployableObject)Obj;
             var inventory = deployable.GetComponent<Inventory>();
             if (inventory != null && deployable != null)

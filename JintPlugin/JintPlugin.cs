@@ -40,9 +40,11 @@
                 .SetValue("Lookup", LookUp.GetLookUp())
                 .SetValue("Plugin", this)
                 .Execute(code);
-            Logger.LogDebug("{0} AllowClr for Assemblies: {1} {2}" +
-            typeof(UnityEngine.GameObject).Assembly.GetName().Name + ", " +
-            typeof(uLink.NetworkPlayer).Assembly.GetName().Name);
+
+            Logger.LogDebug(string.Format("{0} AllowClr for Assemblies: {1} {2} {3}", brktname,
+                typeof(UnityEngine.GameObject).Assembly.GetName().Name,
+                typeof(uLink.NetworkPlayer).Assembly.GetName().Name,
+                typeof(PlayerInventory).Assembly.GetName().Name));
             try {
                 Engine.Invoke("On_PluginInit");
             } catch {
@@ -51,12 +53,9 @@
 
         private void Invoke(string func, params object[] obj)
         {
-            try
-            {
+            try {
                 Engine.Invoke(func, obj);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Logger.LogError(string.Format("{0} Error invoking function {1} in {2} plugin.", brktname, func, Name));
                 Logger.LogException(ex);
             }
@@ -72,66 +71,150 @@
 
         public void InstallHooks()
         {
-            foreach (var funcDecl in GetSourceCodeGlobalFunctions())
-            {
+            foreach (var funcDecl in GetSourceCodeGlobalFunctions()) {
                 Logger.LogDebug(string.Format("{0} Found Function: {1}", brktname, funcDecl.Id.Name));
-                switch (funcDecl.Id.Name)
-                {
-                    case "On_ServerInit": Hooks.OnServerInit += OnServerInit; break;
-                    case "On_PluginInit": Hooks.OnPluginInit += OnPluginInit; break;
-                    case "On_ServerShutdown": Hooks.OnServerShutdown += OnServerShutdown; break;
-                    case "On_ItemsLoaded": Hooks.OnItemsLoaded += OnItemsLoaded; break;
-                    case "On_TablesLoaded": Hooks.OnTablesLoaded += OnTablesLoaded; break;
-                    case "On_Chat": Hooks.OnChat += OnChat; break;
-                    case "On_Console": Hooks.OnConsoleReceived += OnConsole; break;
-                    case "On_Command": Hooks.OnCommand += OnCommand; break;
-                    case "On_PlayerConnected": Hooks.OnPlayerConnected += OnPlayerConnected; break;
-                    case "On_PlayerDisconnected": Hooks.OnPlayerDisconnected += OnPlayerDisconnected; break;
-                    case "On_PlayerKilled": Hooks.OnPlayerKilled += OnPlayerKilled; break;
-                    case "On_PlayerHurt": Hooks.OnPlayerHurt += OnPlayerHurt; break;
-                    case "On_PlayerSpawning": Hooks.OnPlayerSpawning += OnPlayerSpawn; break;
-                    case "On_PlayerSpawned": Hooks.OnPlayerSpawned += OnPlayerSpawned; break;
-                    case "On_PlayerGathering": Hooks.OnPlayerGathering += OnPlayerGathering; break;
-                    case "On_EntityHurt": Hooks.OnEntityHurt += OnEntityHurt; break;
-                    case "On_EntityDecay": Hooks.OnEntityDecay += OnEntityDecay; break;
-                    case "On_EntityDeployed": Hooks.OnEntityDeployed += OnEntityDeployed; break;
-                    case "On_NPCHurt": Hooks.OnNPCHurt += OnNPCHurt; break;
-                    case "On_NPCKilled": Hooks.OnNPCKilled += OnNPCKilled; break;
-                    case "On_BlueprintUse": Hooks.OnBlueprintUse += OnBlueprintUse; break;
-                    case "On_DoorUse": Hooks.OnDoorUse += OnDoorUse; break;
+                switch (funcDecl.Id.Name) {
+                case "On_ServerInit":
+                    Hooks.OnServerInit += OnServerInit;
+                    break;
+                case "On_PluginInit":
+                    Hooks.OnPluginInit += OnPluginInit;
+                    break;
+                case "On_ServerShutdown":
+                    Hooks.OnServerShutdown += OnServerShutdown;
+                    break;
+                case "On_ItemsLoaded":
+                    Hooks.OnItemsLoaded += OnItemsLoaded;
+                    break;
+                case "On_TablesLoaded":
+                    Hooks.OnTablesLoaded += OnTablesLoaded;
+                    break;
+                case "On_Chat":
+                    Hooks.OnChat += OnChat;
+                    break;
+                case "On_Console":
+                    Hooks.OnConsoleReceived += OnConsole;
+                    break;
+                case "On_Command":
+                    Hooks.OnCommand += OnCommand;
+                    break;
+                case "On_PlayerConnected":
+                    Hooks.OnPlayerConnected += OnPlayerConnected;
+                    break;
+                case "On_PlayerDisconnected":
+                    Hooks.OnPlayerDisconnected += OnPlayerDisconnected;
+                    break;
+                case "On_PlayerKilled":
+                    Hooks.OnPlayerKilled += OnPlayerKilled;
+                    break;
+                case "On_PlayerHurt":
+                    Hooks.OnPlayerHurt += OnPlayerHurt;
+                    break;
+                case "On_PlayerSpawning":
+                    Hooks.OnPlayerSpawning += OnPlayerSpawn;
+                    break;
+                case "On_PlayerSpawned":
+                    Hooks.OnPlayerSpawned += OnPlayerSpawned;
+                    break;
+                case "On_PlayerGathering":
+                    Hooks.OnPlayerGathering += OnPlayerGathering;
+                    break;
+                case "On_EntityHurt":
+                    Hooks.OnEntityHurt += OnEntityHurt;
+                    break;
+                case "On_EntityDecay":
+                    Hooks.OnEntityDecay += OnEntityDecay;
+                    break;
+                case "On_EntityDeployed":
+                    Hooks.OnEntityDeployed += OnEntityDeployed;
+                    break;
+                case "On_NPCHurt":
+                    Hooks.OnNPCHurt += OnNPCHurt;
+                    break;
+                case "On_NPCKilled":
+                    Hooks.OnNPCKilled += OnNPCKilled;
+                    break;
+                case "On_BlueprintUse":
+                    Hooks.OnBlueprintUse += OnBlueprintUse;
+                    break;
+                case "On_DoorUse":
+                    Hooks.OnDoorUse += OnDoorUse;
+                    break;
                 }
             }
         }
 
         public void RemoveHooks()
         {
-            foreach (var funcDecl in GetSourceCodeGlobalFunctions())
-            {
+            foreach (var funcDecl in GetSourceCodeGlobalFunctions()) {
                 Logger.LogDebug(string.Format("{0} RemoveHooks, found function {1}", brktname, funcDecl.Id.Name));
-                switch (funcDecl.Id.Name)
-                {
-                    case "On_ServerInit": Hooks.OnServerInit -= OnServerInit; break;
-                    case "On_PluginInit": Hooks.OnPluginInit -= OnPluginInit; break;
-                    case "On_ServerShutdown": Hooks.OnServerShutdown -= OnServerShutdown; break;
-                    case "On_ItemsLoaded": Hooks.OnItemsLoaded -= OnItemsLoaded; break;
-                    case "On_TablesLoaded": Hooks.OnTablesLoaded -= OnTablesLoaded; break;
-                    case "On_Chat": Hooks.OnChat -= OnChat; break;
-                    case "On_Console": Hooks.OnConsoleReceived -= OnConsole; break;
-                    case "On_Command": Hooks.OnCommand -= OnCommand; break;
-                    case "On_PlayerConnected": Hooks.OnPlayerConnected -= OnPlayerConnected; break;
-                    case "On_PlayerDisconnected": Hooks.OnPlayerDisconnected -= OnPlayerDisconnected; break;
-                    case "On_PlayerKilled": Hooks.OnPlayerKilled -= OnPlayerKilled; break;
-                    case "On_PlayerHurt": Hooks.OnPlayerHurt -= OnPlayerHurt; break;
-                    case "On_PlayerSpawning": Hooks.OnPlayerSpawning -= OnPlayerSpawn; break;
-                    case "On_PlayerSpawned": Hooks.OnPlayerSpawned -= OnPlayerSpawned; break;
-                    case "On_PlayerGathering": Hooks.OnPlayerGathering -= OnPlayerGathering; break;
-                    case "On_EntityHurt": Hooks.OnEntityHurt -= OnEntityHurt; break;
-                    case "On_EntityDecay": Hooks.OnEntityDecay -= OnEntityDecay; break;
-                    case "On_EntityDeployed": Hooks.OnEntityDeployed -= OnEntityDeployed; break;
-                    case "On_NPCHurt": Hooks.OnNPCHurt -= OnNPCHurt; break;
-                    case "On_NPCKilled": Hooks.OnNPCKilled -= OnNPCKilled; break;
-                    case "On_BlueprintUse": Hooks.OnBlueprintUse -= OnBlueprintUse; break;
-                    case "On_DoorUse": Hooks.OnDoorUse -= OnDoorUse; break;
+                switch (funcDecl.Id.Name) {
+                case "On_ServerInit":
+                    Hooks.OnServerInit -= OnServerInit;
+                    break;
+                case "On_PluginInit":
+                    Hooks.OnPluginInit -= OnPluginInit;
+                    break;
+                case "On_ServerShutdown":
+                    Hooks.OnServerShutdown -= OnServerShutdown;
+                    break;
+                case "On_ItemsLoaded":
+                    Hooks.OnItemsLoaded -= OnItemsLoaded;
+                    break;
+                case "On_TablesLoaded":
+                    Hooks.OnTablesLoaded -= OnTablesLoaded;
+                    break;
+                case "On_Chat":
+                    Hooks.OnChat -= OnChat;
+                    break;
+                case "On_Console":
+                    Hooks.OnConsoleReceived -= OnConsole;
+                    break;
+                case "On_Command":
+                    Hooks.OnCommand -= OnCommand;
+                    break;
+                case "On_PlayerConnected":
+                    Hooks.OnPlayerConnected -= OnPlayerConnected;
+                    break;
+                case "On_PlayerDisconnected":
+                    Hooks.OnPlayerDisconnected -= OnPlayerDisconnected;
+                    break;
+                case "On_PlayerKilled":
+                    Hooks.OnPlayerKilled -= OnPlayerKilled;
+                    break;
+                case "On_PlayerHurt":
+                    Hooks.OnPlayerHurt -= OnPlayerHurt;
+                    break;
+                case "On_PlayerSpawning":
+                    Hooks.OnPlayerSpawning -= OnPlayerSpawn;
+                    break;
+                case "On_PlayerSpawned":
+                    Hooks.OnPlayerSpawned -= OnPlayerSpawned;
+                    break;
+                case "On_PlayerGathering":
+                    Hooks.OnPlayerGathering -= OnPlayerGathering;
+                    break;
+                case "On_EntityHurt":
+                    Hooks.OnEntityHurt -= OnEntityHurt;
+                    break;
+                case "On_EntityDecay":
+                    Hooks.OnEntityDecay -= OnEntityDecay;
+                    break;
+                case "On_EntityDeployed":
+                    Hooks.OnEntityDeployed -= OnEntityDeployed;
+                    break;
+                case "On_NPCHurt":
+                    Hooks.OnNPCHurt -= OnNPCHurt;
+                    break;
+                case "On_NPCKilled":
+                    Hooks.OnNPCKilled -= OnNPCKilled;
+                    break;
+                case "On_BlueprintUse":
+                    Hooks.OnBlueprintUse -= OnBlueprintUse;
+                    break;
+                case "On_DoorUse":
+                    Hooks.OnDoorUse -= OnDoorUse;
+                    break;
                 }
             }
         }
@@ -157,8 +240,7 @@
 
         public bool CreateDir(string path)
         {
-            try
-            {
+            try {
                 path = ValidateRelativePath(path);
                 if (path == null)
                     return false;
@@ -168,9 +250,7 @@
 
                 Directory.CreateDirectory(path);
                 return true;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Logger.LogException(ex);
             }
             return false;
@@ -219,7 +299,8 @@
 
             string pathh, pathi;
             int i, h;
-            for (i = max, h = i - 1; i > 1; i--, h--) {
+            for (i = max, h = i - 1; i > 1; i--, h--)
+            {
                 pathi = ValidateRelativePath(logfile + i + ".log");
                 pathh = ValidateRelativePath(logfile + h + ".log");
 
@@ -227,9 +308,11 @@
                     if (!File.Exists(pathi))
                         File.Create(pathi);
 
-                    if (!File.Exists(pathh)) {
+                    if (!File.Exists(pathh))
+                    {
                         File.Replace(logfile, pathi, null);
-                    } else {
+                    } else
+                    {
                         File.Replace(pathh, pathi, null);
                     }
                 } catch (Exception ex) {
@@ -253,9 +336,8 @@
         public TimedEvent CreateTimer(string name, int timeoutDelay)
         {
             TimedEvent timer = this.GetTimer(name);
-            if (timer == null)
-            {
-                timer = new TimedEvent(name, (double) timeoutDelay);
+            if (timer == null) {
+                timer = new TimedEvent(name, (double)timeoutDelay);
                 timer.OnFire += OnTimerCB;
                 Timers[name] = timer;
                 return timer;
@@ -280,8 +362,7 @@
         public void KillTimer(string name)
         {
             TimedEvent timer = GetTimer(name);
-            if (timer != null)
-            {
+            if (timer != null) {
                 timer.Stop();
                 Timers.Remove(name);
             }
@@ -326,18 +407,17 @@
         #endregion
 
         #region Web
+
         public string GET(string url)
         {
-            using (System.Net.WebClient client = new System.Net.WebClient())
-            {
+            using (System.Net.WebClient client = new System.Net.WebClient()) {
                 return client.DownloadString(url);
             }
         }
 
         public string POSTJson(string url, string json)
         {
-            using (WebClient client = new WebClient())
-            {
+            using (WebClient client = new WebClient()) {
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 byte[] bytes = client.UploadData(url, "POST", Encoding.UTF8.GetBytes(json));
                 return Encoding.UTF8.GetString(bytes);
@@ -353,13 +433,13 @@
             }
 
             string json = File.ReadAllText(path);
-            using (WebClient client = new WebClient())
-            {
+            using (WebClient client = new WebClient()) {
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 byte[] bytes = client.UploadData(url, "POST", Encoding.UTF8.GetBytes(json));
                 return Encoding.UTF8.GetString(bytes);
             }
         }
+
         #endregion
 
         #region Hooks

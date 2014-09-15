@@ -28,10 +28,6 @@
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
         }
-        public override uint Order
-        {
-            get { return 4; }
-        }
 
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
@@ -43,14 +39,14 @@
             pluginDirectory = new DirectoryInfo(ModuleFolder);
             plugins = new Dictionary<string, Plugin>();
             ReloadPlugins();
-        }        
+        }
 
         private IEnumerable<String> GetPluginNames()
         {
-            foreach (var dirInfo in pluginDirectory.GetDirectories())
-            {
+            foreach (var dirInfo in pluginDirectory.GetDirectories()) {
                 var path = Path.Combine(dirInfo.FullName, dirInfo.Name + ".js");
-                if (File.Exists(path)) yield return dirInfo.Name;
+                if (File.Exists(path))
+                    yield return dirInfo.Name;
             }
         }
 
@@ -58,6 +54,7 @@
         {
             return Path.Combine(pluginDirectory.FullName, name);
         }
+
         private string GetPluginScriptPath(string name)
         {
             return Path.Combine(GetPluginDirectoryPath(name), name + ".js");
@@ -73,18 +70,16 @@
         {
             Logger.LogDebug(string.Format("{0} Unloading {1}  plugin.", brktname, name));
 
-            if (plugins.ContainsKey(name))
-            {
+            if (plugins.ContainsKey(name)) {
                 var plugin = plugins[name];
 
                 plugin.RemoveHooks();
                 plugin.KillTimers();
-                if (removeFromDict) plugins.Remove(name);
+                if (removeFromDict)
+                    plugins.Remove(name);
 
                 Logger.Log(string.Format("{0} {1} plugin was unloaded successfuly.", brktname, name));
-            }
-            else
-            {
+            } else {
                 Logger.LogError(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
                 throw new InvalidOperationException(string.Format("{0} Can't unload {1}. Plugin is not loaded.", brktname, name));
             }
@@ -106,14 +101,12 @@
         {
             Logger.LogDebug(string.Format("{0} Loading plugin {1}.", brktname, name));
 
-            if (plugins.ContainsKey(name))
-            {
+            if (plugins.ContainsKey(name)) {
                 Logger.LogError(string.Format("{0} {1} plugin is already loaded.", brktname, name));
                 throw new InvalidOperationException(string.Format("{0} {1} plugin is already loaded.", brktname, name));
             }
 
-            try
-            {
+            try {
                 string text = GetPluginScriptText(name);
                 DirectoryInfo dir = new DirectoryInfo(Path.Combine(pluginDirectory.FullName, name));
                 Plugin plugin = new Plugin(dir, name, text);
@@ -121,9 +114,7 @@
                 plugins[name] = plugin;
 
                 Logger.Log(string.Format("{0} {1} plugin was loaded successfuly.", brktname, name));
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Logger.LogError(string.Format("{0} {1} plugin could not be loaded.", brktname, name));
                 Logger.LogException(ex);
             }

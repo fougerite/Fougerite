@@ -29,6 +29,7 @@ namespace Fougerite
         public static event EntityDecayDelegate OnEntityDecay;
         public static event EntityDeployedDelegate OnEntityDeployed;
         public static event EntityHurtDelegate OnEntityHurt;
+        public static event EntityDestroyedDelegate OnEntityDestroyed;
         public static event ItemsDatablocksLoaded OnItemsLoaded;
         public static event HurtHandlerDelegate OnNPCHurt;
         public static event KillHandlerDelegate OnNPCKilled;
@@ -243,7 +244,14 @@ namespace Fougerite
                 TakeDamage takeDamage = he.Entity.GetTakeDamage();
                 takeDamage.health += he.DamageAmount;
 
-                if (OnEntityHurt != null)
+                // when entity is destroyed
+                if (e.status != LifeStatus.IsAlive)
+                {
+                    DestroyEvent de = new DestroyEvent(ref e, new Entity(entity));
+                    if (OnEntityDestroyed != null)
+                        OnEntityDestroyed(de);
+                }
+                else if (OnEntityHurt != null)
                     OnEntityHurt(he);
 
                 Zone3D zoned = Zone3D.GlobalContains(he.Entity);
@@ -565,6 +573,9 @@ namespace Fougerite
             OnEntityHurt = delegate(HurtEvent param0)
             {
             };
+            OnEntityDestroyed = delegate(DestroyEvent param0)
+            {
+            };
             OnEntityDecay = delegate(DecayEvent param0)
             {
             };
@@ -647,6 +658,7 @@ namespace Fougerite
         public delegate void EntityDecayDelegate(DecayEvent de);
         public delegate void EntityDeployedDelegate(Fougerite.Player player, Entity e);
         public delegate void EntityHurtDelegate(HurtEvent he);
+        public delegate void EntityDestroyedDelegate(DestroyEvent de);
         public delegate void HurtHandlerDelegate(HurtEvent he);
         public delegate void ItemsDatablocksLoaded(ItemsBlocks items);
         public delegate void KillHandlerDelegate(DeathEvent de);

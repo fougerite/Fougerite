@@ -378,14 +378,13 @@ namespace Fougerite
         {
             get
             {
-                IEnumerable<Entity> structures = 
-                    StructureMaster.AllStructures
-                    .SelectMany(sm => sm._structureComponents)
-                    .Select(sc => new Entity(sc));
-                IEnumerable<Entity> deployables =
-                    UnityEngine.Object.FindObjectsOfType<DeployableObject>()
-                    .Select(sc => new Entity(sc));
-                return structures.Concat(deployables).ToList<Entity>();
+                IEnumerable<Entity> component = from c in
+                    (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
+                    select new Entity(c);
+                IEnumerable<Entity> deployable = from d in
+                    (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
+                    select new Entity(d);
+                return component.Concat(deployable).ToList<Entity>();
             }
         }
 

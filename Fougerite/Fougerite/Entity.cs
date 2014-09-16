@@ -9,8 +9,10 @@ namespace Fougerite
     public class Entity
     {
         private readonly object _obj;
+        /* unused properties
         private EntityInv inv;
         private bool hasInventory = false;
+         */
 
         [ContractInvariantMethod]
         private void Invariant()
@@ -25,10 +27,12 @@ namespace Fougerite
             Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
 
             this._obj = Obj;
+            /* this is broken. cannot cast StructureComponent to DeployableObject  => invalid cast exception
             var deployable = (DeployableObject)Obj;
             var inventory = deployable.GetComponent<Inventory>();
             if (inventory != null && deployable != null)
                 hasInventory = true;
+            */
         }
 
         public void ChangeOwner(Fougerite.Player p)

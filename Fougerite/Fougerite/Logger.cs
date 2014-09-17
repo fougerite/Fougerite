@@ -14,7 +14,7 @@ namespace Fougerite
             public string DateTime;
         }
 
-        private static string LogsFolder = Path.Combine(Config.GetPublicFolder(), "Logs");
+        private static string LogsFolder = Path.Combine(Config.GetPublicFolder(), @"Logs\");
         private static Writer LogWriter;
         private static Writer ChatWriter;
         private static bool showDebug = false;

@@ -245,18 +245,13 @@ namespace Fougerite
                 takeDamage.health += he.DamageAmount;
 
                 // when entity is destroyed
-                /* does not compile: Error CS1729: 'Fougerite.Events.DestroyEvent' does not contain a constructor that takes 2 arguments (CS1729) (Fougerite)
                 if (e.status != LifeStatus.IsAlive)
                 {
-                    DestroyEvent de = new DestroyEvent(ref e, new Entity(entity));
+                    DestroyEvent de = new DestroyEvent(ref e, new Entity(entity), he.IsDecay);
                     if (OnEntityDestroyed != null)
                         OnEntityDestroyed(de);
                 }
                 else if (OnEntityHurt != null)
-                    OnEntityHurt(he);
-                */
-
-                if (OnEntityHurt != null)
                     OnEntityHurt(he);
 
                 Zone3D zoned = Zone3D.GlobalContains(he.Entity);

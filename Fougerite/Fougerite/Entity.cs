@@ -8,11 +8,9 @@ namespace Fougerite
 
     public class Entity
     {
+        public readonly bool hasInventory;
         private readonly object _obj;
-        /* unused properties
         private EntityInv inv;
-        private bool hasInventory = false;
-         */
 
         [ContractInvariantMethod]
         private void Invariant()
@@ -27,12 +25,24 @@ namespace Fougerite
             Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
 
             this._obj = Obj;
-            /* this is broken. cannot cast StructureComponent to DeployableObject  => invalid cast exception
-            var deployable = (DeployableObject)Obj;
-            var inventory = deployable.GetComponent<Inventory>();
-            if (inventory != null && deployable != null)
-                hasInventory = true;
-            */
+
+            if (Obj is DeployableObject)
+            {
+                var deployable = Obj as DeployableObject;
+
+                var inventory = deployable.GetComponent<Inventory>();
+                if (inventory != null)
+                {
+                    this.hasInventory = true;
+                    this.inv = new EntityInv(inventory, this);
+                }
+                else
+                {
+                    this.hasInventory = false;
+                }
+            }
+            else
+                this.hasInventory = false;
         }
 
         public void ChangeOwner(Fougerite.Player p)
@@ -204,9 +214,9 @@ namespace Fougerite
         {
             get
             {
-                if (this.IsDeployableObject())
-                    return new EntityInv(this._obj);
-                return new EntityInv(String.Empty);
+                if (this.hasInventory)
+                    return this.inv;
+                return null;
             }
         }
 

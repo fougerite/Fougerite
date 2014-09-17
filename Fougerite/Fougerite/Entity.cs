@@ -242,19 +242,19 @@ namespace Fougerite
             }
         }
 
-        public ulong OwnerID
+        public string OwnerID
         {
             get
             {
                 if (this.IsDeployableObject())
                 {
-                    return this.GetObject<DeployableObject>().ownerID;
+                    return this.GetObject<DeployableObject>().ownerID.ToString();
                 }
                 if (this.IsStructure())
                 {
-                    return this.GetObject<StructureComponent>()._master.ownerID;
+                    return this.GetObject<StructureComponent>()._master.ownerID.ToString();
                 }
-                return 0L;
+                return null;
             }
         }
 

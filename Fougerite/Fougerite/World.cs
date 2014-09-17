@@ -384,7 +384,11 @@ namespace Fougerite
                 IEnumerable<Entity> deployable = from d in
                     (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
                     select new Entity(d);
-                return component.Concat(deployable).ToList<Entity>();
+                // this is much faster than Concat
+                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
+                entities.AddRange(component);
+                entities.AddRange(deployable);
+                return entities;
             }
         }
 

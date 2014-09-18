@@ -404,18 +404,24 @@ namespace Fougerite
             }
         }
 
-        public float Time
-        {
+        public float Time {
             get
             {
-                float hour = EnvironmentControlCenter.Singleton.GetTime();
-                Contract.Requires(hour >= 0f && hour <= 24f);
-                return hour;
+                try {
+
+                    float hour = EnvironmentControlCenter.Singleton.GetTime();
+                    return hour;
+                } catch (NullReferenceException) {
+                    return 12f;
+                }
             }
             set
             {
-                Contract.Requires(value >= 0f && value <= 24f);
-                EnvironmentControlCenter.Singleton.SetTime(value);
+                float hour = value;
+                if (hour < 0f || hour > 24f)
+                    hour = 12f;
+
+                EnvironmentControlCenter.Singleton.SetTime(hour);
             }
         }
     }

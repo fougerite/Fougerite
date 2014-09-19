@@ -7,6 +7,7 @@ namespace Fougerite
     using Rust;
     using System;
     using System.Linq;
+    using System.Timers;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using uLink;
@@ -208,7 +209,7 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void TeleportToAndFace(Fougerite.Player p, float distance = 1.5f)
+        public void TeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
             Contract.Requires(p.PlayerClient.controllable.transform != null);
 
@@ -218,7 +219,6 @@ namespace Fougerite
             Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
             Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
             this.TeleportTo(target);
-            this.ourPlayer.controllable.transform.LookAt(transform);                                                // turn towards the target player's transform
         }
 
         public void SafeTeleportTo(float x, float y, float z)
@@ -233,19 +233,21 @@ namespace Fougerite
 
         public void SafeTeleportTo(Vector3 target)
         {
-            float height = Terrain.activeTerrain.SampleHeight(target);
+            Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
             IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
-                                                where s.containedBounds.Contains(target)
-                                                select s;
-            if (height > target.y)
-                target.y = height;
-
-            if (structures.Count() >= 1) {
-                this.TeleportTo(target);
-                System.Threading.Thread.Sleep(800);
-                this.TeleportTo(target.x, target.y, target.z);
+                                                        where (s.containedBounds.Contains(terrain))
+                                                        select s;
+            if (structures.Count() >= 1)
+            {
+                this.TeleportTo(terrain);
+                System.Threading.Thread.Sleep(500);
+                this.TeleportTo(target.x, target.y + 0.8f, target.z);
                 return;
             }
+
+            if (terrain.y > target.y)
+                target = terrain;
+
             this.TeleportTo(target);
         }
 

@@ -407,8 +407,8 @@ namespace Fougerite
         public float Time {
             get
             {
-                try {
-
+                try
+                {
                     float hour = EnvironmentControlCenter.Singleton.GetTime();
                     return hour;
                 } catch (NullReferenceException) {
@@ -421,7 +421,10 @@ namespace Fougerite
                 if (hour < 0f || hour > 24f)
                     hour = 12f;
 
-                EnvironmentControlCenter.Singleton.SetTime(hour);
+                try
+                {
+                    EnvironmentControlCenter.Singleton.SetTime(hour);
+                } catch(Exception) { }
             }
         }
     }

@@ -238,7 +238,7 @@ namespace Fougerite
             Vector3 bump = Vector3.up * 0.75f;
             Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
             IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
-                                                        where (s.containedBounds.Contains(terrain))
+                                                        where s.containedBounds.Contains(terrain)
                                                         select s;
             if (terrain.y > target.y)
                 target = terrain;

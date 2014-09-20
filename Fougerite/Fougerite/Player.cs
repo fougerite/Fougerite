@@ -233,20 +233,34 @@ namespace Fougerite
 
         public void SafeTeleportTo(Vector3 target)
         {
+            float maxSafeDistance = 1000f;
+            int ms = 500;
+            Vector3 bump = Vector3.up * 0.75f;
             Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
             IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
                                                         where (s.containedBounds.Contains(terrain))
                                                         select s;
-            if (structures.Count() >= 1)
-            {
-                this.TeleportTo(terrain);
-                System.Threading.Thread.Sleep(500);
-                this.TeleportTo(target.x, target.y + 0.8f, target.z);
-                return;
-            }
-
             if (terrain.y > target.y)
                 target = terrain;
+
+            if (structures.Count() >= 1)
+            {
+                if (Vector3.Distance(this.Location, target) < maxSafeDistance)
+                {
+                    target += bump;
+                    this.TeleportTo(target);
+                    return;
+                }
+                else
+                {
+                    target += bump;
+                    terrain += bump * 2;
+                    this.TeleportTo(terrain);
+                    System.Threading.Thread.Sleep(ms);
+                    this.TeleportTo(target);
+                    return;
+                }            
+            }
 
             this.TeleportTo(target);
         }

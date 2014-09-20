@@ -379,24 +379,36 @@
 
         #region Other functions.
 
-        public string Today()
+        public string Today
         {
-            return DateTime.Now.ToShortDateString();
+            get
+            {
+                return DateTime.Now.ToShortDateString();
+            }
         }
 
-        public int Ticks()
+        public int Ticks
         {
-            return Environment.TickCount;
+            get
+            {
+                return Environment.TickCount;
+            }
         }
 
-        public string ClockTime()
+        public string ClockTime
         {
-            return DateTime.Now.ToShortTimeString();
+            get
+            {
+                return DateTime.Now.ToShortTimeString();
+            }
         }
 
-        public int TimeStamp()
+        public int Timestamp
         {
-            return Time.NowStamp;
+            get
+            {
+                return Time.NowStamp;
+            }
         }
 
         public int TimeSince(int when)

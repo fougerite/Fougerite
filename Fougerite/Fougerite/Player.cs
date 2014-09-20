@@ -218,7 +218,7 @@ namespace Fougerite
 
             Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
             Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
-            this.TeleportTo(target);
+            this.SafeTeleportTo(target);
         }
 
         public void SafeTeleportTo(float x, float y, float z)

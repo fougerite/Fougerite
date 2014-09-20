@@ -155,6 +155,11 @@ public class IniParser
         return (string)this.keyPairs[pair];
     }
 
+    public bool GetBoolSetting(string sectionName, string settingName)
+    {
+        return this.GetSetting(sectionName, settingName).ToLower() == "true";
+    }
+
     public bool isCommandOn(string cmdName)
     {
         Contract.Requires(!string.IsNullOrEmpty(cmdName));

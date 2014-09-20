@@ -270,16 +270,6 @@ namespace Fougerite
             this.TeleportTo(new Vector3(x, y, z));
         }
 
-        public void TeleportTo(Fougerite.Player p)
-        {
-            Contract.Requires(p.Location != null);
-
-            if (this == p) // lol
-                return;
-                
-            this.TeleportTo(p.Location);
-        }
-
         public void TeleportTo(Vector3 target)
         {
             RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);

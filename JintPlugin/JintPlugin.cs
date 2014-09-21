@@ -373,6 +373,15 @@
         #endregion Timer functions.
 
         #region Other functions.
+        public Fougerite.Player PlayerByGameID(string uid)
+        {
+            return Fougerite.Player.FindByGameID(uid);
+        }
+
+        public Fougerite.Player PlayerByName(string name)
+        {
+            return Fougerite.Player.FindByName(name);
+        }
 
         public string Today
         {

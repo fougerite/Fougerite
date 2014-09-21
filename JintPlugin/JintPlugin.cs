@@ -345,18 +345,13 @@
             return timer;
         }
 
-        public TimedEvent CreateTimer(string name, int timeoutDelay, object[] args)
+        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
         {
             TimedEvent timer = CreateTimer(name, timeoutDelay);
-            timer.Args = args;
+            timer.Args = args.ToArray<object>();
             timer.OnFire -= OnTimerCB;
             timer.OnFireArgs += OnTimerCBArgs;
             return timer;
-        }
-
-        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
-        {
-            return this.CreateTimer(name, timeoutDelay, args.ToArray<object>());
         }
 
         public void KillTimer(string name)

@@ -282,23 +282,13 @@
             return timer;
         }
 
-        public TimedEvent CreateTimer(string name, int timeoutDelay, object[] args)
+        public TimedEvent CreateTimer(string name, int timeoutDelay, ParamsList args)
         {
             TimedEvent timer = CreateTimer(name, timeoutDelay);
-            timer.Args = args;
+            timer.Args = args.ToArray();
             timer.OnFire -= OnTimerCB;
             timer.OnFireArgs += OnTimerCBArgs;
             return timer;
-        }
-
-        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
-        {
-            return this.CreateTimer(name, timeoutDelay, args.ToArray<object>());
-        }
-
-        public TimedEvent CreateTimer(string name, int timeoutDelay, ParamsList args)
-        {
-            return this.CreateTimer(name, timeoutDelay, args.ToArray());
         }
 
         public void KillTimer(string name)

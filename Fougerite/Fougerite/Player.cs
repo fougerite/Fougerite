@@ -231,7 +231,7 @@ namespace Fougerite
             this.SafeTeleportTo(new Vector3(x, 0f, z));
         }
 
-        public void SafeTeleportTo(Vector3 target)
+        public bool SafeTeleportTo(Vector3 target)
         {
             float maxSafeDistance = 1000f;
             int ms = 500;
@@ -249,7 +249,7 @@ namespace Fougerite
                 {
                     target += bump;
                     this.TeleportTo(target);
-                    return;
+                    return true;
                 }
                 else
                 {
@@ -258,11 +258,21 @@ namespace Fougerite
                     this.TeleportTo(terrain);
                     System.Threading.Thread.Sleep(ms);
                     this.TeleportTo(target);
-                    return;
+                    return true;
                 }            
             }
 
+            if (terrain.y < 256)
+            {
+                this.Message("That would put you in the ocean.");
+                return false;
+            }
+
+            if (terrain.y < target.y)
+                target = terrain;
+                               
             this.TeleportTo(target);
+            return true;
         }
 
         public void TeleportTo(float x, float y, float z)

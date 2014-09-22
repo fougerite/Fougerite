@@ -132,7 +132,7 @@ namespace Fougerite
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
 		
-	public bool HasBlueprint(BlueprintDataBlock dataBlock)
+	    public bool HasBlueprint(BlueprintDataBlock dataBlock)
         {
             PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
             if (invent.KnowsBP(dataBlock))
@@ -233,46 +233,73 @@ namespace Fougerite
 
         public bool SafeTeleportTo(Vector3 target)
         {
-            float maxSafeDistance = 1000f;
+            float maxSafeDistance = 700f;
             int ms = 500;
-            Vector3 bump = Vector3.up * 0.75f;
-            Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
-            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
-                                                        where s.containedBounds.Contains(terrain)
-                                                        select s;
-            if (terrain.y > target.y)
-                target = terrain;
+            string me = "SafeTeleport";
 
-            if (structures.Count() >= 1)
+            float bumpConst = 0.75f;
+            Vector3 bump = Vector3.up * bumpConst;
+            Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
+            RaycastHit hit;
+            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
+                                                               where s.containedBounds.Contains(terrain)
+                                                               select s;
+            if (structures.Count() == 1)
             {
+                if (terrain.y > target.y)
+                    target = terrain + bump * 2;
+
+                if (Physics.Raycast(target, Vector3.down, out hit))
+                {
+                    if (hit.collider.name == "HB Hit")
+                    {
+                        this.MessageFrom(me, "There you are.");
+                        return false;
+                    }
+                    if (!(hit.distance >= bumpConst * 3 && hit.distance < bumpConst * 6))
+                    {
+                        target = hit.point + bump * 3;
+                    }
+                }
+
                 if (Vector3.Distance(this.Location, target) < maxSafeDistance)
                 {
-                    target += bump;
                     this.TeleportTo(target);
                     return true;
-                }
-                else
+                } else
                 {
-                    target += bump;
-                    terrain += bump * 2;
-                    this.TeleportTo(terrain);
+                    this.TeleportTo(terrain + bump * 2);
                     System.Threading.Thread.Sleep(ms);
                     this.TeleportTo(target);
                     return true;
                 }            
-            }
-
-            if (terrain.y < 256)
+            } else if (structures.Count() == 0)
             {
-                this.Message("That would put you in the ocean.");
+                if (terrain.y < 256)
+                {
+                    this.MessageFrom(me, "That would put you in the ocean.");
+                    return false;
+                }
+
+                if (Physics.Raycast(terrain + Vector3.up * 300, Vector3.down, out hit))
+                {
+                    if (hit.collider.name == "HB Hit")
+                    {
+                        this.MessageFrom(me, "There you are.");
+                        return false;
+                    }
+                    target = hit.point + bump * 2;
+                }
+
+                this.TeleportTo(target);
+                return true;
+            } else
+            {
+                Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
+                Logger.LogDebug(string.Format("[{0}] target={1} terrain{2}", me, target.ToString(), terrain.ToString()));
+                this.MessageFrom(me, "Cannot execute safely with the parameters supplied.");
                 return false;
             }
-
-            if (terrain.y < target.y)
-                target = terrain;
-                               
-            this.TeleportTo(target);
-            return true;
         }
 
         public void TeleportTo(float x, float y, float z)

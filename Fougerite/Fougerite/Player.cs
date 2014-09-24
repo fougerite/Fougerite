@@ -209,6 +209,11 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
+        public void TeleportTo(Fougerite.Player p)
+        {
+            this.TeleportTo(p, 1.5f);
+        }
+
         public void TeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
             Contract.Requires(p.PlayerClient.controllable.transform != null);

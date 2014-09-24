@@ -12,7 +12,6 @@
     using Jint.Native;
     using Jint.Parser;
     using Jint.Parser.Ast;
-    using POSIX;
 
     public class Plugin
     {
@@ -399,6 +398,14 @@
             }
         }
 
+        public float Uptime
+        {
+            get
+            {
+                return UnityEngine.Time.realtimeSinceStartup;
+            }
+        }
+
         public string ClockTime
         {
             get
@@ -411,13 +418,13 @@
         {
             get
             {
-                return Time.NowStamp;
+                return POSIX.Time.NowStamp;
             }
         }
 
         public int TimeSince(int when)
         {
-            return Time.ElapsedStampSince(when);
+            return POSIX.Time.ElapsedStampSince(when);
         }
 
         #endregion

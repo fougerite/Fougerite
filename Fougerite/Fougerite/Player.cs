@@ -233,7 +233,9 @@ namespace Fougerite
 
         public bool SafeTeleportTo(Vector3 target)
         {
-            float maxSafeDistance = 700f;
+            float maxSafeDistance = 360f;
+            float distance = Vector3.Distance(this.Location, target);
+            float seaLevel = 256f;
             int ms = 500;
             string me = "SafeTeleport";
 
@@ -244,6 +246,10 @@ namespace Fougerite
             IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
                                                                where s.containedBounds.Contains(terrain)
                                                                select s;
+
+            Logger.LogDebug(string.Format("[{0}] from={1} to={2} distance={3} terrain={4}", me, 
+                this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
+
             if (structures.Count() == 1)
             {
                 if (terrain.y > target.y)
@@ -262,7 +268,7 @@ namespace Fougerite
                     }
                 }
 
-                if (Vector3.Distance(this.Location, target) < maxSafeDistance)
+                if (distance < maxSafeDistance)
                 {
                     this.TeleportTo(target);
                     return true;
@@ -275,7 +281,7 @@ namespace Fougerite
                 }            
             } else if (structures.Count() == 0)
             {
-                if (terrain.y < 256)
+                if (terrain.y < seaLevel)
                 {
                     this.MessageFrom(me, "That would put you in the ocean.");
                     return false;

@@ -22,18 +22,18 @@ namespace Fougerite
             if (File.Exists(DirectoryConfigPath))
             {
                 FougeriteDirectoryConfig = new IniParser(DirectoryConfigPath);
-                Debug.Log("DirectoryConfig " + DirectoryConfigPath + " loaded!");
+                Debug.Log(string.Format("DirectoryConfig {0} loaded.", DirectoryConfigPath));
             }
-            else Debug.Log("DirectoryConfig " + DirectoryConfigPath + " NOT loaded!");
+            else Debug.Log(string.Format("DirectoryConfig {0} NOT LOADED.", DirectoryConfigPath));
 
             string ConfigPath = Path.Combine(GetPublicFolder(), "Fougerite.cfg");
 
             if (File.Exists(ConfigPath))
             {
                 FougeriteConfig = new IniParser(ConfigPath);
-                Debug.Log("Config " + ConfigPath + " loaded!");
+                Debug.Log(string.Format("Config {0} loaded.", ConfigPath));
             }
-            else Debug.Log("Config " + ConfigPath + " NOT loaded!");
+            else Debug.Log(string.Format("Config {0} NOT LOADED.", ConfigPath));
         }
 
         public static string GetValue(string Section, string Setting)

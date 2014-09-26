@@ -88,11 +88,6 @@
             if (!init)
             {
                 init = true;
-                if (Core.config.GetSetting("Settings", "decay") == "false")
-                {
-                    decay.decaytickrate = float.MaxValue;
-                    decay.deploy_maxhealth_sec = 0f;
-                }
                 if (Core.config.GetSetting("Settings", "pvp") == "true")
                 {
                     server.pvp = true;

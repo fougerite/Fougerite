@@ -7,6 +7,7 @@ namespace Fougerite
     using System;
     using System.IO;
     using System.Timers;
+    using System.Text;
     using UnityEngine;
 
     public class Bootstrap : Facepunch.MonoBehaviour
@@ -33,6 +34,36 @@ namespace Fougerite
             UnityEngine.Object.DontDestroyOnLoad(base.gameObject);
         }
 
+        public bool ApplyOptions()
+        {
+            // look for the string 'false' to disable.  not a bool check
+            if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
+                Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
+                return false;
+            }
+
+            if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
+            {
+                decay.decaytickrate = float.MaxValue;
+                decay.maxperframe = 1;
+                decay.maxtestperframe = 1;
+            }
+            if (!Fougerite.Config.GetBoolValue("Fougerite", "structuredecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
+            {
+                structure.maxframeattempt = 0;
+            }
+            return true;
+        }
+        /*
+        public void WriteRuntimeConfig()
+        {
+            string RuntimeConfig = Path.Combine(Fougerite.Config.GetPublicFolder, "runtime.cfg");
+            StringBuilder sb = new StringBuilder();
+            var a = env.daylength;
+            var b = env.nightlength;
+
+        }
+        */
         public void Start()
         {
             string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
@@ -44,10 +75,8 @@ namespace Fougerite
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
-            // look for the string 'false' to disable.  not a bool check
-            if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
-                Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
-            } else {
+
+            if (ApplyOptions()) {
                 ModuleManager.LoadModules();
                 Fougerite.Hooks.ServerStarted();
             }

@@ -14,7 +14,7 @@ namespace Fougerite
             public string DateTime;
         }
 
-        private static string LogsFolder = Path.Combine(Config.GetPublicFolder(), @"Logs\");
+        private static string LogsFolder = Path.Combine(Config.GetPublicFolder(), "Logs");
         private static Writer LogWriter;
         private static Writer ChatWriter;
         private static bool showDebug = false;
@@ -55,7 +55,7 @@ namespace Fougerite
                     LogWriter.LogWriter.Close();
 
                 LogWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
-                LogWriter.LogWriter = new StreamWriter(LogsFolder + "Log " + LogWriter.DateTime + ".txt", true);
+                LogWriter.LogWriter = new StreamWriter(Path.Combine(LogsFolder, string.Format("Log_{0}.log", LogWriter.DateTime)), true);
                 LogWriter.LogWriter.AutoFlush = true;
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace Fougerite
                     ChatWriter.LogWriter.Close();
 
                 ChatWriter.DateTime = DateTime.Now.ToString("dd_MM_yyyy");
-                ChatWriter.LogWriter = new StreamWriter(LogsFolder + "Chat " + ChatWriter.DateTime + ".txt", true);
+                ChatWriter.LogWriter = new StreamWriter(Path.Combine(LogsFolder, string.Format("Chat_{0}.log", ChatWriter.DateTime)), true);
                 ChatWriter.LogWriter.AutoFlush = true;
             }
             catch (Exception ex)

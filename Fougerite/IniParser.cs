@@ -119,7 +119,7 @@ public class IniParser
     {
         Contract.Requires(!string.IsNullOrEmpty(sectionName));
 
-        System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
+        List<string> list = new List<string>();
         foreach (SectionPair pair in this.tmpList)
         {
             if (pair.Key.StartsWith(";"))
@@ -137,10 +137,15 @@ public class IniParser
     {
         get
         {
-            return (from pair in this.tmpList
-                        group pair by pair.Section into bySection
-                        from IGrouping<string, SectionPair> g in bySection
-                        select g.Key).ToArray<string>();
+            List<string> list = new List<string>();
+            foreach (SectionPair pair in this.tmpList)
+            {
+                if (!list.Contains(pair.Section))
+                {
+                    list.Add(pair.Section);
+                }
+            }
+            return list.ToArray();
         }
     }
 
@@ -153,6 +158,11 @@ public class IniParser
         pair.Section = sectionName;
         pair.Key = settingName;
         return (string)this.keyPairs[pair];
+    }
+
+    public bool GetBoolSetting(string sectionName, string settingName)
+    {
+        return this.GetSetting(sectionName, settingName).ToLower() == "true";
     }
 
     public bool isCommandOn(string cmdName)

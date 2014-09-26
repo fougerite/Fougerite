@@ -67,7 +67,6 @@ namespace RustPP
             }
             TimedEvents.startEvents();
 
-            Fougerite.Hooks.OnEntityDecay += EntityDecay;
             Fougerite.Hooks.OnDoorUse += DoorUse;
             Fougerite.Hooks.OnEntityHurt += EntityHurt;
             Fougerite.Hooks.OnPlayerConnected += PlayerConnect;
@@ -84,7 +83,6 @@ namespace RustPP
         {
             Logger.LogDebug("DeInitialize RPP");
 
-            Fougerite.Hooks.OnEntityDecay -= EntityDecay;
             Fougerite.Hooks.OnDoorUse -= DoorUse;
             Fougerite.Hooks.OnEntityHurt -= EntityHurt;
             Fougerite.Hooks.OnPlayerConnected -= PlayerConnect;
@@ -204,12 +202,6 @@ namespace RustPP
                 if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))
                     RustPP.Hooks.broadcastDeath(victim.Name, attacker.Name, event2.WeaponName);
             }
-        }
-
-        void EntityDecay(DecayEvent de)
-        {
-            if (Core.IsEnabled() && (Core.config.GetSetting("Settings", "decay") == "false"))
-                de.DamageAmount = 0f;
         }
 
         void DoorUse(Fougerite.Player p, DoorEvent de)

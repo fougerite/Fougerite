@@ -7,6 +7,7 @@ namespace Fougerite
     using Rust;
     using System;
     using System.Linq;
+    using System.Timers;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using uLink;
@@ -131,7 +132,7 @@ namespace Fougerite
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
 		
-	public bool HasBlueprint(BlueprintDataBlock dataBlock)
+	    public bool HasBlueprint(BlueprintDataBlock dataBlock)
         {
             PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
             if (invent.KnowsBP(dataBlock))
@@ -208,7 +209,12 @@ namespace Fougerite
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
-        public void TeleportToAndFace(Fougerite.Player p, float distance = 1.5f)
+        public void TeleportTo(Fougerite.Player p)
+        {
+            this.TeleportTo(p, 1.5f);
+        }
+
+        public void TeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
             Contract.Requires(p.PlayerClient.controllable.transform != null);
 
@@ -217,8 +223,7 @@ namespace Fougerite
 
             Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
             Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
-            this.TeleportTo(target);
-            this.ourPlayer.controllable.transform.LookAt(transform);                                                // turn towards the target player's transform
+            this.SafeTeleportTo(target);
         }
 
         public void SafeTeleportTo(float x, float y, float z)
@@ -231,37 +236,86 @@ namespace Fougerite
             this.SafeTeleportTo(new Vector3(x, 0f, z));
         }
 
-        public void SafeTeleportTo(Vector3 target)
+        public bool SafeTeleportTo(Vector3 target)
         {
-            float height = Terrain.activeTerrain.SampleHeight(target);
-            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
-                                                where s.containedBounds.Contains(target)
-                                                select s;
-            if (height > target.y)
-                target.y = height;
+            float maxSafeDistance = 360f;
+            float distance = Vector3.Distance(this.Location, target);
+            float seaLevel = 256f;
+            int ms = 500;
+            string me = "SafeTeleport";
 
-            if (structures.Count() >= 1) {
+            float bumpConst = 0.75f;
+            Vector3 bump = Vector3.up * bumpConst;
+            Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
+            RaycastHit hit;
+            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
+                                                               where s.containedBounds.Contains(terrain)
+                                                               select s;
+
+            Logger.LogDebug(string.Format("[{0}] from={1} to={2} distance={3} terrain={4}", me, 
+                this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
+
+            if (structures.Count() == 1)
+            {
+                if (terrain.y > target.y)
+                    target = terrain + bump * 2;
+
+                if (Physics.Raycast(target, Vector3.down, out hit))
+                {
+                    if (hit.collider.name == "HB Hit")
+                    {
+                        this.MessageFrom(me, "There you are.");
+                        return false;
+                    }
+                    if (!(hit.distance >= bumpConst * 3 && hit.distance < bumpConst * 6))
+                    {
+                        target = hit.point + bump * 3;
+                    }
+                }
+
+                if (distance < maxSafeDistance)
+                {
+                    this.TeleportTo(target);
+                    return true;
+                } else
+                {
+                    this.TeleportTo(terrain + bump * 2);
+                    System.Threading.Thread.Sleep(ms);
+                    this.TeleportTo(target);
+                    return true;
+                }            
+            } else if (structures.Count() == 0)
+            {
+                if (terrain.y < seaLevel)
+                {
+                    this.MessageFrom(me, "That would put you in the ocean.");
+                    return false;
+                }
+
+                if (Physics.Raycast(terrain + Vector3.up * 300, Vector3.down, out hit))
+                {
+                    if (hit.collider.name == "HB Hit")
+                    {
+                        this.MessageFrom(me, "There you are.");
+                        return false;
+                    }
+                    target = hit.point + bump * 2;
+                }
+
                 this.TeleportTo(target);
-                System.Threading.Thread.Sleep(800);
-                this.TeleportTo(target.x, target.y, target.z);
-                return;
+                return true;
+            } else
+            {
+                Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
+                Logger.LogDebug(string.Format("[{0}] target={1} terrain{2}", me, target.ToString(), terrain.ToString()));
+                this.MessageFrom(me, "Cannot execute safely with the parameters supplied.");
+                return false;
             }
-            this.TeleportTo(target);
         }
 
         public void TeleportTo(float x, float y, float z)
         {
             this.TeleportTo(new Vector3(x, y, z));
-        }
-
-        public void TeleportTo(Fougerite.Player p)
-        {
-            Contract.Requires(p.Location != null);
-
-            if (this == p) // lol
-                return;
-                
-            this.TeleportTo(p.Location);
         }
 
         public void TeleportTo(Vector3 target)

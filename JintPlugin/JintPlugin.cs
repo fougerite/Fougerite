@@ -12,7 +12,6 @@
     using Jint.Native;
     using Jint.Parser;
     using Jint.Parser.Ast;
-    using POSIX;
 
     public class Plugin
     {
@@ -345,18 +344,13 @@
             return timer;
         }
 
-        public TimedEvent CreateTimer(string name, int timeoutDelay, object[] args)
+        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
         {
             TimedEvent timer = CreateTimer(name, timeoutDelay);
-            timer.Args = args;
+            timer.Args = args.ToArray<object>();
             timer.OnFire -= OnTimerCB;
             timer.OnFireArgs += OnTimerCBArgs;
             return timer;
-        }
-
-        public TimedEvent CreateTimer(string name, int timeoutDelay, List<object> args)
-        {
-            return this.CreateTimer(name, timeoutDelay, args.ToArray<object>());
         }
 
         public void KillTimer(string name)
@@ -378,30 +372,59 @@
         #endregion Timer functions.
 
         #region Other functions.
-
-        public string Today()
+        public Fougerite.Player PlayerByGameID(string uid)
         {
-            return DateTime.Now.ToShortDateString();
+            return Fougerite.Player.FindByGameID(uid);
         }
 
-        public int Ticks()
+        public Fougerite.Player PlayerByName(string name)
         {
-            return Environment.TickCount;
+            return Fougerite.Player.FindByName(name);
         }
 
-        public string ClockTime()
+        public string Today
         {
-            return DateTime.Now.ToShortTimeString();
+            get
+            {
+                return DateTime.Now.ToShortDateString();
+            }
         }
 
-        public int TimeStamp()
+        public int Ticks
         {
-            return Time.NowStamp;
+            get
+            {
+                return Environment.TickCount;
+            }
+        }
+
+        public float Uptime
+        {
+            get
+            {
+                return UnityEngine.Time.realtimeSinceStartup;
+            }
+        }
+
+        public string ClockTime
+        {
+            get
+            {
+                return DateTime.Now.ToShortTimeString();
+            }
+        }
+
+        public int Timestamp
+        {
+            get
+            {
+                return POSIX.Time.NowStamp;
+            }
         }
 
         public int TimeSince(int when)
         {
-            return Time.ElapsedStampSince(when);
+            return POSIX.Time.ElapsedStampSince(when);
         }
 
         #endregion

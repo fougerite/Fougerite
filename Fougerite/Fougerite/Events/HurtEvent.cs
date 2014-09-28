@@ -62,6 +62,10 @@
                     weaponName = "Wolf Claw";
                 } else if (d.attacker.id.Equals(d.victim.id)) {
                     weaponName = String.Format("Self ({0})", DamageType);
+                } else if (de.amount == "15") {
+                    weaponName = "Spike Wall";
+                } else if (de.amount == "10") {
+                    weaponName = "Large Spike Wall";
                 } else {
                     weaponName = "Hunting Bow";
                 }

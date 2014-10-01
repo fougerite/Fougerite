@@ -374,7 +374,7 @@ namespace Fougerite
                     return;
 
                 Fougerite.Server.GetServer().Players.Remove(item);
-                Logger.LogDebug("User Disconnected: " + item.Name + " (" + item.SteamID.ToString() + ")");
+                Logger.LogDebug("User Disconnected: " + item.Name + " (" + item.SteamID + ")");
                 if (OnPlayerDisconnected != null)
                     OnPlayerDisconnected(item);
             }

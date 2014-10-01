@@ -44,13 +44,16 @@ namespace Fougerite
 
             if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
-                decay.decaytickrate = float.MaxValue;
-                decay.maxperframe = 1;
-                decay.maxtestperframe = 1;
+                decay.decaytickrate = float.MaxValue / 2;
+                decay.deploy_maxhealth_sec = float.MaxValue;
+                decay.maxperframe = -1;
+                decay.maxtestperframe = -1;
             }
             if (!Fougerite.Config.GetBoolValue("Fougerite", "structuredecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
-                structure.maxframeattempt = 0;
+                structure.maxframeattempt = -1;
+                structure.framelimit = -1;
+                structure.minpercentdmg = float.MaxValue;
             }
             return true;
         }

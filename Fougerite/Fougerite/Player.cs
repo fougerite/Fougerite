@@ -252,7 +252,7 @@ namespace Fougerite
                                                                where s.containedBounds.Contains(terrain)
                                                                select s;
 
-            Logger.LogDebug(string.Format("[{0}] from={1} to={2} distance={3} terrain={4}", me, 
+            Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
                 this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
 
             if (structures.Count() == 1)

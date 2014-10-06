@@ -24,6 +24,10 @@
 
         public static void Init()
         {
+            if (config.GetSetting("Settings", "chatname").Length >= 1)
+            {
+                Name = config.GetSetting("Settings", "chatname");
+            }
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;

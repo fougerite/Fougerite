@@ -72,7 +72,7 @@ public class IniParser
         Contract.Requires(!string.IsNullOrEmpty(sectionName));
         Contract.Requires(!string.IsNullOrEmpty(settingName));
 
-        this.AddSetting(sectionName, settingName, null);
+        this.AddSetting(sectionName, settingName, string.Empty);
     }
 
     public void AddSetting(string sectionName, string settingName, string settingValue)
@@ -83,6 +83,9 @@ public class IniParser
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
+        if (settingValue == null)
+            settingValue = string.Empty;
+
         if (this.keyPairs.ContainsKey(pair))
         {
             this.keyPairs.Remove(pair);
@@ -169,8 +172,7 @@ public class IniParser
     {
         Contract.Requires(!string.IsNullOrEmpty(cmdName));
 
-        string setting = this.GetSetting("Commands", cmdName);
-        return ((setting == null) || (setting == "true"));
+        return this.GetBoolSetting("Commands", cmdName);
     }
 
     public void Save()
@@ -225,6 +227,9 @@ public class IniParser
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
+        if (string.IsNullOrEmpty(value))
+            value = string.Empty;
+
         if (this.keyPairs.ContainsKey(pair))
         {
             this.keyPairs[pair] = value;

@@ -87,16 +87,16 @@ namespace Fougerite
             if (!chat.enabled)
                 return;
 
-            if (arg == null)
+            if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
 
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
-            var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
+            var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0));
 
             if (OnChatRaw != null)
                 OnChatRaw(ref arg);
 
-            if (arg == null)
+            if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
 
             if (quotedMessage.Trim('"').StartsWith("/")) {

@@ -7,6 +7,7 @@ namespace Fougerite
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Timers;
     using uLink;
     using UnityEngine;
 
@@ -21,8 +22,6 @@ namespace Fougerite
 
         public void Airdrop(int rep)
         {
-            Contract.Requires(rep >= 0);
-
             for (int i = 0; i < rep; i++)
             {
                 SupplyDropZone.CallAirDrop();
@@ -36,17 +35,15 @@ namespace Fougerite
 
         public void AirdropAt(float x, float y, float z, int rep)
         {
-            for (int i = 0; i < rep; i++)
-            {
-                SupplyDropZone.CallAirDropAt(new Vector3(x, y, z));
-            }
+            Vector3 target = new Vector3(x, y, z);
+            this.AirdropAt(target, rep);
         }
 
         public void AirdropAtPlayer(Fougerite.Player p)
         {
             Contract.Requires(p != null);
 
-            this.AirdropAtPlayer(p, 1);
+            this.AirdropAt(p.X, p.Y, p.Z, 1);
         }
 
         public void AirdropAtPlayer(Fougerite.Player p, int rep)
@@ -54,10 +51,33 @@ namespace Fougerite
             Contract.Requires(p != null);
             Contract.Requires(rep >= 0);
 
+            this.AirdropAt(p.X, p.Y, p.Z, rep);
+        }
+
+        public void AirdropAt(Vector3 target, int rep)
+        {
+            Vector3 original = target;
+            System.Random rand = new System.Random();
+            int reset = 20;
             for (int i = 0; i < rep; i++)
             {
-                SupplyDropZone.CallAirDropAt(p.Location);
+                reset--;
+                if (reset == 0)
+                {
+                    reset = 20;
+                    target = original;
+                }
+                target.y = original.y + rand.Next(-5, 20) * 20;
+                SupplyDropZone.CallAirDropAt(target);
+                Jitter(ref target);
             }
+        }
+
+        private static void Jitter(ref Vector3 target)
+        {
+            Vector2 jitter = UnityEngine.Random.insideUnitCircle;
+            target.x += jitter.x * 250;
+            target.z += jitter.y * 250;
         }
 
         public void Blocks()

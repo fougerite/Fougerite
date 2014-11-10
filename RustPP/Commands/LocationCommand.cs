@@ -3,6 +3,7 @@
     using Fougerite;
     using RustPP.Permissions;
     using System;
+    using UnityEngine;
 
     public class LocationCommand : ChatCommand
     {
@@ -28,11 +29,24 @@
                 }
                 displayName = str2;
             }
+            string[] localities = new IniParser("Localities").EnumSection("Cape Ecko");
+
             foreach (PlayerClient client in PlayerClient.FindAllWithString(displayName))
             {
-                string strValue = string.Concat(new object[] { "Location: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z });
+                string strValue = string.Concat(new object[] { "Vector3: ", (string)client.lastKnownPosition.ToString() });
                 Arguments.ReplyWith(strValue);
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] { (str2 == "") ? "Your" : (displayName + "'s"), " Location Is: X: ", (int)client.lastKnownPosition.x, " Y: ", (int)client.lastKnownPosition.y, " Z: ", (int)client.lastKnownPosition.z }));
+                Vector2 origin = new Vector2(client.lastKnownPosition.x, client.lastKnownPosition.z);
+                foreach (string loc in localities)
+                {                
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] {
+                        (str2 == "") ? "You" : displayName, " Location Is: X: ",
+                        (int)client.lastKnownPosition.x, " Y: ",
+                        (int)client.lastKnownPosition.y, " Z: ",
+                        (int)client.lastKnownPosition.z
+                    }));
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}", (str2 == "") ? "You are" : displayName + " is"));
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("Vector3: {0}", client.lastKnownPosition.ToString()));
+                }
             }
         }
     }

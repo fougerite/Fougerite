@@ -24,10 +24,6 @@
 
         public static void Init()
         {
-            if (config.GetSetting("Settings", "chatname").Length >= 1)
-            {
-                Name = config.GetSetting("Settings", "chatname");
-            }
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;
@@ -69,10 +65,10 @@
             }
         }
 
-        public static void handleCommand(ConsoleSystem.Arg arg)
+        public static void handleCommand(ref ConsoleSystem.Arg arg)
         {
             string displayname = arg.argUser.user.Displayname;
-            string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
+            string[] strArray = arg.GetString(0).Trim().Split(new char[] { ' ' });
             string cmd = strArray[0].Trim();
             string[] chatArgs = new string[strArray.Length - 1];
             for (int i = 1; i < strArray.Length; i++)

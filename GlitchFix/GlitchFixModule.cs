@@ -76,7 +76,7 @@ namespace GlitchFix
                             {
                                 if (Player != null)
                                 {
-                                    Player.Notice("Ya can't place chest under foundation bitch!");
+                                    //Player.Notice("Ya can't place chest under foundation bitch!");
                                     if (GiveBack)
                                     {
                                         if (name == "WoodFoundation")

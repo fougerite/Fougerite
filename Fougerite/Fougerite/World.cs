@@ -76,8 +76,29 @@ namespace Fougerite
         private static void Jitter(ref Vector3 target)
         {
             Vector2 jitter = UnityEngine.Random.insideUnitCircle;
-            target.x += jitter.x * 250;
-            target.z += jitter.y * 250;
+            target.x += jitter.x * 100;
+            target.z += jitter.y * 100;
+        }
+
+        private static Vector3 RandomPointOnGround()
+        {
+            System.Random rand = new System.Random();
+            float z = rand.Next(-1000, -6100);
+            float x = 3600;
+            if (z < -4900 && z >= -6100)
+            {
+                x = rand.Next(3600, 6100);
+            }
+            if (z < 2400 && z >= -4900)
+            {
+                x = rand.Next(3600, 7300);
+            }
+            if (z <= -1000 && z >= -2400)
+            {
+                x = rand.Next(3600, 6700);
+            }
+            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500f, z));
+            return new Vector3(x, y, z);
         }
 
         public void Blocks()
@@ -275,6 +296,819 @@ namespace Fougerite
                     StructureComponentDataBlock block3 = block as StructureComponentDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block3.structureToPlacePrefab.name + "\", \"" + block3.structureToPlaceName + "\"],\n");
                 }
+            }
+        }
+
+        public string ParseItemName(string arg)
+        {
+            string str = " ";
+            str += arg.Replace('"', ' ').ToLower();
+            if (str.Contains(" ani") || str.Contains("fat"))
+            {
+                return "Animal Fat";
+            }
+            if (str.Contains(" ant") || str.Contains("pil"))
+            {
+                return "Anti-Radiation Pills";
+            }
+            if (str.Contains(" bea"))
+            {
+                return "Can of Beans";
+            }
+            if (str.Contains(" tun"))
+            {
+                return "Can of Tuna";
+            }             
+            if (str.Contains(" charc"))
+            {
+                return "Charcoal";
+            }
+            if (str.Contains(" cho"))
+            {
+                return "Chocolate Bar";
+            }
+            if (str.Contains(" coo"))
+            {
+                return "Cooked Chicken Breast";
+            }             
+            if (str.Contains(" gran"))
+            {
+                return "Granola Bar";
+            }
+            if (str.Contains(" inv"))
+            {
+                if (str.Contains("boo"))
+                    return "Invisible Boots";
+            
+                if (str.Contains("hel"))
+                    return "Invisible Helmet";
+            
+                if (str.Contains("pan"))
+                    return "Invisible Pants";
+            
+                if (str.Contains("ves"))
+                    return "Invisible Vest";
+            }
+            if (str.Contains(" raw") && (str.Contains("chi") || str.Contains("bre")))
+            {
+                return "Raw Chicken Breast";
+            }             
+            if (str.Contains(" rec"))
+            {
+                return "Recycle Kit 1";
+            }             
+            if (str.Contains(" roc"))
+            {
+                return "Rock";
+            }       
+            if (str.Contains(" sul")) {
+                if (str.Contains("ore"))
+                    return "Sulfur Ore";
+            
+                return "Sulfur";
+            }         
+            if (str.Contains(" sup") || str.Contains(" sig"))
+            {
+                return "Supply Signal";
+            }
+            if (str.Contains(" ube") && str.Contains("hat"))
+            {
+                return "Uber Hatchet";
+            }             
+            if (str.Contains(" ube") && (str.Contains("hun") || str.Contains("bow")))
+            {
+                return "Uber Hunting Bow";
+            }
+            if (str.Contains(" blo"))
+            {             
+                if (str.Contains("dra") || str.Contains("kit"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Blood Draw Kit Blueprint";
+
+                    return "Blood Draw Kit";
+                }
+                return "Blood";
+            }
+            if (str.Contains(" clo"))
+            {
+                if (str.Contains("boo"))
+                {                
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Cloth Boots BP";
+
+                    return "Cloth Boots";
+                }
+                if (str.Contains("hel"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Cloth Helmet BP";
+
+                    return "Cloth Helmet";
+                }
+                if (str.Contains("pan"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Cloth Pants BP";
+
+                    return "Cloth Pants";
+                }
+                if (str.Contains("ves"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Cloth Vest BP";
+
+                    return "Cloth Vest";
+                }
+                return "Cloth";
+            }
+            if (str.Contains(" lea"))
+            {
+                if (str.Contains("boo"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Leather Boots BP";
+
+                    return "Leather Boots"; 
+                }
+                if (str.Contains("hel"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Leather Helmet BP";
+
+                    return "Leather Helmet"; 
+                }
+                if (str.Contains("pan"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Leather Pants BP";
+
+                    return "Leather Pants"; 
+                }
+                if (str.Contains("ves"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Leather Vest BP";
+
+                    return "Leather Vest"; 
+                }
+                return "Leather";
+            }
+            if (str.Contains(" wood"))
+            {            
+                if (str.Contains("bar"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Barricade Blueprint";
+
+                    return "Wood Barricade"; 
+                }
+                if (str.Contains("cei"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Ceiling BP";
+
+                    return "Wood Ceiling"; 
+                }
+                if (str.Contains("doo"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Doorway BP"; 
+
+                    return "Wood Doorway"; 
+                }
+                if (str.Contains("fou"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Foundation BP";
+
+                    return "Wood Foundation";
+                }
+                if (str.Contains("gate"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Gate Blueprint";
+
+                    return "Wood Gate";
+                }
+                if (str.Contains("gatew"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Gateway Blueprint";
+
+                    return "Wood Gateway";
+                }
+                if (str.Contains("pil"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Pillar BP";
+
+                    return "Wood Pillar";
+                }
+                if (str.Contains("pla"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Planks Blueprint";
+
+                    return "Wood Planks";
+                }
+                if (str.Contains("ram"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Ramp BP";
+
+                    return "Wood Ramp"; 
+                }
+                if (str.Contains("she"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Shelter Blueprint";
+
+                    return "Wood Shelter";
+                }
+                if (str.Contains("sta"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Stairs BP";
+
+                    return "Wood Stairs";
+                }
+                if (str.Contains("sto") || str.Contains("box"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Storage Box Blueprint";
+
+                    return "Wood Storage Box"; 
+                }
+                if (str.Contains("wal"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Wall BP"; 
+
+                    return "Wood Wall"; 
+                }
+                if (str.Contains("win"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wood Window BP";
+
+                    return "Wood Window"; 
+                }
+                if (str.Contains(" woode"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Wooden Door Blueprint";
+
+                    return "Wooden Door"; 
+                }
+                return "Wood";
+            }
+            if (str.Contains(" arr"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Arrow Blueprint";
+
+                return "Arrow";
+            }
+            if (str.Contains(" ban"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Bandage Blueprint";
+
+                return "Bandage"; 
+            }
+            if (str.Contains(" bed"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Bed Blueprint";
+
+                return "Bed";
+            }
+            if (str.Contains(" flas"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Flashlight Mod BP";
+
+                return "Flashlight Mod"; 
+            }
+            if (str.Contains(" flar"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Flare Blueprint";
+
+                return "Flare";
+            }
+            if (str.Contains(" fur"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Furnace Blueprint";
+
+                return "Furnace";
+            }
+            if (str.Contains(" gun"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Gunpowder Blueprint";
+
+                return "Gunpowder"; 
+            }
+            if (str.Contains(" handc"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "HandCannon Blueprint";
+
+                return "HandCannon";
+            }
+            if (str.Contains(" hat") && !str.Contains("sto"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Hatchet Blueprint";
+
+                return "Hatchet";
+            }
+            if (str.Contains(" m4"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "M4 Blueprint";
+
+                return "M4";
+            }
+            if (str.Contains(" mp5"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "MP5A4 Blueprint";
+
+                return "MP5A4"; 
+            }
+            if (str.Contains(" p25"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "P250 Blueprint";
+
+                return "P250";
+            }
+            if (str.Contains(" pap"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Paper Blueprint";
+
+                return "Paper"; 
+            }
+            if (str.Contains(" rev"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Revolver Blueprint";
+
+                return "Revolver"; 
+            }
+            if (str.Contains(" sil"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Silencer BP";
+
+                return "Silencer"; 
+            }
+            if (str.Contains(" tor"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Torch Blueprint";
+
+                return "Torch"; 
+            }
+            if (str.Contains(" wor"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Workbench Blueprint";
+
+                return "Workbench"; 
+            }
+            if (str.Contains(" 556"))
+            {
+                if (str.Contains("cas"))
+                    return "556 Casing Blueprint";
+
+                if (str.Contains("amm"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "556 Ammo Blueprint";
+                
+                    return "556 Ammo";
+                }
+            }
+            if (str.Contains(" 9mm"))
+            {            
+                if (str.Contains(" 9mm") && str.Contains("cas"))
+                {
+                    return "9mm Casing Blueprint"; 
+                }
+                if (str.Contains(" 9mm") && str.Contains("pis"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "9mm Pistol Blueprint";
+
+                    return "9mm Pistol"; 
+                }
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "9mm Ammo Blueprint";
+
+                return "9mm Ammo"; 
+            }
+            if (str.Contains(" cam") || str.Contains(" fir"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Camp Fire Blueprint";
+
+                return "Camp Fire"; 
+            }
+            if ((str.Contains(" explosive") || str.Contains("charg")) && !str.Contains("explosives"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Explosive Charge Blueprint";
+
+                return "Explosive Charge"; 
+            }
+            if (str.Contains(" explosives"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Explosives Blueprint";
+
+                return "Explosives";
+            }
+            if (str.Contains(" f1") || str.Contains(" gre"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "F1 Grenade Blueprint";
+
+                return "F1 Grenade"; 
+            }
+            if (str.Contains(" handm"))
+            {            
+                if (str.Contains("she"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Handmade Shell Blueprint";
+
+                    return "Handmade Shell"; 
+                }
+                if (str.Contains("loc"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Handmade Lockpick Blueprint";
+
+                    return "Handmade Lockpick"; 
+                }
+            }
+            if (str.Contains(" hol"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Holo sight BP";
+
+                return "Holo sight"; 
+            }
+            if (str.Contains(" hun"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Hunting Bow Blueprint";
+
+                return "Hunting Bow"; 
+            }
+            if (str.Contains(" kev"))
+            {
+                if (str.Contains("boo"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Kevlar Boots BP"; 
+
+                    return "Kevlar Boots";
+                }
+                if (str.Contains("hel"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Kevlar Helmet BP";
+
+                    return "Kevlar Helmet"; 
+                }
+                if (str.Contains("pan"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Kevlar Pants BP";
+
+                    return "Kevlar Pants"; 
+                }
+                if (str.Contains("ves"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Kevlar Vest BP";
+                
+                    return "Kevlar Vest";
+                }
+            }
+            if (str.Contains(" las"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Laser Sight BP";
+
+                return "Laser Sight";   
+            }
+            if (str.Contains(" met"))
+            {
+                if (str.Contains("cei"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Ceiling BP";
+
+                    return "Metal Ceiling"; 
+                }
+                if (str.Contains("door") && !str.Contains("doorw"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Door Blueprint";
+
+                    return "Metal Door"; 
+                }
+                if (str.Contains("doorw"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Doorway BP";
+
+                    return "Metal Doorway";
+                }
+                if (str.Contains("fou"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Foundation BP";
+
+                    return "Metal Foundation"; 
+                }
+                if (str.Contains("pil"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Pillar BP";
+
+                    return "Metal Pillar"; 
+                }
+                if (str.Contains("sta"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Stairs BP";
+
+                    return "Metal Stairs"; 
+                }
+                if (str.Contains("wal"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Wall BP";
+
+                    return "Metal Wall"; 
+                }   
+                if (str.Contains("win") && !str.Contains("bar"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Window BP";
+
+                    return "Metal Window"; 
+                }
+                if (str.Contains("ram"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Ramp BP";
+                
+                    return "Metal Ramp";
+                }
+                if (str.Contains("win") && str.Contains("bar"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Metal Window Bars Blueprint";
+
+                    return "Metal Window Bars";
+                }
+                if (str.Contains("fra"))
+                    return "Metal Fragments"; 
+               
+                if (str.Contains("ore"))
+                    return "Metal Ore";               
+            }
+            if (str.Contains(" pic") || str.Contains("axe"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Pick Axe Blueprint";
+
+                return "Pick Axe";
+            }
+            if (str.Contains(" pip"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Pipe Shotgun Blueprint";
+
+                return "Pipe Shotgun"; 
+            }
+            if (str.Contains(" rep"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Repair Bench Blueprint";
+
+                return "Repair Bench"; 
+            }
+            if (str.Contains(" res"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Research Kit Blueprint";
+
+                return "Research Kit 1";
+            }
+            if (str.Contains(" sho") && !str.Contains("pip"))
+            {
+                if (str.Contains("she"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Shotgun Shells Blueprint";
+
+                    return "Shotgun Shells";
+                }
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Shotgun Blueprint";
+
+                return "Shotgun";
+            }
+            if (str.Contains(" sle") || str.Contains("bag"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Sleeping Bag Blueprint";
+
+                return "Sleeping Bag";
+            }
+            if (str.Contains(" sma"))
+            {
+                if (str.Contains("med"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Small Medkit Blueprint";
+
+                    return "Small Medkit"; 
+                }
+                if (str.Contains("sta"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Small Stash Blueprint";
+
+                    return "Small Stash"; 
+                }
+                if (str.Contains("rat"))
+                    return "Small Rations"; 
+
+                if (str.Contains("wat") || str.Contains("bot"))
+                    return "Small Water Bottle"; 
+            }
+            if (str.Contains(" spi") && !str.Contains(" lar"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Spike Wall Blueprint";
+
+                return "Spike Wall";
+            }
+            if (str.Contains(" sto"))
+            {
+                if (str.Contains("hat"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Stone Hatchet Blueprint";
+
+                    return "Stone Hatchet";
+                }
+                return "Stones";                    
+            }
+            if (str.Contains(" bol") || str.Contains(" act") || str.Contains(" rif"))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Bolt Action Rifle Blueprint";
+
+                return "Bolt Action Rifle";
+            }
+            if (str.Contains(" emp"))
+            {
+                if (str.Contains("556"))
+                    return "Empty 556 Casing";
+
+                if (str.Contains("9mm"))
+                    return "Empty 9mm Casing";
+
+                if (str.Contains("sho") || str.Contains("she"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Empty Shotgun Shell Blueprint";
+
+                    return "Empty Shotgun Shell";
+                }
+            }
+            if (str.Contains(" lar") && (str.Contains("woo") || str.Contains("sto")))
+            {
+                if (str.Contains(" bp") || str.Contains(" blueprint"))
+                    return "Large Wood Storage Blueprint";
+
+                return "Large Wood Storage";
+            }
+            if (str.Contains(" low"))
+            {
+                if ((str.Contains("grad") || str.Contains("fue")))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Low Grade Fuel Blueprint";
+
+                    return "Low Grade Fuel";
+                }
+                if (str.Contains("qua") || str.Contains("met"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Low Quality Metal Blueprint";
+
+                    return "Low Quality Metal";
+                }
+            }
+            if (str.Contains(" pri"))
+            {
+                if (str.Contains("556"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Primed 556 Casing Blueprint";
+
+                    return "Primed 556 Casing";
+                }
+                if (str.Contains("9mm"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Primed 9mm Casing Blueprint";
+
+                    return "Primed 9mm Casing";
+                }            
+                if (str.Contains("sho") || str.Contains("she"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Primed Shotgun Shell Blueprint";
+
+                    return "Primed Shotgun Shell";
+                }
+            }
+            if ((str.Contains(" rad") || str.Contains(" sui")))
+            {
+                if (str.Contains("boo"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Rad Suit Boots BP";
+
+                    return "Rad Suit Boots";
+                }
+                if (str.Contains("hel"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Rad Suit Helmet BP";
+                    return "Rad Suit Helmet";
+                }
+                if (str.Contains("pan"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Rad Suit Pants BP";
+
+                    return "Rad Suit Pants";
+                }
+                if (str.Contains("ves"))
+                {
+                    if (str.Contains(" bp") || str.Contains(" blueprint"))
+                        return "Rad Suit Vest BP";
+
+                    return "Rad Suit Vest";
+                }
+            }
+            if (str.Contains(" arm") || str.Contains(" wea"))
+            {
+                for (int i = 1; i <= 7; i++)
+                {
+                    if (str.Contains(string.Format("part{0}", i)) || str.Contains(string.Format("part {0}", i)))
+                    {
+                        if (str.Contains(" arm"))
+                        {
+                            if (str.Contains(" bp") || str.Contains(" blueprint"))
+                                return string.Format("Armor Part {0} BP", i);
+
+                            return string.Format("Armor Part {0}", i); 
+                        }
+                        if (str.Contains(" wea"))
+                        {
+                            if (str.Contains(" bp") || str.Contains(" blueprint"))
+                                return string.Format("Weapon Part {0} BP", i);
+
+                            return string.Format("Weapon Part {0}", i);
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+        public void DataBlocks()
+        {
+            foreach (ItemDataBlock block in DatablockDictionary.All)
+            {
+                File.AppendAllText(Util.GetAbsoluteFilePath("DataBlocks.txt"), string.Format("name={0} uniqueID={1}\n", block.name, block.uniqueID));
             }
         }
 

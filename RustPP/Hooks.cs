@@ -61,18 +61,6 @@
             return flag;
         }
 
-        public static bool decayDisabled()
-        {
-            try
-            {
-                return (Core.config.GetSetting("Settings", "decay").ToLower() == "false");
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         public static void deployableKO(DeployableObject dep, DamageEvent e)
         {
             try

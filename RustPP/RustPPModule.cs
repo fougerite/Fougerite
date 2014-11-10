@@ -65,6 +65,11 @@ namespace RustPP
                 Logger.LogError("[RPP] Can't load config!");
                 return;
             }
+            string chatname = Core.config.GetSetting("Settings", "chatname");
+            if (!string.IsNullOrEmpty(chatname))
+            {
+                Core.Name = Core.config.GetSetting("Settings", "chatname");
+            }
             TimedEvents.startEvents();
 
             Fougerite.Hooks.OnDoorUse += DoorUse;
@@ -104,58 +109,42 @@ namespace RustPP
 
         void HandleCommand(ref ConsoleSystem.Arg arg)
         {
-            Core.handleCommand(arg);
+            //Core.handleCommand(ref arg);
+            Logger.LogDebug(string.Format("[HandleCommand] arg.GetString(0)={0}", arg.GetString(0), "no string"));
+            string displayname = arg.argUser.user.Displayname;
+            string[] strArray = arg.GetString(0).Trim().Split(new char[] { ' ' });
+            string cmd = strArray[0].Trim();
+            string[] chatArgs = new string[strArray.Length - 1];
+            Array.Copy(strArray, 1, chatArgs, 0, chatArgs.Length);
+            string logstr = string.Empty;
+            Logger.LogDebug(string.Format("[HandleCommand] cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
+            ChatCommand.CallCommand(cmd, arg, chatArgs);
         }
 
         void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
             Fougerite.Player p = new Fougerite.Player(arg.argUser.playerClient);
 
             var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
             if (command.GetTPWaitList().Contains(p.PlayerClient.userID))
             {
-                int num;
-                if (int.TryParse(str, out num)) command.PartialNameTP(p, num);
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    command.GetTPWaitList().Remove(p.PlayerClient.userID);
-                }
-                arg = null;
+                command.PartialNameTP(p, arg.GetInt(0));
+                arg.ArgsStr = string.Empty;
             }
             else if (Core.banWaitList.Contains(p.PlayerClient.userID))
             {
-                int num2;
-                if (int.TryParse(str, out num2))
-                {
-                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(p, num2);
-                }
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    Core.banWaitList.Remove(p.PlayerClient.userID);
-                }
-                arg = null;
+                (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(p, arg.GetInt(0));
+                arg.ArgsStr = string.Empty;
             }
             else if (Core.kickWaitList.Contains(p.PlayerClient.userID))
             {
-                int num3;
-                if (int.TryParse(str, out num3))
-                {
-                    (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(p, num3);
-                }
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
-                }
-                arg = null;
+                (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(p, arg.GetInt(0));  
+                arg.ArgsStr = string.Empty;
             }
 
             if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
             {
-                arg = null;
+                arg.ArgsStr = string.Empty;
                 Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You are muted.");
             }
         }

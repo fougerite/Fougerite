@@ -8,27 +8,17 @@
     {
         public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string itemName = World.GetWorld().ParseItemName(string.Join(" ", ChatArguments));
+
+            int qty = int.Parse(ChatArguments[ChatArguments.Length - 1]);
+            if (!(qty >= 1))
+                qty = 1;
+
+            if (!(itemName == string.Empty))
             {
-                str = str + ChatArguments[i] + " ";
-            }
-            string[] strArray = Facepunch.Utility.String.SplitQuotesStrings(str.Trim());
-            if (strArray.Length == 2)
-            {
-                string oldValue = strArray[0].Replace("\"", "");
-                string str3 = "";
-                for (int j = 1; j < ChatArguments.Length; j++)
-                {
-                    str3 = str3 + ChatArguments[j] + " ";
-                }
-                string str4 = str3.Replace("\"", "");
-                if ((oldValue != "") && (str4 != ""))
-                {
-                    string[] strArray2 = str4.Replace(oldValue, "").Trim().Split(new char[] { ' ' });
-                    Arguments.Args = new string[] { oldValue, strArray2[strArray2.Length - 1] };
-                    inv.give(ref Arguments);
-                }
+                Arguments.Args = new string[] { itemName, qty.ToString() };
+                inv.give(ref Arguments);
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} {1} were placed in your inventory.", qty.ToString(), itemName));
             }
             else
             {

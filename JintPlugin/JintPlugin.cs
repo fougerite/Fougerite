@@ -36,7 +36,7 @@
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
-                .SetValue("Lookup", LookUp.GetLookUp())
+                .SetValue("Structures", new LookUp.Structures())
                 .SetValue("Plugin", this)
                 .Execute(code);
 

@@ -3,45 +3,113 @@
     using Facepunch.Utility;
     using Fougerite;
     using System;
+    using System.Collections.Generic;
 
     internal class GiveItemCommand : ChatCommand
     {
         public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            List<PlayerClient> matched = new List<PlayerClient>();
+            string argName = string.Empty;
+
+            if (ChatArguments.Length >= 2) // minimum args: name item
             {
-                str = str + ChatArguments[i] + " ";
-            }
-            string[] strArray = Facepunch.Utility.String.SplitQuotesStrings(str.Trim());
-            if (strArray.Length == 3)
-            {
-                string str2 = strArray[0].Replace("\"", "");
-                string str3 = "";
-                for (int j = 1; j < ChatArguments.Length; j++)
+                foreach (PlayerClient client in PlayerClient.All)
                 {
-                    str3 = str3 + ChatArguments[j] + " ";
-                }
-                string str4 = str3.Replace("\"", "");
-                if ((str2 != "") && (str4 != ""))
-                {
-                    foreach (PlayerClient client in PlayerClient.All)
+                    argName = ChatArguments[0].TrimStart(new char[] { '"', ' ' });
+                    if (client.netUser.displayName.ToLower().Contains(argName.ToLower()))
                     {
-                        if (client.netUser.displayName.ToLower() == str2.ToLower())
+                        if (client.netUser.displayName.ToLower() == argName.ToLower())
                         {
-                            string oldValue = strArray[2].Replace("\"", "");
-                            Arguments.Args = new string[] { str2, str4.Replace(oldValue, "").Trim(), oldValue };
-                            inv.giveplayer(ref Arguments);
-                            return;
+                            matched.Add(client);
+                            break;
+                        } else if (client.netUser.displayName.ToLower() == argName.TrimEnd(new char[] { '"', ' ' }).ToLower())
+                        {
+                            argName = argName.TrimEnd(new char[] { '"', ' ' });
+                            matched.Add(client);
+                            break;
                         }
+                        argName += " " + ChatArguments[1];
+                    } else
+                    {
+                        continue;
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
+                    if (client.netUser.displayName.ToLower().Contains(argName.ToLower()))
+                    {
+                        if (client.netUser.displayName.ToLower() == argName.ToLower())
+                        {
+                            matched.Add(client);
+                            break;
+                        } else if (client.netUser.displayName.ToLower() == argName.TrimEnd(new char[] { '"', ' ' }).ToLower())
+                        {
+                            argName = argName.TrimEnd(new char[] { '"', ' ' });
+                            matched.Add(client);
+                            break;
+                        }
+                        matched.Add(client);
+                        continue;
+                    } else
+                    {
+                        matched.Add(client); // matched with shorter name, but not exactly
+                        continue;
+                    }
+                }
+
+                if (matched.Count >= 1)
+                {
+                    string recipName = matched[0].netUser.displayName;
+                    string[] itemArgs = Arguments.ArgsStr.Replace(argName, "").Replace("\"", "").Trim(new char[] { ' ' }).Split(new char[] { ' ' });
+                    string itemArgStr = string.Join(" ", itemArgs, 0, itemArgs.Length - 2);
+                    string itemName = World.GetWorld().ParseItemName(itemArgStr);
+                    uLink.NetworkPlayer recipPlayer = (uLink.NetworkPlayer)matched[0].netPlayer;
+
+                    if (itemName == string.Empty)
+                    {
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("No item found with name matching '{0}'", itemArgStr));
+                        return;
+                    }
+
+                    if (matched.Count > 1)
+                    {
+                        foreach (PlayerClient match in matched)
+                        {
+                            if (match.netUser.displayName == argName)
+                            {
+                                recipPlayer = match.netPlayer;
+                                recipName = match.netUser.displayName;
+                            }
+                        }
+                        if (recipName == string.Empty)
+                        {
+                            string matchNames = string.Empty;
+                            foreach (PlayerClient match in matched)
+                            {
+                                matchNames += match.netUser.displayName;
+                                matchNames += ", ";
+                            }
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Ambiguous match with 2 or more player names:");
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, matchNames.TrimEnd(new char[] { ',', ' ' }));
+                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Try again, and be more specific.");
+                            return;
+                        }                                            
+                    }
+
+                    int qty = int.Parse(itemArgs[itemArgs.Length - 1]);
+                    if (!(qty >= 1))
+                        qty = 1;
+
+                    Arguments.Args = new string[] { recipName, itemName, qty.ToString() };
+                    inv.giveplayer(ref Arguments);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} {1} were placed in {2}'s inventory.", qty.ToString(), itemName, recipName));
+                    Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you {1} {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
+                    return;
+                } else // !(matched.Count >= 1)
+                {
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("No player found with name matching '{0}'", argName));
+                    return;
                 }
             }
-            else
-            {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /give \"playerName\" \"itemName\" \"quantity\"");
-            }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /give playerName itemName quantity");
         }
     }
 }

@@ -186,13 +186,15 @@
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
       <Project>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</Project>
       <Name>Fougerite</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Contracts">
+      <HintPath>..\References\Microsoft.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.ID">
       <HintPath>..\References\Facepunch.ID.dll</HintPath>
@@ -215,6 +217,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="Jint">
+      <HintPath>References\Jint.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -230,4 +235,5 @@
   <ItemGroup>
     <None Include="Jint\Jint.snk" />
   </ItemGroup>
+</Project>
 </Project>

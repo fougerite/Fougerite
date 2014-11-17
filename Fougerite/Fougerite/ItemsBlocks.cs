@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -9,8 +7,6 @@ namespace Fougerite
     {
         public ItemsBlocks(System.Collections.Generic.List<ItemDataBlock> items)
         {
-            Contract.Requires(items != null);
-
             foreach (ItemDataBlock block in items)
             {
                 base.Add(block);
@@ -19,8 +15,6 @@ namespace Fougerite
 
         public ItemDataBlock Find(string str)
         {
-            Contract.Requires(!string.IsNullOrEmpty(str));
-
             foreach (ItemDataBlock block in this)
             {
                 if (block.name.ToLower() == str.ToLower())

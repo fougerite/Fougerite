@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using Facepunch;
     using System;
@@ -41,16 +39,11 @@ namespace Fougerite
 
         public void AirdropAtPlayer(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
-
             this.AirdropAt(p.X, p.Y, p.Z, 1);
         }
 
         public void AirdropAtPlayer(Fougerite.Player p, int rep)
         {
-            Contract.Requires(p != null);
-            Contract.Requires(rep >= 0);
-
             this.AirdropAt(p.X, p.Y, p.Z, rep);
         }
 
@@ -105,8 +98,6 @@ namespace Fougerite
         {
             foreach (ItemDataBlock block in DatablockDictionary.All)
             {
-                Contract.Assert(block != null);
-
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Name: " + block.name + "\n");
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "ID: " + block.uniqueID + "\n");
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Flags: " + block._itemFlags.ToString() + "\n");
@@ -121,7 +112,6 @@ namespace Fougerite
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Combinations:\n");
                 foreach (ItemDataBlock.CombineRecipe recipe in block.Combinations)
                 {
-                    Contract.Assert(recipe != null);
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "\t" + recipe.ToString() + "\n");
                 }
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Icon: " + block.icon + "\n");
@@ -132,9 +122,6 @@ namespace Fougerite
                 if (block is BulletWeaponDataBlock)
                 {
                     BulletWeaponDataBlock block2 = (BulletWeaponDataBlock)block;
-                    Contract.Assert(block2 != null);
-                    Contract.Assert(block2.ammoType != null);
-
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Min Damage: " + block2.damageMin + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Max Damage: " + block2.damageMax + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Ammo: " + block2.ammoType.ToString() + "\n");
@@ -159,19 +146,16 @@ namespace Fougerite
 
         public StructureMaster CreateSM(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
             return this.CreateSM(p, p.X, p.Y, p.Z, p.PlayerClient.transform.rotation);
         }
 
         public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z)
         {
-            Contract.Requires(p != null);
             return this.CreateSM(p, x, y, z, Quaternion.identity);
         }
 
         public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z, Quaternion rot)
         {
-            Contract.Requires(p != null);
             StructureMaster master = NetCull.InstantiateClassic<StructureMaster>(Bundling.Load<StructureMaster>("content/structures/StructureMasterPrefab"), new Vector3(x, y, z), rot, 0);
             master.SetupCreator(p.PlayerClient.controllable);
             return master;
@@ -179,7 +163,6 @@ namespace Fougerite
 
         public Zone3D CreateZone(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
             return new Zone3D(name);
         }
 
@@ -253,8 +236,6 @@ namespace Fougerite
 
         public static World GetWorld()
         {
-            Contract.Ensures(Contract.Result<World>() != null);
-
             if (world == null)
             {
                 world = new World();
@@ -1114,31 +1095,21 @@ namespace Fougerite
 
         public object Spawn(string prefab, Vector3 location)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            
             return this.Spawn(prefab, location, 1);
         }
 
         public object Spawn(string prefab, Vector3 location, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-            
             return this.Spawn(prefab, location, Quaternion.identity, rep);
         }
 
         public object Spawn(string prefab, float x, float y, float z)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            
             return this.Spawn(prefab, x, y, z, 1);
         }
 
         private object Spawn(string prefab, Vector3 location, Quaternion rotation, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             object obj2 = null;
             for (int i = 0; i < rep; i++)
             {
@@ -1178,41 +1149,26 @@ namespace Fougerite
 
         public object Spawn(string prefab, float x, float y, float z, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, new Vector3(x, y, z), Quaternion.identity, rep);
         }
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-
             return this.Spawn(prefab, x, y, z, rot, 1);
         }
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, new Vector3(x, y, z), rot, rep);
         }
 
         public object SpawnAtPlayer(string prefab, Fougerite.Player p)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(p != null);
-
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, 1);
         }
 
         public object SpawnAtPlayer(string prefab, Fougerite.Player p, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(p != null);
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, rep);
         }
 

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Social
+﻿namespace RustPP.Social
 {
     using Fougerite;
     using System;
@@ -11,14 +9,11 @@ namespace RustPP.Social
     {
         public void AddFriend(string fName, ulong fUID)
         {
-            Contract.Requires(!string.IsNullOrEmpty(fName));
             this.Add(new Friend(fName, fUID));
         }
 
         public string GetRealName(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             foreach (Friend friend in this)
             {
                 if (name.ToLower() == friend.GetDisplayName().ToLower())
@@ -36,8 +31,6 @@ namespace RustPP.Social
 
         public bool isFriendWith(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             bool flag = false;
             foreach (Friend friend in this)
             {
@@ -124,8 +117,6 @@ namespace RustPP.Social
 
         public void RemoveFriend(string fName)
         {
-            Contract.Requires(!string.IsNullOrEmpty(fName));
-
             foreach (Friend friend in this)
             {
                 if (fName.ToLower() == friend.GetDisplayName().ToLower())
@@ -152,7 +143,7 @@ namespace RustPP.Social
         private class Friend
         {
             private string _displayName;
-            private readonly ulong _userID;
+            private ulong _userID;
 
             public Friend(string dName, ulong uID)
             {

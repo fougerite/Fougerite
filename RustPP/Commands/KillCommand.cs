@@ -5,7 +5,7 @@
 
     internal class KillCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)

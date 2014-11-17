@@ -14,11 +14,24 @@
     public class Plugin
     {
         public readonly JintEngine Engine;
-        public readonly string Name;
-        public readonly string Code;
-        public readonly DirectoryInfo RootDirectory;
-        public readonly Dictionary<String, TimedEvent> Timers;
+        {
+            get;
+        }
+        public string Name
+        {
+            get;
+            private set;
+        }
+        public string Code
+        {
+            get;
+            private set;
+        }
+        public DirectoryInfo RootDirectory
         private readonly string brktname = "[Magma]";
+            get;
+            private set;
+        }
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {
@@ -339,16 +352,20 @@
 
         public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
+                throw new ArgumentNullException("evt");
             Invoke("On_BlueprintUse", player, evt);
         }
 
         public void OnChat(Player player, ref ChatString text)
         {
+                throw new ArgumentNullException("text");
             Invoke("On_Chat", player, text);
         }
 
         public void OnCommand(Player player, string command, string[] args)
         {
+            if (args == null)
+                throw new ArgumentNullException("args");
             Invoke("On_Command", player, command, args);
         }
 
@@ -364,6 +381,7 @@
 
         public void OnDoorUse(Player player, DoorEvent evt)
         {
+                throw new ArgumentNullException("evt");
             Invoke("On_DoorUse", player, evt);
         }
 
@@ -409,6 +427,7 @@
 
         public void OnPlayerGathering(Player player, GatherEvent evt)
         {
+                throw new ArgumentNullException("evt");
             Invoke("On_PlayerGathering", player, evt);
         }
 
@@ -424,11 +443,13 @@
 
         public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
+                throw new ArgumentNullException("evt");
             Invoke("On_PlayerSpawning", player, evt);
         }
 
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
+                throw new ArgumentNullException("evt");
             Invoke("On_PlayerSpawned", player, evt);
         }
 

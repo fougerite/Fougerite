@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Permissions
+﻿namespace RustPP.Permissions
 {
     using Fougerite;
     using RustPP;
@@ -27,8 +25,6 @@ namespace RustPP.Permissions
 
         public Administrator(ulong userID, string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this._userid = userID;
             this._name = name;
             this._flags = new System.Collections.Generic.List<string>();
@@ -37,9 +33,6 @@ namespace RustPP.Permissions
 
         public Administrator(ulong userID, string name, string flags)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(flags != null);
-
             this._userid = userID;
             this._name = name;
             this._flags = new System.Collections.Generic.List<string>();
@@ -48,16 +41,11 @@ namespace RustPP.Permissions
 
         public static void AddAdmin(Administrator admin)
         {
-            Contract.Requires(admin != null);
-
             admins.Add(admin);
         }
 
         private static void AddFlagsToList(System.Collections.Generic.List<string> l, string str)
         {
-            Contract.Requires(l != null);
-            Contract.Requires(str != null);
-
             foreach (string str2 in str.Split(new char[] { '|' }))
             {
                 if (!l.Contains(str2.ToLower()))
@@ -86,8 +74,6 @@ namespace RustPP.Permissions
 
         public static string GetProperName(string flag)
         {
-            Contract.Requires(!string.IsNullOrEmpty(flag));
-
             foreach (string str in PermissionsFlags)
             {
                 if (str.ToLower() == flag.ToLower())
@@ -100,8 +86,6 @@ namespace RustPP.Permissions
 
         public bool HasPermission(string perm)
         {
-            Contract.Requires(!string.IsNullOrEmpty(perm));
-
             return (this.Flags.FindIndex(delegate(string x)
             {
                 return x.Equals(perm, StringComparison.OrdinalIgnoreCase);
@@ -122,8 +106,6 @@ namespace RustPP.Permissions
 
         public static bool IsValidFlag(string flag)
         {
-            Contract.Requires(!string.IsNullOrEmpty(flag));
-
             bool flag2 = false;
             foreach (string str in PermissionsFlags)
             {
@@ -137,8 +119,6 @@ namespace RustPP.Permissions
 
         public static void NotifyAdmins(string msg)
         {
-            Contract.Requires(msg != null);
-
             foreach (Administrator administrator in admins)
             {
                 try

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -9,22 +7,11 @@ namespace Fougerite
     public class Entity
     {
         public readonly bool hasInventory;
-        private readonly object _obj;
         private EntityInv inv;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_obj != null);
-            Contract.Invariant(_obj as StructureComponent != null || _obj as DeployableObject != null);
-        }
 
         public Entity(object Obj)
         {
-            Contract.Requires(Obj != null);
-            Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
-
-            this._obj = Obj;
+            this.Object = Obj;
 
             if (Obj is DeployableObject)
             {
@@ -241,6 +228,10 @@ namespace Fougerite
             get
             {
                 return this._obj;
+            }
+            set
+            {
+                this._obj = value;
             }
         }
 

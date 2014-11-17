@@ -8,7 +8,7 @@
 
     internal class BanCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)
@@ -70,16 +70,16 @@
             }
         }
 
-        public void PartialNameBan(Fougerite.Player p, int id)
+        public void PartialNameBan(ref ConsoleSystem.Arg Arguments, int id)
         {
-            if (Core.banWaitList.Contains(p.PlayerClient.userID))
+            if (Core.banWaitList.Contains(Arguments.argUser.userID))
             {
-                List<string> list = (List<string>)Core.banWaitList[p.PlayerClient.userID];
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.banWaitList[Arguments.argUser.userID];
                 string str = list[id];
                 if (id == 0)
                 {
                     Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
-                    Core.banWaitList.Remove(p.PlayerClient.userID);
+                    Core.banWaitList.Remove(Arguments.argUser.userID);
                 }
                 else
                 {
@@ -87,8 +87,8 @@
                     {
                         if (client.netUser.displayName == str)
                         {
-                            Core.banWaitList.Remove(p.PlayerClient.userID);
-                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
+                            Core.banWaitList.Remove(Arguments.argUser.userID);
+                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
                                 Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot ban an administrator!");
                             }

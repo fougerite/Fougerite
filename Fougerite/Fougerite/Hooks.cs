@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System.Linq;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
     using Fougerite.Events;
@@ -20,6 +17,7 @@ namespace Fougerite
         public static Hashtable talkerTimers = new Hashtable();
 
         public static event BlueprintUseHandlerDelegate OnBlueprintUse;
+        public static event ChatRecivedDelegate OnChatReceived;
         public static event ChatHandlerDelegate OnChat;
         public static event ChatRawHandlerDelegate OnChatRaw;
         public static event CommandHandlerDelegate OnCommand;
@@ -49,36 +47,31 @@ namespace Fougerite
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
-            Contract.Requires(item != null);
-            Contract.Requires(bdb != null);
-
-            if (item.controllable == null)
-                throw new InvalidOperationException("IBlueprintItem's controllable is null.");
-
-            if (item.controllable.playerClient == null)
-                throw new InvalidOperationException("IBlueprintItem's playerClient is null.");
-
             Fougerite.Player player = Fougerite.Player.FindByPlayerClient(item.controllable.playerClient);
-            if (player == null) return;
-
-            BPUseEvent ae = new BPUseEvent(bdb);
-            if (OnBlueprintUse != null)
-                OnBlueprintUse(player, ae);
-            if (ae.Cancel) return;
-
-            PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
-            if (internalInventory.BindBlueprint(bdb))
+            if (player != null)
             {
-                int count = 1;
-                if (item.Consume(ref count))
+                BPUseEvent ae = new BPUseEvent(bdb);
+                if (OnBlueprintUse != null)
                 {
-                    internalInventory.RemoveItem(item.slot);
+                    OnBlueprintUse(player, ae);
                 }
-                player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
-            }
-            else
-            {
-                player.Notice("", "You already have this blueprint", 4f);
+                if (!ae.Cancel)
+                {
+                    PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
+                    if (internalInventory.BindBlueprint(bdb))
+                    {
+                        int count = 1;
+                        if (item.Consume(ref count))
+                        {
+                            internalInventory.RemoveItem(item.slot);
+                        }
+                        player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
+                    }
+                    else
+                    {
+                        player.Notice("", "You already have this blueprint", 4f);
+                    }
+                }
             }
         }
 
@@ -86,19 +79,14 @@ namespace Fougerite
         {
             if (!chat.enabled)
                 return;
-
             if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
-
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
             var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0));
-
             if (OnChatRaw != null)
                 OnChatRaw(ref arg);
-
             if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
-
             if (quotedMessage.Trim('"').StartsWith("/")) {
                 Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
 
@@ -116,55 +104,28 @@ namespace Fougerite
             } else {
                 Logger.ChatLog(quotedName, quotedMessage);               
                 var chatstr = new ChatString(quotedMessage);
-
                 if(OnChat != null)
                     OnChat(new Player(arg.argUser.playerClient), ref chatstr);
 
                 string newchat = Facepunch.Utility.String.QuoteSafe(chatstr.NewText.Substring(1, chatstr.NewText.Length - 2)).Replace("\\\"", "" + '\u0022');
-
+                        {
                 if (string.IsNullOrEmpty(newchat))
                     return;
-
+                            {
                 Fougerite.Data.GetData().chat_history.Add(newchat);
                 Fougerite.Data.GetData().chat_history_username.Add(quotedName);                                                   
                 ConsoleNetworker.Broadcast("chat.add " + quotedName + " " + newchat);
-            }
-        }
-
-        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
-        {
-            Contract.Assume(a != null);
-            Contract.Assume(a.Class != null);
-            Contract.Assume(a.Function != null);
-
-            try
-            {
-                bool external = a.argUser == null;
-                bool adminRights = (a.argUser != null && a.argUser.admin) || external;
-
-                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
-                {
-                    if (adminRights)
-                    {
-                        ModuleManager.ReloadModules();
-                        a.ReplyWith("Fougerite: Reloaded!");
+                                ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
+                            }
+                        }
                     }
                 }
-                else if (OnConsoleReceived != null) 
-                    OnConsoleReceived(ref a, external);
-
-                if (string.IsNullOrEmpty(a.Reply))
-                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
-
-                return true;
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
-            return false;
         }
-
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
         {
             try
@@ -172,10 +133,37 @@ namespace Fougerite
                 DoorEvent de = new DoorEvent(new Entity(obj));
                 if (obj.ownerID == controllable.playerClient.userID)
                     de.Open = true;
-
                 if (!(obj is SleepingBag) && OnDoorUse != null)
                     OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
                 return de.Open;
+            }
+            return false;
+        }
+
+        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
+        {
+            try
+            {
+                if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
+                {
+                    a.ReplyWith("All Good!");
+                    return true;
+                }
+                bool external = a.argUser == null;
+                if (OnConsoleReceived != null)
+                    OnConsoleReceived(ref a, external);
+
+                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
+                {
+                    if (((a.argUser != null) && a.argUser.admin) || external)
+                    {
+                        ModuleManager.ReloadModules();
+                        a.ReplyWith("Fougerite: Reloaded!");
+                    }
+                }
+                if ((a.Reply == null) || (a.Reply == ""))
+                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+                return true;
             }
             catch (Exception ex)
             {
@@ -186,8 +174,6 @@ namespace Fougerite
 
         public static float EntityDecay(object entity, float dmg)
         {
-            Contract.Assume(entity != null);
-
             try
             {
                 DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
@@ -209,8 +195,6 @@ namespace Fougerite
 
         public static void EntityDeployed(object entity)
         {
-            Contract.Assume(entity != null);
-
             try
             {
                 Entity e = new Entity(entity);
@@ -227,8 +211,6 @@ namespace Fougerite
 
         public static void EntityHurt(object entity, ref DamageEvent e)
         {
-            Contract.Assume(entity != null);
-
             try
             {
                 HurtEvent he = new HurtEvent(ref e, new Entity(entity));
@@ -265,6 +247,26 @@ namespace Fougerite
                         damage2.health -= he.DamageAmount;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        public static void handleCommand(ref ConsoleSystem.Arg arg)
+        {
+            try
+            {
+                string displayname = arg.argUser.user.Displayname;
+                string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
+                string text = strArray[0].Trim().Remove(0, 1);
+                string[] args = new string[strArray.Length - 1];
+                for (int i = 1; i < strArray.Length; i++)
+                    args[i - 1] = strArray[i].Trim();
+
+                if (OnCommand != null)
+                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
             }
             catch (Exception ex)
             {

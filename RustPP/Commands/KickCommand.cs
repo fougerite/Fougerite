@@ -8,7 +8,7 @@
 
     internal class KickCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)
@@ -67,16 +67,16 @@
             }
         }
 
-        public void PartialNameKick(Fougerite.Player p, int id)
+        public void PartialNameKick(ref ConsoleSystem.Arg Arguments, int id)
         {
-            if (Core.kickWaitList.Contains(p.PlayerClient.userID))
+            if (Core.kickWaitList.Contains(Arguments.argUser.userID))
             {
-                List<string> list = (List<string>)Core.kickWaitList[p.PlayerClient.userID];
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.kickWaitList[Arguments.argUser.userID];
                 string str = list[id];
                 if (id == 0)
                 {
                     Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
+                    Core.kickWaitList.Remove(Arguments.argUser.userID);
                 }
                 else
                 {
@@ -84,8 +84,8 @@
                     {
                         if (client.netUser.displayName == str)
                         {
-                            Core.kickWaitList.Remove(p.PlayerClient.userID);
-                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
+                            Core.kickWaitList.Remove(Arguments.argUser.userID);
+                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
                                 Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot kick an administrator!");
                             }
@@ -97,7 +97,7 @@
                             break;
                         }
                     }
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
+                    Core.kickWaitList.Remove(Arguments.argUser.userID);
                 }
             }
         }

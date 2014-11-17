@@ -1,13 +1,11 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP
+﻿namespace RustPP
 {
     using System;
     using System.Collections.Generic;
 
     public class PList
     {
-        private readonly List<Player> players;
+        private List<Player> players;
 
         public PList()
         {
@@ -16,21 +14,11 @@ namespace RustPP
 
         public PList(List<Player> pl)
         {
-            Contract.Requires(pl != null);
-
             this.players = pl;
-        }
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(players != null);
         }
 
         public void Add(ulong uid, string dname)
         {
-            Contract.Requires(!string.IsNullOrEmpty(dname));
-
             this.players.Add(new Player(uid, dname));
         }
 

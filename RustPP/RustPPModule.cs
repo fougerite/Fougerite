@@ -82,6 +82,7 @@ namespace RustPP
             Fougerite.Hooks.OnShowTalker += ShowTalker;
             Fougerite.Hooks.OnChatRaw += ChatReceived;
             Fougerite.Hooks.OnCommandRaw += HandleCommand;
+            Fougerite.Hooks.OnChatReceived += new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
         }
 
         public override void DeInitialize()
@@ -98,6 +99,7 @@ namespace RustPP
             Fougerite.Hooks.OnShowTalker -= ShowTalker;
             Fougerite.Hooks.OnChatRaw -= ChatReceived;
             Fougerite.Hooks.OnCommandRaw -= HandleCommand;
+            Fougerite.Hooks.OnChatReceived -= new Fougerite.Hooks.ChatRecivedDelegate(ChatReceived);
             
             Logger.LogDebug("DeInitialized RPP");
         }
@@ -125,23 +127,38 @@ namespace RustPP
         {
             Fougerite.Player p = new Fougerite.Player(arg.argUser.playerClient);
 
-            var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
-            if (command.GetTPWaitList().Contains(p.PlayerClient.userID))
+            TeleportToCommand command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
+            if (command.GetTPWaitList().Contains(arg.argUser.userID))
             {
                 command.PartialNameTP(p, arg.GetInt(0));
                 arg.ArgsStr = string.Empty;
+                {
+                    command.PartialNameTP(ref arg, num);
+                }
+                arg = null;
             }
-            else if (Core.banWaitList.Contains(p.PlayerClient.userID))
+            else if (Core.banWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(p, arg.GetInt(0));
                 arg.ArgsStr = string.Empty;
+                arg = null;
             }
-            else if (Core.kickWaitList.Contains(p.PlayerClient.userID))
+            else if (Core.kickWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(p, arg.GetInt(0));  
                 arg.ArgsStr = string.Empty;
+                }
+                arg = null;
             }
+            else if (((str != null) && (str.Length > 1)) && str.Substring(1, 1).Equals("/"))
+            {
+                if (Core.IsEnabled())
+                    Core.handleCommand(ref arg);
+            }
+        }
 
+        void Chat(Fougerite.Player p, ref ChatString text)
+        {
             if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
             {
                 arg.ArgsStr = string.Empty;

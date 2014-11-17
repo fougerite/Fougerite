@@ -75,7 +75,7 @@
             {
                 chatArgs[i - 1] = strArray[i];
             }
-            ChatCommand.CallCommand(cmd, arg, chatArgs);
+            ChatCommand.CallCommand(cmd, ref arg, ref chatArgs);
         }
 
         private static void InitializeCommands()

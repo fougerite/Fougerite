@@ -1,5 +1,3 @@
-using System.Diagnostics.Contracts;
-
 namespace Fougerite
 {
     using Facepunch;
@@ -71,13 +69,11 @@ namespace Fougerite
         {
             string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
             Config.Init(FougeriteDirectoryConfig);
-            Logger.Init();
-
-            Contract.ContractFailed += (sender, args) => args.SetUnwind();
-
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
 
+            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
+            Logger.Init();
 
             if (ApplyOptions()) {
                 ModuleManager.LoadModules();

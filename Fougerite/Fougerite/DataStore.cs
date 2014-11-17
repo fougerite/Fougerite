@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -10,15 +8,9 @@ namespace Fougerite
 
     public class DataStore
     {
-        public readonly Hashtable datastore = new Hashtable();
+        public Hashtable datastore = new Hashtable();
         private static DataStore instance;
         public static string PATH = Path.Combine(Config.GetPublicFolder(), "FougeriteDatastore.ds");
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(datastore != null);
-        }
 
         private object StringifyIfVector3(object keyorval)
         {
@@ -100,11 +92,9 @@ namespace Fougerite
 
         public void Add(string tablename, object key, object val)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
 
             if (key == null)
                 key = "NullReference";
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -116,11 +106,9 @@ namespace Fougerite
 
         public bool ContainsKey(string tablename, object key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
 
             if (key == null)
                 return false;
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -131,8 +119,6 @@ namespace Fougerite
 
         public bool ContainsValue(string tablename, object val)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -143,8 +129,6 @@ namespace Fougerite
 
         public int Count(string tablename)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -155,8 +139,6 @@ namespace Fougerite
 
         public void Flush(string tablename)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             if (((Hashtable)this.datastore[tablename]) != null)
             {
                 this.datastore.Remove(tablename);
@@ -165,11 +147,9 @@ namespace Fougerite
 
         public object Get(string tablename, object key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
 
             if (key == null)
                 return null;
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {
@@ -180,8 +160,6 @@ namespace Fougerite
 
         public static DataStore GetInstance()
         {
-            Contract.Ensures(Contract.Result<DataStore>() != null);
-
             if (instance == null)
             {
                 instance = new DataStore();
@@ -191,8 +169,6 @@ namespace Fougerite
 
         public Hashtable GetTable(string tablename)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null) {
                 return null;
@@ -206,8 +182,6 @@ namespace Fougerite
 
         public object[] Keys(string tablename)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null) {
                 return null;
@@ -226,11 +200,7 @@ namespace Fougerite
                 try
                 {
                     Hashtable hashtable = Util.HashtableFromFile(PATH);
-
-                    this.datastore.Clear();
-                    foreach (DictionaryEntry entry in hashtable)
-                        this.datastore[entry.Key] = entry.Value;
-
+                    this.datastore = hashtable;
                     Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
                 }
                 catch (Exception ex)
@@ -242,11 +212,9 @@ namespace Fougerite
 
         public void Remove(string tablename, object key)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
 
             if (key == null)
                 return;
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable != null)
             {
@@ -265,8 +233,6 @@ namespace Fougerite
 
         public object[] Values(string tablename)
         {
-            Contract.Requires(!string.IsNullOrEmpty(tablename));
-
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null) {
                 return null;

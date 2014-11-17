@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,10 +14,7 @@ namespace Fougerite
 
         public static void Init(string DirectoryConfigPath)
         {
-            Contract.Requires(!string.IsNullOrEmpty(DirectoryConfigPath));
             Contract.Ensures(FougeriteDirectoryConfig != null);
-            Contract.Ensures(FougeriteConfig != null);
-
             if (File.Exists(DirectoryConfigPath))
             {
                 FougeriteDirectoryConfig = new IniParser(DirectoryConfigPath);
@@ -38,20 +34,12 @@ namespace Fougerite
 
         public static string GetValue(string Section, string Setting)
         {
-            Contract.Requires(!string.IsNullOrEmpty(Section));
-            Contract.Requires(!string.IsNullOrEmpty(Setting));
-
             return FougeriteConfig.GetSetting(Section, Setting);
         }
 
         public static bool GetBoolValue(string Section,string Setting)
         {
-            Contract.Requires(!string.IsNullOrEmpty(Section));
-            Contract.Requires(!string.IsNullOrEmpty(Setting));
-
-            var val = FougeriteConfig.GetSetting(Section, Setting);
-
-            return val != null && val.ToLower() == "true";
+            return Config.FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
         }
 
         public static string GetModulesFolder()

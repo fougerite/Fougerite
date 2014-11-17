@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -10,35 +8,19 @@ namespace RustPP.Commands
 
     public abstract class ChatCommand
     {
-        private static readonly List<ChatCommand> classInstances = new List<ChatCommand>();
-
         private string _adminFlags;
         private bool _adminRestricted;
         private string _cmd;
-
-        [ContractInvariantMethod]
-        private static void StaticInvariant()
-        {
-            Contract.Invariant(classInstances != null);
-            Contract.Invariant(Contract.ForAll(classInstances, command => command != null));
-            Contract.Invariant(Contract.ForAll(classInstances, command => command.Command != null));
-        }
+        private static System.Collections.Generic.List<ChatCommand> classInstances = new System.Collections.Generic.List<ChatCommand>();
 
         public static void AddCommand(string cmdString, ChatCommand command)
         {
-            Contract.Requires(!string.IsNullOrEmpty(cmdString));
-            Contract.Requires(command != null);
-
             command.Command = cmdString;
             classInstances.Add(command);
         }
 
-        public static void CallCommand(string cmd, ConsoleSystem.Arg arg, string[] chatArgs)
+        public static void CallCommand(string cmd, ref ConsoleSystem.Arg arg, ref string[] chatArgs)
         {
-            Contract.Requires(!string.IsNullOrEmpty(cmd));
-            Contract.Requires(arg != null);
-            Contract.Requires(arg.argUser != null);
-            Contract.Requires(chatArgs != null);
             Logger.LogDebug(string.Format("[CallCommand] cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
             foreach (ChatCommand command in classInstances)
             {
@@ -58,7 +40,6 @@ namespace RustPP.Commands
                                 if (arg.argUser.admin)
                                 {
                                     Logger.LogDebug(string.Format("[CallCommand] arg.argUser.admin cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
-                                    command.Execute(arg, chatArgs);
                                 }
                                 else
                                 {
@@ -72,7 +53,6 @@ namespace RustPP.Commands
                                 {
                                     Logger.LogDebug(string.Format("[CallCommand] hasPermission cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
                                     try {
-                                    command.Execute(arg, chatArgs);
                                     } catch(Exception ex) {
                                         Logger.LogException(ex);
                                     }
@@ -92,7 +72,6 @@ namespace RustPP.Commands
                         else
                         {
                             Logger.LogDebug(string.Format("[CallCommand] else cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
-                            command.Execute(arg, chatArgs);
                         }
                     }
                     Logger.LogDebug(string.Format("[CallCommand] break cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
@@ -101,12 +80,7 @@ namespace RustPP.Commands
             }
         }
 
-        public virtual void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
-        {
-            Contract.Requires(Arguments != null);
-            Contract.Requires(ChatArguments != null);
-        }
-
+        public abstract void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments);
         public static ChatCommand GetCommand(string cmdString)
         {
             foreach (ChatCommand command in classInstances)

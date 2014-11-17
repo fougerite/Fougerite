@@ -1,31 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
 public class IniParser
 {
-    private readonly string iniFilePath;
-    private readonly Hashtable keyPairs = new Hashtable();
-    private readonly List<SectionPair> tmpList = new List<SectionPair>();
-
-    public readonly string Name;
-
-    [ContractInvariantMethod]
-    private void Invariant()
-    {
-        Contract.Invariant(!string.IsNullOrEmpty(iniFilePath));
-        Contract.Invariant(keyPairs != null);
-        Contract.Invariant(tmpList != null);
-        Contract.Invariant(!string.IsNullOrEmpty(Name));
-    }
+    private string iniFilePath;
+    private Hashtable keyPairs = new Hashtable();
+    public string Name;
+    private System.Collections.Generic.List<SectionPair> tmpList = new System.Collections.Generic.List<SectionPair>();
 
     public IniParser(string iniPath)
     {
-		Contract.Requires(!string.IsNullOrEmpty(iniPath));
         string str2 = null;
         this.iniFilePath = iniPath;
         this.Name = Path.GetFileNameWithoutExtension(iniPath);
@@ -69,17 +57,11 @@ public class IniParser
 
     public void AddSetting(string sectionName, string settingName)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-        Contract.Requires(!string.IsNullOrEmpty(settingName));
-
         this.AddSetting(sectionName, settingName, string.Empty);
     }
 
     public void AddSetting(string sectionName, string settingName, string settingValue)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-        Contract.Requires(!string.IsNullOrEmpty(settingName));
-
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -105,9 +87,6 @@ public class IniParser
 
     public void DeleteSetting(string sectionName, string settingName)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-        Contract.Requires(!string.IsNullOrEmpty(settingName));
-
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -120,8 +99,6 @@ public class IniParser
 
     public string[] EnumSection(string sectionName)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-
         List<string> list = new List<string>();
         foreach (SectionPair pair in this.tmpList)
         {
@@ -154,9 +131,6 @@ public class IniParser
 
     public string GetSetting(string sectionName, string settingName)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-        Contract.Requires(!string.IsNullOrEmpty(settingName));
-
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
@@ -170,8 +144,6 @@ public class IniParser
 
     public bool isCommandOn(string cmdName)
     {
-        Contract.Requires(!string.IsNullOrEmpty(cmdName));
-
         return this.GetBoolSetting("Commands", cmdName);
     }
 
@@ -182,8 +154,6 @@ public class IniParser
 
     public void SaveSettings(string newFilePath)
     {
-        Contract.Requires(!string.IsNullOrEmpty(newFilePath));
-
         ArrayList list = new ArrayList();
         string str = "";
         string str2 = "";
@@ -221,9 +191,6 @@ public class IniParser
 
     public void SetSetting(string sectionName, string settingName, string value)
     {
-        Contract.Requires(!string.IsNullOrEmpty(sectionName));
-        Contract.Requires(!string.IsNullOrEmpty(settingName));
-
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;

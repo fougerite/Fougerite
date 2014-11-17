@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using Rust;
@@ -8,7 +6,7 @@ namespace RustPP.Commands
 
     public class AnnounceCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             if (ChatArguments != null)
             {

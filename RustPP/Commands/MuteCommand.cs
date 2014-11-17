@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -8,30 +6,33 @@ namespace RustPP.Commands
 
     internal class MuteCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = String.Join(" ", ChatArguments).Trim();
-
-            Contract.Assume(PlayerClient.All != null);
-            Contract.Assume(Contract.ForAll(PlayerClient.All, p => p != null));
-
-            foreach (PlayerClient client in PlayerClient.All)
+            string str = "";
+            for (int i = 0; i < ChatArguments.Length; i++)
             {
-                if (client.netUser.displayName.ToLower() != str.ToLower()) continue;
-
-                if (!Core.muteList.Contains(client.userID))
-                {
-                    Core.muteList.Add(client.userID);
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " has been muted!");
-                }
-                else
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already muted.");
-                }
-                return;
+                str = str + ChatArguments[i] + " ";
             }
+            str = str.Trim();
+            if (((ChatArguments != null) || (str == "")) && (str != ""))
+            {
+                foreach (PlayerClient client in PlayerClient.All)
+                {
+                    if (client.netUser.displayName.ToLower() == str.ToLower())
+                    {
+                        if (!Core.muteList.Contains(client.userID))
+                        {
+                            Core.muteList.Add(client.userID);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " has been muted!");
+                        }
+                        else
+                        {
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already muted.");
+                        }
+                        return;
+                    }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
-            
+            }
         }
     }
 }

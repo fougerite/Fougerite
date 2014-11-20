@@ -1,7 +1,6 @@
 # Fougerite project
 
-Fougerite a fully compatible with Magma server mod, featuring better performance and C# plugins.   
-
+Fougerite a fully compatible with Magma server mod, featuring better performance with Python and C# plugins.   
 
 ## Compilation
 * Compile Fougerite.Patcher.
@@ -20,13 +19,17 @@ Fougerite a fully compatible with Magma server mod, featuring better performance
 * If you using Magma copy your plugins from the "save" folder to: "Server_Folder\Fougerite\" (main server's folder, if "Fougerite" folder doesn't exist, just create it) and read read WARNINGs.  
 * Launch your server.  
 
-**WARNING:** If you using Magma you must extract all your files from "save" to main server folder (with rust_server.exe) if you using Magma.  
-Plugins must be placed in "Server_Folder\Fougerite\" - for example "Server\Fougerite\SuperPlugin\SuperPlugin.js"  
+**WARNING:** If you using Magma you must extract all your files from "save" to main server folder (with rust_server.exe).  
+Plugins must be placed in "Server_Folder\Fougerite\MagmaPlugin" - for example "Server\Fougerite\MagmaPlugin\SuperPlugin.js"  
+Other Plugins and Modules will have their own folders here, too.  See Fougerite.cfg.
 
-Use Git Issues system to report bugs, please. Or send an email to rowneg@bk.ru. 
+Come play on the Official Fougerite Rust server at rust.clandestina.la:28025 (192.200.111.163:28025)
+
+Use Git Issues system to report bugs, please. 
 Please visit [our forum](http://fougerite.com/) for more information.
 
 ***
 ###### Developed by EquiFox & xEnt (Rust++ and Magma)
 ###### Forked by Riketta (Zumwalt Project)
 ###### Renamed by Alexknvl (from "Zumwalt" to "Fougerite")
+###### 19-NOV-2014: Contributions and on-going maintenance undertaken by Team Pluton

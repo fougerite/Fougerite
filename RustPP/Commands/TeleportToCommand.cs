@@ -77,7 +77,7 @@
                 string str = list[choice];
                 if (choice == 0)
                 {
-                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
                     tpWaitList.Remove(Arguments.argUser.userID);
                 }
                 else

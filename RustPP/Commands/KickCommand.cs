@@ -75,7 +75,7 @@
                 string str = list[id];
                 if (id == 0)
                 {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
                     Core.kickWaitList.Remove(Arguments.argUser.userID);
                 }
                 else
@@ -87,7 +87,7 @@
                             Core.kickWaitList.Remove(Arguments.argUser.userID);
                             if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
                             {
-                                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot kick an administrator!");
+                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You cannot kick an administrator!");
                             }
                             else
                             {

@@ -193,9 +193,6 @@
       <HintPath>..\References\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Contracts">
-      <HintPath>..\References\Microsoft.Contracts.dll</HintPath>
-    </Reference>
     <Reference Include="Facepunch.ID">
       <HintPath>..\References\Facepunch.ID.dll</HintPath>
       <Private>False</Private>
@@ -235,5 +232,4 @@
   <ItemGroup>
     <None Include="Jint\Jint.snk" />
   </ItemGroup>
-</Project>
 </Project>

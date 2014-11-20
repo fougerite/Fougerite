@@ -14,24 +14,11 @@
     public class Plugin
     {
         public readonly JintEngine Engine;
-        {
-            get;
-        }
-        public string Name
-        {
-            get;
-            private set;
-        }
-        public string Code
-        {
-            get;
-            private set;
-        }
-        public DirectoryInfo RootDirectory
+        public string Name;
+        public string Code;
+        public DirectoryInfo RootDirectory;
+        public readonly Dictionary<String, TimedEvent> Timers;
         private readonly string brktname = "[Magma]";
-            get;
-            private set;
-        }
 
         public Plugin(DirectoryInfo directory, string name, string code)
         {

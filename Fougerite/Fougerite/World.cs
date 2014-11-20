@@ -22,7 +22,7 @@
         {
             for (int i = 0; i < rep; i++)
             {
-                SupplyDropZone.CallAirDrop();
+                SupplyDropZone.CallAirDropAt(RandomPointOnGround());
             }
         }
 
@@ -90,7 +90,7 @@
             {
                 x = rand.Next(3600, 6700);
             }
-            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500f, z));
+            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500, z));
             return new Vector3(x, y, z);
         }
 

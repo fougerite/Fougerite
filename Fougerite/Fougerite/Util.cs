@@ -266,15 +266,19 @@
             return null;
         }
 
-        public Entity GetEntityatCoords(Vector3 GivenEntity)
+        public Entity GetEntityatCoords(Vector3 givenPosition)
         {
             World world = World.GetWorld();
-            foreach (var ent in world.Entities) {
+            foreach (Entity ent in world.Entities) {
                 if (ent.Name != "MetalDoor" && ent.Name != "WoodDoor") {
+                    if (((GameObject)ent.Object).gameObject.transform.position == givenPosition)
+                        return ent;
+                    /*
                     var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
                     var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
                     if (Distance < 0.1f)
                         return ent;
+                   */
                 }
             }
             return null;

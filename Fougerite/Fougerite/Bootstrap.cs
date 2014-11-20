@@ -10,7 +10,7 @@ namespace Fougerite
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.5(MC6)";
+        public static string Version = "1.0.5(MC7)";
 
         public static void AttachBootstrap()
         {
@@ -69,11 +69,10 @@ namespace Fougerite
         {
             string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
             Config.Init(FougeriteDirectoryConfig);
+            Logger.Init();
+
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
-
-            Config.Init(Fougerite.Data.PATH + "Fougerite.cfg");
-            Logger.Init();
 
             if (ApplyOptions()) {
                 ModuleManager.LoadModules();

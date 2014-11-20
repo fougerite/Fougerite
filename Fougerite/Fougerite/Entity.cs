@@ -7,11 +7,12 @@
     public class Entity
     {
         public readonly bool hasInventory;
+        private readonly object _obj;
         private EntityInv inv;
 
         public Entity(object Obj)
         {
-            this.Object = Obj;
+            this._obj = Obj;
 
             if (Obj is DeployableObject)
             {
@@ -228,10 +229,6 @@
             get
             {
                 return this._obj;
-            }
-            set
-            {
-                this._obj = value;
             }
         }
 

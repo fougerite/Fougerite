@@ -8,6 +8,7 @@
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading;
+    using System.Linq;
     using uLink;
     using UnityEngine;
 
@@ -17,7 +18,6 @@
         public static Hashtable talkerTimers = new Hashtable();
 
         public static event BlueprintUseHandlerDelegate OnBlueprintUse;
-        public static event ChatRecivedDelegate OnChatReceived;
         public static event ChatHandlerDelegate OnChat;
         public static event ChatRawHandlerDelegate OnChatRaw;
         public static event CommandHandlerDelegate OnCommand;
@@ -79,14 +79,18 @@
         {
             if (!chat.enabled)
                 return;
+
             if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
+
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
             var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0));
             if (OnChatRaw != null)
                 OnChatRaw(ref arg);
+
             if (string.IsNullOrEmpty(arg.ArgsStr))
                 return;
+
             if (quotedMessage.Trim('"').StartsWith("/")) {
                 Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
 
@@ -108,24 +112,46 @@
                     OnChat(new Player(arg.argUser.playerClient), ref chatstr);
 
                 string newchat = Facepunch.Utility.String.QuoteSafe(chatstr.NewText.Substring(1, chatstr.NewText.Length - 2)).Replace("\\\"", "" + '\u0022');
-                        {
+
                 if (string.IsNullOrEmpty(newchat))
                     return;
-                            {
+
                 Fougerite.Data.GetData().chat_history.Add(newchat);
                 Fougerite.Data.GetData().chat_history_username.Add(quotedName);                                                   
                 ConsoleNetworker.Broadcast("chat.add " + quotedName + " " + newchat);
-                                ConsoleNetworker.Broadcast("chat.add " + item + " " + str);
-                            }
-                        }
+            }
+        }
+
+        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
+        {
+            try
+            {
+                bool external = a.argUser == null;
+                bool adminRights = (a.argUser != null && a.argUser.admin) || external;
+
+                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
+                {
+                    if (adminRights)
+                    {
+                        ModuleManager.ReloadModules();
+                        a.ReplyWith("Fougerite: Reloaded!");
                     }
                 }
+                else if (OnConsoleReceived != null) 
+                    OnConsoleReceived(ref a, external);
+
+                if (string.IsNullOrEmpty(a.Reply))
+                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+
+                return true;
             }
             catch (Exception ex)
             {
                 Logger.LogException(ex);
             }
+            return false;
         }
+
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
         {
             try
@@ -133,37 +159,11 @@
                 DoorEvent de = new DoorEvent(new Entity(obj));
                 if (obj.ownerID == controllable.playerClient.userID)
                     de.Open = true;
+
                 if (!(obj is SleepingBag) && OnDoorUse != null)
                     OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
+
                 return de.Open;
-            }
-            return false;
-        }
-
-        public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
-        {
-            try
-            {
-                if (((a.argUser == null) && (a.Class == "fougeriteweb")) && (a.Function == "handshake"))
-                {
-                    a.ReplyWith("All Good!");
-                    return true;
-                }
-                bool external = a.argUser == null;
-                if (OnConsoleReceived != null)
-                    OnConsoleReceived(ref a, external);
-
-                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
-                {
-                    if (((a.argUser != null) && a.argUser.admin) || external)
-                    {
-                        ModuleManager.ReloadModules();
-                        a.ReplyWith("Fougerite: Reloaded!");
-                    }
-                }
-                if ((a.Reply == null) || (a.Reply == ""))
-                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
-                return true;
             }
             catch (Exception ex)
             {

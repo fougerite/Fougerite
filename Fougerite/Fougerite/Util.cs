@@ -80,7 +80,6 @@
 
         public static string GetAbsoluteFilePath(string fileName)
         {
-            Contract.Requires(!string.IsNullOrEmpty(fileName));
             return Path.Combine(Config.GetPublicFolder(), fileName);
         }
 
@@ -196,9 +195,6 @@
 
         public static void sayAll(string customName, string arg)
         {
-            Contract.Requires(!string.IsNullOrEmpty(customName));
-            Contract.Requires(arg != null);
-
             ConsoleNetworker.Broadcast("chat.add " + Facepunch.Utility.String.QuoteSafe(customName) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 

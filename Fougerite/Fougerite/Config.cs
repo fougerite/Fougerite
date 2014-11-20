@@ -14,7 +14,6 @@ namespace Fougerite
 
         public static void Init(string DirectoryConfigPath)
         {
-            Contract.Ensures(FougeriteDirectoryConfig != null);
             if (File.Exists(DirectoryConfigPath))
             {
                 FougeriteDirectoryConfig = new IniParser(DirectoryConfigPath);

@@ -339,13 +339,11 @@
 
         public void OnBlueprintUse(Player player, BPUseEvent evt)
         {
-                throw new ArgumentNullException("evt");
             Invoke("On_BlueprintUse", player, evt);
         }
 
         public void OnChat(Player player, ref ChatString text)
         {
-                throw new ArgumentNullException("text");
             Invoke("On_Chat", player, text);
         }
 
@@ -368,7 +366,6 @@
 
         public void OnDoorUse(Player player, DoorEvent evt)
         {
-                throw new ArgumentNullException("evt");
             Invoke("On_DoorUse", player, evt);
         }
 
@@ -414,7 +411,6 @@
 
         public void OnPlayerGathering(Player player, GatherEvent evt)
         {
-                throw new ArgumentNullException("evt");
             Invoke("On_PlayerGathering", player, evt);
         }
 
@@ -430,13 +426,11 @@
 
         public void OnPlayerSpawn(Player player, SpawnEvent evt)
         {
-                throw new ArgumentNullException("evt");
             Invoke("On_PlayerSpawning", player, evt);
         }
 
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
-                throw new ArgumentNullException("evt");
             Invoke("On_PlayerSpawned", player, evt);
         }
 

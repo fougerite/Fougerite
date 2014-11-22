@@ -98,6 +98,7 @@
     <None Include="Configs\Rust++.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Configs\Localities.ini" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">

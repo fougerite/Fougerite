@@ -125,7 +125,7 @@ namespace Anticheat
             Hooks.OnServerShutdown += ServerShutdown;
             Hooks.OnShowTalker += ShowTalker;
             Hooks.OnChat += Chat;
-            Hooks.OnChatReceived += new Hooks.ChatRecivedDelegate(ChatReceived);
+            Hooks.OnChatRaw += new Hooks.ChatRawHandlerDelegate(ChatReceived);
         }
 
         public override void DeInitialize()
@@ -151,7 +151,7 @@ namespace Anticheat
             Hooks.OnServerShutdown -= ServerShutdown;
             Hooks.OnShowTalker -= ShowTalker;
             Hooks.OnChat -= Chat;
-            Hooks.OnChatReceived -= new Hooks.ChatRecivedDelegate(ChatReceived);
+            Hooks.OnChatRaw -= new Hooks.ChatRawHandlerDelegate(ChatReceived);
         }
 
         #endregion

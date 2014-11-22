@@ -85,6 +85,9 @@
 
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
             var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0));
+            if (quotedMessage.Trim('"').StartsWith("/"))
+                Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
+
             if (OnChatRaw != null)
                 OnChatRaw(ref arg);
 
@@ -92,18 +95,13 @@
                 return;
 
             if (quotedMessage.Trim('"').StartsWith("/")) {
-                Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
-
-                if (OnCommandRaw != null)
-                    OnCommandRaw(ref arg);
-
                 string[] args = Facepunch.Utility.String.SplitQuotesStrings(quotedMessage.Trim('"'));
                 var command = args[0].TrimStart('/');
                 var cargs = new string[args.Length - 1];
                 Array.Copy(args, 1, cargs, 0, cargs.Length);
 
                 if (OnCommand != null)
-                    OnCommand(new Player(arg.argUser.playerClient), command, cargs);
+                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), command, cargs);
 
             } else {
                 Logger.ChatLog(quotedName, quotedMessage);               
@@ -124,52 +122,36 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-            try
-            {
-                bool external = a.argUser == null;
-                bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
-                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
-                {
-                    if (adminRights)
-                    {
-                        ModuleManager.ReloadModules();
-                        a.ReplyWith("Fougerite: Reloaded!");
-                    }
+            bool external = a.argUser == null;
+            bool adminRights = (a.argUser != null && a.argUser.admin) || external;
+
+            if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload")) {
+                if (adminRights) {
+                    ModuleManager.ReloadModules();
+                    a.ReplyWith("Fougerite: Reloaded!");
                 }
-                else if (OnConsoleReceived != null) 
-                    OnConsoleReceived(ref a, external);
+            } else if (OnConsoleReceived != null)
+                OnConsoleReceived(ref a, external);
 
-                if (string.IsNullOrEmpty(a.Reply))
-                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+            if (string.IsNullOrEmpty(a.Reply))
+                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return false;
+            return true;
+
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
         {
-            try
-            {
-                DoorEvent de = new DoorEvent(new Entity(obj));
-                if (obj.ownerID == controllable.playerClient.userID)
-                    de.Open = true;
+            DoorEvent de = new DoorEvent(new Entity(obj));
+            if (obj.ownerID == controllable.playerClient.userID)
+                de.Open = true;
 
-                if (!(obj is SleepingBag) && OnDoorUse != null)
-                    OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
+            if (!(obj is SleepingBag) && OnDoorUse != null)
+                OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
 
-                return de.Open;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return false;
+            return de.Open;
+           
         }
 
         public static float EntityDecay(object entity, float dmg)
@@ -195,18 +177,11 @@
 
         public static void EntityDeployed(object entity)
         {
-            try
-            {
-                Entity e = new Entity(entity);
-                Fougerite.Player creator = e.Creator;
+            Entity e = new Entity(entity);
+            Fougerite.Player creator = e.Creator;
 
-                if (OnEntityDeployed != null)
-                    OnEntityDeployed(creator, e);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            if (OnEntityDeployed != null)
+                OnEntityDeployed(creator, e);
         }
 
         public static void EntityHurt(object entity, ref DamageEvent e)
@@ -247,26 +222,6 @@
                         damage2.health -= he.DamageAmount;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-        }
-
-        public static void handleCommand(ref ConsoleSystem.Arg arg)
-        {
-            try
-            {
-                string displayname = arg.argUser.user.Displayname;
-                string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
-                string text = strArray[0].Trim().Remove(0, 1);
-                string[] args = new string[strArray.Length - 1];
-                for (int i = 1; i < strArray.Length; i++)
-                    args[i - 1] = strArray[i].Trim();
-
-                if (OnCommand != null)
-                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), text, args);
             }
             catch (Exception ex)
             {
@@ -340,30 +295,24 @@
         public static bool PlayerConnect(NetUser user)
         {
             bool connected = false;
-            try
-            {
-                if (user.playerClient == null)
-                {
-                    Logger.LogDebug("PlayerConnect user.playerClient is null");
-                    return false;
-                }
-                Fougerite.Player item = new Fougerite.Player(user.playerClient);
-                Fougerite.Server.GetServer().Players.Add(item);
-                Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
-                                item.PlayerClient.netPlayer.ipAddress + ")");
-                if (OnPlayerConnected != null)
-                    OnPlayerConnected(item);
 
-                connected = user.connected;
-                if (Fougerite.Config.GetValue("Fougerite", "tellversion") != "false")
-                    item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+            if (user.playerClient == null) {
+                Logger.LogDebug("PlayerConnect user.playerClient is null");
+                return false;
+            }
+            Fougerite.Player item = new Fougerite.Player(user.playerClient);
+            Fougerite.Server.GetServer().Players.Add(item);
+            Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
+            item.PlayerClient.netPlayer.ipAddress + ")");
+            if (OnPlayerConnected != null)
+                OnPlayerConnected(item);
 
-                return connected;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            connected = user.connected;
+            if (Fougerite.Config.GetValue("Fougerite", "tellversion") != "false")
+                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+
+            return connected;
+
             return connected;
         }
 

@@ -51,13 +51,14 @@
         {
             Vector3 original = target;
             System.Random rand = new System.Random();
-            int reset = 20;
+            int r, reset;
+            r = reset = 20;
             for (int i = 0; i < rep; i++)
             {
-                reset--;
-                if (reset == 0)
+                r--;
+                if (r == 0)
                 {
-                    reset = 20;
+                    r = reset;
                     target = original;
                 }
                 target.y = original.y + rand.Next(-5, 20) * 20;

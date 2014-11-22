@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using UnityEngine;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using UnityEngine;
+
     public class Config
     {
         public static IniParser FougeriteDirectoryConfig;
@@ -36,7 +36,7 @@ namespace Fougerite
             return FougeriteConfig.GetSetting(Section, Setting);
         }
 
-        public static bool GetBoolValue(string Section,string Setting)
+        public static bool GetBoolValue(string Section, string Setting)
         {
             return Config.FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
         }

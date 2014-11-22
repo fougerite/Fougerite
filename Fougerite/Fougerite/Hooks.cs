@@ -312,8 +312,6 @@
                 item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
 
             return connected;
-
-            return connected;
         }
 
         public static void PlayerDisconnect(NetUser user)

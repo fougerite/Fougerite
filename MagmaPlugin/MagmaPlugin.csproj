@@ -81,4 +81,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Drop++\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Drop++\Drop++.cfg" />
+    <None Include="Drop++\Drop++.js" />
+  </ItemGroup>
 </Project>

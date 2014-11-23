@@ -169,25 +169,12 @@
 
         public static bool IsEnabled()
         {
-            if (config == null)
-            {
-                return false;
-            }
-            string setting = config.GetSetting("Settings", "rust++_enabled");
-            switch (setting)
-            {
-                case null:
-                    return false;
-
-                case "false":
-                    return false;
-            }
-            return (setting == "true");
+            return config.GetBoolSetting("Settings", "rust++_enabled");
         }
 
         public static void motd(uLink.NetworkPlayer player)
         {
-            if (config.GetSetting("Settings", "motd") == "true")
+            if (config.GetBoolSetting("Settings", "motd"))
             {
                 int num = 1;
                 do

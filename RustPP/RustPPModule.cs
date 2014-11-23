@@ -140,7 +140,7 @@
             {
                 try
                 {
-                    if (Core.config.GetSetting("Settings", "voice_notifications") == "true")
+                    if (Core.config.GetBoolSetting("Settings", "voice_notifications"))
                     {
                         if (Fougerite.Hooks.talkerTimers.ContainsKey(p.userID))
                         {

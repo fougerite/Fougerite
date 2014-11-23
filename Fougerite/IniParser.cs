@@ -134,14 +134,14 @@ public class IniParser
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
-        if((string)this.keyPairs[pair] == null)
-            return string.Empty;
-
         return (string)this.keyPairs[pair];
     }
 
     public bool GetBoolSetting(string sectionName, string settingName)
     {
+        if (this.GetSetting(sectionName, settingName) == null)
+            return false;
+
         return this.GetSetting(sectionName, settingName).ToLower() == "true";
     }
 

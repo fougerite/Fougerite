@@ -302,13 +302,12 @@
             }
             Fougerite.Player item = new Fougerite.Player(user.playerClient);
             Fougerite.Server.GetServer().Players.Add(item);
-            Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
-            item.PlayerClient.netPlayer.ipAddress + ")");
+            Logger.LogDebug(string.Format("User Connected: {0} ({1} | {2})", item.Name, item.SteamID.ToString(), item.PlayerClient.netPlayer.ipAddress));
             if (OnPlayerConnected != null)
                 OnPlayerConnected(item);
 
             connected = user.connected;
-            if (Fougerite.Config.GetValue("Fougerite", "tellversion") != "false")
+            if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
                 item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
 
             return connected;

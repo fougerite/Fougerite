@@ -134,6 +134,9 @@ public class IniParser
         SectionPair pair;
         pair.Section = sectionName;
         pair.Key = settingName;
+        if((string)this.keyPairs[pair] == null)
+            return string.Empty;
+
         return (string)this.keyPairs[pair];
     }
 

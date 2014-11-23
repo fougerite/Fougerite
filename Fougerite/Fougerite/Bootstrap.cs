@@ -39,7 +39,6 @@ namespace Fougerite
                 Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
                 return false;
             }
-
             if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
                 decay.decaytickrate = float.MaxValue / 2;

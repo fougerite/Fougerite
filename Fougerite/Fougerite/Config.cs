@@ -38,7 +38,7 @@
 
         public static bool GetBoolValue(string Section, string Setting)
         {
-            return Config.FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
+            return FougeriteConfig.GetSetting(Section, Setting).ToLower() == "true";
         }
 
         public static string GetModulesFolder()

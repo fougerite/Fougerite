@@ -9,33 +9,22 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            int num = 1;
-            do
+            int i = 1;
+            string setting = Core.config.GetSetting("Settings", "help_string" + i);
+            while (setting != null)
             {
-                string setting = Core.config.GetSetting("Settings", "help_string" + num);
-                if (setting != null)
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
+                i++;
+            }
+            if (Administrator.IsAdmin(Arguments.argUser.userID))
+            {
+                setting = Core.config.GetSetting("Settings", "admin_help_string" + i);
+                while (setting != null)
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
-                    num++;
-                } else if (Administrator.IsAdmin(Arguments.argUser.userID))
-                {
-                    do
-                    {
-                        setting = Core.config.GetSetting("Settings", "admin_help_string" + num);
-                        if (setting != null)
-                        {
-                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
-                            num++;
-                        } else
-                        {
-                            return;
-                        }
-                    } while(true);
-                } else
-                {
-                    return;
-                }               
-            } while (true);
+                    i++;
+                }
+            }
         }
     }
 }

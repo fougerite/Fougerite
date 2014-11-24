@@ -8,17 +8,16 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string playerName = string.Join(" ", ChatArguments).Replace("\"", string.Empty).Trim();
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Get Admin Flags Usage:  /getflags playerName");
+                return;
+            }
             Administrator administrator = Administrator.GetAdmin(playerName);
             if (administrator == null)
             {
-                if (playerName == string.Empty)
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Get Admin Flags Usage:  /getflags playerName");
-                } else
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, playerName + " is not an administrator.");
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, playerName + " is not an administrator.");
                 return;
             }
 

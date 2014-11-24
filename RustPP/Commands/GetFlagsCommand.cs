@@ -23,19 +23,18 @@
             }
 
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}'s Flags: ", administrator.DisplayName));
-            int r = 0;
-            int i = r;
+            int i = 0;
+            int flagsPerRow = 7;
             for (; i < administrator.Flags.Count; i++)
             {
-                if (i - r == 6)
+                if (i >= flagsPerRow && i % flagsPerRow == 0)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(r, i).ToArray()));
-                    r += 6;
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(i - flagsPerRow, flagsPerRow).ToArray()));
                 }
             }
-            if (i - r != 0)
+            if (i % flagsPerRow != 0)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(r, i).ToArray()));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(i - flagsPerRow, i % flagsPerRow).ToArray()));
             }
         }
     }

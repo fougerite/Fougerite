@@ -10,15 +10,14 @@
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             int num = 1;
-            do 
+            do
             {
                 string setting = Core.config.GetSetting("Settings", "help_string" + num);
                 if (setting != null)
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
                     num++;
-                }
-                else if (Administrator.IsAdmin(Arguments.argUser.userID))
+                } else if (Administrator.IsAdmin(Arguments.argUser.userID))
                 {
                     do
                     {
@@ -27,14 +26,12 @@
                         {
                             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
                             num++;
-                        }
-                        else
+                        } else
                         {
                             return;
                         }
                     } while(true);
-                }
-                else
+                } else
                 {
                     return;
                 }               

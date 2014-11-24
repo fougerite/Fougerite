@@ -15,8 +15,9 @@
         [XmlIgnore]
         private static System.Collections.Generic.List<Administrator> admins = new System.Collections.Generic.List<Administrator>();
         public static string[] PermissionsFlags = new string[] { 
-            "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
-            "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
+            "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport",
+            "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin",
+            "CanDeleteAdmin", "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
         };
 
         public Administrator()

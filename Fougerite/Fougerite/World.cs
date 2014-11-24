@@ -289,7 +289,7 @@
             {
                 return "Animal Fat";
             }
-            if (str.Contains(" ant") || str.Contains("pil"))
+            if ((str.Contains(" ant") && str.Contains(" pil")) || str.Contains("pills"))
             {
                 return "Anti-Radiation Pills";
             }
@@ -349,7 +349,7 @@
             
                 return "Sulfur";
             }         
-            if (str.Contains(" sup") || str.Contains(" sig"))
+            if (str.Contains(" sup") || str.Contains(" sign"))
             {
                 return "Supply Signal";
             }
@@ -740,7 +740,7 @@
                     return "Handmade Lockpick"; 
                 }
             }
-            if (str.Contains(" hol"))
+            if (str.Contains(" hol") || str.Contains(" sigh"))
             {
                 if (str.Contains(" bp") || str.Contains(" blueprint"))
                     return "Holo sight BP";

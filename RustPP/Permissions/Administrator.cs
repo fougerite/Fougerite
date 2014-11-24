@@ -15,9 +15,9 @@
         [XmlIgnore]
         private static System.Collections.Generic.List<Administrator> admins = new System.Collections.Generic.List<Administrator>();
         public static string[] PermissionsFlags = new string[] { 
-      "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
-      "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
-     };
+            "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
+            "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
+        };
 
         public Administrator()
         {
@@ -60,14 +60,27 @@
             admins.Remove(GetAdmin(admin));
         }
 
+        public static void DeleteAdmin(string admin)
+        {
+            admins.Remove(GetAdmin(admin));
+        }
+
         public static Administrator GetAdmin(ulong userID)
         {
             foreach (Administrator administrator in admins)
             {
                 if (userID == administrator.UserID)
-                {
                     return administrator;
-                }
+            }
+            return null;
+        }
+
+        public static Administrator GetAdmin(string name)
+        {
+            foreach (Administrator administrator in admins)
+            {
+                if (name.Equals(administrator.DisplayName, StringComparison.OrdinalIgnoreCase))
+                    return administrator;
             }
             return null;
         }
@@ -76,18 +89,15 @@
         {
             foreach (string str in PermissionsFlags)
             {
-                if (str.ToLower() == flag.ToLower())
-                {
-                    return str;
-                }
+                if (str.Equals(flag, StringComparison.OrdinalIgnoreCase))
+                    return flag;
             }
-            return "";
+            return string.Empty;
         }
 
         public bool HasPermission(string perm)
         {
-            return (this.Flags.FindIndex(delegate(string x)
-            {
+            return (this.Flags.FindIndex(delegate(string x) {
                 return x.Equals(perm, StringComparison.OrdinalIgnoreCase);
             }) != -1);
         }
@@ -97,42 +107,33 @@
             foreach (Administrator administrator in admins)
             {
                 if (uid == administrator.UserID)
-                {
                     return true;
-                }
+            }
+            return false;
+        }
+
+        public static bool IsAdmin(string name)
+        {
+            foreach (Administrator administrator in admins)
+            {
+                if (name.Equals(administrator.DisplayName, StringComparison.OrdinalIgnoreCase))
+                    return true;
             }
             return false;
         }
 
         public static bool IsValidFlag(string flag)
         {
-            bool flag2 = false;
-            foreach (string str in PermissionsFlags)
-            {
-                if (str.ToLower() == flag.ToLower())
-                {
-                    flag2 = true;
-                }
-            }
-            return flag2;
+            return GetProperName(flag) != string.Empty;
         }
 
         public static void NotifyAdmins(string msg)
         {
             foreach (Administrator administrator in admins)
             {
-                try
-                {
-                    NetUser user = NetUser.FindByUserID(administrator.UserID);
-                    if (user != null)
-                    {
-                        Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                NetUser user = NetUser.FindByUserID(administrator.UserID);
+                if (user != null)
+                    Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
             }
         }
 

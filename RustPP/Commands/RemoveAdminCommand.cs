@@ -8,44 +8,26 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string playerName = string.Join(" ", ChatArguments).Replace("\"", string.Empty).Trim();
+            Administrator administrator = Administrator.GetAdmin(playerName);
+            if (administrator == null)
             {
-                str = str + ChatArguments[i] + " ";
-            }
-            str = str.Trim();
-            if ((ChatArguments != null) || (str == ""))
-            {
-                if (str != null)
+                if (playerName == string.Empty)
                 {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        ulong userID = client.userID;
-                        ulong num3 = Arguments.argUser.userID;
-                        if (client.netUser.displayName.ToLower() == str.ToLower())
-                        {
-                            if (userID == num3)
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Seriously? You can't unadmin yourself...");
-                            }
-                            else if (Administrator.IsAdmin(userID))
-                            {
-                                Administrator.DeleteAdmin(userID);
-                                Administrator.NotifyAdmins(client.netUser.displayName + " is not an administrator anymore!");
-                            }
-                            else
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is not an administrator.");
-                            }
-                            return;
-                        }
-                    }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Remove Admin Usage:  /unadmin playerName");
+                } else
+                {
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, playerName + " is not an administrator.");
+                    return;
                 }
             }
-            else
+            if (administrator.UserID == Arguments.argUser.userID)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Remove Admin Usage:  /unadmin \"playerName\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Seriously? You can't unadmin yourself...");
+            } else
+            {
+                Administrator.NotifyAdmins(administrator.DisplayName + " is not an administrator anymore!");
+                Administrator.DeleteAdmin(administrator.DisplayName);
             }
         }
     }

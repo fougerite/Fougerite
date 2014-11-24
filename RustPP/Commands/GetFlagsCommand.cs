@@ -21,7 +21,22 @@
                 }
                 return;
             }
-            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}'s Flags: {1}", administrator.DisplayName, string.Join(", ", administrator.Flags.ToArray())));
+
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}'s Flags: ", administrator.DisplayName));
+            int r = 0;
+            int i = r;
+            for (; i < administrator.Flags.Count; i++)
+            {
+                if (i - r == 6)
+                {
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(r, i).ToArray()));
+                    r += 6;
+                }
+            }
+            if (i - r != 0)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(r, i).ToArray()));
+            }
         }
     }
 }

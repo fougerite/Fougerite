@@ -8,14 +8,10 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++) {
-                str = str + ChatArguments[i] + " ";
-            }
-            str = str.Trim();
-            if (((ChatArguments != null) || (str == "")) && (str != "")) {
+            string playerName = string.Join(" ", ChatArguments).Replace("\"", string.Empty).Trim();
+            if (playerName != string.Empty) {
                 foreach (PlayerClient client in PlayerClient.All) {
-                    if (client.netUser.displayName.ToLower() == str.ToLower()) {
+                    if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase)) {
                         if (!Core.muteList.Contains(client.userID)) {
                             Core.muteList.Add(client.userID);
                             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " has been muted!");
@@ -24,7 +20,7 @@
                         }
                         return;
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + playerName);
                 }
             }
         }

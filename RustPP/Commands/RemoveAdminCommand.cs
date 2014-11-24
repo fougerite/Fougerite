@@ -8,7 +8,7 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string playerName = string.Join(" ", ChatArguments).Replace("\"", string.Empty).Trim();
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
             Administrator administrator = Administrator.GetAdmin(playerName);
             if (administrator == null)
             {

@@ -3,50 +3,52 @@
     using Fougerite;
     using RustPP.Permissions;
     using System;
+    using System.Collections.Generic;
 
     internal class AddAdminCommand : ChatCommand
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
             {
-                str = str + ChatArguments[i] + " ";
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "AddAdmin Usage:  /addadmin playerName");
+                return;
             }
-            str = str.Trim();
-            if ((ChatArguments != null) || (str == ""))
+            foreach (KeyValuePair<ulong, string> entry in Core.userCache)
             {
-                if (str != null)
+                if (entry.Value.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        ulong userID = client.userID;
-                        ulong num3 = Arguments.argUser.userID;
-                        if (client.netUser.displayName.ToLower() == str.ToLower())
-                        {
-                            if (userID == num3)
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Seriously? You are already an admin...");
-                            }
-                            else if (Administrator.IsAdmin(userID))
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, client.netUser.displayName + " is already an administrator.");
-                            }
-                            else
-                            {
-                                Administrator.AddAdmin(new Administrator(userID, client.netUser.displayName));
-                                Administrator.NotifyAdmins(client.netUser.displayName + " is now an administrator!");
-                            }
-                            return;
-                        }
-                    }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
+                    if (AddAdminIfNotAlready(entry.Key, entry.Value, Arguments.argUser))
+                        return;
                 }
             }
-            else
+            foreach (PlayerClient client in PlayerClient.All)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "AddAdmin Usage:  /addadmin \"playerName\"");
+                if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (AddAdminIfNotAlready(client.netUser.userID, client.netUser.displayName, Arguments.argUser))
+                        return;
+                }
             }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + playerName);                
+        }
+
+        public bool AddAdminIfNotAlready(ulong newID, string newName, NetUser myAdmin)
+        {
+            if (newID == myAdmin.userID)
+            {
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, "Seriously? You are already an admin...");
+            } else if (Administrator.IsAdmin(newID))
+            {
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, newName + " is already an administrator.");
+            } else
+            {
+                Administrator.AddAdmin(new Administrator(newID, newName));
+                Administrator.NotifyAdmins(newName + " is now an administrator!");
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -19,7 +19,7 @@
             {
                 if (entry.Value.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (AddAdminIfNotAlready(entry.Key, entry.Value, Arguments.argUser))
+                    if (AddNewAdmin(entry.Key, entry.Value, Arguments.argUser))
                         return;
                 }
             }
@@ -27,21 +27,23 @@
             {
                 if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (AddAdminIfNotAlready(client.netUser.userID, client.netUser.displayName, Arguments.argUser))
+                    if (AddNewAdmin(client.netUser.userID, client.netUser.displayName, Arguments.argUser))
                         return;
                 }
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + playerName);                
         }
 
-        public bool AddAdminIfNotAlready(ulong newID, string newName, NetUser myAdmin)
+        public bool AddNewAdmin(ulong newID, string newName, NetUser myAdmin)
         {
             if (newID == myAdmin.userID)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, "Seriously? You are already an admin...");
+                return true;
             } else if (Administrator.IsAdmin(newID))
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, newName + " is already an administrator.");
+                return true;
             } else
             {
                 Administrator.AddAdmin(new Administrator(newID, newName));

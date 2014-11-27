@@ -16,16 +16,16 @@
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Ban Usage:  /ban playerName");
                 return;
             }
-            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-            list.Add("Cancel");
+            PList list = new PList();
+            list.Add(0, "Cancel");
             foreach (KeyValuePair<ulong, string> entry in Core.userCache)
             {
                 if (entry.Value.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    BanPlayer(entry.Key, entry.Value, Arguments.argUser);
+                    BanPlayer(new PList.Player(entry.Key, entry.Value), Arguments.argUser);
                     return;
                 } else if (entry.Value.ToLower().Contains(playerName.ToLower()))
-                    list.Add(entry.Value);
+                    list.Add(entry.Key, entry.Value);
             }
             if (list.Count == 1)
             {
@@ -33,10 +33,10 @@
                 {
                     if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                     {
-                        BanPlayer(client.netUser.userID, client.netUser.displayName, Arguments.argUser);
+                        BanPlayer(new PList.Player(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
                     } else if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
-                        list.Add(client.netUser.displayName);
+                        list.Add(new PList.Player(client.netUser.userID, client.netUser.displayName));
                 }
             }
             if (list.Count == 1)
@@ -44,70 +44,42 @@
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player matches the name: " + playerName);
                 return;
             }
-            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  Player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list[i]));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i]));
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
-            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to ban.");
             Core.banWaitList.Add(Arguments.argUser.userID, list);
         }
 
         public void PartialNameBan(ref ConsoleSystem.Arg Arguments, int id)
         {
-            if (Core.banWaitList.Contains(Arguments.argUser.userID))
+            if (id == 0)
             {
-                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)Core.banWaitList[Arguments.argUser.userID];
-                string playerName = list[id];
-                if (id == 0)
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
-                    Core.banWaitList.Remove(Arguments.argUser.userID);
-                }
-                else
-                {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        if (client.netUser.displayName == playerName)
-                        {
-                            Core.banWaitList.Remove(Arguments.argUser.userID);
-                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You cannot ban an administrator!");
-                            }
-                            else
-                            {
-                                Core.blackList.Add(client.netUser.userID, client.netUser.displayName);
-                                Administrator.NotifyAdmins(client.netUser.displayName + " has been banned.");
-                                client.netUser.Kick(NetError.Facepunch_Kick_Ban, true);
-                            }
-                            break;
-                        }
-                    }
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
+                return;
             }
+            PList list = (PList)Core.banWaitList[Arguments.argUser.userID];
+            BanPlayer(list.PlayerList[id], Arguments.argUser);
         }
 
-        public void BanPlayer(ulong banID, string banName, NetUser myAdmin)
+        public void BanPlayer(PList.Player ban, NetUser myAdmin)
         {
-            if (banID == myAdmin.userID)
+            if (ban.UserID == myAdmin.userID)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, "Seriously? You can't ban yourself.");
-            } else if (Administrator.IsAdmin(banID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
+            } else if (Administrator.IsAdmin(ban.UserID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
             {
-                Util.sayUser(myAdmin.networkPlayer, Core.Name, banName + " is an administrator. You can't ban administrators.");
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, ban.DisplayName + " is an administrator. You can't ban administrators.");
             } else
             {
-                Core.blackList.Add(banID, banName);
-                Administrator.NotifyAdmins(banName + " has been banned.");
+                Core.blackList.Add(ban);
+                Administrator.NotifyAdmins(string.Format("{0} has been banned by {1}.", ban.DisplayName, myAdmin.displayName));
                 PlayerClient client;
-                PlayerClient.FindByUserID(banID, out client);
-                if(client != null)
+                if (PlayerClient.FindByUserID(ban.UserID, out client))
                     client.netUser.Kick(NetError.Facepunch_Kick_Ban, true);
-
-                if(Core.banWaitList.Contains(banID))
-                    Core.banWaitList.Remove(banID);
             }
         }
     }

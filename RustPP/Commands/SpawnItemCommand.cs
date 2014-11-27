@@ -22,7 +22,7 @@
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /i \"itemName\" \"quantity\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /i itemName quantity");
             }
         }
     }

@@ -109,14 +109,69 @@
         void ChatReceived(ref ConsoleSystem.Arg arg)
         {
             var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
-            if (command.GetTPWaitList().Contains(arg.argUser.userID)) {
+            if (command.GetTPWaitList().Contains(arg.argUser.userID))
+            {
                 command.PartialNameTP(ref arg, arg.GetInt(0));
                 arg.ArgsStr = string.Empty;
-            } else if (Core.banWaitList.Contains(arg.argUser.userID)) {
+            } else if (Core.banWaitList.Contains(arg.argUser.userID))
+            {
                 (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(ref arg, arg.GetInt(0));
+                Core.banWaitList.Remove(arg.argUser.userID);
                 arg.ArgsStr = string.Empty;
-            } else if (Core.kickWaitList.Contains(arg.argUser.userID)) {
-                (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(ref arg, arg.GetInt(0));  
+            } else if (Core.kickWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(ref arg, arg.GetInt(0));
+                Core.kickWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.killWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("kill") as KillCommand).PartialNameKill(ref arg, arg.GetInt(0));
+                Core.killWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.whiteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addwl") as WhiteListAddCommand).PartialNameWhitelist(ref arg, arg.GetInt(0));
+                Core.whiteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminAddWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addadmin") as AddAdminCommand).PartialNameNewAdmin(ref arg, arg.GetInt(0));
+                Core.adminAddWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminRemoveWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unadmin") as RemoveAdminCommand).PartialNameRemoveAdmin(ref arg, arg.GetInt(0));
+                Core.adminRemoveWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminFlagsWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("getflags") as GetFlagsCommand).PartialNameGetFlags(ref arg, arg.GetInt(0));
+                Core.adminFlagsWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.muteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("mute") as MuteCommand).PartialNameMute(ref arg, arg.GetInt(0));
+                Core.muteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unmuteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unmute") as UnmuteCommand).PartialNameUnmute(ref arg, arg.GetInt(0));
+                Core.unmuteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminFlagWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addflag") as AddFlagCommand).PartialNameAddFlags(ref arg, arg.GetInt(0));
+                Core.adminFlagWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminUnflagWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unflag") as RemoveFlagsCommand).PartialNameRemoveFlags(ref arg, arg.GetInt(0));
+                Core.adminUnflagWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unbanWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unban") as UnbanCommand).PartialNameUnban(ref arg, arg.GetInt(0));
+                Core.unbanWaitList.Remove(arg.argUser.userID);
                 arg.ArgsStr = string.Empty;
             }
 

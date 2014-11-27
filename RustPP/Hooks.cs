@@ -127,12 +127,12 @@
                 if (Core.blackList.Contains(user.userID))
                 {
                     Core.tempConnect.Add(user.userID);
-                    user.Kick(NetError.Facepunch_Connector_VAC_Banned, true);
+                    user.Kick(NetError.Facepunch_Kick_Ban, true);
                     return false;
                 }
                 if (Core.config.GetBoolSetting("WhiteList", "enabled") && !Core.whiteList.Contains(user.userID))
                 {
-                    user.Kick(NetError.Facepunch_Connector_AuthFailure, true);
+                    user.Kick(NetError.Facepunch_Whitelist_Failure, true);
                 }
                 if (!Core.userCache.ContainsKey(user.userID))
                 {

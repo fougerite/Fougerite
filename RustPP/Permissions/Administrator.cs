@@ -9,11 +9,11 @@
     [Serializable]
     public class Administrator
     {
-        private System.Collections.Generic.List<string> _flags;
+        private List<string> _flags;
         private string _name;
         private ulong _userid;
         [XmlIgnore]
-        private static System.Collections.Generic.List<Administrator> admins = new System.Collections.Generic.List<Administrator>();
+        private static List<Administrator> admins = new List<Administrator>();
         public static string[] PermissionsFlags = new string[] { 
             "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport",
             "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin",
@@ -28,7 +28,7 @@
         {
             this._userid = userID;
             this._name = name;
-            this._flags = new System.Collections.Generic.List<string>();
+            this._flags = new List<string>();
             AddFlagsToList(this._flags, Core.config.GetSetting("Settings", "default_admin_flags"));
         }
 
@@ -36,7 +36,7 @@
         {
             this._userid = userID;
             this._name = name;
-            this._flags = new System.Collections.Generic.List<string>();
+            this._flags = new List<string>();
             AddFlagsToList(this._flags, flags);
         }
 
@@ -45,7 +45,7 @@
             admins.Add(admin);
         }
 
-        private static void AddFlagsToList(System.Collections.Generic.List<string> l, string str)
+        private static void AddFlagsToList(List<string> l, string str)
         {
             foreach (string str2 in str.Split(new char[] { '|' }))
             {
@@ -139,7 +139,7 @@
         }
 
         [XmlIgnore]
-        public static System.Collections.Generic.List<Administrator> AdminList
+        public static List<Administrator> AdminList
         {
             get
             {
@@ -163,7 +163,7 @@
             }
         }
 
-        public System.Collections.Generic.List<string> Flags
+        public List<string> Flags
         {
             get
             {

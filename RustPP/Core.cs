@@ -11,16 +11,31 @@
 
     public class Core
     {
-        public static Hashtable banWaitList = new Hashtable();
-        public static PList blackList = new PList();
-        public static IniParser config;
-        public static Hashtable kickWaitList = new Hashtable();
-        public static System.Collections.Generic.List<ulong> muteList = new System.Collections.Generic.List<ulong>();
-        public static System.Collections.Generic.List<ulong> tempConnect = new System.Collections.Generic.List<ulong>();
-        public static Dictionary<ulong, string> userCache;
-        public static string Version = "1.6.0";
-        public static PList whiteList = new PList();
         public static string Name = "Rust++";
+        public static string Version = "1.7.0";
+        public static IniParser config;
+        public static PList blackList = new PList();
+        public static PList whiteList = new PList();
+        public static PList muteList = new PList();
+        public static List<ulong> tempConnect = new List<ulong>();
+        public static Dictionary<ulong, string> userCache;
+        public static Hashtable banWaitList = new Hashtable();
+        public static Hashtable unbanWaitList = new Hashtable();
+        public static Hashtable kickWaitList = new Hashtable();
+        public static Hashtable killWaitList = new Hashtable();
+        public static Hashtable whiteWaitList = new Hashtable();
+        public static Hashtable adminFlagsWaitList = new Hashtable();
+        public static Hashtable adminFlagWaitList = new Hashtable();
+        public static Hashtable adminFlagsList = new Hashtable();
+        public static Hashtable adminUnflagWaitList = new Hashtable();
+        public static Hashtable adminAddWaitList = new Hashtable();
+        public static Hashtable adminRemoveWaitList = new Hashtable();
+        public static Hashtable muteWaitList = new Hashtable();
+        public static Hashtable unmuteWaitList = new Hashtable();
+        public static Hashtable friendWaitList = new Hashtable();
+        public static Hashtable unfriendWaitList = new Hashtable();
+        public static Hashtable shareWaitList = new Hashtable();
+        public static Hashtable unshareWaitList = new Hashtable();
 
         public static void Init()
         {

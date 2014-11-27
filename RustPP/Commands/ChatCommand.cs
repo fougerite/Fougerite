@@ -40,38 +40,38 @@
                                 if (arg.argUser.admin)
                                 {
                                     Logger.LogDebug(string.Format("[CallCommand] arg.argUser.admin cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
-                                }
-                                else
+                                    command.Execute(ref arg, ref chatArgs);
+                                } else
                                 {
                                     Logger.LogDebug(string.Format("[CallCommand] you need rcon access cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
                                     Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You need RCON access to be able to use this command.");
                                 }
-                            }
-                            else if (Administrator.IsAdmin(arg.argUser.userID))
+                            } else if (Administrator.IsAdmin(arg.argUser.userID))
                             {
                                 if (Administrator.GetAdmin(arg.argUser.userID).HasPermission(command.AdminFlags))
                                 {
-                                    Logger.LogDebug(string.Format("[CallCommand] hasPermission cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
-                                    try {
-                                    } catch(Exception ex) {
+                                    Logger.LogDebug(string.Format("[CallCommand] hasPermission command.Execute! cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
+                                    try
+                                    {
+                                        command.Execute(ref arg, ref chatArgs);
+                                    } catch (Exception ex)
+                                    {
                                         Logger.LogException(ex);
                                     }
-                                }
-                                else
+                                } else
                                 {
                                     Logger.LogDebug(string.Format("[CallCommand] only with permission cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
-                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "Only administrators with the " + command.AdminFlags.ToString() + " permission can use that command.");
+                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "Only administrators with the " + command.AdminFlags + " permission can use that command.");
                                 }
-                            }
-                            else
+                            } else
                             {
                                 Logger.LogDebug(string.Format("[CallCommand] you don't have access cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
                                 Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You don't have access to use this command");
                             }
-                        }
-                        else
+                        } else
                         {
-                            Logger.LogDebug(string.Format("[CallCommand] else cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
+                            Logger.LogDebug(string.Format("[CallCommand] else command.Execute! cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
+                            command.Execute(ref arg, ref chatArgs);
                         }
                     }
                     Logger.LogDebug(string.Format("[CallCommand] break cmd={0} chatArgs=({1})", cmd, string.Join(")(", chatArgs)));
@@ -81,6 +81,7 @@
         }
 
         public abstract void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments);
+
         public static ChatCommand GetCommand(string cmdString)
         {
             foreach (ChatCommand command in classInstances)

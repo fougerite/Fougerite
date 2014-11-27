@@ -22,6 +22,11 @@
             this.players.Add(new Player(uid, dname));
         }
 
+        public void Add(Player player)
+        {
+            this.players.Add(player);
+        }
+
         public bool Contains(ulong uid)
         {
             foreach (Player player in this.players)

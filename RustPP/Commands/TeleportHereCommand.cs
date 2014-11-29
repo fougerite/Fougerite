@@ -27,7 +27,7 @@
                 return;
             }
 
-            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
+            List<string> list = new List<string>();
             list.Add("TargetToHere");
             foreach (PlayerClient client in PlayerClient.All)
             {

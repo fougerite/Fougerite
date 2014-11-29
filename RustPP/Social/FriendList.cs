@@ -34,7 +34,7 @@
             bool flag = false;
             foreach (Friend friend in this)
             {
-                if (friend.GetDisplayName().ToLower() == name.ToLower())
+                if (friend.GetDisplayName().Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
                     flag = true;
                 }
@@ -57,61 +57,55 @@
 
         public void OutputList(ref ConsoleSystem.Arg arg)
         {
-            ArrayList list = new ArrayList();
-            ArrayList list2 = new ArrayList();
+            ArrayList onlineFriends = new ArrayList();
+            ArrayList offlineFriends = new ArrayList();
             foreach (Friend friend in this)
             {
                 PlayerClient client;
-                try
+                if (PlayerClient.FindByUserID(friend.GetUserID(), out client))
                 {
-                    client = EnumerableToArray.ToArray<PlayerClient>(PlayerClient.FindAllWithString(friend.GetUserID().ToString()))[0];
-                }
-                catch
+                    onlineFriends.Add(client.netUser.displayName);
+                    friend.SetDisplayName(client.netUser.displayName);
+                } else
                 {
-                    list2.Add(friend.GetDisplayName());
-                    continue;
-                }
-                list.Add(client.netUser.displayName + " (Online)");
-                friend.SetDisplayName(client.netUser.displayName);
-            }
-            if (list.Count > 0)
-            {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Concat(new object[] { "You currently have ", list.Count, " friend", (list.Count > 1) ? "s" : "", " online." }));
-            }
-            else
-            {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, "None of your friend is playing right now.");
-            }
-            foreach (string str in list2)
-            {
-                list.Add(str);
-            }
-            int num = 0;
-            int num2 = 0;
-            string str2 = "";
-            foreach (string str3 in list)
-            {
-                num2++;
-                if (num2 >= 60)
-                {
-                    num = 0;
-                    break;
-                }
-                str2 = str2 + str3 + ", ";
-                if (num == 6)
-                {
-                    num = 0;
-                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
-                    str2 = "";
-                }
-                else
-                {
-                    num++;
+                    offlineFriends.Add(friend.GetDisplayName());
                 }
             }
-            if (num != 0)
+            int i = 0;
+            int friendsPerRow = 7;
+            Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                string.Format("You currently have {0} friend{1} online:",
+                    (onlineFriends.Count == 0 ? "no" : onlineFriends.Count.ToString()), ((onlineFriends.Count != 1) ? "s" : string.Empty)));
+            for (; i < onlineFriends.Count; i++)
             {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
+                if (i >= friendsPerRow && i % friendsPerRow == 0)
+                {
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, 
+                        string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray(typeof(string)) as string[]));
+                }
+            }
+            if (i % friendsPerRow != 0)
+            {
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                    string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, i % friendsPerRow).ToArray(typeof(string)) as string[]));
+            }
+
+            Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                string.Format("You have {0} offline friend{1}:",
+                    (onlineFriends.Count == 0 ? "no" : onlineFriends.Count.ToString()), ((onlineFriends.Count != 1) ? "s" : string.Empty)));
+            i = 0;
+            for (; i < offlineFriends.Count; i++)
+            {
+                if (i >= friendsPerRow && i % friendsPerRow == 0)
+                {
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                        string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray(typeof(string)) as string[]));
+                }
+            }
+            if (i % friendsPerRow != 0)
+            {
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                    string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, i % friendsPerRow).ToArray(typeof(string)) as string[]));
             }
         }
 

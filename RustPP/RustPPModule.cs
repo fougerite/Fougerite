@@ -113,6 +113,16 @@
             {
                 command.PartialNameTP(ref arg, arg.GetInt(0));
                 arg.ArgsStr = string.Empty;
+            } else if (Core.friendWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addfriend") as AddFriendCommand).PartialNameAddFriend(ref arg, arg.GetInt(0));
+                Core.friendWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.shareWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("share") as ShareCommand).PartialNameDoorShare(ref arg, arg.GetInt(0));
+                Core.shareWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
             } else if (Core.banWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(ref arg, arg.GetInt(0));
@@ -127,6 +137,16 @@
             {
                 (ChatCommand.GetCommand("kill") as KillCommand).PartialNameKill(ref arg, arg.GetInt(0));
                 Core.killWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unfriendWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unfriend") as UnfriendCommand).PartialNameUnfriend(ref arg, arg.GetInt(0));
+                Core.unfriendWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unshareWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unshare") as UnshareCommand).PartialNameUnshareDoors(ref arg, arg.GetInt(0));
+                Core.unshareWaitList.Remove(arg.argUser.userID);
                 arg.ArgsStr = string.Empty;
             } else if (Core.whiteWaitList.Contains(arg.argUser.userID))
             {
@@ -177,12 +197,11 @@
 
             if (Core.IsEnabled())
                 Core.handleCommand(ref arg);
-            
         }
 
         void Chat(Fougerite.Player p, ref ChatString text)
         {
-            if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
+            if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID))
             {
                 text.NewText = string.Empty;
                 Util.sayUser(p.PlayerClient.netUser.networkPlayer, Core.Name, "You are muted.");
@@ -191,27 +210,28 @@
 
         void ShowTalker(uLink.NetworkPlayer player, PlayerClient p)
         {
-            if (Core.IsEnabled())
+            if (!Core.IsEnabled())
+                return;
+
+            if (!Core.config.GetBoolSetting("Settings", "voice_notifications"))
+                return;
+
+            if (Fougerite.Hooks.talkerTimers.ContainsKey(p.userID))
             {
-                try
-                {
-                    if (Core.config.GetBoolSetting("Settings", "voice_notifications"))
-                    {
-                        if (Fougerite.Hooks.talkerTimers.ContainsKey(p.userID))
-                        {
-                            if ((Environment.TickCount - ((int)Fougerite.Hooks.talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
-                                return;
-                            Fougerite.Hooks.talkerTimers[p.userID] = Environment.TickCount;
-                        }
-                        else
-                            Fougerite.Hooks.talkerTimers.Add(p.userID, Environment.TickCount);
-                        Notice.Inventory(player, "☎ " + p.netUser.displayName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                if ((Environment.TickCount - ((int)Fougerite.Hooks.talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
+                    return;
+
+                Fougerite.Hooks.talkerTimers[p.userID] = Environment.TickCount;
+            } else
+            {   
+                Fougerite.Hooks.talkerTimers.Add(p.userID, Environment.TickCount);
+            }
+            try
+            {
+                Notice.Inventory(player, "☎ " + p.netUser.displayName);
+            } catch (Exception ex)
+            {
+                Logger.LogException(ex);
             }
         }
 

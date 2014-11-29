@@ -11,7 +11,7 @@
         private string _adminFlags;
         private bool _adminRestricted;
         private string _cmd;
-        private static System.Collections.Generic.List<ChatCommand> classInstances = new System.Collections.Generic.List<ChatCommand>();
+        private static List<ChatCommand> classInstances = new List<ChatCommand>();
 
         public static void AddCommand(string cmdString, ChatCommand command)
         {

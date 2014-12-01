@@ -12,17 +12,20 @@
             int i = 1;
             string setting = Core.config.GetSetting("Settings", "help_string" + i);
             while (setting != null)
-            {
+            {                 
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
                 i++;
+                setting = Core.config.GetSetting("Settings", "help_string" + i);
             }
             if (Administrator.IsAdmin(Arguments.argUser.userID))
             {
+                i = 1;
                 setting = Core.config.GetSetting("Settings", "admin_help_string" + i);
                 while (setting != null)
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
                     i++;
+                    setting = Core.config.GetSetting("Settings", "admin_help_string" + i);
                 }
             }
         }

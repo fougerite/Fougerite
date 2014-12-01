@@ -3,6 +3,7 @@
     using Fougerite;
     using System;
     using System.Collections;
+    using System.Collections.Generic;
 
     [Serializable]
     public class FriendList : ArrayList
@@ -16,7 +17,7 @@
         {
             foreach (Friend friend in this)
             {
-                if (name.ToLower() == friend.GetDisplayName().ToLower())
+                if (name.Equals(friend.GetDisplayName(), StringComparison.OrdinalIgnoreCase))
                 {
                     return friend.GetDisplayName();
                 }
@@ -92,20 +93,20 @@
 
             Util.sayUser(arg.argUser.networkPlayer, Core.Name,
                 string.Format("You have {0} offline friend{1}:",
-                    (onlineFriends.Count == 0 ? "no" : onlineFriends.Count.ToString()), ((onlineFriends.Count != 1) ? "s" : string.Empty)));
+                    (offlineFriends.Count == 0 ? "no" : offlineFriends.Count.ToString()), ((offlineFriends.Count != 1) ? "s" : string.Empty)));
             i = 0;
             for (; i < offlineFriends.Count; i++)
             {
                 if (i >= friendsPerRow && i % friendsPerRow == 0)
                 {
                     Util.sayUser(arg.argUser.networkPlayer, Core.Name,
-                        string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray(typeof(string)) as string[]));
+                        string.Join(", ", offlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray(typeof(string)) as string[]));
                 }
             }
             if (i % friendsPerRow != 0)
             {
                 Util.sayUser(arg.argUser.networkPlayer, Core.Name,
-                    string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, i % friendsPerRow).ToArray(typeof(string)) as string[]));
+                    string.Join(", ", offlineFriends.GetRange(i - friendsPerRow, i % friendsPerRow).ToArray(typeof(string)) as string[]));
             }
         }
 
@@ -113,7 +114,7 @@
         {
             foreach (Friend friend in this)
             {
-                if (fName.ToLower() == friend.GetDisplayName().ToLower())
+                if (fName.Equals(friend.GetDisplayName(), StringComparison.OrdinalIgnoreCase))
                 {
                     this.Remove(friend);
                     break;

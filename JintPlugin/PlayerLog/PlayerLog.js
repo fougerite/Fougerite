@@ -51,7 +51,6 @@ function On_PlayerSpawned(Player, se) {
 
 function On_PlayerDisconnected(Player) {
 	var data = new PlayerLogData(Player, 'disconnect', Plugin.Timestamp);
-	data.ip = 'n/a';
 	Plugin.Log('PlayerJSON', JSON.stringify(data));
 	// Plugin.POSTJson('http://www.myrustsite.ru/tysmiha', JSON.stringify(data));
 }

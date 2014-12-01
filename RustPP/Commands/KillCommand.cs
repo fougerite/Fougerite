@@ -23,7 +23,7 @@
                 {
                     KillPlayer(client, Arguments.argUser.playerClient);
                     return;
-                } else if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(client.netUser.userID, client.netUser.displayName);
             }
             if (list.Count == 1)
@@ -34,7 +34,7 @@
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i]));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i].DisplayName));
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you want to murder.");

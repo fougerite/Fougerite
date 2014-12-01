@@ -23,7 +23,7 @@
                 {
                     NewAdmin(new Administrator(entry.Key, entry.Value), Arguments.argUser);
                     return;
-                } else if (entry.Value.ToLower().Contains(playerName.ToLower()))
+                } else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(new Administrator(entry.Key, entry.Value));
             }
             if (list.Count == 1)
@@ -34,7 +34,7 @@
                     {                
                         NewAdmin(new Administrator(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
-                    } else if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                    } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(new Administrator(client.netUser.userID, client.netUser.displayName));
                 }
             }
@@ -46,7 +46,7 @@
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list[i]));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list[i].DisplayName));
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to become administrator.");
@@ -60,7 +60,7 @@
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
                 return;
             }
-            System.Collections.Generic.List<Administrator> list = (System.Collections.Generic.List<Administrator>)Core.adminAddWaitList[Arguments.argUser.userID];
+            List<Administrator> list = (List<Administrator>)Core.adminAddWaitList[Arguments.argUser.userID];
             NewAdmin(list[id], Arguments.argUser);
         }
 
@@ -78,7 +78,7 @@
 
                 if (flagstr != null)
                 {
-                    List<string> flags = new List<string>(flagstr.Split(new char[] { ' ' }));
+                    List<string> flags = new List<string>(flagstr.Split(new char[] { '|' }));
                     newAdmin.Flags = flags;
                 }
                 Administrator.AddAdmin(newAdmin);

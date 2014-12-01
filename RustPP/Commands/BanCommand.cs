@@ -24,7 +24,7 @@
                 {
                     BanPlayer(new PList.Player(entry.Key, entry.Value), Arguments.argUser);
                     return;
-                } else if (entry.Value.ToLower().Contains(playerName.ToLower()))
+                } else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(entry.Key, entry.Value);
             }
             if (list.Count == 1)
@@ -35,7 +35,7 @@
                     {
                         BanPlayer(new PList.Player(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
-                    } else if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                    } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(new PList.Player(client.netUser.userID, client.netUser.displayName));
                 }
             }
@@ -47,7 +47,7 @@
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i]));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i].DisplayName));
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to ban.");
@@ -76,6 +76,7 @@
             } else
             {
                 Core.blackList.Add(ban);
+                Administrator.DeleteAdmin(ban.UserID);
                 Administrator.NotifyAdmins(string.Format("{0} has been banned by {1}.", ban.DisplayName, myAdmin.displayName));
                 PlayerClient client;
                 if (PlayerClient.FindByUserID(ban.UserID, out client))

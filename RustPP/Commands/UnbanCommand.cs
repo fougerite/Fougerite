@@ -23,7 +23,7 @@
                 {
                     UnbanPlayer(banned, Arguments.argUser);
                     return;
-                } else if (banned.DisplayName.ToLower().Contains(playerName.ToLower()))
+                } else if (banned.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(banned);
             }
 
@@ -35,7 +35,7 @@
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i]));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i].DisplayName));
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to unban.");
@@ -55,15 +55,8 @@
 
         public void UnbanPlayer(PList.Player unban, NetUser myAdmin)
         {
-            if (unban.UserID == myAdmin.userID ||
-                Administrator.IsAdmin(unban.UserID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
-            {
-                Util.sayUser(myAdmin.networkPlayer, Core.Name, "OK.");
-            } else
-            {
-                Core.blackList.Remove(unban.UserID);
-                Administrator.NotifyAdmins(string.Format("{0} has been unbanned by {1}.", unban.DisplayName, myAdmin.displayName));
-            }
+            Core.blackList.Remove(unban.UserID);
+            Administrator.NotifyAdmins(string.Format("{0} has been unbanned by {1}.", unban.DisplayName, myAdmin.displayName));
         }
     }
 }

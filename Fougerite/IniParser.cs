@@ -142,7 +142,7 @@ public class IniParser
         if (this.GetSetting(sectionName, settingName) == null)
             return false;
 
-        return this.GetSetting(sectionName, settingName).ToLower() == "true";
+        return this.GetSetting(sectionName, settingName).ToUpperInvariant() == "TRUE";
     }
 
     public bool isCommandOn(string cmdName)

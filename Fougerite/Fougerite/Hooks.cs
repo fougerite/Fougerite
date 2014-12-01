@@ -126,7 +126,7 @@
             bool external = a.argUser == null;
             bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
-            if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload")) {
+            if ((a.Class.ToUpperInvariant() == "FOUGERITE") && (a.Function.ToUpperInvariant() == "RELOAD")) {
                 if (adminRights) {
                     ModuleManager.ReloadModules();
                     a.ReplyWith("Fougerite: Reloaded!");

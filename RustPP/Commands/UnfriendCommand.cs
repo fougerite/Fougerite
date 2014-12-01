@@ -40,14 +40,14 @@
                 list.Add(0, "Cancel");
                 foreach (KeyValuePair<ulong, string> entry in Core.userCache)
                 {
-                    if (friendsList.isFriendWith(entry.Key) && entry.Value.ToLower().Contains(playerName.ToLower()))
+                    if (friendsList.isFriendWith(entry.Key) && entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(entry.Key, entry.Value);
                 }
                 if (list.Count == 1)
                 {
                     foreach (PlayerClient client in PlayerClient.All)
                     {
-                        if (friendsList.isFriendWith(client.netUser.userID) && client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                        if (friendsList.isFriendWith(client.netUser.userID) && client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                             list.Add(client.netUser.userID, client.netUser.displayName);
                     }
                 }

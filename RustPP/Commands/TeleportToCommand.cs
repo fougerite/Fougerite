@@ -17,11 +17,11 @@
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere playerName");
                 return;
             } 
-            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
+            List<string> list = new List<string>();
             list.Add("ToTarget");
             foreach (PlayerClient client in PlayerClient.All)
             {
-                if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                 {
                     if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                     {

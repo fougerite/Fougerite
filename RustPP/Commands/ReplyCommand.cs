@@ -22,7 +22,7 @@
                     }
                     foreach (PlayerClient client in PlayerClient.All)
                     {
-                        if (client.netUser.displayName.ToLower() == key.ToLower())
+                        if (client.netUser.displayName.Equals(key, StringComparison.OrdinalIgnoreCase))
                         {
                             Util.say(client.netPlayer, "\"PM from " + Arguments.argUser.displayName + "\"", "\"" + str2 + "\"");
                             Util.say(Arguments.argUser.networkPlayer, "\"PM to " + key + "\"", "\"" + str2 + "\"");

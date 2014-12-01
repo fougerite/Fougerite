@@ -17,13 +17,13 @@
                 foreach (PlayerClient client in PlayerClient.All)
                 {
                     playerName = ChatArguments[0].TrimStart(new char[] { '"', ' ' });
-                    if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                    if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     {
-                        if (client.netUser.displayName.ToLower() == playerName.ToLower())
+                        if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                         {
                             matched.Add(client);
                             break;
-                        } else if (client.netUser.displayName.ToLower() == playerName.TrimEnd(new char[] { '"', ' ' }).ToLower())
+                        } else if (client.netUser.displayName.Equals(playerName.TrimEnd(new char[] { '"', ' ' }), StringComparison.OrdinalIgnoreCase))
                         {
                             playerName = playerName.TrimEnd(new char[] { '"', ' ' });
                             matched.Add(client);
@@ -34,13 +34,13 @@
                     {
                         continue;
                     }
-                    if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                    if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     {
-                        if (client.netUser.displayName.ToLower() == playerName.ToLower())
+                        if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                         {
                             matched.Add(client);
                             break;
-                        } else if (client.netUser.displayName.ToLower() == playerName.TrimEnd(new char[] { '"', ' ' }).ToLower())
+                        } else if (client.netUser.displayName.Equals(playerName.TrimEnd(new char[] { '"', ' ' }), StringComparison.OrdinalIgnoreCase))
                         {
                             playerName = playerName.TrimEnd(new char[] { '"', ' ' });
                             matched.Add(client);

@@ -23,7 +23,7 @@
                 {
                     RemoveAdmin(administrator, Arguments.argUser);
                     return;
-                } else if (administrator.DisplayName.ToLower().Contains(playerName.ToLower()))
+                } else if (administrator.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(administrator);
             }
             if (list.Count == 1)

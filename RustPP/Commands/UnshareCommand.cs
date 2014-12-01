@@ -31,7 +31,7 @@
                     {
                         UnshareDoors(new PList.Player(id, Core.userCache[id]), Arguments.argUser);
                         return;
-                    } else if (Core.userCache[id].ToLower().Contains(playerName.ToLower()))
+                    } else if (Core.userCache[id].ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(id, Core.userCache[id]);
                 } else
                 {

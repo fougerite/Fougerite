@@ -25,7 +25,7 @@
                     {
                         administrator = admin;
                         break;
-                    } else if (administrator.DisplayName.ToLower().Contains(playerName.ToLower()))
+                    } else if (administrator.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     {
                         list.Add(administrator);
                     }

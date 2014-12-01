@@ -17,7 +17,7 @@
         {
             foreach (ItemDataBlock block in this)
             {
-                if (block.name.ToLower() == str.ToLower())
+                if (block.name.ToUpperInvariant() == str.ToUpperInvariant())
                 {
                     return block;
                 }

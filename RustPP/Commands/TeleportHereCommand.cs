@@ -31,7 +31,7 @@
             list.Add("TargetToHere");
             foreach (PlayerClient client in PlayerClient.All)
             {
-                if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                 {
                     if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                     {

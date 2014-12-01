@@ -45,14 +45,15 @@
             admins.Add(admin);
         }
 
-        private static void AddFlagsToList(List<string> l, string str)
+        private static void AddFlagsToList(List<string> l, string flagstr)
         {
-            foreach (string str2 in str.Split(new char[] { '|' }))
+            foreach (string flag in flagstr.Split(new char[] { '|' }))
             {
-                if (!l.Contains(str2.ToLower()))
-                {
-                    l.Add(str2);
-                }
+                string proper = Administrator.GetProperName(flag);
+                if (l.Contains(proper) || proper.Equals(string.Empty))
+                    continue;
+
+                l.Add(proper);
             }
         }
 
@@ -86,11 +87,11 @@
             return null;
         }
 
-        public static string GetProperName(string flag)
+        public static string GetProperName(string name)
         {
-            foreach (string str in PermissionsFlags)
+            foreach (string flag in PermissionsFlags)
             {
-                if (str.Equals(flag, StringComparison.OrdinalIgnoreCase))
+                if (flag.Equals(name, StringComparison.OrdinalIgnoreCase))
                     return flag;
             }
             return string.Empty;

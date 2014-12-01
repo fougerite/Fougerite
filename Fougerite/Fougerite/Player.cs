@@ -72,7 +72,7 @@
         public static Fougerite.Player FindByName(string name)
         {
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.Name.ToLower() == name.ToLower())
+                if (player != null && player.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                     return player;
             return null;
         }

@@ -26,7 +26,7 @@
                 {
                     DoorShare(new PList.Player(entry.Key, entry.Value), Arguments.argUser);
                     return;
-                } else if (entry.Value.ToLower().Contains(playerName.ToLower()))
+                } else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(entry.Key, entry.Value);
             }
             if (list.Count == 1)
@@ -37,7 +37,7 @@
                     {
                         DoorShare(new PList.Player(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
-                    } else if (client.netUser.displayName.ToLower().Contains(playerName.ToLower()))
+                    } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(client.netUser.userID, client.netUser.displayName);
                 }
             }

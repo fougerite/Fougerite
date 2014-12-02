@@ -44,9 +44,29 @@
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;
-            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")))
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
             {
-                command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
+                bool success = false;
+                SerializableDictionary<ulong, List<ulong>> doorsDict;
+                try
+                {
+                    doorsDict = Helper.ObjectFromXML<SerializableDictionary<ulong, List<ulong>>>(RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
+                    Hashtable doorsSave = new Hashtable();
+                    foreach (KeyValuePair<ulong, List<ulong>> kvp in doorsDict)
+                    {
+                        ArrayList arr = new ArrayList(kvp.Value);
+                        doorsSave.Add(kvp.Key, arr);
+                    }
+                    command.SetSharedDoors(doorsSave);
+                    success = true;
+                } catch (Exception ex)
+                {
+                    Logger.LogError("[Rust++ Core.Init] exception loading doorsSave.xml");
+                    Logger.LogException(ex);
+                }
+                if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")) && !success)
+                    command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
+
                 if (!File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
                 {
                     SerializableDictionary<ulong, List<ulong>> doorsSave = new SerializableDictionary<ulong, List<ulong>>();

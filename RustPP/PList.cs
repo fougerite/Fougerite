@@ -29,14 +29,9 @@
 
         public bool Contains(ulong uid)
         {
-            foreach (Player player in this.players)
-            {
-                if (player.UserID == uid)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return this.players.Exists(delegate(Player obj) {
+                return obj.UserID == uid;   
+            });
         }
 
         public Player Get(ulong uid)
@@ -53,13 +48,11 @@
 
         public void Remove(ulong uid)
         {
-            foreach (Player player in this.players)
-            {
-                if (player.UserID == uid)
-                {
-                    this.players.Remove(player);
-                }
-            }
+            Player p = this.players.Find(delegate(Player obj) {
+                return obj.UserID == uid;   
+            });
+            if (p != null)
+                this.players.Remove(p);
         }
 
         public int Count

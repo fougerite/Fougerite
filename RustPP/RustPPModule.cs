@@ -11,6 +11,7 @@
     using System.IO;
     using System.Reflection;
     using System.Timers;
+    using UnityEngine;
 
     public class RustPPModule : Fougerite.Module
     {
@@ -258,7 +259,7 @@
             if (Core.IsEnabled() && !de.Open)
             {
                 ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
-                ArrayList list = (ArrayList)command.GetSharedDoors()[de.Entity.OwnerID];
+                ArrayList list = (ArrayList)command.GetSharedDoors()[(de.Entity.Object as DeployableObject).ownerID];
                 if (list == null)
                     de.Open = false;
                 else if (list.Contains(p.PlayerClient.userID))

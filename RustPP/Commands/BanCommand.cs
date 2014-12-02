@@ -4,6 +4,7 @@
     using RustPP;
     using RustPP.Permissions;
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     internal class BanCommand : ChatCommand
@@ -51,7 +52,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to ban.");
-            Core.banWaitList.Add(Arguments.argUser.userID, list);
+            Core.banWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameBan(ref ConsoleSystem.Arg Arguments, int id)
@@ -70,18 +71,24 @@
             if (ban.UserID == myAdmin.userID)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, "Seriously? You can't ban yourself.");
-            } else if (Administrator.IsAdmin(ban.UserID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
+                return;
+            }
+            if (Administrator.IsAdmin(ban.UserID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, ban.DisplayName + " is an administrator. You can't ban administrators.");
-            } else
-            {
-                Core.blackList.Add(ban);
-                Administrator.DeleteAdmin(ban.UserID);
-                Administrator.NotifyAdmins(string.Format("{0} has been banned by {1}.", ban.DisplayName, myAdmin.displayName));
-                PlayerClient client;
-                if (PlayerClient.FindByUserID(ban.UserID, out client))
-                    client.netUser.Kick(NetError.Facepunch_Kick_Ban, true);
+                return;
             }
+            if (Core.blackList.Contains(ban.UserID))
+            {
+                Logger.LogError(string.Format("[BanPlayer] {0}, id={1} already on blackList. WTF.", ban.DisplayName, ban.UserID));
+                Core.blackList.Remove(ban.UserID);
+            }
+            Core.blackList.Add(ban);
+            Administrator.DeleteAdmin(ban.UserID);
+            Administrator.NotifyAdmins(string.Format("{0} has been banned by {1}.", ban.DisplayName, myAdmin.displayName));
+            PlayerClient client;
+            if (PlayerClient.FindByUserID(ban.UserID, out client))
+                client.netUser.Kick(NetError.Facepunch_Kick_Ban, true);
         }
     }
 }

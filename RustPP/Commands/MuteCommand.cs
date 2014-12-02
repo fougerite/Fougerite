@@ -51,7 +51,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
-            Core.muteWaitList.Add(Arguments.argUser.userID, list);
+            Core.muteWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameMute(ref ConsoleSystem.Arg Arguments, int id)
@@ -59,11 +59,9 @@
             if (id == 0)
             {
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
-                Core.muteWaitList.Remove(Arguments.argUser.userID);
                 return;
             }
             PList list = (PList)Core.muteWaitList[Arguments.argUser.userID];
-            Core.muteWaitList.Remove(Arguments.argUser.userID);
             MutePlayer(list.PlayerList[id], Arguments.argUser);
         }
 
@@ -72,14 +70,37 @@
             if (mute.UserID == myAdmin.userID)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, "There is no point muting yourself.");
-            } else if (Administrator.IsAdmin(mute.UserID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
-            {
-                Util.sayUser(myAdmin.networkPlayer, Core.Name, mute.DisplayName + " is an administrator. You can't mute administrators.");
-            } else
-            {
-                Core.muteList.Add(mute);
-                Administrator.NotifyAdmins(string.Format("{0} has been muted by {1}.", mute.DisplayName, myAdmin.displayName));
+                return;
             }
+            if (Core.muteList.Contains(mute.UserID))
+            {
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Format("{0} is already muted.", mute.DisplayName));
+                return;
+            }
+            if (Administrator.IsAdmin(mute.UserID))
+            {
+                Administrator mutingAdmin = Administrator.GetAdmin(myAdmin.userID);
+                Administrator mutedAdmin = Administrator.GetAdmin(mute.UserID);
+                if (mutedAdmin.HasPermission("CanUnmute") || mutedAdmin.HasPermission("CanAddFlags") || mutedAdmin.HasPermission("RCON"))
+                {
+                    if (!mutedAdmin.HasPermission("RCON"))
+                    {
+                        if (mutingAdmin.HasPermission("RCON") || mutingAdmin.HasPermission("CanUnflag"))
+                        {                                     
+                            mutedAdmin.Flags.Remove("CanUnmute");
+                            mutedAdmin.Flags.Remove("CanMute");
+                            mutedAdmin.Flags.Remove("CanAddFlags");
+                            mutedAdmin.Flags.Remove("CanUnflag");
+                        }
+                    } else
+                    {
+                        Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Format("{0} is an administrator. You can't mute administrators.", mute.DisplayName));
+                        return;
+                    }
+                }
+            }
+            Core.muteList.Add(mute);
+            Administrator.NotifyAdmins(string.Format("{0} has been muted by {1}.", mute.DisplayName, myAdmin.displayName));
         }
     }
 }

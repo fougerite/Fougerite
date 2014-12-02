@@ -38,7 +38,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to kick.");
-            Core.kickWaitList.Add(Arguments.argUser.userID, list);
+            Core.kickWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameKick(ref ConsoleSystem.Arg Arguments, int id)

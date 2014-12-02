@@ -64,7 +64,7 @@
                 }
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the friend to remove.");
-                Core.unfriendWaitList.Add(Arguments.argUser.userID, list);
+                Core.unfriendWaitList[Arguments.argUser.userID] = list;
             }
         }
 

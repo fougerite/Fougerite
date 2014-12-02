@@ -20,7 +20,7 @@
         }
         public override string Author
         {
-            get { return "xEnt22"; }
+            get { return "xEnt22, mikec"; }
         }
         public override string Description
         {

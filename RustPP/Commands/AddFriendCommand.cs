@@ -52,7 +52,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to add as your friend.");
-            Core.friendWaitList.Add(Arguments.argUser.userID, list);
+            Core.friendWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameAddFriend(ref ConsoleSystem.Arg Arguments, int id)

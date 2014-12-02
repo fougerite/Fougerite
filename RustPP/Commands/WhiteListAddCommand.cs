@@ -51,7 +51,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to whitelist.");
-            Core.whiteWaitList.Add(Arguments.argUser.userID, list);
+            Core.whiteWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameWhitelist(ref ConsoleSystem.Arg Arguments, int id)

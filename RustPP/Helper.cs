@@ -77,7 +77,7 @@
                 if (Core.muteList.Count != 0)
                 {
                     Logger.Log("Saving mutelist.");
-                    ObjectToXML<List<PList.Player>>(Core.blackList.PlayerList, RustPPModule.GetAbsoluteFilePath("mutelist.xml"));
+                    ObjectToXML<List<PList.Player>>(Core.muteList.PlayerList, RustPPModule.GetAbsoluteFilePath("mutelist.xml"));
                 } else if (File.Exists(RustPPModule.GetAbsoluteFilePath("mutelist.xml")))
                 {
                     File.Delete(RustPPModule.GetAbsoluteFilePath("mutelist.xml"));
@@ -93,7 +93,6 @@
             } catch (Exception ex)
             {
                 Fougerite.Logger.LogException(ex);
-                throw;
             }
         }
 

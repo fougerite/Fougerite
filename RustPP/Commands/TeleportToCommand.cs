@@ -42,7 +42,7 @@
                 }
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
-                tpWaitList.Add(Arguments.argUser.userID, list);
+                tpWaitList[Arguments.argUser.userID] = list;
             } else
             {
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + playerName);

@@ -58,7 +58,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you won't share doors with.");
-            Core.unshareWaitList.Add(Arguments.argUser.userID, list);
+            Core.unshareWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameUnshareDoors(ref ConsoleSystem.Arg Arguments, int id)

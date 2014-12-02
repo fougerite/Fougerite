@@ -39,7 +39,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to unban.");
-            Core.unbanWaitList.Add(Arguments.argUser.userID, list);
+            Core.unbanWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameUnban(ref ConsoleSystem.Arg Arguments, int id)

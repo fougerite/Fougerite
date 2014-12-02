@@ -9,9 +9,8 @@
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string itemName = World.GetWorld().ParseItemName(string.Join(" ", ChatArguments));
-
-            int qty = int.Parse(ChatArguments[ChatArguments.Length - 1]);
-            if (!(qty >= 1))
+            int qty;
+            if (!int.TryParse(ChatArguments[ChatArguments.Length - 1], out qty))
                 qty = 1;
 
             if (!(itemName == string.Empty))

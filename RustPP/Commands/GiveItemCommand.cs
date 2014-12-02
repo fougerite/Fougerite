@@ -94,8 +94,8 @@
                         }                                            
                     }
 
-                    int qty = int.Parse(itemArgs[itemArgs.Length - 1]);
-                    if (!(qty >= 1))
+                    int qty;
+                    if (!int.TryParse(itemArgs[itemArgs.Length - 1], out qty))
                         qty = 1;
 
                     Arguments.Args = new string[] { recipName, itemName, qty.ToString() };

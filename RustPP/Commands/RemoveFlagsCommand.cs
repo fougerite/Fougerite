@@ -71,7 +71,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the administrator you were looking for.");
-            Core.adminUnflagWaitList.Add(Arguments.argUser.userID, list);
+            Core.adminUnflagWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameRemoveFlags(ref ConsoleSystem.Arg Arguments, int id)

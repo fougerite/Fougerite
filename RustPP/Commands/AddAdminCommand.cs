@@ -50,7 +50,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to become administrator.");
-            Core.adminAddWaitList.Add(Arguments.argUser.userID, list);
+            Core.adminAddWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameNewAdmin(ref ConsoleSystem.Arg Arguments, int id)

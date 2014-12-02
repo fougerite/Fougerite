@@ -38,7 +38,7 @@
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the adminstrator to remove.");
-            Core.adminRemoveWaitList.Add(Arguments.argUser.userID, list);
+            Core.adminRemoveWaitList[Arguments.argUser.userID] = list;
         }
 
         public void PartialNameRemoveAdmin(ref ConsoleSystem.Arg Arguments, int id)

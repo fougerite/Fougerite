@@ -17,14 +17,17 @@
             }
             List<Administrator> list = new List<Administrator>();
             list.Add(new Administrator(0, "Cancel"));
-            foreach (Administrator administrator in Administrator.AdminList)
+            Administrator administrator = Administrator.AdminList.Find(delegate(Administrator obj) {
+                return obj.DisplayName.Equals(playerName, StringComparison.OrdinalIgnoreCase);   
+            });
+            if (administrator != null)
             {
-                if (administrator.DisplayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
-                {
-                    RemoveAdmin(administrator, Arguments.argUser);
-                    return;
-                } else if (administrator.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
-                    list.Add(administrator);
+                RemoveAdmin(administrator, Arguments.argUser);
+            } else
+            {
+                list.AddRange(Administrator.AdminList.FindAll(delegate(Administrator obj) {
+                    return obj.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant());  
+                }));
             }
             if (list.Count == 1)
             {

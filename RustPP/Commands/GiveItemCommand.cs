@@ -100,8 +100,8 @@
 
                     Arguments.Args = new string[] { recipName, itemName, qty.ToString() };
                     inv.giveplayer(ref Arguments);
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} {1} were placed in {2}'s inventory.", qty.ToString(), itemName, recipName));
-                    Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you {1} {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", qty.ToString(), itemName, recipName));
+                    Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
                     return;
                 } else // !(matched.Count >= 1)
                 {

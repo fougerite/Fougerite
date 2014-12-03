@@ -17,7 +17,7 @@
             {
                 Arguments.Args = new string[] { itemName, qty.ToString() };
                 inv.give(ref Arguments);
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} {1} were placed in your inventory.", qty.ToString(), itemName));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in your inventory.", qty.ToString(), itemName));
             }
             else
             {

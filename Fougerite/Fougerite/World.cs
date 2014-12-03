@@ -20,10 +20,33 @@
 
         public void Airdrop(int rep)
         {
+            System.Random rand = new System.Random();
+            Vector3 rpog;
             for (int i = 0; i < rep; i++)
             {
-                SupplyDropZone.CallAirDropAt(RandomPointOnGround());
+                RandomPointOnGround(ref rand, out rpog);
+                SupplyDropZone.CallAirDropAt(rpog);
             }
+        }
+
+        private static void RandomPointOnGround(ref System.Random rand, out Vector3 onground)
+        {
+            float z = (float)rand.Next(-6100, -1000);
+            float x = (float)3600;
+            if (z < -4900 && z >= -6100)
+            {
+                x = (float)rand.Next(3600, 6100);
+            }
+            if (z < 2400 && z >= -4900)
+            {
+                x = (float)rand.Next(3600, 7300);
+            }
+            if (z <= -1000 && z >= -2400)
+            {
+                x = (float)rand.Next(3600, 6700);
+            }
+            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500, z));
+            onground = new Vector3(x, y, z);
         }
 
         public void AirdropAt(float x, float y, float z)
@@ -72,27 +95,6 @@
             Vector2 jitter = UnityEngine.Random.insideUnitCircle;
             target.x += jitter.x * 100;
             target.z += jitter.y * 100;
-        }
-
-        private static Vector3 RandomPointOnGround()
-        {
-            System.Random rand = new System.Random();
-            float z = rand.Next(-1000, -6100);
-            float x = 3600;
-            if (z < -4900 && z >= -6100)
-            {
-                x = rand.Next(3600, 6100);
-            }
-            if (z < 2400 && z >= -4900)
-            {
-                x = rand.Next(3600, 7300);
-            }
-            if (z <= -1000 && z >= -2400)
-            {
-                x = rand.Next(3600, 6700);
-            }
-            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500, z));
-            return new Vector3(x, y, z);
         }
 
         public void Blocks()
@@ -682,23 +684,23 @@
                     return "556 Ammo";
                 }
             }
-            if (str.Contains(" 9mm"))
+            if (str.Contains(" 9MM"))
             {            
-                if (str.Contains(" 9mm") && str.Contains("CAS"))
+                if (str.Contains(" 9MM") && str.Contains("CAS"))
                 {
-                    return "9mm Casing Blueprint"; 
+                    return "9MM Casing Blueprint"; 
                 }
-                if (str.Contains(" 9mm") && str.Contains("PIS"))
+                if (str.Contains(" 9MM") && str.Contains("PIS"))
                 {
                     if (IsBP(str))
-                        return "9mm Pistol Blueprint";
+                        return "9MM Pistol Blueprint";
 
-                    return "9mm Pistol"; 
+                    return "9MM Pistol"; 
                 }
                 if (IsBP(str))
-                    return "9mm Ammo Blueprint";
+                    return "9MM Ammo Blueprint";
 
-                return "9mm Ammo"; 
+                return "9MM Ammo"; 
             }
             if (str.Contains(" CAM") || str.Contains(" FIR"))
             {
@@ -976,8 +978,8 @@
                 if (str.Contains("556"))
                     return "Empty 556 Casing";
 
-                if (str.Contains("9mm"))
-                    return "Empty 9mm Casing";
+                if (str.Contains("9MM"))
+                    return "Empty 9MM Casing";
 
                 if (str.Contains("SHO") || str.Contains("SHE"))
                 {
@@ -1020,12 +1022,12 @@
 
                     return "Primed 556 Casing";
                 }
-                if (str.Contains("9mm"))
+                if (str.Contains("9MM"))
                 {
                     if (IsBP(str))
-                        return "Primed 9mm Casing Blueprint";
+                        return "Primed 9MM Casing Blueprint";
 
-                    return "Primed 9mm Casing";
+                    return "Primed 9MM Casing";
                 }            
                 if (str.Contains("SHO") || str.Contains("SHE"))
                 {
@@ -1069,7 +1071,7 @@
             {
                 for (int i = 1; i <= 7; i++)
                 {
-                    if (str.Contains(string.Format("part{0}", i)) || str.Contains(string.Format("part {0}", i)))
+                    if (str.Contains(string.Format("PART{0}", i)) || str.Contains(string.Format("PART {0}", i)))
                     {
                         if (str.Contains(" ARM"))
                         {

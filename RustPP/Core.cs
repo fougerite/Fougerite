@@ -44,9 +44,9 @@
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;
+            bool success = false;
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
             {
-                bool success = false;
                 SerializableDictionary<ulong, List<ulong>> doorsDict;
                 try
                 {
@@ -61,24 +61,24 @@
                     success = true;
                 } catch (Exception ex)
                 {
-                    Logger.LogError("[Rust++ Core.Init] exception loading doorsSave.xml");
+                    Logger.LogError(string.Format("[{0} Core.Init] exception loading doorsSave.xml", Core.Name));
                     Logger.LogException(ex);
                 }
-                if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")) && !success)
-                    command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
+            }
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")) && !success)
+                command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
 
-                if (!File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
+            if (!File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
+            {
+                SerializableDictionary<ulong, List<ulong>> doorsSave = new SerializableDictionary<ulong, List<ulong>>();
+                foreach (DictionaryEntry entry in command.GetSharedDoors())
                 {
-                    SerializableDictionary<ulong, List<ulong>> doorsSave = new SerializableDictionary<ulong, List<ulong>>();
-                    foreach (DictionaryEntry entry in command.GetSharedDoors())
-                    {
-                        ulong key = (ulong)entry.Key;
-                        ArrayList value = (ArrayList)entry.Value;
-                        List<ulong> list = new List<ulong>(value.OfType<ulong>());
-                        doorsSave.Add(key, list);
-                    }
-                    Helper.ObjectToXML<SerializableDictionary<ulong, List<ulong>>>(doorsSave, RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
+                    ulong key = (ulong)entry.Key;
+                    ArrayList value = (ArrayList)entry.Value;
+                    List<ulong> list = new List<ulong>(value.OfType<ulong>());
+                    doorsSave.Add(key, list);
                 }
+                Helper.ObjectToXML<SerializableDictionary<ulong, List<ulong>>>(doorsSave, RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp")))
             {
@@ -88,13 +88,27 @@
             {
                 Administrator.AdminList = Helper.ObjectFromXML<List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
             }
-            if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")))
+            success = false;
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
+            {
+                try
+                {
+                    SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                    userCache = new Dictionary<ulong, string>(userDict);
+                    success = true;
+                } catch (Exception ex)
+                {
+                    Logger.LogError(string.Format("[{0} Core.Init] exception loading userCache.xml", Core.Name));
+                    Logger.LogException(ex);
+                }
+            }
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")) && !success)
             {
                 userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                 if (!File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
                     Helper.ObjectToXML<SerializableDictionary<ulong, string>>(new SerializableDictionary<ulong, string>(userCache), RustPPModule.GetAbsoluteFilePath("userCache.xml"));
             }
-            else
+            else if (!success)
             {
                 userCache = new Dictionary<ulong, string>();
             }

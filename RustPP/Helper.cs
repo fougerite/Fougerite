@@ -60,8 +60,8 @@
                 if (Core.userCache.Count != 0)
                 {
                     Logger.Log("Saving user cache.");
-                    ObjectToFile<Dictionary<ulong, string>>(Core.userCache, RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                     ObjectToXML<SerializableDictionary<ulong, string>>(new SerializableDictionary<ulong, string>(Core.userCache), RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                    ObjectToFile<Dictionary<ulong, string>>(Core.userCache, RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                 } else if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")))
                 {
                     File.Delete(RustPPModule.GetAbsoluteFilePath("cache.rpp"));

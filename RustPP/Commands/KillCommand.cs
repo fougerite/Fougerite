@@ -2,40 +2,71 @@
 {
     using Fougerite;
     using System;
+    using RustPP;
+    using RustPP.Permissions;
+    using System.Collections.Generic;
 
     internal class KillCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
             {
-                str = str + ChatArguments[i] + " ";
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Kill Usage:  /kill playerName");
             }
-            str = str.Trim();
-            PlayerClient client = null;
-            foreach (PlayerClient client2 in PlayerClient.All)
+            PList list = new PList();
+            list.Add(new PList.Player(0, "Cancel"));
+            foreach (PlayerClient client in PlayerClient.All)
             {
-                if (client2.netUser.displayName.ToLower() == str.ToLower())
+                if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
-                    client = client2;
-                }
+                    KillPlayer(client, Arguments.argUser.playerClient);
+                    return;
+                } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
+                    list.Add(client.netUser.userID, client.netUser.displayName);
             }
-            if (client != null)
+            if (list.Count == 1)
             {
-                try
-                {
-                    Character character;
-                    Character.FindByUser(client.userID, out character);
-                    IDBase victim = character;
-                    TakeDamage.Kill(Arguments.argUser.playerClient, victim, null);
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You killed " + client.netUser.displayName);
-                    Util.sayUser(client.netPlayer, Core.Name, Arguments.argUser.displayName + " killed you with his admin power.");
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player matches the name: " + playerName);
+                return;
+            }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
+            for (int i = 1; i < list.Count; i++)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i].DisplayName));
+            }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you want to murder.");
+            Core.killWaitList[Arguments.argUser.userID] = list;
+        }
+
+        public void PartialNameKill(ref ConsoleSystem.Arg Arguments, int id)
+        {
+            if (id == 0)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
+                return;
+            }
+            PList list = (PList)Core.killWaitList[Arguments.argUser.userID];
+            PlayerClient client;
+            if (PlayerClient.FindByUserID(list.PlayerList[id].UserID, out client))
+                KillPlayer(client, Arguments.argUser.playerClient);
+        }
+
+        public void KillPlayer(PlayerClient victim, PlayerClient myAdmin)
+        {
+            if (victim == myAdmin)
+            {
+                Util.sayUser(myAdmin.netUser.networkPlayer, Core.Name, "Suicide isn't painless. " + Core.Name + " won't let you kill yourself.");
+            } else if (Administrator.IsAdmin(victim.userID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
+            {
+                Util.sayUser(myAdmin.netUser.networkPlayer, Core.Name, victim.netUser.displayName + " is an administrator. May I suggest a rock?");
+            } else
+            {
+                Administrator.NotifyAdmins(string.Format("{0} killed {1} with mind bullets.", myAdmin.netUser.displayName, victim.netUser.displayName));
+                Util.sayUser(victim.netPlayer, myAdmin.netUser.displayName, string.Format("I killed you with mind bullets. That's telekinesis, {1}.", myAdmin.netUser.displayName, victim.netUser.displayName));
+                TakeDamage.Kill(myAdmin, victim, null);
             }
         }
     }

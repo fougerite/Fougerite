@@ -6,9 +6,9 @@
 
     internal class GodModeCommand : ChatCommand
     {
-        private System.Collections.Generic.List<ulong> userIDs = new System.Collections.Generic.List<ulong>();
+        private List<ulong> userIDs = new List<ulong>();
 
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             if (!this.userIDs.Contains(Arguments.argUser.userID))
             {

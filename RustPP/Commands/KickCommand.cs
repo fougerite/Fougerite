@@ -8,97 +8,65 @@
 
     internal class KickCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
             {
-                str = str + ChatArguments[i] + " ";
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Kick Usage:  /kick playerName");
             }
-            str = str.Trim();
-            if ((ChatArguments == null) && !(str == ""))
+            PList list = new PList();
+            list.Add(0, "Cancel");
+            foreach (PlayerClient client in PlayerClient.All)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Kick Usage:  /kick \"playerName\"");
+                if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
+                {
+                    KickPlayer(client.netUser, Arguments.argUser);
+                    return;
+                } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
+                    list.Add(client.netUser.userID, client.netUser.displayName);
             }
-            else if (str != "")
+            if (list.Count == 1)
             {
-                System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-                list.Add("Cancel");
-                foreach (PlayerClient client in PlayerClient.All)
-                {
-                    if (client.netUser.displayName.ToLower().Contains(str.ToLower()))
-                    {
-                        if (client.netUser.displayName.ToLower() == str.ToLower())
-                        {
-                            if (Arguments.argUser.userID == client.userID)
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You can't kick yourself.");
-                            }
-                            else if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(Arguments.argUser.userID).HasPermission("RCON"))
-                            {
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You cannot kick an administrator!");
-                            }
-                            else
-                            {
-                                Core.kickWaitList.Remove(Arguments.argUser.userID);
-                                Administrator.NotifyAdmins(client.netUser.displayName + " has been kicked.");
-                                client.netUser.Kick(NetError.Facepunch_Kick_Violation, true);
-                            }
-                            return;
-                        }
-                        list.Add(client.netUser.displayName);
-                    }
-                }
-                if (list.Count != 1)
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
-                    for (int j = 1; j < list.Count; j++)
-                    {
-                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
-                    }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
-                    Core.kickWaitList.Add(Arguments.argUser.userID, list);
-                }
-                else
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player matches the name: " + playerName);
+                return;
             }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
+            for (int i = 1; i < list.Count; i++)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0} - {1}", i, list.PlayerList[i].DisplayName));
+            }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player to kick.");
+            Core.kickWaitList[Arguments.argUser.userID] = list;
         }
 
-        public void PartialNameKick(Fougerite.Player p, int id)
+        public void PartialNameKick(ref ConsoleSystem.Arg Arguments, int id)
         {
-            if (Core.kickWaitList.Contains(p.PlayerClient.userID))
+            if (id == 0)
             {
-                List<string> list = (List<string>)Core.kickWaitList[p.PlayerClient.userID];
-                string str = list[id];
-                if (id == 0)
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
-                }
-                else
-                {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        if (client.netUser.displayName == str)
-                        {
-                            Core.kickWaitList.Remove(p.PlayerClient.userID);
-                            if (Administrator.IsAdmin(client.userID) && !Administrator.GetAdmin(p.PlayerClient.userID).HasPermission("RCON"))
-                            {
-                                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You cannot kick an administrator!");
-                            }
-                            else
-                            {
-                                Administrator.NotifyAdmins(client.netUser.displayName + " has been kicked.");
-                                client.netUser.Kick(NetError.Facepunch_Kick_Violation, true);
-                            }
-                            break;
-                        }
-                    }
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
+                return;
+            }
+                
+            PList list = (PList)Core.kickWaitList[Arguments.argUser.userID];
+            PlayerClient client;
+            if (PlayerClient.FindByUserID(list.PlayerList[id].UserID, out client))
+                KickPlayer(client.netUser, Arguments.argUser);
+        }
+
+        public void KickPlayer(NetUser badPlayer, NetUser myAdmin)
+        {
+            if (badPlayer == myAdmin)
+            {
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, "You can't kick yourself.");
+            } else if (Administrator.IsAdmin(badPlayer.userID) && !Administrator.GetAdmin(myAdmin.userID).HasPermission("RCON"))
+            {
+                Util.sayUser(myAdmin.networkPlayer, Core.Name, badPlayer.displayName + " is an administrator. You can't kick administrators.");
+            } else
+            {
+                Administrator.NotifyAdmins(string.Format("{0} has been kicked by {1}.", badPlayer.displayName, myAdmin.displayName));
+                badPlayer.Kick(NetError.Facepunch_Kick_Ban, true);
             }
         }
     }

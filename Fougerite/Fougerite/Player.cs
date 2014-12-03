@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
     using Fougerite.Events;
@@ -15,50 +13,36 @@ namespace Fougerite
 
     public class Player
     {
-        private readonly PlayerClient ourPlayer;
-        private readonly long connectedAt;
-
+        private long connectedAt;
         private PlayerInv inv;
         private bool invError;
         private bool justDied;
-        
+        private PlayerClient ourPlayer;
 
-        //public Player()
-        //{
-        //    this.justDied = true;
-        //}
+        public Player()
+        {
+            this.justDied = true;
+        }
 
         public Player(PlayerClient client)
         {
-            Contract.Requires(client != null);
-
             this.justDied = true;
             this.ourPlayer = client;
             this.connectedAt = DateTime.UtcNow.Ticks;
             this.FixInventoryRef();
         }
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(ourPlayer != null);
-        }
-
         public void Disconnect()
         {
             NetUser netUser = this.ourPlayer.netUser;
-
-            if (netUser == null)
-                throw new InvalidOperationException("Player's netUser is null.");
-
-            if (netUser.connected)
+            if (netUser.connected && (netUser != null))
+            {
                 netUser.Kick(NetError.NoError, true);
+            }
         }
 
         public Fougerite.Player Find(string search)
         {
-            Contract.Requires(!string.IsNullOrEmpty(search));
-
             Fougerite.Player player = FindBySteamID(search);
             if (player != null)
             {
@@ -79,8 +63,6 @@ namespace Fougerite
 
         public static Fougerite.Player FindByGameID(string uid)
         {
-            Contract.Requires(!string.IsNullOrEmpty(uid));
-
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 if (player != null && player.GameID == uid)
                     return player;
@@ -89,18 +71,14 @@ namespace Fougerite
 
         public static Fougerite.Player FindByName(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.Name.ToLower() == name.ToLower())
+                if (player != null && player.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                     return player;
             return null;
         }
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
-            if (np == null) return null;
-
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 if (player != null && player.ourPlayer.netPlayer == np)
                     return player;
@@ -109,8 +87,6 @@ namespace Fougerite
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
-            if (pc == null) return null;
-
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 if (player!= null && player.PlayerClient == pc)
                     return player;
@@ -119,8 +95,6 @@ namespace Fougerite
 
         public static Fougerite.Player FindBySteamID(string uid)
         {
-            Contract.Requires(!string.IsNullOrEmpty(uid));
-
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
                 if (player != null && player.SteamID == uid)
                     return player;
@@ -142,8 +116,6 @@ namespace Fougerite
 
         private void Hooks_OnPlayerKilled(DeathEvent de)
         {
-            Contract.Requires(de != null);
-
             try
             {
                 Fougerite.Player victim = de.Victim as Fougerite.Player;
@@ -161,8 +133,6 @@ namespace Fougerite
 
         public void InventoryNotice(string arg)
         {
-            Contract.Requires(arg != null);
-
             Rust.Notice.Inventory(this.ourPlayer.netPlayer, arg);
         }
 
@@ -173,39 +143,26 @@ namespace Fougerite
 
         public void Message(string arg)
         {
-            Contract.Requires(arg != null);
-
             this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void MessageFrom(string playername, string arg)
         {
-            Contract.Requires(!string.IsNullOrEmpty(playername));
-            Contract.Requires(arg != null);
-
             this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(playername) + " " + Facepunch.Utility.String.QuoteSafe(arg));
         }
 
         public void Notice(string arg)
         {
-            Contract.Requires(arg != null);
-
             Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
         }
 
         public void Notice(string icon, string text, float duration = 4f)
         {
-            Contract.Requires(icon != null);
-            Contract.Requires(text != null);
-            Contract.Requires(duration >= 0);
-
             Rust.Notice.Popup(this.PlayerClient.netPlayer, icon, text, duration);
         }
 
         public void SendCommand(string cmd)
         {
-            Contract.Requires(cmd != null);
-
             ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
         }
 
@@ -216,8 +173,6 @@ namespace Fougerite
 
         public void TeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
-            Contract.Requires(p.PlayerClient.controllable.transform != null);
-
             if (this == p) // lol
                 return;
 
@@ -402,7 +357,7 @@ namespace Fougerite
         {
             get
             {
-                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() > 0);
+                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
             }
             set
             {

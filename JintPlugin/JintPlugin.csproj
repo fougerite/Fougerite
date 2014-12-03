@@ -186,7 +186,6 @@
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
       <Project>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</Project>
       <Name>Fougerite</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -226,8 +225,11 @@
   -->
   <ItemGroup>
     <Folder Include="Jint\" />
+    <Folder Include="PlayerLog\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Jint\Jint.snk" />
+    <None Include="PlayerLog\PlayerLog.js" />
+    <None Include="PlayerLog\README.txt" />
   </ItemGroup>
 </Project>

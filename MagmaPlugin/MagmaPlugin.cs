@@ -14,9 +14,9 @@
     public class Plugin
     {
         public readonly JintEngine Engine;
-        public readonly string Name;
-        public readonly string Code;
-        public readonly DirectoryInfo RootDirectory;
+        public string Name;
+        public string Code;
+        public DirectoryInfo RootDirectory;
         public readonly Dictionary<String, TimedEvent> Timers;
         private readonly string brktname = "[Magma]";
 
@@ -349,6 +349,8 @@
 
         public void OnCommand(Player player, string command, string[] args)
         {
+            if (args == null)
+                throw new ArgumentNullException("args");
             Invoke("On_Command", player, command, args);
         }
 

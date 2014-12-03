@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-using System.Linq;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using Facepunch.Utility;
     using Fougerite.Events;
@@ -11,6 +8,7 @@ namespace Fougerite
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading;
+    using System.Linq;
     using uLink;
     using UnityEngine;
 
@@ -49,36 +47,31 @@ namespace Fougerite
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
-            Contract.Requires(item != null);
-            Contract.Requires(bdb != null);
-
-            if (item.controllable == null)
-                throw new InvalidOperationException("IBlueprintItem's controllable is null.");
-
-            if (item.controllable.playerClient == null)
-                throw new InvalidOperationException("IBlueprintItem's playerClient is null.");
-
             Fougerite.Player player = Fougerite.Player.FindByPlayerClient(item.controllable.playerClient);
-            if (player == null) return;
-
-            BPUseEvent ae = new BPUseEvent(bdb);
-            if (OnBlueprintUse != null)
-                OnBlueprintUse(player, ae);
-            if (ae.Cancel) return;
-
-            PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
-            if (internalInventory.BindBlueprint(bdb))
+            if (player != null)
             {
-                int count = 1;
-                if (item.Consume(ref count))
+                BPUseEvent ae = new BPUseEvent(bdb);
+                if (OnBlueprintUse != null)
                 {
-                    internalInventory.RemoveItem(item.slot);
+                    OnBlueprintUse(player, ae);
                 }
-                player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
-            }
-            else
-            {
-                player.Notice("", "You already have this blueprint", 4f);
+                if (!ae.Cancel)
+                {
+                    PlayerInventory internalInventory = player.Inventory.InternalInventory as PlayerInventory;
+                    if (internalInventory.BindBlueprint(bdb))
+                    {
+                        int count = 1;
+                        if (item.Consume(ref count))
+                        {
+                            internalInventory.RemoveItem(item.slot);
+                        }
+                        player.Notice("", "You can now craft: " + bdb.resultItem.name, 4f);
+                    }
+                    else
+                    {
+                        player.Notice("", "You already have this blueprint", 4f);
+                    }
+                }
             }
         }
 
@@ -92,6 +85,8 @@ namespace Fougerite
 
             var quotedName = Facepunch.Utility.String.QuoteSafe(arg.argUser.displayName);
             var quotedMessage = Facepunch.Utility.String.QuoteSafe(arg.GetString(0));
+            if (quotedMessage.Trim('"').StartsWith("/"))
+                Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
 
             if (OnChatRaw != null)
                 OnChatRaw(ref arg);
@@ -100,23 +95,17 @@ namespace Fougerite
                 return;
 
             if (quotedMessage.Trim('"').StartsWith("/")) {
-                Logger.LogDebug("[CHAT-CMD] " + quotedName + " executed " + quotedMessage);
-
-                if (OnCommandRaw != null)
-                    OnCommandRaw(ref arg);
-
                 string[] args = Facepunch.Utility.String.SplitQuotesStrings(quotedMessage.Trim('"'));
                 var command = args[0].TrimStart('/');
                 var cargs = new string[args.Length - 1];
                 Array.Copy(args, 1, cargs, 0, cargs.Length);
 
                 if (OnCommand != null)
-                    OnCommand(new Player(arg.argUser.playerClient), command, cargs);
+                    OnCommand(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), command, cargs);
 
             } else {
                 Logger.ChatLog(quotedName, quotedMessage);               
                 var chatstr = new ChatString(quotedMessage);
-
                 if(OnChat != null)
                     OnChat(new Player(arg.argUser.playerClient), ref chatstr);
 
@@ -133,61 +122,40 @@ namespace Fougerite
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-            Contract.Assume(a != null);
-            Contract.Assume(a.Class != null);
-            Contract.Assume(a.Function != null);
 
-            try
-            {
-                bool external = a.argUser == null;
-                bool adminRights = (a.argUser != null && a.argUser.admin) || external;
+            bool external = a.argUser == null;
+            bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
-                if ((a.Class.ToLower() == "fougerite") && (a.Function.ToLower() == "reload"))
-                {
-                    if (adminRights)
-                    {
-                        ModuleManager.ReloadModules();
-                        a.ReplyWith("Fougerite: Reloaded!");
-                    }
+            if ((a.Class.ToUpperInvariant() == "FOUGERITE") && (a.Function.ToUpperInvariant() == "RELOAD")) {
+                if (adminRights) {
+                    ModuleManager.ReloadModules();
+                    a.ReplyWith("Fougerite: Reloaded!");
                 }
-                else if (OnConsoleReceived != null) 
-                    OnConsoleReceived(ref a, external);
+            } else if (OnConsoleReceived != null)
+                OnConsoleReceived(ref a, external);
 
-                if (string.IsNullOrEmpty(a.Reply))
-                    a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+            if (string.IsNullOrEmpty(a.Reply))
+                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return false;
+            return true;
+
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
         {
-            try
-            {
-                DoorEvent de = new DoorEvent(new Entity(obj));
-                if (obj.ownerID == controllable.playerClient.userID)
-                    de.Open = true;
+            DoorEvent de = new DoorEvent(new Entity(obj));
+            if (obj.ownerID == controllable.playerClient.userID)
+                de.Open = true;
 
-                if (!(obj is SleepingBag) && OnDoorUse != null)
-                    OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
-                return de.Open;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            return false;
+            if (!(obj is SleepingBag) && OnDoorUse != null)
+                OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
+
+            return de.Open;
+           
         }
 
         public static float EntityDecay(object entity, float dmg)
         {
-            Contract.Assume(entity != null);
-
             try
             {
                 DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
@@ -209,26 +177,15 @@ namespace Fougerite
 
         public static void EntityDeployed(object entity)
         {
-            Contract.Assume(entity != null);
+            Entity e = new Entity(entity);
+            Fougerite.Player creator = e.Creator;
 
-            try
-            {
-                Entity e = new Entity(entity);
-                Fougerite.Player creator = e.Creator;
-
-                if (OnEntityDeployed != null)
-                    OnEntityDeployed(creator, e);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            if (OnEntityDeployed != null)
+                OnEntityDeployed(creator, e);
         }
 
         public static void EntityHurt(object entity, ref DamageEvent e)
         {
-            Contract.Assume(entity != null);
-
             try
             {
                 HurtEvent he = new HurtEvent(ref e, new Entity(entity));
@@ -338,30 +295,21 @@ namespace Fougerite
         public static bool PlayerConnect(NetUser user)
         {
             bool connected = false;
-            try
-            {
-                if (user.playerClient == null)
-                {
-                    Logger.LogDebug("PlayerConnect user.playerClient is null");
-                    return false;
-                }
-                Fougerite.Player item = new Fougerite.Player(user.playerClient);
-                Fougerite.Server.GetServer().Players.Add(item);
-                Logger.LogDebug("User Connected: " + item.Name + " (" + item.SteamID.ToString() + " | " +
-                                item.PlayerClient.netPlayer.ipAddress + ")");
-                if (OnPlayerConnected != null)
-                    OnPlayerConnected(item);
 
-                connected = user.connected;
-                if (Fougerite.Config.GetValue("Fougerite", "tellversion") != "false")
-                    item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+            if (user.playerClient == null) {
+                Logger.LogDebug("PlayerConnect user.playerClient is null");
+                return false;
+            }
+            Fougerite.Player item = new Fougerite.Player(user.playerClient);
+            Fougerite.Server.GetServer().Players.Add(item);
+            Logger.LogDebug(string.Format("User Connected: {0} ({1} | {2})", item.Name, item.SteamID.ToString(), item.PlayerClient.netPlayer.ipAddress));
+            if (OnPlayerConnected != null)
+                OnPlayerConnected(item);
 
-                return connected;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            connected = user.connected;
+            if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
+                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+
             return connected;
         }
 

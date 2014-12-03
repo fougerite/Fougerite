@@ -13,7 +13,7 @@
         {
             try
             {
-                if (Core.config.GetSetting("Settings", "pvp_death_broadcast").ToLower() == "true")
+                if (Core.config.GetBoolSetting("Settings", "pvp_death_broadcast"))
                 {
                     char ch = '⊕';
                     Util.sayAll(Core.Name, killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
@@ -99,7 +99,7 @@
             {
                 FriendsCommand command2 = (FriendsCommand)ChatCommand.GetCommand("friends");
                 FriendList list = (FriendList)command2.GetFriendsLists()[e.attacker.userID];
-                if (Core.config.GetSetting("Settings", "friendly_fire").ToLower() == "true")
+                if (Core.config.GetBoolSetting("Settings", "friendly_fire"))
                 {
                     return command.IsOn(e.victim.userID);
                 }
@@ -117,15 +117,7 @@
 
         public static bool KeepItem()
         {
-            try
-            {
-                string keepitems = Core.config.GetSetting("Settings", "keepitems").ToLower();
-                return keepitems == "true";
-            }
-            catch
-            {
-                return false;
-            }
+            return Core.config.GetBoolSetting("Settings", "keepitems");
         }
 
         public static bool loginNotice(NetUser user)
@@ -135,12 +127,12 @@
                 if (Core.blackList.Contains(user.userID))
                 {
                     Core.tempConnect.Add(user.userID);
-                    user.Kick(NetError.Facepunch_Connector_VAC_Banned, true);
+                    user.Kick(NetError.Facepunch_Kick_Ban, true);
                     return false;
                 }
-                if (((Core.config.GetSetting("WhiteList", "enabled") != null) && (Core.config.GetSetting("WhiteList", "enabled").ToLower() == "true")) && !Core.whiteList.Contains(user.userID))
+                if (Core.config.GetBoolSetting("WhiteList", "enabled") && !Core.whiteList.Contains(user.userID))
                 {
-                    user.Kick(NetError.Facepunch_Connector_AuthFailure, true);
+                    user.Kick(NetError.Facepunch_Whitelist_Failure, true);
                 }
                 if (!Core.userCache.ContainsKey(user.userID))
                 {
@@ -155,7 +147,7 @@
                     user.admin = true;
                 }
                 Core.motd(user.networkPlayer);
-                if (Core.config.GetSetting("Settings", "join_notice").ToLower() == "true")
+                if (Core.config.GetBoolSetting("Settings", "join_notice"))
                 {
                     foreach (PlayerClient client in PlayerClient.All)
                     {
@@ -180,7 +172,7 @@
                 {
                     Core.tempConnect.Remove(user.userID);
                 }
-                else if (Core.config.GetSetting("Settings", "leave_notice").ToLower() == "true")
+                else if (Core.config.GetBoolSetting("Settings", "leave_notice"))
                 {
                     foreach (PlayerClient client in PlayerClient.All)
                     {

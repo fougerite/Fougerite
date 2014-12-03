@@ -1,13 +1,11 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP
+﻿namespace RustPP
 {
     using System;
     using System.Collections.Generic;
 
     public class PList
     {
-        private readonly List<Player> players;
+        private List<Player> players;
 
         public PList()
         {
@@ -16,34 +14,24 @@ namespace RustPP
 
         public PList(List<Player> pl)
         {
-            Contract.Requires(pl != null);
-
             this.players = pl;
-        }
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(players != null);
         }
 
         public void Add(ulong uid, string dname)
         {
-            Contract.Requires(!string.IsNullOrEmpty(dname));
-
             this.players.Add(new Player(uid, dname));
+        }
+
+        public void Add(Player player)
+        {
+            this.players.Add(player);
         }
 
         public bool Contains(ulong uid)
         {
-            foreach (Player player in this.players)
-            {
-                if (player.UserID == uid)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return this.players.Exists(delegate(Player obj) {
+                return obj.UserID == uid;   
+            });
         }
 
         public Player Get(ulong uid)
@@ -60,13 +48,11 @@ namespace RustPP
 
         public void Remove(ulong uid)
         {
-            foreach (Player player in this.players)
-            {
-                if (player.UserID == uid)
-                {
-                    this.players.Remove(player);
-                }
-            }
+            Player p = this.players.Find(delegate(Player obj) {
+                return obj.UserID == uid;   
+            });
+            if (p != null)
+                this.players.Remove(p);
         }
 
         public int Count

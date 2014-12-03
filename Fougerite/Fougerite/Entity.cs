@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -12,18 +10,8 @@ namespace Fougerite
         private readonly object _obj;
         private EntityInv inv;
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_obj != null);
-            Contract.Invariant(_obj as StructureComponent != null || _obj as DeployableObject != null);
-        }
-
         public Entity(object Obj)
         {
-            Contract.Requires(Obj != null);
-            Contract.Requires(Obj as StructureComponent != null || Obj as DeployableObject != null);
-
             this._obj = Obj;
 
             if (Obj is DeployableObject)

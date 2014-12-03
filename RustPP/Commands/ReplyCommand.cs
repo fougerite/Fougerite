@@ -8,7 +8,7 @@
     {
         private Hashtable replies = new Hashtable();
 
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             if (ChatArguments != null)
             {
@@ -22,7 +22,7 @@
                     }
                     foreach (PlayerClient client in PlayerClient.All)
                     {
-                        if (client.netUser.displayName.ToLower() == key.ToLower())
+                        if (client.netUser.displayName.Equals(key, StringComparison.OrdinalIgnoreCase))
                         {
                             Util.say(client.netPlayer, "\"PM from " + Arguments.argUser.displayName + "\"", "\"" + str2 + "\"");
                             Util.say(Arguments.argUser.networkPlayer, "\"PM to " + key + "\"", "\"" + str2 + "\"");

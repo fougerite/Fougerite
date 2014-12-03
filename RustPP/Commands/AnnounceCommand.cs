@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using Rust;
@@ -8,32 +6,21 @@ namespace RustPP.Commands
 
     public class AnnounceCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            if (ChatArguments != null)
+            string strText = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+
+            if (strText == string.Empty)
             {
-                string strText = "";
-                for (int i = 0; i < ChatArguments.Length; i++)
-                {
-                    strText = strText + ChatArguments[i] + " ";
-                }
-                if (strText == string.Empty)
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter a valid message.");
-                }
-                else
-                {
-                    char ch = '☢';
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        Notice.Popup(client.netPlayer, ch.ToString(), strText, 5f);
-                    }
-                }
-            }
-            else
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Announce Usage:  /announce your message here");
+            } else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Announce Usage:  /announce \"message\"");
-            }
+                char ch = '☢';
+                foreach (PlayerClient client in PlayerClient.All)
+                {
+                    Notice.Popup(client.netPlayer, ch.ToString(), strText, 5f);
+                }
+            }   
         }
     }
 }

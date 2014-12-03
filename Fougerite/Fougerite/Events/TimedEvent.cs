@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite.Events
+﻿namespace Fougerite.Events
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -10,26 +8,16 @@ namespace Fougerite.Events
     public class TimedEvent
     {
         private object[] _args;
-        private readonly string _name;
-        private readonly System.Timers.Timer _timer;
+        private string _name;
+        private System.Timers.Timer _timer;
         private long lastTick;
 
         public event TimedEventFireDelegate OnFire;
 
         public event TimedEventFireArgsDelegate OnFireArgs;
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_timer != null);
-            Contract.Invariant(!string.IsNullOrEmpty(_name));
-        }
-
         public TimedEvent(string name, double interval)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(interval >= 0);
-
             this._name = name;
             this._timer = new System.Timers.Timer();
             this._timer.Interval = interval;
@@ -39,9 +27,6 @@ namespace Fougerite.Events
         public TimedEvent(string name, double interval, object[] args)
             : this(name, interval)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(interval >= 0);
-            Contract.Requires(args != null);
             this.Args = args;
         }
 
@@ -98,6 +83,10 @@ namespace Fougerite.Events
             get
             {
                 return this._name;
+            }
+            set
+            {
+                this._name = value;
             }
         }
 

@@ -36,8 +36,8 @@
         private DirectoryInfo pluginDirectory;
         private Dictionary<string, Plugin> plugins;
         private readonly string[] filters = new string[2] {
-            "system.io",
-            "system.xml"
+            "SYSTEM.IO",
+            "SYSTEM.XML"
         };
         public static Hashtable inifiles = new Hashtable();
         private readonly string brktname = "[Magma]";
@@ -127,7 +127,7 @@
 
         public bool FilterPlugin(string script)
         {
-            string str1 = script.ToLower();
+            string str1 = script.ToUpperInvariant();
             foreach (string str2 in filters) {
                 if (str1.Contains(str2)) {
                     Logger.LogError(string.Format("{0} Script may not contain: {1}", brktname, str2));

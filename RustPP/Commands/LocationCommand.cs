@@ -3,51 +3,57 @@
     using Fougerite;
     using RustPP.Permissions;
     using System;
-    using UnityEngine;
 
     public class LocationCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string displayName;
-            string str2 = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string targetName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (targetName.Equals(string.Empty) || targetName.Equals(Arguments.argUser.displayName))
             {
-                str2 = str2 + ChatArguments[i] + " ";
-            }
-            str2 = str2.Trim();
-            if (str2 == "")
-            {
-                displayName = Arguments.argUser.displayName;
-            }
-            else
-            {
-                if (!Administrator.IsAdmin(Arguments.argUser.userID))
+                string reply;
+                if (GetLocationString(ref Arguments.argUser, Arguments.argUser.playerClient, out reply))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Only administrators can ask for another player's location.");
-                    return;
+                    Arguments.ReplyWith(reply);
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, reply);
                 }
-                displayName = str2;
+                return;
             }
-            string[] localities = new IniParser("Localities").EnumSection("Cape Ecko");
-
-            foreach (PlayerClient client in PlayerClient.FindAllWithString(displayName))
+            if (!Administrator.IsAdmin(Arguments.argUser.userID))
             {
-                string strValue = string.Concat(new object[] { "Vector3: ", (string)client.lastKnownPosition.ToString() });
-                Arguments.ReplyWith(strValue);
-                Vector2 origin = new Vector2(client.lastKnownPosition.x, client.lastKnownPosition.z);
-                foreach (string loc in localities)
-                {                
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] {
-                        (str2 == "") ? "You" : displayName, " Location Is: X: ",
-                        (int)client.lastKnownPosition.x, " Y: ",
-                        (int)client.lastKnownPosition.y, " Z: ",
-                        (int)client.lastKnownPosition.z
-                    }));
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}", (str2 == "") ? "You are" : displayName + " is"));
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("Vector3: {0}", client.lastKnownPosition.ToString()));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Only Administrators can get the locations of other players.");
+                return;
+            }
+            foreach (PlayerClient client in PlayerClient.All)
+            {
+                if (targetName.Equals("all", StringComparison.OrdinalIgnoreCase) ||
+                    targetName.Equals(client.netUser.displayName, StringComparison.OrdinalIgnoreCase) ||
+                    targetName.ToUpperInvariant().Contains(client.netUser.displayName.ToUpperInvariant()))
+                {
+                    string reply;
+                    if (GetLocationString(ref Arguments.argUser, client, out reply))
+                    {
+                        Arguments.ReplyWith(reply);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, reply);
+                    }
                 }
             }
+        }
+
+        public bool GetLocationString(ref NetUser source, PlayerClient location, out string reply)
+        {
+            bool flag = false;
+            try
+            {
+                string[] v3 = location.lastKnownPosition.ToString("F").Trim(new char[] { '(', ')', ' ' }).Split(new char[] { ',' });
+                reply = string.Format("{3} Location: X:{0} Y:{1} Z:{2}", v3[0], v3[1], v3[2],
+                    (location.netUser == source ? "Your" : string.Format("{0}'s", location.netUser.displayName)));
+                flag = true;
+            } catch (Exception)
+            {
+                reply = string.Empty;
+            }
+            return flag;
         }
     }
 }

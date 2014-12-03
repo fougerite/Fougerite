@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
     using System.Collections.Generic;
@@ -8,23 +6,15 @@ namespace Fougerite
     public class Server
     {
         private ItemsBlocks _items;
+        private StructureMaster _serverStructs = new StructureMaster();
         public Fougerite.Data data = new Fougerite.Data();
-        private readonly System.Collections.Generic.List<Fougerite.Player> players = new System.Collections.Generic.List<Fougerite.Player>();
+        private System.Collections.Generic.List<Fougerite.Player> players = new System.Collections.Generic.List<Fougerite.Player>();
         private static Fougerite.Server server;
         public string server_message_name = "Fougerite";
         public Util util = new Util();
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(players != null);
-            Contract.Invariant(Contract.ForAll(players, p => p != null));
-        }
-
         public void Broadcast(string arg)
         {
-            Contract.Requires(arg != null);
-
             foreach (Fougerite.Player player in this.Players)
             {
                 player.Message(arg);
@@ -33,9 +23,6 @@ namespace Fougerite
 
         public void BroadcastFrom(string name, string arg)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(arg != null);
-
             foreach (Fougerite.Player player in this.Players)
             {
                 player.MessageFrom(name, arg);
@@ -44,8 +31,6 @@ namespace Fougerite
 
         public void BroadcastNotice(string s)
         {
-            Contract.Requires(s != null);
-
             foreach (Fougerite.Player player in this.Players)
             {
                 player.Notice(s);
@@ -54,8 +39,6 @@ namespace Fougerite
 
         public Fougerite.Player FindPlayer(string s)
         {
-            Contract.Requires(!string.IsNullOrEmpty(s));
-
             Fougerite.Player player = Fougerite.Player.FindBySteamID(s);
             if (player != null)
             {
@@ -76,8 +59,6 @@ namespace Fougerite
 
         public static Fougerite.Server GetServer()
         {
-            Contract.Ensures(Contract.Result<Server>() != null);
-
             if (server == null)
             {
                 server = new Fougerite.Server();
@@ -124,6 +105,14 @@ namespace Fougerite
             get
             {
                 return this.players;
+            }
+        }
+
+        public StructureMaster ServerStructures
+        {
+            get
+            {
+                return this._serverStructs;
             }
         }
     }

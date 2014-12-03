@@ -7,7 +7,7 @@
 
     public class PrivateMessagesCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)
@@ -28,7 +28,7 @@
                 {
                     foreach (PlayerClient client in PlayerClient.All)
                     {
-                        if (client.netUser.displayName.ToLower() == str2.ToLower())
+                        if (client.netUser.displayName.Equals(str2, StringComparison.OrdinalIgnoreCase))
                         {
                             Util.say(client.netPlayer, "\"PM from " + Arguments.argUser.displayName + "\"", "\"" + str4 + "\"");
                             Util.say(Arguments.argUser.networkPlayer, "\"PM to " + client.netUser.displayName + "\"", "\"" + str4 + "\"");

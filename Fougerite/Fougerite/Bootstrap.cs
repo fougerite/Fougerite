@@ -1,5 +1,3 @@
-using System.Diagnostics.Contracts;
-
 namespace Fougerite
 {
     using Facepunch;
@@ -12,7 +10,7 @@ namespace Fougerite
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.5(MC6)";
+        public static string Version = "1.0.7";
 
         public static void AttachBootstrap()
         {
@@ -36,12 +34,11 @@ namespace Fougerite
 
         public bool ApplyOptions()
         {
-            // look for the string 'false' to disable.  not a bool check
+            // look for the string 'false' to disable.  **not a bool check**
             if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
                 Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
                 return false;
             }
-
             if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
                 decay.decaytickrate = float.MaxValue / 2;
@@ -57,27 +54,15 @@ namespace Fougerite
             }
             return true;
         }
-        /*
-        public void WriteRuntimeConfig()
-        {
-            string RuntimeConfig = Path.Combine(Fougerite.Config.GetPublicFolder, "runtime.cfg");
-            StringBuilder sb = new StringBuilder();
-            var a = env.daylength;
-            var b = env.nightlength;
 
-        }
-        */
         public void Start()
         {
             string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
             Config.Init(FougeriteDirectoryConfig);
             Logger.Init();
 
-            Contract.ContractFailed += (sender, args) => args.SetUnwind();
-
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
-
 
             if (ApplyOptions()) {
                 ModuleManager.LoadModules();

@@ -31,6 +31,11 @@
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, playerName + " is not an administrator.");
                 return;
             }
+            if (list.Count == 2)
+            {
+                GetFlags(list[1], Arguments.argUser);
+                return;
+            }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));
             for (int i = 1; i < list.Count; i++)
             {
@@ -55,23 +60,20 @@
         public void GetFlags(Administrator administrator, NetUser myAdmin)
         {
             Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Format("{0}'s Flags: ", administrator.DisplayName));
-            int i = 0;
             int flagsPerRow = 7;
-            if (administrator.Flags.Count <= flagsPerRow)
+            if (administrator.Flags.Count <= flagsPerRow && administrator.Flags.Count > 0)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.ToArray()));
                 return;
-            }
-            for (; i < administrator.Flags.Count; i++)
+            } else if (administrator.Flags.Count > 0)
             {
-                if (i > flagsPerRow && i % flagsPerRow == 0)
+                int i = flagsPerRow;
+                for (; i <= administrator.Flags.Count; i += flagsPerRow)
                 {
                     Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(i - flagsPerRow, flagsPerRow).ToArray()));
-                } 
-            }
-            if (i % flagsPerRow != 0)
-            {
-                Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(i - flagsPerRow, i % flagsPerRow).ToArray()));
+                }
+                if (administrator.Flags.Count % flagsPerRow > 0 || i - flagsPerRow == flagsPerRow)
+                    Util.sayUser(myAdmin.networkPlayer, Core.Name, string.Join(", ", administrator.Flags.GetRange(i - flagsPerRow, administrator.Flags.Count % flagsPerRow).ToArray()));
             }
         }
     }

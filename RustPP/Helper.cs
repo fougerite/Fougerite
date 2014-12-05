@@ -180,13 +180,13 @@
 
                 writer.WriteStartElement("Item");
                 writer.WriteStartElement("Key");
-                writer.WriteAttributeString(string.Empty, "type", string.Empty, key.GetType().AssemblyQualifiedName);
+                writer.WriteAttributeString(string.Empty, "type", string.Empty, key.GetType().FullName);
                 new XmlSerializer(key.GetType()).Serialize(writer, key);
                 writer.WriteEndElement();
                 writer.WriteStartElement("Value");
                 if (value != null)
                 {
-                    writer.WriteAttributeString(string.Empty, "type", string.Empty, value.GetType().AssemblyQualifiedName);
+                    writer.WriteAttributeString(string.Empty, "type", string.Empty, value.GetType().FullName);
                     new XmlSerializer(value.GetType()).Serialize(writer, value);
                 }
                 writer.WriteEndElement();

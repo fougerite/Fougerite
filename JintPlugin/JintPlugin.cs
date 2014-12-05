@@ -263,7 +263,7 @@
 
         public string FromJsonFile(string path)
         {
-            string json = @"";
+            string json = string.Empty;
             path = ValidateRelativePath(path + ".json");
             if (File.Exists(path))
                 json = File.ReadAllText(path);

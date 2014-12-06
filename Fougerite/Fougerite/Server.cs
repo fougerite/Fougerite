@@ -5,13 +5,10 @@
 
     public class Server
     {
-        private ItemsBlocks _items;
-        private StructureMaster _serverStructs = new StructureMaster();
         public Fougerite.Data data = new Fougerite.Data();
-        private System.Collections.Generic.List<Fougerite.Player> players = new System.Collections.Generic.List<Fougerite.Player>();
+        private List<Fougerite.Player> players = new List<Fougerite.Player>();
         private static Fougerite.Server server;
         public string server_message_name = "Fougerite";
-        public Util util = new Util();
 
         public void Broadcast(string arg)
         {
@@ -72,7 +69,7 @@
             ServerSaveManager.AutoSave();
         }
 
-        public System.Collections.Generic.List<string> ChatHistoryMessages
+        public List<string> ChatHistoryMessages
         {
             get
             {
@@ -80,7 +77,7 @@
             }
         }
 
-        public System.Collections.Generic.List<string> ChatHistoryUsers
+        public List<string> ChatHistoryUsers
         {
             get
             {
@@ -88,31 +85,11 @@
             }
         }
 
-        public ItemsBlocks Items
-        {
-            get
-            {
-                return this._items;
-            }
-            set
-            {
-                this._items = value;
-            }
-        }
-
-        public System.Collections.Generic.List<Fougerite.Player> Players
+        public List<Fougerite.Player> Players
         {
             get
             {
                 return this.players;
-            }
-        }
-
-        public StructureMaster ServerStructures
-        {
-            get
-            {
-                return this._serverStructs;
             }
         }
     }

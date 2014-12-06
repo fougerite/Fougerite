@@ -51,50 +51,70 @@
             return keyorval;
         }
 
-        public bool ToIni(string inifilename = "DataStore")
+        public void ToIni(string tablename, IniParser ini)
         {
-            string inipath = Path.Combine(Config.GetPublicFolder(), inifilename.RemoveChars(new char[] { '.', '/', '\\', '%', '$' }).RemoveWhiteSpaces() + ".ini");
-            File.WriteAllText(inipath, "");
-            IniParser ini = new IniParser(inipath);
+            string nullref = "__NullReference__";
+            Hashtable ht = (Hashtable)this.datastore[tablename];
+            if (ht == null || ini == null)
+                return;
+
+            foreach (object key in ht.Keys)
+            {
+                string setting = key.ToString();
+                string val = nullref;
+                if (ht[setting] != null)
+                {
+                    float tryfloat;
+                    if (float.TryParse((string)ht[setting], tryfloat))
+                    {
+                        val = ((float)ht[setting]).ToString("G9");
+                    } else
+                    {
+                        val = ht[setting].ToString();
+                    }
+                }
+                ini.AddSetting(tablename, setting, val);
+            }
             ini.Save();
+        }
 
-            foreach (string section in this.datastore.Keys) {
-                Hashtable ht = (Hashtable)this.datastore[section];
-                foreach (object setting in ht.Keys) {
-                    try {
-                        string key = "NullReference";
-                        string val = "NullReference";
-                        if (setting != null) {
-                            if (setting.GetType().GetMethod("ToString", Type.EmptyTypes) == null) {
-                                key = "type:" + setting.GetType().ToString();
-                            } else {
-                                key = setting.ToString();
-                            }
-                        }
-
-                        if (ht[setting] != null) {
-                            if (ht[setting].GetType().GetMethod("ToString", Type.EmptyTypes) == null) {
-                                val = "type:" + ht[setting].GetType().ToString();
-                            } else {
-                                val = ht[setting].ToString();
-                            }            
-                        }
-
-                        ini.AddSetting(section, key, val);
-                    } catch (Exception ex) {
-                        Logger.LogException(ex);
+        public void FromIni(IniParser ini)
+        {
+            foreach (string section in ini.Sections)
+            {
+                foreach (string key in ini.EnumSection(section))
+                {
+                    string setting = ini.GetSetting(section, key);
+                    float value;
+                    if (float.TryParse(setting, value))
+                    {
+                        Add(section, key, value);
+                    } else if (int.TryParse(setting, value))
+                    {
+                        Add(section, key, value);
+                    } else if (ini.GetBoolSetting(section, key))
+                    {
+                        Add(section, key, true);
+                    } else if (setting.ToUpperInvariant() == "FALSE")
+                    {
+                        Add(section, key, false);
+                    } else if (setting == "__NullReference__")
+                    {
+                        Add(section, key, null);
+                    } else
+                    {
+                        Add(section, key, ini.GetSetting(section, key));
                     }
                 }
             }
-            ini.Save();
-            return true;           
         }
 
         public void Add(string tablename, object key, object val)
         {
 
             if (key == null)
-                key = "NullReference";
+                return;
+
             Hashtable hashtable = (Hashtable)this.datastore[tablename];
             if (hashtable == null)
             {

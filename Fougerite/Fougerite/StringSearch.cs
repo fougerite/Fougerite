@@ -4,12 +4,13 @@
  *		- http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf
  */
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Fougerite
 {
     static class LevenshteinDistance
     {
+        /// http://www.dotnetperls.com/levenshtein
         /// <summary>
         /// Compute the distance between two strings.
         /// </summary>
@@ -173,11 +174,11 @@ namespace Fougerite
 			public TreeNode(TreeNode parent,char c)
 			{
 				_char=c; _parent=parent;
-				_results=new ArrayList();
+				_results=new List<string>();
 				_resultsAr=new string[] {};
 
 				_transitionsAr=new TreeNode[] {};
-				_transHash=new Hashtable();
+                _transHash=new Dictionary<char, TreeNode>();
 			}
 
 
@@ -189,7 +190,7 @@ namespace Fougerite
 			{
 				if (_results.Contains(result)) return;
 				_results.Add(result);
-				_resultsAr=(string[])_results.ToArray(typeof(string));
+                _resultsAr=_results.ToArray<string>();
 			}
 
 			/// <summary>
@@ -232,10 +233,10 @@ namespace Fougerite
 			private char _char;
 			private TreeNode _parent;
 			private TreeNode _failure;
-			private ArrayList _results;
+			private List<string> _results;
 			private TreeNode[] _transitionsAr;
 			private string[] _resultsAr;
-			private Hashtable _transHash;
+            private Dictionary<char, TreeNode> _transHash;
 
 			/// <summary>
 			/// Character
@@ -350,7 +351,7 @@ namespace Fougerite
 			}
 
 			// Find failure functions
-			ArrayList nodes=new ArrayList();
+			List<TreeNode> nodes=new List<TreeNode>();
 			// level 1 nodes - fail to root node
 			foreach(TreeNode nd in _root.Transitions)
 			{
@@ -360,7 +361,7 @@ namespace Fougerite
 			// other nodes - using BFS
 			while(nodes.Count!=0)
 			{
-				ArrayList newNodes=new ArrayList();
+				List<TreeNode> newNodes=new List<TreeNode>();
 				foreach(TreeNode nd in nodes)
 				{
 					TreeNode r=nd.Parent.Failure;
@@ -411,7 +412,7 @@ namespace Fougerite
 		/// <returns>Array of occurrences</returns>
 		public StringSearchResult[] FindAll(string text)
 		{
-			ArrayList ret=new ArrayList();
+            List<StringSearchResult> ret=new List<StringSearchResult>();
 			TreeNode ptr=_root;
 			int index=0;
 
@@ -430,7 +431,7 @@ namespace Fougerite
 					ret.Add(new StringSearchResult(index-found.Length+1,found));
 				index++;
 			}
-			return (StringSearchResult[])ret.ToArray(typeof(StringSearchResult));
+            return ret.ToArray<StringSearchResult>();
 		}
 
 
@@ -441,7 +442,6 @@ namespace Fougerite
 		/// <returns>First occurrence of any keyword (or StringSearchResult.Empty if text doesn't contain any keyword)</returns>
 		public StringSearchResult FindFirst(string text)
 		{
-			ArrayList ret=new ArrayList();
 			TreeNode ptr=_root;
 			int index=0;
 

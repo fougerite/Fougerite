@@ -12,6 +12,30 @@
     public class World
     {
         private static World world;
+        private static List<string> itemNamesFull;
+        private static List<string> itemNameWords;
+
+        public static World GetWorld()
+        {
+            if (world == null)
+            {
+                world = new World();
+                itemNamesFull = new List<string>(DatablockDictionary.All.Length);
+                itemNameWords = new List<string>(DatablockDictionary.All.Length);
+                foreach (Datablock block in DatablockDictionary.All)
+                {
+                    itemNamesFull.Add(block.name);
+                    foreach (string word in block.name.Split(new char[] { ' ', '-' }))
+                    {
+                        if (itemNameWords.Contains(word))
+                            continue;
+
+                        itemNameWords.Add(word);
+                    }
+                }
+            }
+            return world;
+        }
 
         public void Airdrop()
         {
@@ -235,15 +259,6 @@
 
             Distance = (float) Math.Round(Distance - 1.5f, 2); // 1.5 - player height
             return (Distance < 0.5f ? 0 : Distance); // if Distance < 0.5 we may say that he is grounded o_O
-        }
-
-        public static World GetWorld()
-        {
-            if (world == null)
-            {
-                world = new World();
-            }
-            return world;
         }
 
         public void Lists()

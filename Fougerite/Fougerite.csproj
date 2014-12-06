@@ -85,6 +85,7 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Compile Include="Fougerite\Events\DestroyEvent.cs" />
+    <Compile Include="Fougerite\StringSearch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fougerite.cfg">

@@ -222,10 +222,6 @@
                         this.MessageFrom(me, "There you are.");
                         return false;
                     }
-                    if (!(hit.distance >= bumpConst * 3 && hit.distance < bumpConst * 6))
-                    {
-                        target = hit.point + bump * 3;
-                    }
                 }
 
                 if (distance < maxSafeDistance)
@@ -235,8 +231,14 @@
                 } else
                 {
                     this.TeleportTo(terrain + bump * 2);
-                    System.Threading.Thread.Sleep(ms);
-                    this.TeleportTo(target);
+                    System.Timers.Timer timer = new System.Timers.Timer();
+                    timer.Interval = 500d;
+                    timer.AutoReset = false;
+                    timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                    {
+                        this.TeleportTo(target);
+                    };
+                    timer.Start();
                     return true;
                 }            
             } else if (structures.Count() == 0)
@@ -252,6 +254,15 @@
                     if (hit.collider.name == "HB Hit")
                     {
                         this.MessageFrom(me, "There you are.");
+                        return false;
+                    }
+                    Vector3 worldPos = target - Terrain.activeTerrain.transform.position as Vector3;
+                    Vector3 tnPos = new Vector3(Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.x, worldPos.x), 0, Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.z, worldPos.z));
+                    float gradient = Terrain.activeTerrain.terrainData.GetSteepness(tnPos.x, tnPos.z);
+                    Logger.LogDebug(string.Format("[{0}] gradient={1}", me, gradient));
+                    if (gradient > 50d)
+                    {
+                        this.MessageFrom(me, "It's too steep there.");
                         return false;
                     }
                     target = hit.point + bump * 2;

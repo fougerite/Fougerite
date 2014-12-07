@@ -11,7 +11,6 @@
         private bool _protected;
         private bool _pvp;
         private List<Entity> tmpPoints;
-        private Dictionary<string, Zone3D> _zones = new Dictionary<string, Zone3D>();
 
         public Zone3D(string name)
         {
@@ -19,7 +18,9 @@
             this.Protected = false;
             this.tmpPoints = new List<Entity>();
             this.Points = new List<Vector2>();
-            _zones.Add(name, this);
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            if (!zones.ContainsKey(name))
+                zones.Add(name, this);
         }
 
         public bool Contains(Entity en)

@@ -194,7 +194,6 @@
         public bool SafeTeleportTo(Vector3 target)
         {
             float maxSafeDistance = 360f;
-            float distance = Vector3.Distance(this.Location, target);
             float seaLevel = 256f;
             double ms = 500d;
             string me = "SafeTeleport";
@@ -207,22 +206,24 @@
                                                                where s.containedBounds.Contains(terrain)
                                                                select s;
 
-            Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
-                this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
+            if (terrain.y > target.y)
+                target = terrain + bump * 2;
 
             if (structures.Count() == 1)
             {
-                if (terrain.y > target.y)
-                    target = terrain + bump * 2;
-
                 if (Physics.Raycast(target, Vector3.down, out hit))
                 {
                     if (hit.collider.name == "HB Hit")
                     {
-                        this.MessageFrom(me, "There you are.");
+                        this.Message("There you are.");
                         return false;
                     }
                 }
+                StructureMaster structure = structures.FirstOrDefault<StructureMaster>();
+                if (!structure.containedBounds.Contains(target) || hit.distance > 8f)                
+                    target = hit.point + bump;
+
+                float distance = Vector3.Distance(this.Location, target);
 
                 if (distance < maxSafeDistance)
                 {
@@ -245,7 +246,7 @@
             {
                 if (terrain.y < seaLevel)
                 {
-                    this.MessageFrom(me, "That would put you in the ocean.");
+                    this.Message("That would put you in the ocean.");
                     return false;
                 }
 
@@ -253,20 +254,22 @@
                 {
                     if (hit.collider.name == "HB Hit")
                     {
-                        this.MessageFrom(me, "There you are.");
+                        this.Message("There you are.");
                         return false;
                     }
                     Vector3 worldPos = target - Terrain.activeTerrain.transform.position;
                     Vector3 tnPos = new Vector3(Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.x, worldPos.x), 0, Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.z, worldPos.z));
                     float gradient = Terrain.activeTerrain.terrainData.GetSteepness(tnPos.x, tnPos.z);
-                    Logger.LogDebug(string.Format("[{0}] gradient={1}", me, gradient.ToString("G9")));
                     if (gradient > 50f)
                     {
-                        this.MessageFrom(me, "It's too steep there.");
+                        this.Message("It's too steep there.");
                         return false;
                     }
                     target = hit.point + bump * 2;
                 }
+                float distance = Vector3.Distance(this.Location, target);
+                Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
+                    this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
 
                 this.TeleportTo(target);
                 return true;
@@ -274,7 +277,7 @@
             {
                 Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
                 Logger.LogDebug(string.Format("[{0}] target={1} terrain{2}", me, target.ToString(), terrain.ToString()));
-                this.MessageFrom(me, "Cannot execute safely with the parameters supplied.");
+                this.Message("Cannot execute safely with the parameters supplied.");
                 return false;
             }
         }

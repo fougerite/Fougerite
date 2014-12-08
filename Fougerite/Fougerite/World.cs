@@ -12,28 +12,61 @@
     public class World
     {
         private static World world;
-        private static List<string> itemNamesFull;
-        private static List<string> itemNameWords;
-        internal Dictionary<string, Zone3D> zones = new Dictionary<string, Zone3D>();
+        public List<string> itemNamesFull;
+        public List<string> itemNameWords;
+        public Dictionary<string, Zone3D> zones;
+
+        public World()
+        {
+            string[] words = { "1", "2", "3", "4", "5", "556", "6", "7",
+                "9MM", "ACTION", "AMMO", "ANIMAL", "ANTI", "ARMOR", "ARROW", "AXE", "BAG", "BANDAGE", "BAR", "BARRICADE", "BARS",
+                "BEANS", "BED", "BENCH", "BLOOD", "BLUEPRINT", "BOLT", "BOOTS", "BOTTLE", "BOW", "BOX", "BP", "BREAST", "CAMP",
+                "CAN", "CASING", "CEILING", "CHARCOAL", "CHARGE", "CHICKEN", "CHOCOLATE", "CLOTH", "COOKED", "DOOR", "DOORWAY",
+                "DRAW", "EMPTY", "EXPLOSIVE", "EXPLOSIVES", "F1", "FAT", "FIRE", "FLARE", "FLASHLIGHT", "FOUNDATION", "FRAGMENTS",
+                "FUEL", "FURNACE", "GATE", "GATEWAY", "GRADE", "GRANOLA", "GRENADE", "GUNPOWDER", "HANDCANNON", "HANDMADE", "HATCHET",
+                "HELMET", "HOLO", "HUNTING", "INVISIBLE", "KEVLAR", "KIT", "LARGE", "LASER", "LEATHER", "LOCKPICK", "LOW", "M4",
+                "MEDKIT", "METAL", "MOD", "MP5A4", "OF", "ORE", "P250", "PANTS", "PAPER", "PART", "PICK", "PILLAR", "PILLS", "PIPE",
+                "PISTOL", "PLANKS", "PRIMED", "QUALITY", "RAD", "RADIATION", "RAMP", "RATIONS", "RAW", "RECYCLE", "REPAIR", "RESEARCH",
+                "REVOLVER", "RIFLE", "ROCK", "SHELL", "SHELLS", "SHELTER", "SHOTGUN", "SIGHT", "SIGNAL", "SILENCER", "SLEEPING",
+                "SMALL", "SPIKE", "STAIRS", "STASH", "STONE", "STONES", "STORAGE", "SUIT", "SULFUR", "SUPPLY", "TORCH", "TUNA", "UBER",
+                "VEST", "WALL", "WATER", "WEAPON", "WINDOW", "WOOD", "WOODEN", "WORKBENCH"
+            };
+            this.itemNameWords = new List<string>(words);
+            string[] names = { "556 Ammo Blueprint", "556 Ammo", "556 Casing Blueprint", "9mm Ammo Blueprint", "9mm Ammo", "9mm Casing Blueprint", "9mm Pistol Blueprint", "9mm Pistol", 
+                "Animal Fat", "Anti-Radiation Pills", "Armor Part 1 BP", "Armor Part 1", "Armor Part 2 BP", "Armor Part 2", "Armor Part 3 BP", "Armor Part 3", "Armor Part 4 BP", 
+                "Armor Part 4", "Armor Part 5 BP", "Armor Part 5", "Armor Part 6 BP", "Armor Part 6", "Armor Part 7 BP", "Armor Part 7", "Arrow Blueprint", "Arrow", "Bandage Blueprint", 
+                "Bandage", "Bed Blueprint", "Bed", "Blood Draw Kit Blueprint", "Blood Draw Kit", "Blood", "Bolt Action Rifle Blueprint", "Camp Fire Blueprint", "Camp Fire", "Can of Beans", 
+                "Can of Tuna", "Charcoal", "Chocolate Bar", "Cloth Boots BP", "Cloth Boots", "Cloth Helmet BP", "Cloth Helmet", "Cloth Pants BP", "Cloth Pants", "Cloth Vest BP", "Cloth Vest", 
+                "Cloth", "Cooked Chicken Breast", "Empty 556 Casing", "Empty 9mm Casing", "Empty Shotgun Shell Blueprint", "Empty Shotgun Shell", "Explosive Charge Blueprint", "Explosive Charge", 
+                "Explosives Blueprint", "Explosives", "F1 Grenade Blueprint", "F1 Grenade", "Flare Blueprint", "Flare", "Flashlight Mod BP", "Flashlight Mod", "Furnace Blueprint", "Furnace", 
+                "Granola Bar", "Gunpowder Blueprint", "Gunpowder", "HandCannon Blueprint", "HandCannon", "Handmade Lockpick Blueprint", "Handmade Lockpick", "Handmade Shell Blueprint", "Handmade Shell", 
+                "Hatchet Blueprint", "Hatchet", "Holo sight BP", "Holo sight", "Hunting Bow Blueprint", "Hunting Bow", "Invisible Boots", "Invisible Helmet", "Invisible Pants", "Invisible Vest", 
+                "Kevlar Boots BP", "Kevlar Boots", "Kevlar Helmet BP", "Kevlar Helmet", "Kevlar Pants BP", "Kevlar Pants", "Kevlar Vest BP", "Kevlar Vest", "Large Medkit Blueprint", "Large Medkit", 
+                "Large Spike Wall Blueprint", "Large Spike Wall", "Large Wood Storage Blueprint", "Large Wood Storage", "Laser Sight BP", "Laser Sight", "Leather Boots BP", "Leather Boots", "Leather Helmet BP", 
+                "Leather Helmet", "Leather Pants BP", "Leather Pants", "Leather Vest BP", "Leather Vest", "Leather", "Low Grade Fuel Blueprint", "Low Grade Fuel", "Low Quality Metal Blueprint", "Low Quality Metal", 
+                "M4 Blueprint", "M4", "MP5A4 Blueprint", "MP5A4", "Metal Ceiling BP", "Metal Ceiling", "Metal Door Blueprint", "Metal Door", "Metal Doorway BP", "Metal Doorway", "Metal Foundation BP",
+                "Metal Foundation", "Metal Fragments", "Metal Ore", "Metal Pillar BP", "Metal Pillar", "Metal Ramp BP", "Metal Ramp", "Metal Stairs BP", "Metal Stairs", "Metal Wall BP", "Metal Wall", "Metal Window BP", 
+                "Metal Window Bars Blueprint", "Metal Window Bars", "Metal Window", "P250 Blueprint", "P250", "Paper Blueprint", "Paper", "Pick Axe Blueprint", "Pick Axe", "Pipe Shotgun Blueprint", "Pipe Shotgun", 
+                "Primed 556 Casing Blueprint", "Primed 556 Casing", "Primed 9mm Casing Blueprint", "Primed 9mm Casing", "Primed Shotgun Shell Blueprint", "Primed Shotgun Shell", "Rad Suit Boots BP", "Rad Suit Boots", 
+                "Rad Suit Helmet BP", "Rad Suit Helmet", "Rad Suit Pants BP", "Rad Suit Pants", "Rad Suit Vest BP", "Rad Suit Vest", "Raw Chicken Breast", "Recycle Kit 1", "Repair Bench Blueprint", "Repair Bench", 
+                "Research Kit 1", "Research Kit Blueprint", "Revolver Blueprint", "Revolver", "Rock", "Shotgun Blueprint", "Shotgun Shells Blueprint", "Shotgun Shells", "Shotgun", "Silencer BP", "Silencer", 
+                "Sleeping Bag Blueprint", "Sleeping Bag", "Small Medkit Blueprint", "Small Medkit", "Small Rations", "Small Stash Blueprint", "Small Stash", "Small Water Bottle", "Spike Wall Blueprint", "Spike Wall", 
+                "Stone Hatchet Blueprint", "Stone Hatchet", "Stones", "Sulfur Ore", "Sulfur", "Supply Signal", "Torch Blueprint", "Torch", "Uber Hatchet", "Uber Hunting Bow", "Weapon Part 1 BP", "Weapon Part 1", 
+                "Weapon Part 2 BP", "Weapon Part 2", "Weapon Part 3 BP", "Weapon Part 3", "Weapon Part 4 BP", "Weapon Part 4", "Weapon Part 5 BP", "Weapon Part 5", "Weapon Part 6 BP", "Weapon Part 6", "Weapon Part 7 BP", 
+                "Weapon Part 7", "Wood Barricade Blueprint", "Wood Barricade", "Wood Ceiling BP", "Wood Ceiling", "Wood Doorway BP", "Wood Doorway", "Wood Foundation BP", "Wood Foundation", "Wood Gate Blueprint", 
+                "Wood Gate", "Wood Gateway Blueprint", "Wood Gateway", "Wood Pillar BP", "Wood Pillar", "Wood Planks Blueprint", "Wood Planks", "Wood Ramp BP", "Wood Ramp", "Wood Shelter Blueprint", "Wood Shelter", 
+                "Wood Stairs BP", "Wood Stairs", "Wood Storage Box Blueprint", "Wood Storage Box", "Wood Wall BP", "Wood Wall", "Wood Window BP", "Wood Window", "Wood", "Wooden Door Blueprint", "Wooden Door", 
+                "Workbench Blueprint", "Workbench" };
+            this.itemNamesFull = new List<string>(names);
+            this.zones = new Dictionary<string, Zone3D>();
+            Logger.LogDebug(string.Format("[World] itemNameWords.Count={0} itemNamesFull.Count={1}", this.itemNameWords.Count.ToString(), this.itemNamesFull.Count.ToString()));
+        }
 
         public static World GetWorld()
         {
             if (world == null)
             {
                 world = new World();
-                itemNamesFull = new List<string>(DatablockDictionary.All.Length);
-                itemNameWords = new List<string>(DatablockDictionary.All.Length);
-                foreach (Datablock block in DatablockDictionary.All)
-                {
-                    itemNamesFull.Add(block.name);
-                    foreach (string word in block.name.Split(new char[] { ' ', '-' }))
-                    {
-                        if (itemNameWords.Contains(word))
-                            continue;
-
-                        itemNameWords.Add(word);
-                    }
-                }
             }
             return world;
         }

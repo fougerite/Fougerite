@@ -122,9 +122,15 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-
             bool external = a.argUser == null;
             bool adminRights = (a.argUser != null && a.argUser.admin) || external;
+
+            string userid = "[external][external]";
+            if (adminRights && !external)
+                userid = string.Format("[{0}][{1}]", a.argUser.displayName, a.argUser.userID.ToString());
+
+            string logmsg = string.Format("[ConsoleReceived] userid={0} adminRights={1} command={2}.{3} args={4}", userid, adminRights.ToString(), a.Class, a.Function, (a.HasArgs(1) ? a.ArgsStr : "none"));
+            Logger.LogDebug(logmsg);
 
             if ((a.Class.ToUpperInvariant() == "FOUGERITE") && (a.Function.ToUpperInvariant() == "RELOAD")) {
                 if (adminRights) {

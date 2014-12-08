@@ -196,7 +196,7 @@
             float maxSafeDistance = 360f;
             float distance = Vector3.Distance(this.Location, target);
             float seaLevel = 256f;
-            int ms = 500;
+            double ms = 500d;
             string me = "SafeTeleport";
 
             float bumpConst = 0.75f;
@@ -232,7 +232,7 @@
                 {
                     this.TeleportTo(terrain + bump * 2);
                     System.Timers.Timer timer = new System.Timers.Timer();
-                    timer.Interval = 500d;
+                    timer.Interval = ms;
                     timer.AutoReset = false;
                     timer.Elapsed += delegate(object x, ElapsedEventArgs y)
                     {
@@ -249,18 +249,18 @@
                     return false;
                 }
 
-                if (Physics.Raycast(terrain + Vector3.up * 300, Vector3.down, out hit))
+                if (Physics.Raycast(terrain + Vector3.up * 300f, Vector3.down, out hit))
                 {
                     if (hit.collider.name == "HB Hit")
                     {
                         this.MessageFrom(me, "There you are.");
                         return false;
                     }
-                    Vector3 worldPos = target - Terrain.activeTerrain.transform.position as Vector3;
+                    Vector3 worldPos = target - Terrain.activeTerrain.transform.position;
                     Vector3 tnPos = new Vector3(Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.x, worldPos.x), 0, Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.z, worldPos.z));
                     float gradient = Terrain.activeTerrain.terrainData.GetSteepness(tnPos.x, tnPos.z);
-                    Logger.LogDebug(string.Format("[{0}] gradient={1}", me, gradient));
-                    if (gradient > 50d)
+                    Logger.LogDebug(string.Format("[{0}] gradient={1}", me, gradient.ToString("G9")));
+                    if (gradient > 50f)
                     {
                         this.MessageFrom(me, "It's too steep there.");
                         return false;

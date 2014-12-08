@@ -5,6 +5,8 @@
 
     public class Server
     {
+        private ItemsBlocks _items;
+        private StructureMaster _serverStructs = new StructureMaster();
         public Fougerite.Data data = new Fougerite.Data();
         private List<Fougerite.Player> players = new List<Fougerite.Player>();
         private static Fougerite.Server server;
@@ -85,7 +87,19 @@
             }
         }
 
-        public List<Fougerite.Player> Players
+        public ItemsBlocks Items
+        {
+            get
+            {
+                return this._items;
+            }
+            set
+            {
+                this._items = value;
+            }
+        }
+
+        public System.Collections.Generic.List<Fougerite.Player> Players
         {
             get
             {

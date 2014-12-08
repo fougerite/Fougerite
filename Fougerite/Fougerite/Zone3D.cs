@@ -52,12 +52,13 @@
 
         public static Zone3D Get(string name)
         {
-            return _zones[name] as Zone3D;
+            return World.GetWorld().zones[name] as Zone3D;
         }
 
         public static Zone3D GlobalContains(Entity e)
         {
-            foreach (Zone3D zone in _zones.Values)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
                 if (zone.Contains(e))
                 {
@@ -69,7 +70,8 @@
 
         public static Zone3D GlobalContains(Fougerite.Player p)
         {
-            foreach (Zone3D zone in _zones.Values)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
                 if (zone.Contains(p))
                 {

@@ -14,6 +14,7 @@
         private static World world;
         private static List<string> itemNamesFull;
         private static List<string> itemNameWords;
+        internal Dictionary<string, Zone3D> zones = new Dictionary<string, Zone3D>();
 
         public static World GetWorld()
         {
@@ -199,6 +200,12 @@
             return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
         }
 
+        public float GetGround(Vector3 target)
+        {
+            Vector3 above = new Vector3(target.x, 2000f, target.z);
+            return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+        }
+
         public float GetTerrainHeight(Vector3 target)
         {
             return Terrain.activeTerrain.SampleHeight(target);
@@ -209,56 +216,26 @@
             return GetTerrainHeight(new Vector3(x, y, z));
         }
 
+        public float GetTerrainSteepness(Vector3 target)
+        {
+            return Terrain.activeTerrain.terrainData.GetSteepness(target.x, target.z);
+        }
+
+        public float GetTerrainSteepness(float x, float z)
+        {
+            return Terrain.activeTerrain.terrainData.GetSteepness(x, z);
+        }
+
         public float GetGroundDist(float x, float y, float z)
         {
-            Vector3 origin = new Vector3(x, y, z);
-            return GetGroundDist(origin);
+            float ground = GetGround(x, z);
+            return y - ground;
         }
 
-        [Flags]
-        public enum Layers
+        public float GetGroundDist(Vector3 target)
         {
-            Default = 0,
-            TransparentFX = 1,
-            IgnoreRaycast = 2,
-            Water = 4,
-            NGUILayer = 8,
-            NGUILayer2D = 9,
-            Static = 10,
-            Sprite = 11,
-            CULL500 = 12,
-            ViewModel = 13,
-            GrassDisplacement = 14,
-            CharacterCollision = 16,
-            Hitbox = 17,
-            Debris = 18,
-            Terrain = 19,
-            Mechanical = 20,
-            RayOnly = 21,
-            MeshBatched = 22,
-            Skybox = 23,
-            Zone = 26,
-            Ragdoll = 27,
-            Vehicle = 28,
-            PlayerClip = 29,
-            GameUI = 31
-        }
-
-        public float GetGroundDist(Vector3 origin)
-        {
-            RaycastHit Hit;
-
-            float Distance = float.NaN;
-
-            Layers mask = Layers.Static | Layers.Terrain;
-            if (Physics.Raycast(origin, Vector3.down, out Hit, float.MaxValue, (int)mask))
-            {
-                Logger.LogDebug("GetGroundDist: " + Hit.transform.name + " - " + Hit.transform.tag);
-                Distance = Hit.distance;
-            }
-
-            Distance = (float) Math.Round(Distance - 1.5f, 2); // 1.5 - player height
-            return (Distance < 0.5f ? 0 : Distance); // if Distance < 0.5 we may say that he is grounded o_O
+            float ground = GetGround(target);
+            return target.y - ground;
         }
 
         public void Lists()
@@ -295,6 +272,156 @@
                     StructureComponentDataBlock block3 = block as StructureComponentDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block3.structureToPlacePrefab.name + "\", \"" + block3.structureToPlaceName + "\"],\n");
                 }
+            }
+        }
+
+
+        public void DataBlocks()
+        {
+            foreach (ItemDataBlock block in DatablockDictionary.All)
+            {
+                File.AppendAllText(Util.GetAbsoluteFilePath("DataBlocks.txt"), string.Format("name={0} uniqueID={1}\n", block.name, block.uniqueID));
+            }
+        }
+
+        public object Spawn(string prefab, Vector3 location)
+        {
+            return this.Spawn(prefab, location, 1);
+        }
+
+        public object Spawn(string prefab, Vector3 location, int rep)
+        {
+            return this.Spawn(prefab, location, Quaternion.identity, rep);
+        }
+
+        public object Spawn(string prefab, float x, float y, float z)
+        {
+            return this.Spawn(prefab, x, y, z, 1);
+        }
+
+        private object Spawn(string prefab, Vector3 location, Quaternion rotation, int rep)
+        {
+            object obj2 = null;
+            for (int i = 0; i < rep; i++)
+            {
+                if (prefab == ":player_soldier")
+                {
+                    obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
+                }
+                else if (prefab.Contains("C130"))
+                {
+                    obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
+                }
+                else
+                {
+                    GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
+                    obj2 = obj3;
+                    StructureComponent component = obj3.GetComponent<StructureComponent>();
+                    if (component != null)
+                    {
+                        obj2 = new Entity(component);
+                    }
+                    else
+                    {
+                        DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
+                        if (obj4 != null)
+                        {
+                            obj4.ownerID = 0L;
+                            obj4.creatorID = 0L;
+                            obj4.CacheCreator();
+                            obj4.CreatorSet();
+                            obj2 = new Entity(obj4);
+                        }
+                    }
+                }
+            }
+            return obj2;
+        }
+
+        public object Spawn(string prefab, float x, float y, float z, int rep)
+        {
+            return this.Spawn(prefab, new Vector3(x, y, z), Quaternion.identity, rep);
+        }
+
+        public object Spawn(string prefab, float x, float y, float z, Quaternion rot)
+        {
+            return this.Spawn(prefab, x, y, z, rot, 1);
+        }
+
+        public object Spawn(string prefab, float x, float y, float z, Quaternion rot, int rep)
+        {
+            return this.Spawn(prefab, new Vector3(x, y, z), rot, rep);
+        }
+
+        public object SpawnAtPlayer(string prefab, Fougerite.Player p)
+        {
+            return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, 1);
+        }
+
+        public object SpawnAtPlayer(string prefab, Fougerite.Player p, int rep)
+        {
+            return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, rep);
+        }
+
+        public float DayLength
+        {
+            get { return env.daylength; }
+            set { env.daylength = value; }
+        }
+
+        public StructureMaster[] Structures
+        {
+            get
+            {
+                return StructureMaster.AllStructures.ToArray<StructureMaster>();
+            }
+        }
+
+        public List<Entity> Entities
+        {
+            get
+            {
+                IEnumerable<Entity> component = from c in
+                    (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
+                    select new Entity(c);
+                IEnumerable<Entity> deployable = from d in
+                    (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
+                    select new Entity(d);
+                // this is much faster than Concat
+                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
+                entities.AddRange(component);
+                entities.AddRange(deployable);
+                return entities;
+            }
+        }
+
+        public float NightLength
+        {
+            get { return env.nightlength; }
+            set { env.nightlength = value; }
+        }
+
+        public float Time {
+            get
+            {
+                try
+                {
+                    float hour = EnvironmentControlCenter.Singleton.GetTime();
+                    return hour;
+                } catch (NullReferenceException) {
+                    return 12f;
+                }
+            }
+            set
+            {
+                float hour = value;
+                if (hour < 0f || hour > 24f)
+                    hour = 12f;
+
+                try
+                {
+                    EnvironmentControlCenter.Singleton.SetTime(hour);
+                } catch(Exception) { }
             }
         }
 
@@ -1106,159 +1233,6 @@
                 }
             }
             return string.Empty;
-        }
-
-        public void DataBlocks()
-        {
-            foreach (ItemDataBlock block in DatablockDictionary.All)
-            {
-                File.AppendAllText(Util.GetAbsoluteFilePath("DataBlocks.txt"), string.Format("name={0} uniqueID={1}\n", block.name, block.uniqueID));
-            }
-        }
-
-        public object Spawn(string prefab, Vector3 location)
-        {
-            return this.Spawn(prefab, location, 1);
-        }
-
-        public object Spawn(string prefab, Vector3 location, int rep)
-        {
-            return this.Spawn(prefab, location, Quaternion.identity, rep);
-        }
-
-        public object Spawn(string prefab, float x, float y, float z)
-        {
-            return this.Spawn(prefab, x, y, z, 1);
-        }
-
-        private object Spawn(string prefab, Vector3 location, Quaternion rotation, int rep)
-        {
-            object obj2 = null;
-            for (int i = 0; i < rep; i++)
-            {
-                if (prefab == ":player_soldier")
-                {
-                    obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
-                }
-                else if (prefab.Contains("C130"))
-                {
-                    obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
-                }
-                else
-                {
-                    GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
-                    obj2 = obj3;
-                    StructureComponent component = obj3.GetComponent<StructureComponent>();
-                    if (component != null)
-                    {
-                        obj2 = new Entity(component);
-                    }
-                    else
-                    {
-                        DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
-                        if (obj4 != null)
-                        {
-                            obj4.ownerID = 0L;
-                            obj4.creatorID = 0L;
-                            obj4.CacheCreator();
-                            obj4.CreatorSet();
-                            obj2 = new Entity(obj4);
-                        }
-                    }
-                }
-            }
-            return obj2;
-        }
-
-        public object Spawn(string prefab, float x, float y, float z, int rep)
-        {
-            return this.Spawn(prefab, new Vector3(x, y, z), Quaternion.identity, rep);
-        }
-
-        public object Spawn(string prefab, float x, float y, float z, Quaternion rot)
-        {
-            return this.Spawn(prefab, x, y, z, rot, 1);
-        }
-
-        public object Spawn(string prefab, float x, float y, float z, Quaternion rot, int rep)
-        {
-            return this.Spawn(prefab, new Vector3(x, y, z), rot, rep);
-        }
-
-        public object SpawnAtPlayer(string prefab, Fougerite.Player p)
-        {
-            return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, 1);
-        }
-
-        public object SpawnAtPlayer(string prefab, Fougerite.Player p, int rep)
-        {
-            return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, rep);
-        }
-
-        public float DayLength
-        {
-            get
-            {
-                return env.daylength;
-            }
-            set
-            {
-                env.daylength = value;
-            }
-        }
-
-        public List<Entity> Entities
-        {
-            get
-            {
-                IEnumerable<Entity> component = from c in
-                    (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
-                    select new Entity(c);
-                IEnumerable<Entity> deployable = from d in
-                    (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
-                    select new Entity(d);
-                // this is much faster than Concat
-                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
-                entities.AddRange(component);
-                entities.AddRange(deployable);
-                return entities;
-            }
-        }
-
-        public float NightLength
-        {
-            get
-            {
-                return env.nightlength;
-            }
-            set
-            {
-                env.nightlength = value;
-            }
-        }
-
-        public float Time {
-            get
-            {
-                try
-                {
-                    float hour = EnvironmentControlCenter.Singleton.GetTime();
-                    return hour;
-                } catch (NullReferenceException) {
-                    return 12f;
-                }
-            }
-            set
-            {
-                float hour = value;
-                if (hour < 0f || hour > 24f)
-                    hour = 12f;
-
-                try
-                {
-                    EnvironmentControlCenter.Singleton.SetTime(hour);
-                } catch(Exception) { }
-            }
         }
     }
 }

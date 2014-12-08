@@ -12,6 +12,15 @@
         private static DataStore instance;
         public static string PATH = Path.Combine(Config.GetPublicFolder(), "FougeriteDatastore.ds");
 
+        public static DataStore GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new DataStore();
+            }
+            return instance;
+        }
+
         public void ToIni(string tablename, IniParser ini)
         {
             string nullref = "__NullReference__";
@@ -136,15 +145,6 @@
             return hashtable[key];
         }
 
-        public static DataStore GetInstance()
-        {
-            if (instance == null)
-            {
-                instance = new DataStore();
-            }
-            return instance;
-        }
-
         public Hashtable GetTable(string tablename)
         {
             Hashtable hashtable = this.datastore[tablename] as Hashtable;
@@ -160,7 +160,9 @@
             if (hashtable == null)
                 return null;
 
-            return (hashtable.Keys as object[]).ToArray<object>();
+            object[] array = new object[hashtable.Keys.Count];
+            hashtable.Keys.CopyTo(array, 0);
+            return array;
         }
 
         public void Load()
@@ -207,7 +209,9 @@
             if (hashtable == null)
                 return null;
 
-            return (hashtable.Values as object[]).ToArray<object>();
+            object[] array = new object[hashtable.Values.Count];
+            hashtable.Values.CopyTo(array, 0);
+            return array;
         }
     }
 }

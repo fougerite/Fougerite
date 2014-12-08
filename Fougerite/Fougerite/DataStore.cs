@@ -12,45 +12,6 @@
         private static DataStore instance;
         public static string PATH = Path.Combine(Config.GetPublicFolder(), "FougeriteDatastore.ds");
 
-        private object StringifyIfVector3(object keyorval)
-        {
-            if (keyorval == null)
-                return keyorval;
-
-            try {
-                if (typeof(Vector3).Equals(keyorval.GetType())) {
-                    return "Vector3," +
-                    ((Vector3)keyorval).x.ToString("G9") + "," +
-                    ((Vector3)keyorval).y.ToString("G9") + "," +
-                    ((Vector3)keyorval).z.ToString("G9");
-                }
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }
-            return keyorval;
-        }
-
-        private object ParseIfVector3String(object keyorval)
-        {
-            if (keyorval == null)
-                return keyorval;
-
-            try {
-                if (typeof(string).Equals(keyorval.GetType())) {
-                    if ((keyorval as string).StartsWith("Vector3,")) {
-                        string[] v3array = (keyorval as string).Split(new char[] { ',' });
-                        Vector3 parse = new Vector3(Single.Parse(v3array[1]), 
-                                            Single.Parse(v3array[2]),
-                                            Single.Parse(v3array[3]));
-                        return parse;
-                    }
-                }
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }          
-            return keyorval;
-        }
-
         public void ToIni(string tablename, IniParser ini)
         {
             string nullref = "__NullReference__";
@@ -65,7 +26,7 @@
                 if (ht[setting] != null)
                 {
                     float tryfloat;
-                    if (float.TryParse((string)ht[setting], tryfloat))
+                    if (float.TryParse((string)ht[setting], out tryfloat))
                     {
                         val = ((float)ht[setting]).ToString("G9");
                     } else
@@ -85,13 +46,14 @@
                 foreach (string key in ini.EnumSection(section))
                 {
                     string setting = ini.GetSetting(section, key);
-                    float value;
-                    if (float.TryParse(setting, value))
+                    float valuef;
+                    int valuei;
+                    if (float.TryParse(setting, out valuef))
                     {
-                        Add(section, key, value);
-                    } else if (int.TryParse(setting, value))
+                        Add(section, key, valuef);
+                    } else if (int.TryParse(setting, out valuei))
                     {
-                        Add(section, key, value);
+                        Add(section, key, valuei);
                     } else if (ini.GetBoolSetting(section, key))
                     {
                         Add(section, key, true);
@@ -111,45 +73,42 @@
 
         public void Add(string tablename, object key, object val)
         {
-
             if (key == null)
                 return;
 
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
             if (hashtable == null)
             {
                 hashtable = new Hashtable();
                 this.datastore.Add(tablename, hashtable);
             }
-            hashtable[StringifyIfVector3(key)] = StringifyIfVector3(val);
+            hashtable[key] = val;
         }
 
         public bool ContainsKey(string tablename, object key)
         {
-
             if (key == null)
                 return false;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable != null)
-            {
-                return hashtable.ContainsKey(StringifyIfVector3(key));
-            }
-            return false;
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+                return false;
+
+            return hashtable.ContainsKey(key);
         }
 
         public bool ContainsValue(string tablename, object val)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable != null)
-            {
-                return hashtable.ContainsValue(StringifyIfVector3(val));
-            }
-            return false;
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+                return false;
+
+            return hashtable.ContainsValue(val);
         }
 
         public int Count(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
             if (hashtable == null)
             {
                 return 0;
@@ -159,7 +118,7 @@
 
         public void Flush(string tablename)
         {
-            if (((Hashtable)this.datastore[tablename]) != null)
+            if ((this.datastore[tablename] as Hashtable) != null)
             {
                 this.datastore.Remove(tablename);
             }
@@ -167,15 +126,14 @@
 
         public object Get(string tablename, object key)
         {
-
             if (key == null)
                 return null;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
             if (hashtable == null)
-            {
                 return null;
-            }
-            return ParseIfVector3String(hashtable[StringifyIfVector3(key)]);
+
+            return hashtable[key];
         }
 
         public static DataStore GetInstance()
@@ -189,28 +147,20 @@
 
         public Hashtable GetTable(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            Hashtable parse = new Hashtable(hashtable.Count);
-            foreach (DictionaryEntry entry in hashtable) {
-                parse.Add(ParseIfVector3String(entry.Key), ParseIfVector3String(entry.Value));
-            }
-            return parse;
+
+            return hashtable;
         }
 
         public object[] Keys(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            List<object> parse = new List<object>(hashtable.Keys.Count);
-            foreach (object key in hashtable.Keys) {
-                parse.Add(ParseIfVector3String(key));
-            }
-            return parse.ToArray<object>();
+
+            return (hashtable.Keys as object[]).ToArray<object>();
         }
 
         public void Load()
@@ -232,13 +182,13 @@
 
         public void Remove(string tablename, object key)
         {
-
             if (key == null)
                 return;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
             if (hashtable != null)
             {
-                hashtable.Remove(StringifyIfVector3(key));
+                hashtable.Remove(key);
             }
         }
 
@@ -253,15 +203,11 @@
 
         public object[] Values(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            List<object> parse = new List<object>(hashtable.Values.Count);
-            foreach (object val in hashtable.Values) {
-                parse.Add(ParseIfVector3String(val));
-            }
-            return parse.ToArray<object>();
+
+            return (hashtable.Values as object[]).ToArray<object>();
         }
     }
 }

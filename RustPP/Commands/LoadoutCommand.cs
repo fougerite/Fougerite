@@ -17,11 +17,10 @@
                     {
                         string name = Core.config.GetSetting("AdminLoadout", "item" + i + "_name");
                         string amount = Core.config.GetSetting("AdminLoadout", "item" + i + "_amount");
-                        if (name.Length > 1 && amount.Length > 1)
-                        {
-                            Arguments.Args = new string[] { name, amount };
-                        }
+                        Arguments.Args = new string[] { name, amount };
+                        string newargs = Arguments.ArgsStr;
                         inv.give(ref Arguments);
+                        Logger.LogDebug(string.Format("[Loadout] gave {0} to {1}", newargs, Arguments.argUser.displayName));
                     }
                 } catch (Exception ex)
                 {

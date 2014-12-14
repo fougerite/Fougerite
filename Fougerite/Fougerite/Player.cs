@@ -138,7 +138,7 @@
 
         public void Kill()
         {
-            TakeDamage.KillSelf(this.PlayerClient.controllable.character, null);
+            TakeDamage.KillSelf(this.ourPlayer.controllable.character, null);
         }
 
         public void Message(string arg)
@@ -153,17 +153,17 @@
 
         public void Notice(string arg)
         {
-            Rust.Notice.Popup(this.PlayerClient.netPlayer, "!", arg, 4f);
+            Rust.Notice.Popup(this.ourPlayer.netPlayer, "!", arg, 4f);
         }
 
         public void Notice(string icon, string text, float duration = 4f)
         {
-            Rust.Notice.Popup(this.PlayerClient.netPlayer, icon, text, duration);
+            Rust.Notice.Popup(this.ourPlayer.netPlayer, icon, text, duration);
         }
 
         public void SendCommand(string cmd)
         {
-            ConsoleNetworker.SendClientCommand(this.PlayerClient.netPlayer, cmd);
+            ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, cmd);
         }
 
         public void TeleportTo(Fougerite.Player p)
@@ -269,7 +269,7 @@
                 }
                 float distance = Vector3.Distance(this.Location, target);
                 Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
-                    this.Location.ToString(), target.ToString(), distance.ToString("G7"), terrain.ToString()));
+                    this.Location.ToString(), target.ToString(), distance.ToString("F2"), terrain.ToString()));
 
                 this.TeleportTo(target);
                 return true;
@@ -289,7 +289,7 @@
 
         public void TeleportTo(Vector3 target)
         {
-            RustServerManagement.Get().TeleportPlayerToWorld(this.PlayerClient.netPlayer, target);
+            RustServerManagement.Get().TeleportPlayerToWorld(this.ourPlayer.netPlayer, target);
         }
 
         public bool Admin
@@ -312,12 +312,12 @@
         {
             get
             {
-                return this.PlayerClient.controllable.health;
+                return this.ourPlayer.controllable.health;
             }
             set
             {
-                this.PlayerClient.controllable.takeDamage.health = value;
-                this.PlayerClient.controllable.takeDamage.Heal(this.PlayerClient.controllable, 0f);
+                this.ourPlayer.controllable.takeDamage.health = value;
+                this.ourPlayer.controllable.takeDamage.Heal(this.ourPlayer.controllable, 0f);
             }
         }
 
@@ -347,11 +347,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
+                return this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float)Convert.ToInt32(value));
+                this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float)Convert.ToInt32(value));
             }
         }
 
@@ -359,11 +359,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsCold();
+                return this.ourPlayer.controllable.GetComponent<Metabolism>().IsCold();
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float)(-10)) : ((float)10);
+                this.ourPlayer.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float)(-10)) : ((float)10);
             }
         }
 
@@ -371,11 +371,11 @@
         {
             get
             {
-                return (this.PlayerClient.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
+                return (this.ourPlayer.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
             }
             set
             {
-                this.PlayerClient.controllable.GetComponent<FallDamage>().SetLegInjury((float)Convert.ToInt32(value));
+                this.ourPlayer.controllable.GetComponent<FallDamage>().SetLegInjury((float)Convert.ToInt32(value));
             }
         }
 

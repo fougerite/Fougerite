@@ -300,11 +300,27 @@
             }
         }
 
+        public ulong UID
+        {
+            get
+            {
+                return this.ourPlayer.userID;
+            }
+        }
+
         public string GameID
         {
             get
             {
-                return this.ourPlayer.userID.ToString();
+                return this.ourPlayer.userID.ToString("G17");
+            }
+        }
+
+        public string SteamID
+        {
+            get
+            {
+                return this.ourPlayer.userID.ToString("G17");
             }
         }
 
@@ -418,15 +434,7 @@
             {
                 return this.ourPlayer;
             }
-        }
-
-        public string SteamID
-        {
-            get
-            {
-                return this.ourPlayer.netUser.userID.ToString();
-            }
-        }
+        }            
 
         public long TimeOnline
         {

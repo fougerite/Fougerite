@@ -1,14 +1,14 @@
-﻿using System;
-using System.Runtime.Serialization;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
+    using System;
+    using System.Runtime.Serialization;
+    using System.Xml;
+    using System.Xml.Schema;
+    using System.Xml.Serialization;
+    using System.Collections.Generic;
+    using System.Collections;
+    using System.Linq;
+
     [XmlRoot("Dictionary")]
     public class SerializableDictionary<KT, VT> : Dictionary<KT, VT>, IXmlSerializable //, IEnumerable<KeyValuePair<KT, VT>>, ICollection<KeyValuePair<KT, VT>>, IEnumerable
     {

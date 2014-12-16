@@ -1,15 +1,16 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using UnityEngine;
-using uLink;
-using POSIX;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Xml;
+    using System.Xml.Schema;
+    using System.Xml.Serialization;
+    using UnityEngine;
+    using uLink;
+    using POSIX;
+    using Fougerite.Events;
+
     [Serializable]
     public class Newman
     {
@@ -63,52 +64,51 @@ namespace Fougerite
 
         #region hooks
 
-        public void OnConnect(PlayerClient client)
+        public void OnConnect()
         {
-            if (this.id != client.userID)
-                return;
-
             this.connected = POSIX.Time.NowSpan;
             this.sessions.Update(this.connected);
 
-            this.lastKnownIpAddr = client.netPlayer.externalIP;
+            this.lastKnownIpAddr = this.Client.netPlayer.externalIP;
             if (!this.ipAddrList.Contains(this.lastKnownIpAddr))
                 this.ipAddrList.Add(this.lastKnownIpAddr);
 
-            if (!this.nameList.Contains(client.netUser.displayName))
-                this.nameList.Add(client.netUser.displayName);
+            if (!this.nameList.Contains(this.Client.netUser.displayName))
+                this.nameList.Add(this.Client.netUser.displayName);
 
-            if (this.name != client.netUser.displayName)
-                this.name = client.netUser.displayName;
+            if (this.name != this.Client.netUser.displayName)
+                this.name = this.Client.netUser.displayName;
         }
 
-        public void OnDisconnect(PlayerClient client)
+        public void OnDisconnect()
         {
-            if (this.id != client.userID)
-                return;
-
-        }
-
-        public void OnDeath(PlayerClient client)
-        {
-            if (this.id != client.userID)
-                return;
 
         }
 
-        public void OnSpawn(PlayerClient client)
+        public void OnDeath()
         {
-            if (this.id != client.userID)
-                return;
 
         }
 
-        public void Update(PlayerClient client)
+        public void OnSpawn()
         {
-            if (this.id != client.userID)
-                return;
 
+        }
+
+        public void Update()
+        {
             this.sessions.Update(this.connected);
+            if (this.Client != null && this.Client.hasLastKnownPosition)
+            {
+                this.lastKnownCoordinates = new Coordinates(this.Client.lastKnownPosition);
+            } else
+            {
+                this.lastKnownCoordinates = new Coordinates();
+            }
+        }
+
+        public void OnBlueprintUse(BPUseEvent ae)
+        {
         }
 
         #endregion
@@ -205,16 +205,10 @@ namespace Fougerite
         {
             get
             {
-                if (this.IsOnline)
-                {
-                    var query = from p in Server.GetServer().Players
-                                               where p.PlayerClient.userID == this.SteamID
-                                               select p;
-                    return query.FirstOrDefault<Fougerite.Player>();
-                } else
-                {
-                    return null;
-                }
+                var query = from p in Server.GetServer().Players
+                                            where p.PlayerClient.userID == this.SteamID
+                                            select p;
+                return query.FirstOrDefault<Fougerite.Player>();
             }
         }
 
@@ -301,6 +295,7 @@ namespace Fougerite
                     }
                     reader.MoveToContent();
                 }
+                // <Sessions />
             }
 
             public XmlSchema GetSchema()
@@ -312,8 +307,8 @@ namespace Fougerite
         #endregion
     }
 
-    [XmlRoot("Vector3")]
-    public class Coordinates : IXmlSerializable
+    [Serializable]
+    public class Coordinates
     {
         private Dictionary<char, float> coordinates;
         private static readonly char _x = 'x';
@@ -399,32 +394,6 @@ namespace Fougerite
         public float z
         {
             get { return this.Z; }
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteStartElement("X");
-            new XmlSerializer(typeof(float)).Serialize(writer, this.X);
-            writer.WriteEndElement();
-            writer.WriteStartElement("Y");
-            new XmlSerializer(typeof(float)).Serialize(writer, this.Y);
-            writer.WriteEndElement();
-            writer.WriteStartElement("Z");
-            new XmlSerializer(typeof(float)).Serialize(writer, this.Z);
-            writer.WriteEndElement();
-        }
-        public void ReadXml(XmlReader reader)
-        {
-            bool empty = reader.IsEmptyElement;
-            reader.Read(); // <Vector3>
-            if (empty)
-                return;
-
-
-        }
-        public XmlSchema GetSchema()
-        {
-            return null; 
         }
     }
 }

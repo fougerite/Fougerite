@@ -3,6 +3,7 @@
     using Facepunch.Utility;
     using Fougerite.Events;
     using Rust;
+    using RustProto;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -51,6 +52,9 @@
             if (player != null)
             {
                 BPUseEvent ae = new BPUseEvent(bdb);
+                Newman garry = Server.GetServer().GetNewman(item.controllable.playerClient.userID);
+                garry.OnBlueprintUse(ae);
+
                 if (OnBlueprintUse != null)
                 {
                     OnBlueprintUse(player, ae);
@@ -157,7 +161,6 @@
                 OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
 
             return de.Open;
-           
         }
 
         public static float EntityDecay(object entity, float dmg)
@@ -304,17 +307,26 @@
 
             if (user.playerClient == null) {
                 Logger.LogDebug("PlayerConnect user.playerClient is null");
-                return false;
+                return connected;
             }
-            Fougerite.Player item = new Fougerite.Player(user.playerClient);
-            Fougerite.Server.GetServer().Players.Add(item);
-            Logger.LogDebug(string.Format("User Connected: {0} ({1} | {2})", item.Name, item.SteamID.ToString(), item.PlayerClient.netPlayer.ipAddress));
+
+            Fougerite.Server server = Fougerite.Server.GetServer();
+
+            Fougerite.Player player = new Fougerite.Player(user.playerClient);
+            Newman garry = server.GetNewman(user.playerClient.userID);
+
+            server.Players.Add(player);
+            garry.OnConnect();
+
+            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", garry.Name, garry.SteamID.ToString(), garry.IP));
+
             if (OnPlayerConnected != null)
-                OnPlayerConnected(item);
+                OnPlayerConnected(player);
 
             connected = user.connected;
+
             if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
-                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                player.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
 
             return connected;
         }

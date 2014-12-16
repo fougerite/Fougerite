@@ -9,6 +9,16 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Private Message Usage:  /pm playerName message");
+                return;
+            }
+            foreach (PlayerClient client in PlayerClient.All)
+            {
+
+            }
             string str = "";
             for (int i = 0; i < ChatArguments.Length; i++)
             {

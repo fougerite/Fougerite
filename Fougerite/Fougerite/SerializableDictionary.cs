@@ -10,7 +10,7 @@
     using System.Linq;
 
     [XmlRoot("Dictionary")]
-    public class SerializableDictionary<KT, VT> : Dictionary<KT, VT>, IXmlSerializable //, IEnumerable<KeyValuePair<KT, VT>>, ICollection<KeyValuePair<KT, VT>>, IEnumerable
+    public class SerializableDictionary<KT, VT> : Dictionary<KT, VT>, IXmlSerializable
     {
         public SerializableDictionary()
         { 

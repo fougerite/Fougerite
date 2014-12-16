@@ -300,14 +300,6 @@
             }
         }
 
-        public ulong UID
-        {
-            get
-            {
-                return this.ourPlayer.userID;
-            }
-        }
-
         public string GameID
         {
             get
@@ -320,7 +312,7 @@
         {
             get
             {
-                return this.ourPlayer.userID.ToString("G17");
+                return this.ourPlayer.netUser.userID.ToString("G17");
             }
         }
 

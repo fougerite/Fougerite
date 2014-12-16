@@ -3,6 +3,7 @@
     using Facepunch.Utility;
     using Fougerite;
     using System;
+    using System.Linq;
     using System.Collections;
 
     public class PrivateMessagesCommand : ChatCommand

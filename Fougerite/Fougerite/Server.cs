@@ -62,8 +62,17 @@
 
         public Newman GetNewman(string search)
         {
-            if (search.StartsWith("7656119"))
+            ulong uid;
+            if (search.StartsWith("7656119") && ulong.TryParse(search, out uid))
             {
+                if (allNewmans.ContainsKey(uid))
+                    return allNewmans[uid];
+
+                var byid1 = from g in allNewmans.Values
+                                           group g by LevenshteinDistance.Compute(search, g.StringID) into d
+                                           orderby d.Key ascending
+                                           select d.FirstOrDefault();
+
             } else
             {
                 var byname1 = from g in allNewmans.Values

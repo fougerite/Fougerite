@@ -311,14 +311,11 @@
             }
 
             Fougerite.Server server = Fougerite.Server.GetServer();
-
             Fougerite.Player player = new Fougerite.Player(user.playerClient);
-            Newman garry = server.GetNewman(user.playerClient.userID);
-
             server.Players.Add(player);
-            garry.OnConnect();
+            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", player.Name, player.SteamID, player.IP));
 
-            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", garry.Name, garry.SteamID.ToString(), garry.IP));
+            server.GetNewman(user.playerClient.userID).OnConnect();
 
             if (OnPlayerConnected != null)
                 OnPlayerConnected(player);

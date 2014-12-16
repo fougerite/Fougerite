@@ -70,9 +70,9 @@
             }
         }
 
-        public System.Collections.Generic.List<Entity> GetLinkedStructs()
+        public List<Entity> GetLinkedStructs()
         {
-            System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
+            List<Entity> list = new List<Entity>();
             foreach (StructureComponent component in (this.Object as StructureComponent)._master._structureComponents)
             {
                 if (component != this.Object as StructureComponent)
@@ -135,23 +135,39 @@
         {
             get
             {
-                return Fougerite.Player.FindByGameID(this.CreatorID.ToString());
+                return Fougerite.Player.FindByGameID(this.CreatorID);
             }
         }
 
-        public ulong CreatorID
+        public string OwnerID
         {
             get
             {
                 if (this.IsDeployableObject())
                 {
-                    return this.GetObject<DeployableObject>().creatorID;
+                    return this.GetObject<DeployableObject>().ownerID.ToString();
                 }
                 if (this.IsStructure())
                 {
-                    return this.GetObject<StructureComponent>()._master.creatorID;
+                    return this.GetObject<StructureComponent>()._master.ownerID.ToString();
                 }
-                return 0L;
+                return null;
+            }
+        }
+
+        public string CreatorID
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                {
+                    return this.GetObject<DeployableObject>().creatorID.ToString("G17");
+                }
+                if (this.IsStructure())
+                {
+                    return this.GetObject<StructureComponent>()._master.creatorID.ToString("G17");
+                }
+                return null;
             }
         }
 
@@ -220,7 +236,7 @@
                 {
                     return this.GetObject<StructureComponent>().name.Replace("(Clone)", "");
                 }
-                return "";
+                return string.Empty;
             }
         }
 
@@ -236,23 +252,23 @@
         {
             get
             {
-                return Fougerite.Player.FindByGameID(this.OwnerID.ToString());
+                return Fougerite.Player.FindByGameID(this.OwnerID);
             }
         }
 
-        public string OwnerID
+        public Vector3 Location
         {
             get
             {
                 if (this.IsDeployableObject())
                 {
-                    return this.GetObject<DeployableObject>().ownerID.ToString();
+                    return this.GetObject<DeployableObject>().gameObject.transform.position;
                 }
                 if (this.IsStructure())
                 {
-                    return this.GetObject<StructureComponent>()._master.ownerID.ToString();
+                    return this.GetObject<StructureComponent>().gameObject.transform.position;
                 }
-                return null;
+                return Vector3.zero;
             }
         }
 

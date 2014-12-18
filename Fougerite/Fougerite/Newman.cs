@@ -60,6 +60,24 @@
             this.mutedByAdmin = new List<TimeSpan>();
         }
 
+        public Newman(ulong uid, string name)
+        {
+            this.name = name;
+            this.id = uid;
+            this.connected = epoch.Subtract(epoch);
+            this.sessions = new Sessions();
+            this.lastKnownCoordinates = new Coordinates();
+            this.lastKnownIpAddr = "255.255.255.255";
+            this.ipAddrList = new List<string>();
+            this.nameList = new List<string>();
+            this.nameList.Add(this.name);
+            this.friendList = new List<ulong>();
+            this.shareList = new List<ulong>();
+            this.blueprintList = new List<string>();
+            this.kickedByAdmin = new List<TimeSpan>();
+            this.mutedByAdmin = new List<TimeSpan>();
+        }
+
         #endregion
 
         #region hooks
@@ -82,22 +100,25 @@
 
         public void OnDisconnect()
         {
-
+            this.sessions.Update(this.connected);
+            this.connected = epoch.Subtract(epoch);
         }
 
         public void OnDeath()
         {
-
+            this.Update();
         }
 
         public void OnSpawn()
         {
-
+            this.Update();
         }
 
         public void Update()
         {
-            this.sessions.Update(this.connected);
+            if(this.connected != epoch.Subtract(epoch))
+                this.sessions.Update(this.connected);
+
             if (this.Client != null && this.Client.hasLastKnownPosition)
             {
                 this.lastKnownCoordinates = new Coordinates(this.Client.lastKnownPosition);
@@ -147,7 +168,7 @@
                 var query = from p in PlayerClient.All
                                         where p.userID == this.SteamID
                                         select p;
-                return query.Count<PlayerClient>() == 1;
+                return query.Count() == 1;
             }
         }
 

@@ -68,38 +68,19 @@
                 if (allNewmans.ContainsKey(uid))
                     return allNewmans[uid];
 
-                var byid1 = from g in allNewmans.Values
-                                           group g by LevenshteinDistance.Compute(search, g.StringID) into d
-                                           orderby d.Key ascending
-                                           select d.FirstOrDefault();
-
+                var byId = from g in allNewmans.Values
+                                       group g by LevenshteinDistance.Compute(search, g.StringID) into d
+                                       orderby d.Key ascending
+                                       select d.FirstOrDefault();
+                return byId.First();
             } else
             {
-                var byname1 = from g in allNewmans.Values
-                                      group g by LevenshteinDistance.Compute(search.ToUpperInvariant(), g.Name.ToUpperInvariant()) into d
-                                      orderby d.Key ascending
-                                      select d.FirstOrDefault();
-                if (byname1.Count() == 1)
-                    return byname1.First();
-
-                var byname2 = from g in byname1
-                                     group g by Math.Abs(g.Name.Length - search.Length) into d
-                                     orderby d.Key ascending
-                                     select d.FirstOrDefault();
-                if (byname2.Count() > 1)
-                {
-                    Logger.LogDebug("[GetNewman] LevenshteinDistance AND Length failed to single out only 1 name.");
-                    string matches = string.Empty;
-                    foreach (Newman garry in byname2)
-                    {
-                        matches.Insert(matches.Length, ", ");
-                        matches.Insert(matches.Length, garry.Name);
-                    }
-                    Logger.LogDebug(string.Format("search={0} matches={1}", search, matches));
-                }
-                return byname2.FirstOrDefault();
+                var byName = from g in allNewmans.Values
+                                         group g by LevenshteinDistance.Compute(search.ToUpperInvariant(), g.Name.ToUpperInvariant()) into d
+                                         orderby d.Key ascending
+                                         select d.FirstOrDefault();
+                return byName.First();
             }
-
         }
 
         public SerializableDictionary<ulong, Newman> Newmans

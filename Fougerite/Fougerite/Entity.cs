@@ -143,15 +143,32 @@
         {
             get
             {
+                string id = string.Empty;
                 if (this.IsDeployableObject())
                 {
-                    return this.GetObject<DeployableObject>().ownerID.ToString();
+                    try 
+                    {
+                        id = this.GetObject<DeployableObject>().ownerID.ToString("G17");
+                    } catch (NullReferenceException ex)
+                    {
+                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
+                        NetCull.Destroy((this._obj as DeployableObject).gameObject);
+                    }
+                    return id;
                 }
                 if (this.IsStructure())
                 {
-                    return this.GetObject<StructureComponent>()._master.ownerID.ToString();
+                    try 
+                    {
+                        id = this.GetObject<StructureComponent>()._master.ownerID.ToString("G17");
+                    } catch (NullReferenceException ex)
+                    {
+                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
+                        NetCull.Destroy((this._obj as StructureComponent).gameObject);
+                    }
+                    return id;
                 }
-                return null;
+                return id;
             }
         }
 
@@ -159,15 +176,32 @@
         {
             get
             {
+                string id = string.Empty;
                 if (this.IsDeployableObject())
                 {
-                    return this.GetObject<DeployableObject>().creatorID.ToString("G17");
+                    try 
+                    {
+                        id = this.GetObject<DeployableObject>().creatorID.ToString("G17");
+                    } catch (NullReferenceException ex)
+                    {
+                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
+                        NetCull.Destroy((this._obj as DeployableObject).gameObject);
+                    }
+                    return id;
                 }
                 if (this.IsStructure())
                 {
-                    return this.GetObject<StructureComponent>()._master.creatorID.ToString("G17");
+                    try 
+                    {
+                        id = this.GetObject<StructureComponent>()._master.creatorID.ToString("G17");
+                    } catch (NullReferenceException ex)
+                    {
+                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
+                        NetCull.Destroy((this._obj as StructureComponent).gameObject);
+                    }
+                    return id;
                 }
-                return null;
+                return id;
             }
         }
 

@@ -315,7 +315,7 @@
             server.Players.Add(player);
             Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", player.Name, player.SteamID, player.IP));
 
-            server.GetNewman(user.playerClient.userID).OnConnect();
+            server.GetNewman(user.playerClient).OnConnect();
 
             if (OnPlayerConnected != null)
                 OnPlayerConnected(player);

@@ -72,14 +72,20 @@
                                        group g by LevenshteinDistance.Compute(search, g.StringID) into d
                                        orderby d.Key ascending
                                        select d.FirstOrDefault();
-                return byId.First();
+                if (byId.Count() == 1)
+                    return byId.First();
+
+                return byId.FirstOrDefault();
             } else
             {
                 var byName = from g in allNewmans.Values
                                          group g by LevenshteinDistance.Compute(search.ToUpperInvariant(), g.Name.ToUpperInvariant()) into d
                                          orderby d.Key ascending
                                          select d.FirstOrDefault();
-                return byName.First();
+                if (byName.Count() == 1)
+                    return byName.First();
+
+                return byName.FirstOrDefault();
             }
         }
 

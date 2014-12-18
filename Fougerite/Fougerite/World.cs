@@ -192,13 +192,13 @@
         public float GetGround(float x, float z)
         {
             Vector3 above = new Vector3(x, 2000f, z);
-            return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+            return (float)((RaycastHit)Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
         }
 
         public float GetGround(Vector3 target)
         {
             Vector3 above = new Vector3(target.x, 2000f, target.z);
-            return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+            return (float)((RaycastHit)Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
         }
 
         public float GetTerrainHeight(Vector3 target)
@@ -261,8 +261,7 @@
                 {
                     DeployableItemDataBlock block2 = block as DeployableItemDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block2.ObjectToPlace.name + "\", \"" + block2.DeployableObjectPrefabName + "\"],\n");
-                }
-                else if (block is StructureComponentDataBlock)
+                } else if (block is StructureComponentDataBlock)
                 {
                     StructureComponentDataBlock block3 = block as StructureComponentDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block3.structureToPlacePrefab.name + "\", \"" + block3.structureToPlaceName + "\"],\n");
@@ -302,12 +301,10 @@
                 if (prefab == ":player_soldier")
                 {
                     obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
-                }
-                else if (prefab.Contains("C130"))
+                } else if (prefab.Contains("C130"))
                 {
                     obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
-                }
-                else
+                } else
                 {
                     GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
                     obj2 = obj3;
@@ -315,8 +312,7 @@
                     if (component != null)
                     {
                         obj2 = new Entity(component);
-                    }
-                    else
+                    } else
                     {
                         DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
                         if (obj4 != null)
@@ -377,11 +373,11 @@
             get
             {
                 IEnumerable<Entity> component = from c in
-                    (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
-                    select new Entity(c);
+                                                                (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
+                                                            select new Entity(c);
                 IEnumerable<Entity> deployable = from d in
-                    (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
-                    select new Entity(d);
+                                                                 (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
+                                                             select new Entity(d);
                 // this is much faster than Concat
                 List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
                 entities.AddRange(component);
@@ -396,14 +392,16 @@
             set { env.nightlength = value; }
         }
 
-        public float Time {
+        public float Time
+        {
             get
             {
                 try
                 {
                     float hour = EnvironmentControlCenter.Singleton.GetTime();
                     return hour;
-                } catch (NullReferenceException) {
+                } catch (NullReferenceException)
+                {
                     return 12f;
                 }
             }
@@ -416,17 +414,56 @@
                 try
                 {
                     EnvironmentControlCenter.Singleton.SetTime(hour);
-                } catch(Exception) { }
+                } catch (Exception)
+                {
+                }
             }
         }
 
-        public bool IsBP(string name)
+        public static bool IsBP(string search, out string match)
         {
-            return name.Contains(" BP") || name.Contains(" BLUEPRINT");
+            string BP = "BP";
+            string BLUEPRINT = "BLUEPRINT";
+            bool flag = false;          
+            string[] terms = search.Split(new char[] { ' ' });
+            foreach (string term in terms)
+            {
+                match = term;
+                flag = LD(term, BP) == 0 ? true : false;
+                if (flag)
+                    return flag;
+
+                int distance = Math.Abs(term.Length - BLUEPRINT.Length) + 2;
+                flag = LD(term, BLUEPRINT) <= distance ? true : false;
+                if (flag)
+                    return flag;
+            }
+            match = string.Empty;
+            return flag;
+        }
+
+        public static int LD(string s, string t)
+        {
+            return LevenshteinDistance.Compute(s, t);
+        }
+
+        public string MatchItemName(string search)
+        {
+            IEnumerable<string> query = from term in names
+                                                 group term by LD(search.ToUpperInvariant(), term.ToUpperInvariant()) into match
+                                                 orderby match.Key ascending
+                                                 select match.FirstOrDefault();
+            if (query.Count() == 1)
+                return query.First();
+
+            Logger.LogDebug("[MatchItemName] found more than one match, returning first.");
+            Logger.LogDebug(string.Format("[MatchItemName] search={0} matches={1}", search, string.Join(", ", query.ToArray())));
+            return query.FirstOrDefault();
         }
 
         public string ParseItemName(string arg)
         {
+            string bp;
             string str = " ";
             str += arg.Replace('"', ' ').ToUpperInvariant();
             if (str.Contains(" ANI") || str.Contains("FAT"))
@@ -487,7 +524,8 @@
             {
                 return "Rock";
             }       
-            if (str.Contains(" SUL")) {
+            if (str.Contains(" SUL"))
+            {
                 if (str.Contains("ORE"))
                     return "Sulfur Ore";
             
@@ -509,7 +547,7 @@
             {             
                 if (str.Contains("DRA") || str.Contains("KIT"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Blood Draw Kit Blueprint";
 
                     return "Blood Draw Kit";
@@ -520,28 +558,28 @@
             {
                 if (str.Contains("BOO"))
                 {                
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Cloth Boots BP";
 
                     return "Cloth Boots";
                 }
                 if (str.Contains("HEL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Cloth Helmet BP";
 
                     return "Cloth Helmet";
                 }
                 if (str.Contains("PAN"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Cloth Pants BP";
 
                     return "Cloth Pants";
                 }
                 if (str.Contains("VES"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Cloth Vest BP";
 
                     return "Cloth Vest";
@@ -552,28 +590,28 @@
             {
                 if (str.Contains("BOO"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Leather Boots BP";
 
                     return "Leather Boots"; 
                 }
                 if (str.Contains("HEL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Leather Helmet BP";
 
                     return "Leather Helmet"; 
                 }
                 if (str.Contains("PAN"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Leather Pants BP";
 
                     return "Leather Pants"; 
                 }
                 if (str.Contains("VES"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Leather Vest BP";
 
                     return "Leather Vest"; 
@@ -584,105 +622,105 @@
             {            
                 if (str.Contains("BAR"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Barricade Blueprint";
 
                     return "Wood Barricade"; 
                 }
                 if (str.Contains("CEI"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Ceiling BP";
 
                     return "Wood Ceiling"; 
                 }
                 if (str.Contains("DOO"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Doorway BP"; 
 
                     return "Wood Doorway"; 
                 }
                 if (str.Contains("FOU"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Foundation BP";
 
                     return "Wood Foundation";
                 }
                 if (str.Contains("GATE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Gate Blueprint";
 
                     return "Wood Gate";
                 }
                 if (str.Contains("GATEW"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Gateway Blueprint";
 
                     return "Wood Gateway";
                 }
                 if (str.Contains("PIL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Pillar BP";
 
                     return "Wood Pillar";
                 }
                 if (str.Contains("PLA"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Planks Blueprint";
 
                     return "Wood Planks";
                 }
                 if (str.Contains("RAM"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Ramp BP";
 
                     return "Wood Ramp"; 
                 }
                 if (str.Contains("SHE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Shelter Blueprint";
 
                     return "Wood Shelter";
                 }
                 if (str.Contains("STA"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Stairs BP";
 
                     return "Wood Stairs";
                 }
                 if (str.Contains("STO") || str.Contains("BOX"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Storage Box Blueprint";
 
                     return "Wood Storage Box"; 
                 }
                 if (str.Contains("WAL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Wall BP"; 
 
                     return "Wood Wall"; 
                 }
                 if (str.Contains("WIN"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wood Window BP";
 
                     return "Wood Window"; 
                 }
                 if (str.Contains(" WOODE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Wooden Door Blueprint";
 
                     return "Wooden Door"; 
@@ -691,119 +729,119 @@
             }
             if (str.Contains(" ARR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Arrow Blueprint";
 
                 return "Arrow";
             }
             if (str.Contains(" BAN"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Bandage Blueprint";
 
                 return "Bandage"; 
             }
             if (str.Contains(" BED"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Bed Blueprint";
 
                 return "Bed";
             }
             if (str.Contains(" FLAS"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Flashlight Mod BP";
 
                 return "Flashlight Mod"; 
             }
             if (str.Contains(" FLAR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Flare Blueprint";
 
                 return "Flare";
             }
             if (str.Contains(" FUR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Furnace Blueprint";
 
                 return "Furnace";
             }
             if (str.Contains(" GUN"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Gunpowder Blueprint";
 
                 return "Gunpowder"; 
             }
             if (str.Contains(" HANDC"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "HandCannon Blueprint";
 
                 return "HandCannon";
             }
             if (str.Contains(" HAT") && !str.Contains("STO"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Hatchet Blueprint";
 
                 return "Hatchet";
             }
             if (str.Contains(" M4"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "M4 Blueprint";
 
                 return "M4";
             }
             if (str.Contains(" MP5"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "MP5A4 Blueprint";
 
                 return "MP5A4"; 
             }
             if (str.Contains(" P25"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "P250 Blueprint";
 
                 return "P250";
             }
             if (str.Contains(" PAP"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Paper Blueprint";
 
                 return "Paper"; 
             }
             if (str.Contains(" REV"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Revolver Blueprint";
 
                 return "Revolver"; 
             }
             if (str.Contains(" SIL"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Silencer BP";
 
                 return "Silencer"; 
             }
             if (str.Contains(" TOR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Torch Blueprint";
 
                 return "Torch"; 
             }
             if (str.Contains(" WOR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Workbench Blueprint";
 
                 return "Workbench"; 
@@ -815,7 +853,7 @@
 
                 if (str.Contains("AMM"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "556 Ammo Blueprint";
                 
                     return "556 Ammo";
@@ -829,40 +867,40 @@
                 }
                 if (str.Contains(" 9MM") && str.Contains("PIS"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "9MM Pistol Blueprint";
 
                     return "9MM Pistol"; 
                 }
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "9MM Ammo Blueprint";
 
                 return "9MM Ammo"; 
             }
             if (str.Contains(" CAM") || str.Contains(" FIR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Camp Fire Blueprint";
 
                 return "Camp Fire"; 
             }
             if ((str.Contains(" EXPLOSIVE") || str.Contains("CHARG")) && !str.Contains("EXPLOSIVES"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Explosive Charge Blueprint";
 
                 return "Explosive Charge"; 
             }
             if (str.Contains(" EXPLOSIVES"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Explosives Blueprint";
 
                 return "Explosives";
             }
             if (str.Contains(" F1") || str.Contains(" GRE"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "F1 Grenade Blueprint";
 
                 return "F1 Grenade"; 
@@ -871,14 +909,14 @@
             {            
                 if (str.Contains("SHE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Handmade Shell Blueprint";
 
                     return "Handmade Shell"; 
                 }
                 if (str.Contains("LOC"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Handmade Lockpick Blueprint";
 
                     return "Handmade Lockpick"; 
@@ -886,14 +924,14 @@
             }
             if (str.Contains(" HOL") || str.Contains(" SIGH"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Holo sight BP";
 
                 return "Holo sight"; 
             }
             if (str.Contains(" HUN"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Hunting Bow Blueprint";
 
                 return "Hunting Bow"; 
@@ -902,28 +940,28 @@
             {
                 if (str.Contains("BOO"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Kevlar Boots BP"; 
 
                     return "Kevlar Boots";
                 }
                 if (str.Contains("HEL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Kevlar Helmet BP";
 
                     return "Kevlar Helmet"; 
                 }
                 if (str.Contains("PAN"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Kevlar Pants BP";
 
                     return "Kevlar Pants"; 
                 }
                 if (str.Contains("VES"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Kevlar Vest BP";
                 
                     return "Kevlar Vest";
@@ -931,7 +969,7 @@
             }
             if (str.Contains(" LAS"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Laser Sight BP";
 
                 return "Laser Sight";   
@@ -940,70 +978,70 @@
             {
                 if (str.Contains("CEI"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Ceiling BP";
 
                     return "Metal Ceiling"; 
                 }
                 if (str.Contains("DOOR") && !str.Contains("DOORW"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Door Blueprint";
 
                     return "Metal Door"; 
                 }
                 if (str.Contains("DOORW"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Doorway BP";
 
                     return "Metal Doorway";
                 }
                 if (str.Contains("FOU"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Foundation BP";
 
                     return "Metal Foundation"; 
                 }
                 if (str.Contains("PIL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Pillar BP";
 
                     return "Metal Pillar"; 
                 }
                 if (str.Contains("STA"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Stairs BP";
 
                     return "Metal Stairs"; 
                 }
                 if (str.Contains("WAL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Wall BP";
 
                     return "Metal Wall"; 
                 }   
                 if (str.Contains("WIN") && !str.Contains("BAR"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Window BP";
 
                     return "Metal Window"; 
                 }
                 if (str.Contains("RAM"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Ramp BP";
                 
                     return "Metal Ramp";
                 }
                 if (str.Contains("WIN") && str.Contains("BAR"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Metal Window Bars Blueprint";
 
                     return "Metal Window Bars";
@@ -1016,28 +1054,28 @@
             }
             if (str.Contains(" PIC") || str.Contains("AXE"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Pick Axe Blueprint";
 
                 return "Pick Axe";
             }
             if (str.Contains(" PIP"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Pipe Shotgun Blueprint";
 
                 return "Pipe Shotgun"; 
             }
             if (str.Contains(" REP"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Repair Bench Blueprint";
 
                 return "Repair Bench"; 
             }
             if (str.Contains(" RES"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Research Kit Blueprint";
 
                 return "Research Kit 1";
@@ -1046,19 +1084,19 @@
             {
                 if (str.Contains("SHE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Shotgun Shells Blueprint";
 
                     return "Shotgun Shells";
                 }
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Shotgun Blueprint";
 
                 return "Shotgun";
             }
             if (str.Contains(" SLE") || str.Contains("BAG"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Sleeping Bag Blueprint";
 
                 return "Sleeping Bag";
@@ -1067,14 +1105,14 @@
             {
                 if (str.Contains("MED"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Small Medkit Blueprint";
 
                     return "Small Medkit"; 
                 }
                 if (str.Contains("STA"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Small Stash Blueprint";
 
                     return "Small Stash"; 
@@ -1087,7 +1125,7 @@
             }
             if (str.Contains(" SPI") && !str.Contains(" LAR"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Spike Wall Blueprint";
 
                 return "Spike Wall";
@@ -1096,7 +1134,7 @@
             {
                 if (str.Contains("HAT"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Stone Hatchet Blueprint";
 
                     return "Stone Hatchet";
@@ -1105,7 +1143,7 @@
             }
             if (str.Contains(" BOL") || str.Contains(" ACT") || str.Contains(" RIF"))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Bolt Action Rifle Blueprint";
 
                 return "Bolt Action Rifle";
@@ -1120,7 +1158,7 @@
 
                 if (str.Contains("SHO") || str.Contains("SHE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Empty Shotgun Shell Blueprint";
 
                     return "Empty Shotgun Shell";
@@ -1128,7 +1166,7 @@
             }
             if (str.Contains(" LAR") && (str.Contains("WOO") || str.Contains("STO")))
             {
-                if (IsBP(str))
+                if (IsBP(str, out bp))
                     return "Large Wood Storage Blueprint";
 
                 return "Large Wood Storage";
@@ -1137,14 +1175,14 @@
             {
                 if ((str.Contains("GRAD") || str.Contains("FUE")))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Low Grade Fuel Blueprint";
 
                     return "Low Grade Fuel";
                 }
                 if (str.Contains("QUA") || str.Contains("MET"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Low Quality Metal Blueprint";
 
                     return "Low Quality Metal";
@@ -1154,21 +1192,21 @@
             {
                 if (str.Contains("556"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Primed 556 Casing Blueprint";
 
                     return "Primed 556 Casing";
                 }
                 if (str.Contains("9MM"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Primed 9MM Casing Blueprint";
 
                     return "Primed 9MM Casing";
                 }            
                 if (str.Contains("SHO") || str.Contains("SHE"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Primed Shotgun Shell Blueprint";
 
                     return "Primed Shotgun Shell";
@@ -1178,27 +1216,27 @@
             {
                 if (str.Contains("BOO"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Rad Suit Boots BP";
 
                     return "Rad Suit Boots";
                 }
                 if (str.Contains("HEL"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Rad Suit Helmet BP";
                     return "Rad Suit Helmet";
                 }
                 if (str.Contains("PAN"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Rad Suit Pants BP";
 
                     return "Rad Suit Pants";
                 }
                 if (str.Contains("VES"))
                 {
-                    if (IsBP(str))
+                    if (IsBP(str, out bp))
                         return "Rad Suit Vest BP";
 
                     return "Rad Suit Vest";
@@ -1212,14 +1250,14 @@
                     {
                         if (str.Contains(" ARM"))
                         {
-                            if (IsBP(str))
+                            if (IsBP(str, out bp))
                                 return string.Format("Armor Part {0} BP", i);
 
                             return string.Format("Armor Part {0}", i); 
                         }
                         if (str.Contains(" WEA"))
                         {
-                            if (IsBP(str))
+                            if (IsBP(str, out bp))
                                 return string.Format("Weapon Part {0} BP", i);
 
                             return string.Format("Weapon Part {0}", i);
@@ -1267,7 +1305,8 @@
             "Weapon Part 7", "Wood Barricade Blueprint", "Wood Barricade", "Wood Ceiling BP", "Wood Ceiling", "Wood Doorway BP", "Wood Doorway", "Wood Foundation BP", "Wood Foundation", "Wood Gate Blueprint", 
             "Wood Gate", "Wood Gateway Blueprint", "Wood Gateway", "Wood Pillar BP", "Wood Pillar", "Wood Planks Blueprint", "Wood Planks", "Wood Ramp BP", "Wood Ramp", "Wood Shelter Blueprint", "Wood Shelter", 
             "Wood Stairs BP", "Wood Stairs", "Wood Storage Box Blueprint", "Wood Storage Box", "Wood Wall BP", "Wood Wall", "Wood Window BP", "Wood Window", "Wood", "Wooden Door Blueprint", "Wooden Door", 
-            "Workbench Blueprint", "Workbench" };
+            "Workbench Blueprint", "Workbench"
+        };
     }
 
 }

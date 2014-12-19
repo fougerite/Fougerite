@@ -17,7 +17,7 @@ namespace GlitchFix
         }
         public override string Author
         {
-            get { return "dretax14"; }
+            get { return "DreTaX"; }
         }
         public override string Description
         {
@@ -69,22 +69,18 @@ namespace GlitchFix
                                 return;
                             }
                         }
-                        else if (ent.Name != "WoodRamp" && ent.Name != "MetalRamp" && ent.Name != "WoodFoundation" && ent.Name != "WoodDoorFrame" && ent.Name != "WoodWall" && ent.Name != "WoodPillar" && ent.Name != "WoodCeiling" && ent.Name != "MetalDoor" && ent.Name != "WoodStairs" && ent.Name != "WoodWindowFrame" && ent.Name != "MetalFoundation" && ent.Name != "MetalDoorFrame" && ent.Name != "MetalWall" && ent.Name != "MetalPillar" && ent.Name != "MetalCeiling" && ent.Name != "MetalStairs" && ent.Name != "MetalWindowFrame" && ent.Name != "Wood_Shelter" && ent.Name != "Barricade_Fence_Deployable" && ent.Name != "Wood Box" && ent.Name != "Metal Bars Window" && ent.Name != "CampFire" && ent.Name != "Wood Spike Wall" && ent.Name != "Large Wood Spike Wall")
+                        else if (ent.Name == "Wood Box" || ent.Name == "Wood Box Large")
                         {
 
                             if (Entity != ent && Entity.InstanceID != ent.InstanceID && dist <= 2.5)
                             {
-                                if (Player != null)
+                                if (Player != null && GiveBack)
                                 {
-                                    //Player.Notice("Ya can't place chest under foundation bitch!");
-                                    if (GiveBack)
-                                    {
-                                        if (name == "WoodFoundation")
-                                            name = "Wood Foundation";
-                                        else if (name == "MetalFoundation")
-                                            name = "Metal Foundation";
-                                        Player.Inventory.AddItem(name, 1);
-                                    }
+                                    if (name == "WoodFoundation")
+                                        name = "Wood Foundation";
+                                    else if (name == "MetalFoundation")
+                                        name = "Metal Foundation";
+                                    Player.Inventory.AddItem(name, 1);
                                 }
                                 Entity.Destroy();
                                 return;

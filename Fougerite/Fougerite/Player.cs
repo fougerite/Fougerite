@@ -300,11 +300,34 @@
             }
         }
 
+        public ulong UID
+        {
+            get
+            {
+                ulong id = 0;
+                try
+                {
+                    id = this.ourPlayer.userID;
+                } catch (NullReferenceException ex)
+                {
+                    Logger.LogDebug(ex.Message + " getting Player.UID. Returned 0.");
+                }
+                return id;
+            }
+        }
         public string GameID
         {
             get
             {
-                return this.ourPlayer.userID.ToString("G17");
+                string id = string.Empty;
+                try
+                {
+                    id = this.ourPlayer.userID.ToString("G17");
+                } catch (NullReferenceException ex)
+                {
+                    Logger.LogDebug(ex.Message + " getting Player.GameID. Returned empty string.");
+                }
+                return id;
             }
         }
 
@@ -312,7 +335,15 @@
         {
             get
             {
-                return this.ourPlayer.netUser.userID.ToString("G17");
+                string id = string.Empty;
+                try
+                {
+                    id = this.ourPlayer.netUser.userID.ToString("G17");
+                } catch (NullReferenceException ex)
+                {
+                    Logger.LogDebug(ex.Message + " getting Player.SteamID. Returned empty string.");
+                }
+                return id;
             }
         }
 

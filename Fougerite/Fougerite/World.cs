@@ -12,15 +12,10 @@
     public class World
     {
         private static World world;
-        public List<string> itemNamesFull;
-        public List<string> itemNameWords;
         public Dictionary<string, Zone3D> zones;
 
         public World()
         {
-            this.itemNameWords = new List<string>(words);
-            this.itemNamesFull = new List<string>(names);
-            Logger.LogDebug(string.Format("[World] itemNameWords.Count={0} itemNamesFull.Count={1}", this.itemNameWords.Count.ToString(), this.itemNamesFull.Count.ToString()));
             this.zones = new Dictionary<string, Zone3D>();
         }
 

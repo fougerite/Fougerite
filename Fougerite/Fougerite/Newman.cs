@@ -116,7 +116,7 @@
 
         public void Update()
         {
-            if(this.connected != epoch.Subtract(epoch))
+            if (this.connected != epoch.Subtract(epoch))
                 this.sessions.Update(this.connected);
 
             if (this.Client != null && this.Client.hasLastKnownPosition)
@@ -227,8 +227,8 @@
             get
             {
                 var query = from p in Server.GetServer().Players
-                                            where p.PlayerClient.userID == this.SteamID
-                                            select p;
+                                        where this.SteamID == p.PlayerClient.userID
+                                        select p;
                 return query.FirstOrDefault<Fougerite.Player>();
             }
         }
@@ -239,9 +239,84 @@
             get
             {
                 var query = from p in PlayerClient.All
-                                        where p.userID == this.SteamID
+                                        where this.SteamID == p.userID
                                         select p;
                 return query.FirstOrDefault<PlayerClient>();
+            }
+        }
+
+        private static Fougerite.Entity[] QueryToEntity<T>(IEnumerable<T> query)
+        {
+            Fougerite.Entity[] these = new Fougerite.Entity[query.Count<T>()];
+            for (int i = 0; i < these.Length; i++)
+            {
+                these[i] = new Fougerite.Entity((query.ElementAtOrDefault<T>(i) as UnityEngine.Component).GetComponent<DeployableObject>() as DeployableObject);
+            }
+            return these;
+        }
+
+        [XmlIgnore]
+        public Fougerite.Entity[] Structures
+        {
+            get
+            {
+                var query = from s in StructureMaster.AllStructures
+                                        where this.SteamID == s.ownerID
+                                        select s;
+                Fougerite.Entity[] these = new Fougerite.Entity[query.Count()];
+                for (int i = 0; i < these.Length; i++)
+                {
+                    these[i] = new Fougerite.Entity(query.ElementAtOrDefault(i));
+                }
+                return these;
+            }
+        }
+
+        [XmlIgnore]
+        public Fougerite.Entity Sleeper
+        {
+            get
+            {
+                var query = from s in UnityEngine.Object.FindObjectsOfType(typeof(SleepingAvatar)) as SleepingAvatar[]
+                                        where this.SteamID == (s.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                                        select s;
+                return (QueryToEntity<SleepingAvatar>(query) as IEnumerable<Fougerite.Entity>).ElementAtOrDefault(0);
+            }
+        }
+
+        [XmlIgnore]
+        public Fougerite.Entity[] Shelters
+        {
+            get
+            {
+                var query = from d in UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject)) as DeployableObject[]
+                                        where d.name.Contains("Shelter") && this.SteamID == d.ownerID
+                                        select d;
+                return QueryToEntity<DeployableObject>(query);
+            }
+        }
+
+        [XmlIgnore]
+        public Fougerite.Entity[] Storage
+        {
+            get
+            {
+                var query = from s in UnityEngine.Object.FindObjectsOfType(typeof(SaveableInventory)) as SaveableInventory[]
+                                        where this.SteamID == (s.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                                        select s;
+                return QueryToEntity<SaveableInventory>(query);
+            }
+        }
+
+        [XmlIgnore]
+        public Fougerite.Entity[] Fires
+        {
+            get
+            {
+                var query = from f in UnityEngine.Object.FindObjectsOfType(typeof(FireBarrel)) as FireBarrel[]
+                                        where this.SteamID == (f.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                                        select f;
+                return QueryToEntity<FireBarrel>(query);
             }
         }
 

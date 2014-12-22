@@ -35,7 +35,7 @@
 
         public void ChangeOwner(Fougerite.Player p)
         {
-            if (this.IsDeployableObject())
+            if (this.IsDeployableObject() && !(bool)(this.Object as DeployableObject).GetComponent<SleepingAvatar>())
             {
                 this.GetObject<DeployableObject>().SetupCreator(p.PlayerClient.controllable);
             }

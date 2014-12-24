@@ -27,7 +27,7 @@
         private List<string> nameList;
         private List<ulong> friendList;
         private List<ulong> shareList;
-        private List<string> blueprintList;
+        private SerializableDictionary<int, string> blueprintsKnown;
         private List<TimeSpan> kickedByAdmin;
         private List<TimeSpan> mutedByAdmin;
 
@@ -55,7 +55,8 @@
 
             this.friendList = new List<ulong>();
             this.shareList = new List<ulong>();
-            this.blueprintList = new List<string>();
+            this.blueprintsKnown = client.controllable.GetComponent<PlayerInventory>().GetBoundBPs()
+                .ToDictionary<BlueprintDataBlock, int, string>(bp => bp.uniqueID, bp => bp.name) as SerializableDictionary<int, string>;
             this.kickedByAdmin = new List<TimeSpan>();
             this.mutedByAdmin = new List<TimeSpan>();
         }
@@ -73,7 +74,7 @@
             this.nameList.Add(this.name);
             this.friendList = new List<ulong>();
             this.shareList = new List<ulong>();
-            this.blueprintList = new List<string>();
+            this.blueprintsKnown = new SerializableDictionary<int, string>();
             this.kickedByAdmin = new List<TimeSpan>();
             this.mutedByAdmin = new List<TimeSpan>();
         }
@@ -130,6 +131,8 @@
 
         public void OnBlueprintUse(BPUseEvent ae)
         {
+            if (!this.blueprintsKnown.ContainsKey(ae.DataBlock.uniqueID))
+                this.blueprintsKnown.Add(ae.DataBlock.uniqueID, ae.DataBlock.name);
         }
 
         #endregion

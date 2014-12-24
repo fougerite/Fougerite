@@ -111,6 +111,27 @@
             return (this.Object is StructureComponent);
         }
 
+        public bool IsStructureMaster()
+        {
+            return (this.Object is StructureMaster);
+        }
+
+        public bool IsSleeper()
+        {
+            if (this.IsDeployableObject())
+                return (this.Object as DeployableObject).GetComponent<SleepingAvatar>() != null;
+
+            return false;
+        }
+
+        public bool IsFireBarrel()
+        {
+            if (this.IsDeployableObject())
+                return (this.Object as DeployableObject).GetComponent<FireBarrel>() != null;
+
+            return false;
+        }
+
         public void SetDecayEnabled(bool c)
         {
             if (this.IsDeployableObject())

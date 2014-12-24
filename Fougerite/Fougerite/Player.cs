@@ -41,8 +41,13 @@
             }
         }
 
-        public Fougerite.Player Find(string search)
+        public static int LD(string s, string t)
         {
+            return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
+        }
+
+        public Fougerite.Player Find(string search)
+        {               
             Fougerite.Player player = FindBySteamID(search);
             if (player != null)
             {
@@ -61,20 +66,36 @@
             return null;
         }
 
-        public static Fougerite.Player FindByGameID(string uid)
+        public static Fougerite.Player FindBySteamID(string uid)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.GameID == uid)
-                    return player;
-            return null;
+            var query = from p in Fougerite.Server.GetServer().Players
+                group p by LD(uid, p.SteamID) into match
+                orderby match.Key ascending
+                select match.FirstOrDefault();
+            return query.FirstOrDefault();
         }
 
-        public static Fougerite.Player FindByName(string name)
+        public static Fougerite.Player FindByGameID(string uid)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    return player;
-            return null;
+            var query = from p in Fougerite.Server.GetServer().Players
+                group p by LD(uid, p.GameID) into match
+                orderby match.Key ascending
+                select match.FirstOrDefault();
+            return query.FirstOrDefault();
+        }
+
+        public static Fougerite.Player FindByName(string search)
+        {
+            var query = from p in Fougerite.Server.GetServer().Players
+                                 group p by LD(search, p.Name) into match
+                                 orderby match.Key ascending
+                                 select match.FirstOrDefault();
+            if (query.Count() == 1)
+                return query.FirstOrDefault();
+
+            Logger.LogDebug("[FindByName] found more than one match, returning first.");
+            Logger.LogDebug(string.Format("[FindByName] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.Name).ToArray<string>())));
+            return query.FirstOrDefault();
         }
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
@@ -88,15 +109,7 @@
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player!= null && player.PlayerClient == pc)
-                    return player;
-            return null;
-        }
-
-        public static Fougerite.Player FindBySteamID(string uid)
-        {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.SteamID == uid)
+                if (player != null && player.PlayerClient == pc)
                     return player;
             return null;
         }
@@ -105,8 +118,8 @@
         {
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
-		
-	    public bool HasBlueprint(BlueprintDataBlock dataBlock)
+
+        public bool HasBlueprint(BlueprintDataBlock dataBlock)
         {
             PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
             if (invent.KnowsBP(dataBlock))
@@ -123,8 +136,7 @@
                 {
                     this.justDied = true;
                 }
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 this.invError = true;
                 Logger.LogException(ex);
@@ -220,7 +232,7 @@
                     }
                 }
                 StructureMaster structure = structures.FirstOrDefault<StructureMaster>();
-                if (!structure.containedBounds.Contains(target) || hit.distance > 8f)                
+                if (!structure.containedBounds.Contains(target) || hit.distance > 8f)
                     target = hit.point + bump;
 
                 float distance = Vector3.Distance(this.Location, target);
@@ -235,8 +247,7 @@
                     System.Timers.Timer timer = new System.Timers.Timer();
                     timer.Interval = ms;
                     timer.AutoReset = false;
-                    timer.Elapsed += delegate(object x, ElapsedEventArgs y)
-                    {
+                    timer.Elapsed += delegate(object x, ElapsedEventArgs y) {
                         this.TeleportTo(target);
                     };
                     timer.Start();
@@ -315,6 +326,7 @@
                 return id;
             }
         }
+
         public string GameID
         {
             get
@@ -457,7 +469,7 @@
             {
                 return this.ourPlayer;
             }
-        }            
+        }
 
         public long TimeOnline
         {

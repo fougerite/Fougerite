@@ -355,11 +355,13 @@
             set { env.daylength = value; }
         }
 
-        public StructureMaster[] Structures
+        public List<Entity> AllStructures
         {
             get
             {
-                return StructureMaster.AllStructures.ToArray<StructureMaster>();
+                IEnumerable<Entity> structures = from s in StructureMaster.AllStructures
+                                                             select new Entity(s);
+                return structures.ToList<Entity>();
             }
         }
 
@@ -367,12 +369,10 @@
         {
             get
             {
-                IEnumerable<Entity> component = from c in
-                                                                (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
+                IEnumerable<Entity> component = from c in (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
                                                             select new Entity(c);
-                IEnumerable<Entity> deployable = from d in
-                                                                 (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
-                                                             select new Entity(d);
+                IEnumerable<Entity> deployable = from d in (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
+                                                            select new Entity(d);
                 // this is much faster than Concat
                 List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
                 entities.AddRange(component);
@@ -428,7 +428,7 @@
                 if (flag)
                     return flag;
 
-                int distance = Math.Abs(term.Length - BLUEPRINT.Length) + 2;
+                int distance = Math.Abs(term.Length - BLUEPRINT.Length) + 1;
                 flag = LD(term, BLUEPRINT) <= distance ? true : false;
                 if (flag)
                     return flag;
@@ -439,13 +439,13 @@
 
         public static int LD(string s, string t)
         {
-            return LevenshteinDistance.Compute(s, t);
+            return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
         }
 
         public string MatchItemName(string search)
         {
             IEnumerable<string> query = from term in names
-                                                 group term by LD(search.ToUpperInvariant(), term.ToUpperInvariant()) into match
+                                                 group term by LD(search, term) into match
                                                  orderby match.Key ascending
                                                  select match.FirstOrDefault();
             if (query.Count() == 1)

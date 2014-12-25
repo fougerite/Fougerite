@@ -437,7 +437,7 @@
             return flag;
         }
 
-        public static int LD(string s, string t)
+        private static int LD(string s, string t)
         {
             return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
         }

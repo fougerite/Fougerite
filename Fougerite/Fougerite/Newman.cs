@@ -182,7 +182,7 @@
         [XmlIgnore]
         public string StringID
         {
-            get { return this.id.ToString("G17"); }
+            get { return this.id.ToString(); }
         }
 
         [XmlIgnore]

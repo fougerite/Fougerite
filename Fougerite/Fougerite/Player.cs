@@ -47,40 +47,40 @@
         }
 
         public Fougerite.Player Find(string search)
-        {               
-            Fougerite.Player player = FindBySteamID(search);
-            if (player != null)
+        {
+            if (search.StartsWith("7656119"))
             {
-                return player;
+                ulong uid;
+                if (ulong.TryParse(search, out uid))
+                {
+                    var query = from pc in PlayerClient.All
+                                               where pc.userID == uid
+                                               select pc;
+                    if (query.Count() == 1)
+                        return new Fougerite.Player(query.FirstOrDefault());
+                } else
+                {
+                    return FindBySteamID(search);
+                }
             }
-            player = FindByGameID(search);
-            if (player != null)
-            {
-                return player;
-            }
-            player = FindByName(search);
-            if (player != null)
-            {
-                return player;
-            }
-            return null;
+            return FindByName(search);
         }
 
         public static Fougerite.Player FindBySteamID(string uid)
         {
             var query = from p in Fougerite.Server.GetServer().Players
-                group p by LD(uid, p.SteamID) into match
-                orderby match.Key ascending
-                select match.FirstOrDefault();
+                                 group p by LD(uid, p.SteamID) into match
+                                 orderby match.Key ascending
+                                 select match.FirstOrDefault();
             return query.FirstOrDefault();
         }
 
         public static Fougerite.Player FindByGameID(string uid)
         {
             var query = from p in Fougerite.Server.GetServer().Players
-                group p by LD(uid, p.GameID) into match
-                orderby match.Key ascending
-                select match.FirstOrDefault();
+                                 group p by LD(uid, p.GameID) into match
+                                 orderby match.Key ascending
+                                 select match.FirstOrDefault();
             return query.FirstOrDefault();
         }
 
@@ -217,7 +217,6 @@
             IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
                                                                where s.containedBounds.Contains(terrain)
                                                                select s;
-
             if (terrain.y > target.y)
                 target = terrain + bump * 2;
 
@@ -321,7 +320,7 @@
                     id = this.ourPlayer.userID;
                 } catch (NullReferenceException ex)
                 {
-                    Logger.LogDebug(ex.Message + " getting Player.UID. Returned 0.");
+                    Logger.LogDebug(string.Format("{0} getting Player.UID. Returned 0.", ex.Message));
                 }
                 return id;
             }
@@ -334,10 +333,10 @@
                 string id = string.Empty;
                 try
                 {
-                    id = this.ourPlayer.userID.ToString("G17");
+                    id = this.ourPlayer.userID.ToString();
                 } catch (NullReferenceException ex)
                 {
-                    Logger.LogDebug(ex.Message + " getting Player.GameID. Returned empty string.");
+                    Logger.LogDebug(string.Format("{0} getting Player.GameID. Returned empty string.", ex.Message));
                 }
                 return id;
             }
@@ -350,10 +349,10 @@
                 string id = string.Empty;
                 try
                 {
-                    id = this.ourPlayer.netUser.userID.ToString("G17");
+                    id = this.ourPlayer.netUser.userID.ToString();
                 } catch (NullReferenceException ex)
                 {
-                    Logger.LogDebug(ex.Message + " getting Player.SteamID. Returned empty string.");
+                    Logger.LogDebug(string.Format("{0} getting Player.GameID. Returned empty string.", ex.Message));
                 }
                 return id;
             }

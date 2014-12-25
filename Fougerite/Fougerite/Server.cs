@@ -47,6 +47,11 @@
             return null;
         }
 
+        private static int LD(string s, string t)
+        {
+            return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
+        }
+
         public Newman GetNewman(PlayerClient client)
         {
             Newman garry = this.GetNewman(client.userID);
@@ -68,23 +73,17 @@
                 if (allNewmans.ContainsKey(uid))
                     return allNewmans[uid];
 
-                var byId = from g in allNewmans.Values
-                                       group g by LevenshteinDistance.Compute(search, g.StringID) into d
-                                       orderby d.Key ascending
-                                       select d.FirstOrDefault();
-                if (byId.Count() == 1)
-                    return byId.First();
-
+                var byId = from garry in allNewmans.Values
+                                       group garry by LD(search, garry.StringID) into match
+                                       orderby match.Key ascending
+                                       select match.FirstOrDefault();
                 return byId.FirstOrDefault();
             } else
             {
-                var byName = from g in allNewmans.Values
-                                         group g by LevenshteinDistance.Compute(search.ToUpperInvariant(), g.Name.ToUpperInvariant()) into d
-                                         orderby d.Key ascending
-                                         select d.FirstOrDefault();
-                if (byName.Count() == 1)
-                    return byName.First();
-
+                var byName = from garry in allNewmans.Values
+                                         group garry by LD(search.ToUpperInvariant(), garry.Name.ToUpperInvariant()) into match
+                                         orderby match.Key ascending
+                                         select match.FirstOrDefault();
                 return byName.FirstOrDefault();
             }
         }

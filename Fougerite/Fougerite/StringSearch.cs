@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Fougerite
 {
-    static class LevenshteinDistance
+    public static class LevenshteinDistance
     {
         /// http://www.dotnetperls.com/levenshtein
         /// <summary>

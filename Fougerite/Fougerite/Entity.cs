@@ -169,7 +169,7 @@
                 {
                     try 
                     {
-                        id = this.GetObject<DeployableObject>().ownerID.ToString("G17");
+                        id = this.GetObject<DeployableObject>().ownerID.ToString();
                     } catch (NullReferenceException ex)
                     {
                         Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
@@ -181,7 +181,7 @@
                 {
                     try 
                     {
-                        id = this.GetObject<StructureComponent>()._master.ownerID.ToString("G17");
+                        id = this.GetObject<StructureComponent>()._master.ownerID.ToString();
                     } catch (NullReferenceException ex)
                     {
                         Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
@@ -202,7 +202,7 @@
                 {
                     try 
                     {
-                        id = this.GetObject<DeployableObject>().creatorID.ToString("G17");
+                        id = this.GetObject<DeployableObject>().creatorID.ToString();
                     } catch (NullReferenceException ex)
                     {
                         Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
@@ -214,7 +214,7 @@
                 {
                     try 
                     {
-                        id = this.GetObject<StructureComponent>()._master.creatorID.ToString("G17");
+                        id = this.GetObject<StructureComponent>()._master.creatorID.ToString();
                     } catch (NullReferenceException ex)
                     {
                         Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);

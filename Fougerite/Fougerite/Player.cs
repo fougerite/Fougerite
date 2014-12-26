@@ -178,29 +178,29 @@
             ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, cmd);
         }
 
-        public void TeleportTo(Fougerite.Player p)
+        public bool TeleportTo(Fougerite.Player p)
         {
-            this.TeleportTo(p, 1.5f);
+            return this.TeleportTo(p, 1.5f);
         }
 
-        public void TeleportTo(Fougerite.Player p, float distance = 1.5f)
+        public bool TeleportTo(Fougerite.Player p, float distance = 1.5f)
         { 
             if (this == p) // lol
-                return;
+                return false;
 
             Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
             Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
-            this.SafeTeleportTo(target);
+            return this.SafeTeleportTo(target);
         }
 
-        public void SafeTeleportTo(float x, float y, float z)
+        public bool SafeTeleportTo(float x, float y, float z)
         {
-            this.SafeTeleportTo(new Vector3(x, y, z));
+            return this.SafeTeleportTo(new Vector3(x, y, z));
         }
 
-        public void SafeTeleportTo(float x, float z)
+        public bool SafeTeleportTo(float x, float z)
         {
-            this.SafeTeleportTo(new Vector3(x, 0f, z));
+            return this.SafeTeleportTo(new Vector3(x, 0f, z));
         }
 
         public bool SafeTeleportTo(Vector3 target)
@@ -238,19 +238,21 @@
 
                 if (distance < maxSafeDistance)
                 {
-                    this.TeleportTo(target);
-                    return true;
+                    return this.TeleportTo(target);
                 } else
                 {
-                    this.TeleportTo(terrain + bump * 2);
-                    System.Timers.Timer timer = new System.Timers.Timer();
-                    timer.Interval = ms;
-                    timer.AutoReset = false;
-                    timer.Elapsed += delegate(object x, ElapsedEventArgs y) {
-                        this.TeleportTo(target);
-                    };
-                    timer.Start();
-                    return true;
+                    if (this.TeleportTo(terrain + bump * 2))
+                    {
+                        System.Timers.Timer timer = new System.Timers.Timer();
+                        timer.Interval = ms;
+                        timer.AutoReset = false;
+                        timer.Elapsed += delegate(object x, ElapsedEventArgs y) {
+                            this.TeleportTo(target);
+                        };
+                        timer.Start();
+                        return true;
+                    }
+                    return false;
                 }            
             } else if (structures.Count() == 0)
             {
@@ -281,8 +283,7 @@
                 Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
                     this.Location.ToString(), target.ToString(), distance.ToString("F2"), terrain.ToString()));
 
-                this.TeleportTo(target);
-                return true;
+                return this.TeleportTo(target);
             } else
             {
                 Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
@@ -292,14 +293,14 @@
             }
         }
 
-        public void TeleportTo(float x, float y, float z)
+        public bool TeleportTo(float x, float y, float z)
         {
-            this.TeleportTo(new Vector3(x, y, z));
+            return this.TeleportTo(new Vector3(x, y, z));
         }
 
-        public void TeleportTo(Vector3 target)
+        public bool TeleportTo(Vector3 target)
         {
-            RustServerManagement.Get().TeleportPlayerToWorld(this.ourPlayer.netPlayer, target);
+            return RustServerManagement.Get().TeleportPlayerToWorld(this.ourPlayer.netPlayer, target);
         }
 
         public bool Admin

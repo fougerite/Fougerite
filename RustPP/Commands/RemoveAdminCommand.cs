@@ -31,7 +31,7 @@
             }
             if (list.Count == 1)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No adminstrator matches the name: " + playerName);
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("No adminstrator matches the name:  {0}", playerName));
                 return;
             }
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  player{1} {2}: ", ((list.Count - 1)).ToString(), (((list.Count - 1) > 1) ? "s match" : " matches"), playerName));

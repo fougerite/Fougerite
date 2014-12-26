@@ -10,43 +10,41 @@
 
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            if (ChatArguments != null)
+            if (ChatArguments.Length >= 1)
             {
                 if (this.replies.ContainsKey(Arguments.argUser.displayName))
                 {
-                    string key = this.replies[Arguments.argUser.displayName].ToString();
-                    string str2 = "";
-                    for (int i = 0; i < ChatArguments.Length; i++)
+                    string replyTo = (string)this.replies[Arguments.argUser.displayName];
+                    PlayerClient recipient = Fougerite.Player.FindByName(replyTo).PlayerClient as PlayerClient;
+                    if (recipient == null)
                     {
-                        str2 = str2 + ChatArguments[i] + " ";
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("No player found with the name: {0}", replyTo.Replace('"', 'ˮ')));
+                        this.replies.Remove(Arguments.argUser.displayName);
+                        return;
                     }
-                    foreach (PlayerClient client in PlayerClient.All)
+                    string message = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' }).Replace('"', 'ˮ');
+                    if (message == string.Empty)
                     {
-                        if (client.netUser.displayName.Equals(key, StringComparison.OrdinalIgnoreCase))
-                        {
-                            Util.say(client.netPlayer, "\"PM from " + Arguments.argUser.displayName + "\"", "\"" + str2 + "\"");
-                            Util.say(Arguments.argUser.networkPlayer, "\"PM to " + key + "\"", "\"" + str2 + "\"");
-                            if (this.replies.ContainsKey(key))
-                            {
-                                this.replies[key] = Arguments.argUser.displayName;
-                            }
-                            else
-                            {
-                                this.replies.Add(key, Arguments.argUser.displayName);
-                            }
-                            return;
-                        }
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Reply Command Usage:  /r message");
+                        return;
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + key);
-                }
-                else
+
+                    Util.say(recipient.netPlayer, string.Format("\"PM from {0}\"",  Arguments.argUser.displayName.Replace('"', 'ˮ')), string.Format("\"{0}\"", message));
+                    Util.say(Arguments.argUser.networkPlayer, string.Format("\"PM to {0}\"", replyTo.Replace('"', 'ˮ')), string.Format("\"{0}\"", message));
+                    if (this.replies.ContainsKey(replyTo))
+                    {
+                        this.replies[replyTo] = Arguments.argUser.displayName;
+                    } else
+                    {
+                        this.replies.Add(replyTo, Arguments.argUser.displayName);
+                    }
+                } else
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "There's nobody to answer.");
                 }
-            }
-            else
+            } else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Reply Command Usage:  /r \"message\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Reply Command Usage:  /r message");
             }
         }
 

@@ -12,6 +12,8 @@
         private object _victim;
         private string _weapon;
         private WeaponImpact _wi;
+        private readonly bool _playerattacker;
+        private readonly bool _playervictim;
 
         public HurtEvent(ref DamageEvent d)
         {
@@ -19,19 +21,23 @@
             if (player != null)
             {
                 this.Attacker = player;
+                this._playerattacker = true;
             }
             else
             {
                 this.Attacker = new NPC(d.attacker.character);
+                this._playerattacker = false;
             }
             Fougerite.Player player2 = Fougerite.Player.FindByPlayerClient(d.victim.client);
             if (player2 != null)
             {
                 this.Victim = player2;
+                this._playervictim = true;
             }
             else
             {
                 this.Victim = new NPC(d.victim.character);
+                this._playervictim = false;
             }
             this.DamageEvent = d;
             this.WeaponData = null;
@@ -210,6 +216,22 @@
             set
             {
                 this._weapon = value;
+            }
+        }
+
+        public bool VictimIsPlayer
+        {
+            get
+            {
+                return this._playervictim;
+            }       
+        }
+
+        public bool AttackerIsPlayer
+        {
+            get
+            {
+                return this._playerattacker;
             }
         }
     }

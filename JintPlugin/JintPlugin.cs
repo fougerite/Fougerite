@@ -19,7 +19,7 @@
         public readonly string Name;
         public readonly string Code;
         public readonly DirectoryInfo RootDirectory;
-        public readonly Dictionary<String, TimedEvent> Timers;
+        public readonly Dictionary<string, TimedEvent> Timers;
         private readonly string brktname = "[Jint]";
 
         public Plugin(DirectoryInfo directory, string name, string code)

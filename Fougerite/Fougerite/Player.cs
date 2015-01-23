@@ -18,6 +18,8 @@
         private bool invError;
         private bool justDied;
         private PlayerClient ourPlayer;
+        private ulong uid;
+        private string name;
 
         public Player()
         {
@@ -29,6 +31,8 @@
             this.justDied = true;
             this.ourPlayer = client;
             this.connectedAt = DateTime.UtcNow.Ticks;
+            this.uid = client.netUser.userID;
+            this.name = client.netUser.user.displayname_;
             this.FixInventoryRef();
         }
 
@@ -39,11 +43,6 @@
             {
                 netUser.Kick(NetError.NoError, true);
             }
-        }
-
-        public static int LD(string s, string t)
-        {
-            return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
         }
 
         public Fougerite.Player Find(string search)
@@ -66,30 +65,26 @@
             return FindByName(search);
         }
 
-        public static Fougerite.Player FindBySteamID(string uid)
+        public static Fougerite.Player FindBySteamID(string search)
         {
             var query = from p in Fougerite.Server.GetServer().Players
-                                 group p by LD(uid, p.SteamID) into match
+                                 group p by search.Distance(p.SteamID) into match
                                  orderby match.Key ascending
                                  select match.FirstOrDefault();
             return query.FirstOrDefault();
         }
 
-        public static Fougerite.Player FindByGameID(string uid)
+        public static Fougerite.Player FindByGameID(string search)
         {
-            var query = from p in Fougerite.Server.GetServer().Players
-                                 group p by LD(uid, p.GameID) into match
-                                 orderby match.Key ascending
-                                 select match.FirstOrDefault();
-            return query.FirstOrDefault();
+            return FindBySteamID(search);
         }
 
         public static Fougerite.Player FindByName(string search)
         {
-            var query = from p in Fougerite.Server.GetServer().Players
-                                 group p by LD(search, p.Name) into match
+            var query = from pc in PlayerClient.All
+                                 group pc by search.Distance(pc.netUser.user.displayname_) into match
                                  orderby match.Key ascending
-                                 select match.FirstOrDefault();
+                                 select new Fougerite.Player(match.FirstOrDefault());
             if (query.Count() == 1)
                 return query.FirstOrDefault();
 
@@ -100,18 +95,15 @@
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.ourPlayer.netPlayer == np)
-                    return player;
-            return null;
+            var query = from pc in PlayerClient.All
+                                 where pc.netPlayer == np
+                                 select new Fougerite.Player(pc);
+            return query.FirstOrDefault();
         }
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
-            foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
-                if (player != null && player.PlayerClient == pc)
-                    return player;
-            return null;
+            return new Fougerite.Player(pc);
         }
 
         public void FixInventoryRef()
@@ -226,7 +218,7 @@
                 {
                     if (hit.collider.name == "HB Hit")
                     {
-                        this.Message("There you are.");
+                        // this.Message("There you are.");
                         return false;
                     }
                 }
@@ -315,15 +307,7 @@
         {
             get
             {
-                ulong id = 0;
-                try
-                {
-                    id = this.ourPlayer.userID;
-                } catch (NullReferenceException ex)
-                {
-                    Logger.LogDebug(string.Format("{0} getting Player.UID. Returned 0.", ex.Message));
-                }
-                return id;
+                return this.uid;
             }
         }
 
@@ -331,15 +315,7 @@
         {
             get
             {
-                string id = string.Empty;
-                try
-                {
-                    id = this.ourPlayer.userID.ToString();
-                } catch (NullReferenceException ex)
-                {
-                    Logger.LogDebug(string.Format("{0} getting Player.GameID. Returned empty string.", ex.Message));
-                }
-                return id;
+                return this.uid.ToString();
             }
         }
 
@@ -347,15 +323,7 @@
         {
             get
             {
-                string id = string.Empty;
-                try
-                {
-                    id = this.ourPlayer.netUser.userID.ToString();
-                } catch (NullReferenceException ex)
-                {
-                    Logger.LogDebug(string.Format("{0} getting Player.GameID. Returned empty string.", ex.Message));
-                }
-                return id;
+                return this.uid.ToString();
             }
         }
 
@@ -446,12 +414,13 @@
         {
             get
             {
-                return this.ourPlayer.netUser.user.displayname_; // displayname_
+                return this.name; // displayname_
             }
             set
             {
+                this.name = value;
                 this.ourPlayer.netUser.user.displayname_ = value; // displayname_
-                this.ourPlayer.userName = this.ourPlayer.netUser.user.displayname_; // displayname_
+                this.ourPlayer.userName = value; // displayname_
             }
         }
 

@@ -47,11 +47,6 @@
             return null;
         }
 
-        private static int LD(string s, string t)
-        {
-            return LevenshteinDistance.Compute(s.ToUpperInvariant(), t.ToUpperInvariant());
-        }
-
         public Newman GetNewman(PlayerClient client)
         {
             Newman garry = this.GetNewman(client.userID);
@@ -74,14 +69,14 @@
                     return allNewmans[uid];
 
                 var byId = from garry in allNewmans.Values
-                                       group garry by LD(search, garry.StringID) into match
+                                       group garry by search.Distance(garry.StringID) into match
                                        orderby match.Key ascending
                                        select match.FirstOrDefault();
                 return byId.FirstOrDefault();
             } else
             {
                 var byName = from garry in allNewmans.Values
-                                         group garry by LD(search.ToUpperInvariant(), garry.Name.ToUpperInvariant()) into match
+                                         group garry by search.Distance(garry.Name) into match
                                          orderby match.Key ascending
                                          select match.FirstOrDefault();
                 return byName.FirstOrDefault();

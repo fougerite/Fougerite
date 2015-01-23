@@ -14,7 +14,7 @@
                 for (int i = 1; i < ChatArguments.Length - 1; i++)
                     terms += string.Format(" {0}", ChatArguments[i]);
 
-                string itemName = World.GetWorld().MatchItemName(terms.Trim());
+                string itemName = World.GetWorld().MatchItemName(terms);
                 int qty;
                 if (!int.TryParse(ChatArguments[ChatArguments.Length - 1], out qty))
                     qty = 1;

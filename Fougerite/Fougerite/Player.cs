@@ -67,10 +67,10 @@
 
         public static Fougerite.Player FindBySteamID(string search)
         {
-            var query = from p in Fougerite.Server.GetServer().Players
-                                 group p by search.Distance(p.SteamID) into match
+            var query = from pc in PlayerClient.All
+                                 group pc by search.Distance(pc.userID.ToString()) into match
                                  orderby match.Key ascending
-                                 select match.FirstOrDefault();
+                                 select new Fougerite.Player(match.FirstOrDefault());
             return query.FirstOrDefault();
         }
 

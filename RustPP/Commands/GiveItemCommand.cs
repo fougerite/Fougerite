@@ -60,7 +60,7 @@
                     string recipName = matched[0].netUser.displayName;
                     string[] itemArgs = Arguments.ArgsStr.Replace(playerName, "").Replace("\"", "").Trim(new char[] { ' ' }).Split(new char[] { ' ' });
                     string itemArgStr = string.Join(" ", itemArgs, 0, itemArgs.Length - 2);
-                    string itemName = World.GetWorld().ParseItemName(itemArgStr);
+                    string itemName = World.GetWorld().MatchItemName(itemArgStr);
                     uLink.NetworkPlayer recipPlayer = (uLink.NetworkPlayer)matched[0].netPlayer;
 
                     if (itemName == string.Empty)

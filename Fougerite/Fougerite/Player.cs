@@ -70,8 +70,8 @@
             var query = from pc in PlayerClient.All
                                  group pc by search.Distance(pc.userID.ToString()) into match
                                  orderby match.Key ascending
-                                 select new Fougerite.Player(match.FirstOrDefault());
-            return query.FirstOrDefault();
+                                 select match.FirstOrDefault();
+            return new Fougerite.Player(query.FirstOrDefault());
         }
 
         public static Fougerite.Player FindByGameID(string search)
@@ -84,21 +84,21 @@
             var query = from pc in PlayerClient.All
                                  group pc by search.Distance(pc.netUser.user.displayname_) into match
                                  orderby match.Key ascending
-                                 select new Fougerite.Player(match.FirstOrDefault());
+                                 select match.FirstOrDefault();
             if (query.Count() == 1)
-                return query.FirstOrDefault();
+                return new Fougerite.Player(query.FirstOrDefault());
 
             Logger.LogDebug("[FindByName] found more than one match, returning first.");
-            Logger.LogDebug(string.Format("[FindByName] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.Name).ToArray<string>())));
-            return query.FirstOrDefault();
+            Logger.LogDebug(string.Format("[FindByName] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.netUser.displayName).ToArray<string>())));
+            return new Fougerite.Player(query.FirstOrDefault());
         }
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
             var query = from pc in PlayerClient.All
                                  where pc.netPlayer == np
-                                 select new Fougerite.Player(pc);
-            return query.FirstOrDefault();
+                                 select pc;
+            return new Fougerite.Player(query.FirstOrDefault());
         }
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)

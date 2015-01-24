@@ -47,6 +47,11 @@
 
         public Fougerite.Player Find(string search)
         {
+            return Search(search);
+        }
+
+        public static Fougerite.Player Search(string search)
+        {
             if (search.StartsWith("7656119"))
             {
                 ulong uid;

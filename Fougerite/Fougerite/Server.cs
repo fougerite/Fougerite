@@ -91,24 +91,9 @@
             }
         }
 
-        public Fougerite.Player FindPlayer(string s)
+        public Fougerite.Player FindPlayer(string search)
         {
-            Fougerite.Player player = Fougerite.Player.FindBySteamID(s);
-            if (player != null)
-            {
-                return player;
-            }
-            player = Fougerite.Player.FindByGameID(s);
-            if (player != null)
-            {
-                return player;
-            }
-            player = Fougerite.Player.FindByName(s);
-            if (player != null)
-            {
-                return player;
-            }
-            return null;
+            return Fougerite.Player.Search(search);
         }
 
         public static Fougerite.Server GetServer()

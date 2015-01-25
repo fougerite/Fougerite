@@ -229,10 +229,10 @@
         {
             get
             {
-                var query = from p in Server.GetServer().Players
-                                        where this.SteamID == p.PlayerClient.userID
-                                        select p;
-                return query.FirstOrDefault<Fougerite.Player>();
+                var query = from pc in PlayerClient.All
+                                        where this.SteamID == pc.userID
+                                        select pc;
+                return new Fougerite.Player(query.FirstOrDefault());
             }
         }
 

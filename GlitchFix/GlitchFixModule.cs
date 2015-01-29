@@ -56,13 +56,13 @@ namespace GlitchFix
                     var name = Entity.Name;
                     bool GiveBack = Config.GetSetting("Settings", "giveback").ToLower() == "true";
                     var two = Util.GetUtil().CreateVector(Entity.X, Entity.Y, Entity.Z);
-                    var deploylist = UnityEngine.Object.FindObjectsOfType(typeof (DeployableObject));
+                    var deploylist = UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject));
                     foreach (DeployableObject ent in deploylist)
                     {
-                        if (ent.name.Contains("WoodBox") && Entity.InstanceID != ent.GetInstanceID())
+                        if (ent.name.Contains("WoodBox") || ent.name.Contains("Stash"))
                         {
                             var dist = Util.GetUtil().GetVectorsDistance(two, ent.gameObject.transform.position);
-                            if (dist > 2.5) continue;
+                            if (dist > 3.7) continue;
                             if (Player != null && GiveBack)
                             {
                                 switch (name)
@@ -80,14 +80,13 @@ namespace GlitchFix
                             return;
                         }
                     }
-                    var structurelist = UnityEngine.Object.FindObjectsOfType(typeof (StructureComponent));
+                    var structurelist = UnityEngine.Object.FindObjectsOfType(typeof(StructureComponent));
                     foreach (StructureComponent structure in structurelist)
                     {
                         if (structure.name.Contains("Ramp") && Entity.InstanceID != structure.GetInstanceID())
                         {
                             {
-                                var dist = Util.GetUtil()
-                                    .GetVectorsDistance(two, structure.gameObject.transform.position);
+                                var dist = Util.GetUtil().GetVectorsDistance(two, structure.gameObject.transform.position);
                                 if (dist != 0) continue;
                                 if (GiveBack && Player != null)
                                 {

@@ -64,6 +64,149 @@ public static class LevenshteinDistance
     }
 }
 
+public static class BlueprintStringEx
+{
+    public static bool HasBP(this string search, out string match)
+    {
+        string BP = "BP";
+        string BLUEPRINT = "Blueprint";
+        bool flag = false;          
+        string[] terms = search.Split(new char[] { ' ' });
+        foreach (string term in terms)
+        {
+            match = term;
+            flag = BP.Distance(term) == 0 ? true : false;
+            if (flag)
+                return flag;
+
+            int distance = Math.Abs(term.Length - BLUEPRINT.Length) + 1;
+            flag = BLUEPRINT.Distance(term) <= distance ? true : false;
+            if (flag)
+                return flag;
+        }
+        match = string.Empty;
+        return flag;
+    }
+
+    public static string Blueprint(this string itemName)
+    {
+        if (BlueprintNames.ContainsKey(itemName))
+            return string.Format("{0} {1}", itemName, BlueprintNames[itemName]);
+
+        return itemName;
+    }
+
+    private static readonly Dictionary<string, string> BlueprintNames = new Dictionary<string, string>()
+    {
+        { "556 Ammo", "Blueprint" },
+        { "9mm Ammo", "Blueprint" },
+        { "9mm Pistol", "Blueprint" },
+        { "Armor Part 1", "BP" },
+        { "Armor Part 2", "BP" },
+        { "Armor Part 3", "BP" },
+        { "Armor Part 4", "BP" },
+        { "Armor Part 5", "BP" },
+        { "Armor Part 6", "BP" },
+        { "Armor Part 7", "BP" },
+        { "Arrow", "Blueprint" },
+        { "Bandage", "Blueprint" },
+        { "Bed", "Blueprint" },
+        { "Blood Draw Kit", "Blueprint" },
+        { "Bolt Action Rifle", "Blueprint" },
+        { "Camp Fire", "Blueprint" },
+        { "Cloth Boots", "BP" },
+        { "Cloth Helmet", "BP" },
+        { "Cloth Pants", "BP" },
+        { "Cloth Vest", "BP" },
+        { "Empty Shotgun Shell", "Blueprint" },
+        { "Explosive Charge", "Blueprint" },
+        { "Explosives", "Blueprint" },
+        { "F1 Grenade", "Blueprint" },
+        { "Flare", "Blueprint" },
+        { "Flashlight Mod", "Blueprint" },
+        { "Furnace", "Blueprint" },
+        { "Gunpowder", "Blueprint" },
+        { "HandCannon", "Blueprint" },
+        { "Handmade Lockpick", "Blueprint" },
+        { "Handmade Shell", "Blueprint" },
+        { "Hatchet", "Blueprint" },
+        { "Holo sight", "Blueprint" },
+        { "Hunting Bow", "Blueprint" },
+        { "Kevlar Boots", "BP" },
+        { "Kevlar Helmet", "BP" },
+        { "Kevlar Pants", "BP" },
+        { "Kevlar Vest", "BP" },
+        { "Large Medkit", "Blueprint" },
+        { "Large Spike Wall", "Blueprint" },
+        { "Large Wood Storage", "Blueprint" },
+        { "Laser Sight", "Blueprint" },
+        { "Leather Boots", "BP" },
+        { "Leather Helmet", "BP" },
+        { "Leather Pants", "BP" },
+        { "Leather Vest", "BP" },
+        { "Low Grade Fuel", "Blueprint" },
+        { "Low Quality Metal", "Blueprint" },
+        { "M4", "Blueprint" },
+        { "MP5A4", "Blueprint" },
+        { "Metal Ceiling", "" },
+        { "Metal Door", "Blueprint" },
+        { "Metal Doorway", "BP" },
+        { "Metal Foundation", "BP" },
+        { "Metal Pillar", "BP" },
+        { "Metal Ramp", "BP" },
+        { "Metal Stairs", "BP" },
+        { "Metal Wall", "BP" },
+        { "Metal Window Bars", "Blueprint" },
+        { "Metal Window", "BP" },
+        { "P250", "Blueprint" },
+        { "Paper", "Blueprint" },
+        { "Pick Axe", "Blueprint" },
+        { "Pipe Shotgun", "Blueprint" },
+        { "Primed 556 Casing", "Blueprint" },
+        { "Primed 9mm Casing", "Blueprint" },
+        { "Primed Shotgun Shell", "Blueprint" },
+        { "Rad Suit Boots", "BP" },
+        { "Rad Suit Helmet", "BP" },
+        { "Rad Suit Pants", "BP" },
+        { "Rad Suit Vest", "BP" },
+        { "Repair Bench", "Blueprint" },
+        { "Research Kit", "Blueprint" },
+        { "Revolver", "Blueprint" },
+        { "Shotgun Shells", "Blueprint" },
+        { "Shotgun", "Blueprint" },
+        { "Silencer", "Blueprint" },
+        { "Sleeping Bag", "Blueprint" },
+        { "Small Medkit", "Blueprint" },
+        { "Small Stash", "Blueprint" },
+        { "Spike Wall", "Blueprint" },
+        { "Stone Hatchet", "Blueprint" },
+        { "Torch", "Blueprint" },
+        { "Weapon Part 1", "BP" },
+        { "Weapon Part 2", "BP" },
+        { "Weapon Part 3", "BP" },
+        { "Weapon Part 4", "BP" },
+        { "Weapon Part 5", "BP" },
+        { "Weapon Part 6" , "BP" },
+        { "Weapon Part 7", "BP" },
+        { "Wood Barricade", "Blueprint" },
+        { "Wood Ceiling", "BP" },
+        { "Wood Doorway", "BP" },
+        { "Wood Foundation", "BP" },
+        { "Wood Gate", "Blueprint" },
+        { "Wood Gateway", "Blueprint" },
+        { "Wood Pillar", "BP" },
+        { "Wood Planks", "Blueprint" },
+        { "Wood Ramp", "BP" },
+        { "Wood Shelter", "BP" },
+        { "Wood Stairs", "BP" },
+        { "Wood Storage Box", "Blueprint" },
+        { "Wood Wall", "BP" },
+        { "Wood Window", "BP" },
+        { "Wooden Door", "Blueprint" },
+        { "Workbench", "Blueprint" }
+    };
+}
+
 /// <summary>
 /// Interface containing all methods to be implemented
 /// by string search algorithm

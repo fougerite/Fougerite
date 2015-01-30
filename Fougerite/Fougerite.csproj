@@ -88,6 +88,7 @@
     <Compile Include="Fougerite\StringSearch.cs" />
     <Compile Include="Fougerite\Newman.cs" />
     <Compile Include="Fougerite\SerializableDictionary.cs" />
+    <Compile Include="Fougerite\Knobs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Fougerite.cfg">

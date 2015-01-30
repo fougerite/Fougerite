@@ -7,70 +7,58 @@ namespace Fougerite
     public class Knobs
     {
         private static Knobs knobs;
-        private static Dictionary<string, ConsoleSystem> _knobs;
+        private static Dictionary<string, Type> _knobs;
 
         public Knobs GetKnobs()
         {
             if (knobs == null)
             {
                 knobs = new Knobs();
-                _knobs = new Dictionary<string, ConsoleSystem>();
-                _knobs.Add("AIRDROP", airdrop);
-                _knobs.Add("CHAT", chat);
-                _knobs.Add("CONDITIONLOSS", conditionloss);
-                _knobs.Add("CONFIG", config);
-                _knobs.Add("CRAFTING", crafting);
-                _knobs.Add("DMG", dmg);
-                _knobs.Add("DECAY", decay);
-                _knobs.Add("ENV", env);
-                _knobs.Add("FALLDAMAGE", falldamage);
-                _knobs.Add("FOOTSTEPS", footsteps);
-                _knobs.Add("GLOBAL", global);
-                _knobs.Add("GUNSHOTS", gunshots);
-                _knobs.Add("INTERP", interp);
-                _knobs.Add("INV", inv);
-                _knobs.Add("LOCKENTRY", lockentry);
-                _knobs.Add("NETCULL", netcull);
-                _knobs.Add("NOTICE", notice);
-                _knobs.Add("OBJECTS", objects);
-                _knobs.Add("PACKET", packet);
-                _knobs.Add("PLAYER", player);
-                _knobs.Add("RCON", rcon);
-                _knobs.Add("SAVE", save);
-                _knobs.Add("SERVER", server);
-                _knobs.Add("SLEEPERS", sleepers);
-                _knobs.Add("STRUCTURE", structure);
-                _knobs.Add("TELEPORT", teleport);
-                _knobs.Add("TRUTH", truth);
-                _knobs.Add("VOICE", voice);
-                _knobs.Add("WILDLIFE", wildlife);
+                _knobs = new Dictionary<string, Type>();
+                _knobs.Add("airdrop", Type.GetType("airdrop"));
+                _knobs.Add("chat", Type.GetType("chat"));
+                _knobs.Add("conditionloss", Type.GetType("conditionloss"));
+                _knobs.Add("config", Type.GetType("config"));
+                _knobs.Add("crafting", Type.GetType("crafting"));
+                _knobs.Add("dmg", Type.GetType("dmg"));
+                _knobs.Add("decay", Type.GetType("decay"));
+                _knobs.Add("env", Type.GetType("env"));
+                _knobs.Add("falldamage", Type.GetType("falldamage"));
+                _knobs.Add("footsteps", Type.GetType("footsteps"));
+                _knobs.Add("global", Type.GetType("global"));
+                _knobs.Add("gunshots", Type.GetType("gunshots"));
+                _knobs.Add("interp", Type.GetType("interp"));
+                _knobs.Add("inv", Type.GetType("inv"));
+                _knobs.Add("lockentry", Type.GetType("lockentry"));
+                _knobs.Add("netcull", Type.GetType("netcull"));
+                _knobs.Add("notice", Type.GetType("notice"));
+                _knobs.Add("objects", Type.GetType("objects"));
+                _knobs.Add("packet", Type.GetType("packet"));
+                _knobs.Add("player", Type.GetType("player"));
+                _knobs.Add("rcon", Type.GetType("rcon"));
+                _knobs.Add("save", Type.GetType("save"));
+                _knobs.Add("server", Type.GetType("server"));
+                _knobs.Add("sleepers", Type.GetType("sleepers"));
+                _knobs.Add("structure", Type.GetType("structure"));
+                _knobs.Add("teleport", Type.GetType("teleport"));
+                _knobs.Add("truth", Type.GetType("truth"));
+                _knobs.Add("voice", Type.GetType("voice"));
+                _knobs.Add("wildlife", Type.GetType("wildlife"));
             }
             return knobs;
         }
 
-        public void AddKnob(ConsoleSystem knob)
+        public string List
         {
-            if (knob == null)
-                return;
-
-            string knobname = knob.GetType().FullName;
-            if (string.IsNullOrEmpty(knobname) || _knobs.ContainsKey(knobname.ToUpperInvariant()))
-                return;
-
-            try
+            get
             {
-                _knobs.Add(knobname, knob);
-            } catch (InvalidCastException ex)
-            {
-                Logger.LogError(string.Format("[Knobs] exception adding {0}", knobname));
-                Logger.LogException(ex);
+                return string.Join("\n", _knobs.Keys.ToArray<string>());
             }
         }
-
-        public ConsoleSystem Get(string knobname)
+        public Type Get(string knobname)
         {
-            ConsoleSystem knob;
-            _knobs.TryGetValue(knobname.ToUpperInvariant(), out knob);
+            Type knob;
+            _knobs.TryGetValue(knobname.ToLowerInvariant(), out knob);
             return knob;
         }
 
@@ -81,7 +69,7 @@ namespace Fougerite
                 Logger.LogDebug("[Knobs.CallMethod] usage: CallMethod(Fougerite.Player player, string knobname, string methodname, string argstr = \"\")");
                 return;
             }
-            if (!_knobs.ContainsKey(knobname.ToUpperInvariant()))
+            if (!_knobs.ContainsKey(knobname.ToLowerInvariant()))
             {
                 Logger.LogDebug(string.Format("[Knobs.CallMethod] No such knob: {0}", knobname));
                 return;
@@ -95,7 +83,7 @@ namespace Fougerite
                 Logger.LogError(string.Format("[Knobs.CallMethod] invalid: {0} {1}", command, argstr));
                 return;
             }
-            ConsoleSystem.RunCommand(arg, true);
+            ConsoleSystem.RunCommand(ref arg, true);
         }
     }
 }

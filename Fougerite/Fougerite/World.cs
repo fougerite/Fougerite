@@ -440,7 +440,7 @@
             return query.FirstOrDefault();
         }
 
-        public static readonly string[] ItemNames = { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
+        public static readonly IEnumerable<string> ItemNames = new string[] { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
             "Armor Part 4", "Armor Part 5", "Armor Part 6", "Armor Part 7", "Arrow", "Bandage", "Bed", "Blood Draw Kit", "Blood", "Bolt Action Rifle", "Camp Fire", "Can of Beans", 
             "Can of Tuna", "Charcoal", "Chocolate Bar", "Cloth Boots", "Cloth Helmet", "Cloth Pants", "Cloth Vest", "Cloth", "Cooked Chicken Breast", "Empty 556 Casing",
             "Empty 9mm Casing", "Empty Shotgun Shell", "Explosive Charge", "Explosives", "F1 Grenade", "Flare", "Flashlight Mod", "Furnace", "Granola Bar", "Gunpowder", "HandCannon",
@@ -452,8 +452,7 @@
             "Research Kit 1", "Revolver", "Rock", "Shotgun Shells", "Shotgun", "Silencer", "Sleeping Bag", "Small Medkit", "Small Rations", "Small Stash", "Small Water Bottle", "Spike Wall", 
             "Stone Hatchet", "Stones", "Sulfur Ore", "Sulfur", "Supply Signal", "Torch", "Uber Hatchet", "Uber Hunting Bow", "Weapon Part 1", "Weapon Part 2", "Weapon Part 3", "Weapon Part 4",
             "Weapon Part 5", "Weapon Part 6", "Weapon Part 7", "Wood Barricade", "Wood Ceiling", "Wood Doorway", "Wood Foundation", "Wood Gate", "Wood Gateway", "Wood Pillar", "Wood Planks",
-            "Wood Ramp", "Wood Shelter", "Wood Stairs", "Wood Storage Box", "Wood Wall", "Wood Window", "Wood", "Wooden Door", "Workbench"
-        };
+            "Wood Ramp", "Wood Shelter", "Wood Stairs", "Wood Storage Box", "Wood Wall", "Wood Window", "Wood", "Wooden Door", "Workbench" };
     }
 
 }

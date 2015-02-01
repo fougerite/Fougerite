@@ -11,10 +11,11 @@
             if (ChatArguments.Length > 0)
             {
                 int qty = 1;
-                string terms = string.Join(" ", ChatArguments);
+                string terms = string.Join(" ", ChatArguments).RemoveChars(new char[] { '"' });
+                Logger.LogDebug(string.Format("[SpawnItemCommand] ChatArguments={0}", terms));
                 if (ChatArguments.Length > 1)
                 {
-                    if (int.TryParse(ChatArguments[0], out qty))
+                    if (ChatArguments[0] != "556" && int.TryParse(ChatArguments[0], out qty))
                     {
                         terms = ChatArguments[1];
                         for (int i = 2; i < ChatArguments.Length; i++)
@@ -26,23 +27,18 @@
                             terms += string.Format(" {0}", ChatArguments[i]);
                     }
                 }
-
-                string bpterm;
-                if (terms.HasBP(out bpterm))
-                {
-                    terms = terms.Replace(bpterm, "");
-                }
-                string itemName = World.MatchItemName(terms);
-                Logger.LogDebug(string.Format("[SpawnItemCommand] terms={0}, itemName={1}", terms, itemName));
+                string itemName; 
+                if (terms.HasBPTerm())
+                    itemName = terms.BaseItem().MatchItemName().Blueprint();
+                else
+                    itemName = terms.BaseItem().MatchItemName();
 
                 Arguments.Args = new string[] { itemName, qty.ToString() };
-                inv.give(ref Arguments);
+                Logger.LogDebug(string.Format("[SpawnItemCommand] terms={0}, itemName={1}, qty={2}", terms, itemName, qty.ToString()));
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in your inventory.", qty.ToString(), itemName));
-
+                inv.give(ref Arguments);
             } else
-            {
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /i itemName quantity");
-            }
         }
     }
 }

@@ -10,10 +10,12 @@
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             string playerName = string.Empty;
-            List<PlayerClient> matched = new List<PlayerClient>();
+            List <PlayerClient> matched = new List<PlayerClient>();
 
             if (ChatArguments.Length >= 2) // minimum args: name item
             {
+                // extract itemName
+
                 foreach (PlayerClient client in PlayerClient.All)
                 {
                     playerName = ChatArguments[0].TrimStart(new char[] { '"', ' ' });
@@ -60,7 +62,7 @@
                     string recipName = matched[0].netUser.displayName;
                     string[] itemArgs = Arguments.ArgsStr.Replace(playerName, "").Replace("\"", "").Trim(new char[] { ' ' }).Split(new char[] { ' ' });
                     string itemArgStr = string.Join(" ", itemArgs, 0, itemArgs.Length - 2);
-                    string itemName = World.MatchItemName(itemArgStr);
+                    string itemName = itemArgStr.MatchItemName();
                     uLink.NetworkPlayer recipPlayer = (uLink.NetworkPlayer)matched[0].netPlayer;
 
                     if (itemName == string.Empty)

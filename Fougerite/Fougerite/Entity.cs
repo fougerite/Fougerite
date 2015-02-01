@@ -9,13 +9,21 @@
         public readonly bool hasInventory;
         private readonly object _obj;
         private EntityInv inv;
+        private ulong _ownerid;
 
         public Entity(object Obj)
         {
             this._obj = Obj;
 
+            if (Obj is StructureMaster)
+                this._ownerid = (Obj as StructureMaster).ownerID;
+
+            if (Obj is StructureComponent)
+                this._ownerid = (Obj as StructureComponent)._master.ownerID;
+
             if (Obj is DeployableObject)
             {
+                this._ownerid = (Obj as DeployableObject).ownerID;
                 var deployable = Obj as DeployableObject;
 
                 var inventory = deployable.GetComponent<Inventory>();
@@ -36,37 +44,52 @@
         public void ChangeOwner(Fougerite.Player p)
         {
             if (this.IsDeployableObject() && !(bool)(this.Object as DeployableObject).GetComponent<SleepingAvatar>())
-            {
                 this.GetObject<DeployableObject>().SetupCreator(p.PlayerClient.controllable);
-            }
+
+            if (this.IsStructureMaster())
+                this.GetObject<StructureMaster>().SetupCreator(p.PlayerClient.controllable);
         }
 
         public void Destroy()
         {
-            try
+            if (this.IsDeployableObject())
             {
-                if (this.IsDeployableObject())
+                try
                 {
                     this.GetObject<DeployableObject>().OnKilled();
-                }
-                else if (this.IsStructure())
-                {
-                    StructureComponent comp = this.GetObject<StructureComponent>();
-                    comp._master.RemoveComponent(comp);
-                    comp._master = null;
-                    this.GetObject<StructureComponent>().StartCoroutine("DelayedKill");
-                }
-            }
-            catch
-            {
-                if (this.IsDeployableObject())
+                } catch
                 {
                     NetCull.Destroy(this.GetObject<DeployableObject>().networkViewID);
                 }
-                else if (this.IsStructure())
+            } else if (this.IsStructure())
+            {
+                DestroyStructure(this.GetObject<StructureComponent>());                
+            } else if (this.IsStructureMaster())
+            {
+                HashSet<StructureComponent> components = this.GetObject<StructureMaster>()._structureComponents;
+                foreach (StructureComponent comp in components)
+                    DestroyStructure(comp);
+
+                try 
                 {
-                    NetCull.Destroy(this.GetObject<StructureComponent>().networkViewID);
+                    this.GetObject<StructureMaster>().OnDestroy();
+                } catch
+                {
+                    NetCull.Destroy(this.GetObject<StructureMaster>().networkViewID);
                 }
+            }
+        }
+
+        private static void DestroyStructure(StructureComponent comp)
+        {
+            try
+            {
+                comp._master.RemoveComponent(comp);
+                comp._master = null;
+                comp.StartCoroutine("DelayedKill");
+            } catch
+            {
+                NetCull.Destroy(comp.networkViewID);
             }
         }
 
@@ -164,32 +187,7 @@
         {
             get
             {
-                string id = string.Empty;
-                if (this.IsDeployableObject())
-                {
-                    try 
-                    {
-                        id = this.GetObject<DeployableObject>().ownerID.ToString();
-                    } catch (NullReferenceException ex)
-                    {
-                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
-                        NetCull.Destroy((this._obj as DeployableObject).gameObject);
-                    }
-                    return id;
-                }
-                if (this.IsStructure())
-                {
-                    try 
-                    {
-                        id = this.GetObject<StructureComponent>()._master.ownerID.ToString();
-                    } catch (NullReferenceException ex)
-                    {
-                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
-                        NetCull.Destroy((this._obj as StructureComponent).gameObject);
-                    }
-                    return id;
-                }
-                return id;
+                return this._ownerid.ToString();
             }
         }
 
@@ -197,32 +195,7 @@
         {
             get
             {
-                string id = string.Empty;
-                if (this.IsDeployableObject())
-                {
-                    try 
-                    {
-                        id = this.GetObject<DeployableObject>().creatorID.ToString();
-                    } catch (NullReferenceException ex)
-                    {
-                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
-                        NetCull.Destroy((this._obj as DeployableObject).gameObject);
-                    }
-                    return id;
-                }
-                if (this.IsStructure())
-                {
-                    try 
-                    {
-                        id = this.GetObject<StructureComponent>()._master.creatorID.ToString();
-                    } catch (NullReferenceException ex)
-                    {
-                        Logger.LogError("Entity has no owner; destroying it. " + ex.InnerException);
-                        NetCull.Destroy((this._obj as StructureComponent).gameObject);
-                    }
-                    return id;
-                }
-                return id;
+                return this._ownerid.ToString();
             }
         }
 
@@ -316,13 +289,14 @@
             get
             {
                 if (this.IsDeployableObject())
-                {
-                    return this.GetObject<DeployableObject>().gameObject.transform.position;
-                }
+                    return this.GetObject<DeployableObject>().transform.position;
+
                 if (this.IsStructure())
-                {
-                    return this.GetObject<StructureComponent>().gameObject.transform.position;
-                }
+                    return this.GetObject<StructureComponent>().transform.position;
+
+                if (this.IsStructureMaster())
+                    return this.GetObject<StructureMaster>().containedBounds.center;
+
                 return Vector3.zero;
             }
         }
@@ -331,26 +305,7 @@
         {
             get
             {
-                if (this.IsDeployableObject())
-                {
-                    return this.GetObject<DeployableObject>().gameObject.transform.position.x;
-                }
-                if (this.IsStructure())
-                {
-                    return this.GetObject<StructureComponent>().gameObject.transform.position.x;
-                }
-                return 0f;
-            }
-            set
-            {
-                if (this.IsDeployableObject())
-                {
-                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(value, this.Y, this.Z);
-                }
-                else if (this.IsStructure())
-                {
-                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(value, this.Y, this.Z);
-                }
+                return this.Location.x;
             }
         }
 
@@ -358,53 +313,16 @@
         {
             get
             {
-                if (this.IsDeployableObject())
-                {
-                    return this.GetObject<DeployableObject>().gameObject.transform.position.y;
-                }
-                if (this.IsStructure())
-                {
-                    return this.GetObject<StructureComponent>().gameObject.transform.position.y;
-                }
-                return 0f;
+                return this.Location.y;
             }
-            set
-            {
-                if (this.IsDeployableObject())
-                {
-                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(this.X, value, this.Z);
-                }
-                else if (this.IsStructure())
-                {
-                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(this.X, value, this.Z);
-                }
-            }
+
         }
 
         public float Z
         {
             get
             {
-                if (this.IsDeployableObject())
-                {
-                    return this.GetObject<DeployableObject>().gameObject.transform.position.z;
-                }
-                if (this.IsStructure())
-                {
-                    return this.GetObject<StructureComponent>().gameObject.transform.position.z;
-                }
-                return 0f;
-            }
-            set
-            {
-                if (this.IsDeployableObject())
-                {
-                    this.GetObject<DeployableObject>().gameObject.transform.position = new Vector3(this.X, this.Y, value);
-                }
-                else if (this.IsStructure())
-                {
-                    this.GetObject<StructureComponent>().gameObject.transform.position = new Vector3(this.X, this.Y, value);
-                }
+                return this.Location.z;
             }
         }
     }

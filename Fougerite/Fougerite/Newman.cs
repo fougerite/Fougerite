@@ -55,8 +55,16 @@
 
             this.friendList = new List<ulong>();
             this.shareList = new List<ulong>();
-            this.blueprintsKnown = client.controllable.GetComponent<PlayerInventory>().GetBoundBPs()
+            try
+            {
+                this.blueprintsKnown = client.controllable.GetComponent<PlayerInventory>().GetBoundBPs()
                 .ToDictionary<BlueprintDataBlock, int, string>(bp => bp.uniqueID, bp => bp.name) as SerializableDictionary<int, string>;
+            } catch (Exception ex)
+            {
+                Logger.LogError("[Newman] assign blueprintsKnown:");
+                Logger.LogException(ex);
+            }
+           
             this.kickedByAdmin = new List<TimeSpan>();
             this.mutedByAdmin = new List<TimeSpan>();
         }
@@ -121,12 +129,9 @@
                 this.sessions.Update(this.connected);
 
             if (this.Client != null && this.Client.hasLastKnownPosition)
-            {
                 this.lastKnownCoordinates = new Coordinates(this.Client.lastKnownPosition);
-            } else
-            {
+            else
                 this.lastKnownCoordinates = new Coordinates();
-            }
         }
 
         public void OnBlueprintUse(BPUseEvent ae)
@@ -244,7 +249,7 @@
                 var query = from p in PlayerClient.All
                                         where this.SteamID == p.userID
                                         select p;
-                return query.FirstOrDefault<PlayerClient>();
+                return query.FirstOrDefault();
             }
         }
 
@@ -253,7 +258,7 @@
             Fougerite.Entity[] these = new Fougerite.Entity[query.Count<T>()];
             for (int i = 0; i < these.Length; i++)
             {
-                these[i] = new Fougerite.Entity((query.ElementAtOrDefault<T>(i) as UnityEngine.Component).GetComponent<DeployableObject>() as DeployableObject);
+                these[i] = new Fougerite.Entity((query.ElementAtOrDefault<T>(i) as UnityEngine.Component).GetComponent<DeployableObject>());
             }
             return these;
         }
@@ -409,34 +414,34 @@
     [Serializable]
     public class Coordinates
     {
-        private Dictionary<char, float> coordinates;
+        private IDictionary<char, float> coordinates;
         private static readonly char _x = 'x';
         private static readonly char _y = 'y';
         private static readonly char _z = 'z';
 
         public Coordinates()
         {
-            this.coordinates = new Dictionary<char, float>();
             float y = Terrain.activeTerrain.SampleHeight(Vector3.zero) + 1f;
-            this.coordinates.Add(_x, 0f);
-            this.coordinates.Add(_y, y);
-            this.coordinates.Add(_z, 0f);
+            this.coordinates = new Dictionary<char, float>()
+            {
+                { _x, 0f }, { _y, y }, { _z, 0f }
+            };
         }
 
         public Coordinates(float x, float y, float z)
         {
-            this.coordinates = new Dictionary<char, float>();
-            this.coordinates.Add(_x, x);
-            this.coordinates.Add(_y, y);
-            this.coordinates.Add(_z, z);
+            this.coordinates = new Dictionary<char, float>()
+            {
+                { _x, x }, { _y, y }, { _z, z }
+            };
         }
 
         public Coordinates(Vector3 vector)
         {
-            this.coordinates = new Dictionary<char, float>();
-            this.coordinates.Add(_x, vector.x);
-            this.coordinates.Add(_y, vector.y);
-            this.coordinates.Add(_z, vector.z);
+            this.coordinates = new Dictionary<char, float>()
+            {
+                { _x, vector.x }, { _y, vector.y }, { _z, vector.z }
+            };
         }
 
         public static Vector3 ToVector3(Coordinates coordinates)

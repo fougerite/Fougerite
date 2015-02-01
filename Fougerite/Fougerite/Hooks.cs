@@ -313,9 +313,6 @@
             Fougerite.Server server = Fougerite.Server.GetServer();
             Fougerite.Player player = new Fougerite.Player(user.playerClient);
             server.Players.Add(player);
-            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", player.Name, player.SteamID, player.IP));
-
-            server.GetNewman(user.playerClient).OnConnect();
 
             if (OnPlayerConnected != null)
                 OnPlayerConnected(player);
@@ -323,8 +320,16 @@
             connected = user.connected;
 
             if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
-                player.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                player.Message(string.Format("This server is powered by Fougerite v.{0}!", Bootstrap.Version));
 
+            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", player.Name, player.SteamID, player.IP));
+            try
+            {
+                server.GetNewman(user.playerClient).OnConnect();
+            } catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
             return connected;
         }
 
@@ -340,8 +345,17 @@
                 Logger.LogDebug("User Disconnected: " + item.Name + " (" + item.SteamID + ")");
                 if (OnPlayerDisconnected != null)
                     OnPlayerDisconnected(item);
+
             }
             catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+
+            try
+            {
+                Fougerite.Server.GetServer().GetNewman(user.playerClient).OnDisconnect();
+            } catch (Exception ex)
             {
                 Logger.LogException(ex);
             }

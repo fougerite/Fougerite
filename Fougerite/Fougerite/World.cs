@@ -355,7 +355,7 @@
             set { env.daylength = value; }
         }
 
-        public List<Entity> AllStructures
+        public List<Entity> StructureMasters
         {
             get
             {
@@ -414,45 +414,5 @@
                 }
             }
         }
-
-        public static string MatchItemName(string search)
-        {
-            string bpterm;
-            string searchname = search;
-            if (search.HasBP(out bpterm))
-                searchname = search.Replace(bpterm, "");
-
-            var query = from itemname in ItemNames
-                                 group itemname by searchname.Distance(itemname) into match
-                                 orderby match.Key ascending
-                                 select match.FirstOrDefault();
-            string propername;
-            if (query.Count() == 1)
-            {
-                propername = query.FirstOrDefault();
-                if (search.HasBP(out bpterm))
-                    return propername.Blueprint();
-
-                return propername;
-            }
-            Logger.LogDebug("[MatchItemName] found more than one match, returning first.");
-            Logger.LogDebug(string.Format("[MatchItemName] search={0} matches={1}", search, string.Join(", ", query.ToArray())));
-            return query.FirstOrDefault();
-        }
-
-        public static readonly IEnumerable<string> ItemNames = new string[] { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
-            "Armor Part 4", "Armor Part 5", "Armor Part 6", "Armor Part 7", "Arrow", "Bandage", "Bed", "Blood Draw Kit", "Blood", "Bolt Action Rifle", "Camp Fire", "Can of Beans", 
-            "Can of Tuna", "Charcoal", "Chocolate Bar", "Cloth Boots", "Cloth Helmet", "Cloth Pants", "Cloth Vest", "Cloth", "Cooked Chicken Breast", "Empty 556 Casing",
-            "Empty 9mm Casing", "Empty Shotgun Shell", "Explosive Charge", "Explosives", "F1 Grenade", "Flare", "Flashlight Mod", "Furnace", "Granola Bar", "Gunpowder", "HandCannon",
-            "Handmade Lockpick", "Handmade Shell", "Hatchet", "Holo sight", "Hunting Bow", "Invisible Boots", "Invisible Helmet", "Invisible Pants", "Invisible Vest", "Kevlar Boots",
-            "Kevlar Helmet", "Kevlar Pants", "Kevlar Vest", "Large Medkit", "Large Spike Wall", "Large Wood Storage", "Laser Sight", "Leather Boots", "Leather Helmet", "Leather Pants",
-            "Leather Vest", "Leather", "Low Grade Fuel", "Low Quality Metal", "M4", "MP5A4", "Metal Ceiling", "Metal Door", "Metal Doorway", "Metal Foundation", "Metal Fragments",
-            "Metal Ore", "Metal Pillar", "Metal Ramp", "Metal Stairs", "Metal Wall", "Metal Window Bars", "Metal Window", "P250", "Paper", "Pick Axe", "Pipe Shotgun", "Primed 556 Casing",
-            "Primed 9mm Casing", "Primed Shotgun Shell", "Rad Suit Boots", "Rad Suit Helmet", "Rad Suit Pants", "Rad Suit Vest", "Raw Chicken Breast", "Recycle Kit 1", "Repair Bench", 
-            "Research Kit 1", "Revolver", "Rock", "Shotgun Shells", "Shotgun", "Silencer", "Sleeping Bag", "Small Medkit", "Small Rations", "Small Stash", "Small Water Bottle", "Spike Wall", 
-            "Stone Hatchet", "Stones", "Sulfur Ore", "Sulfur", "Supply Signal", "Torch", "Uber Hatchet", "Uber Hunting Bow", "Weapon Part 1", "Weapon Part 2", "Weapon Part 3", "Weapon Part 4",
-            "Weapon Part 5", "Weapon Part 6", "Weapon Part 7", "Wood Barricade", "Wood Ceiling", "Wood Doorway", "Wood Foundation", "Wood Gate", "Wood Gateway", "Wood Pillar", "Wood Planks",
-            "Wood Ramp", "Wood Shelter", "Wood Stairs", "Wood Storage Box", "Wood Wall", "Wood Window", "Wood", "Wooden Door", "Workbench" };
     }
-
 }

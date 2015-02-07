@@ -52,9 +52,6 @@
             if (player != null)
             {
                 BPUseEvent ae = new BPUseEvent(bdb);
-                Newman garry = Server.GetServer().GetNewman(item.controllable.playerClient.userID);
-                garry.OnBlueprintUse(ae);
-
                 if (OnBlueprintUse != null)
                 {
                     OnBlueprintUse(player, ae);
@@ -322,14 +319,6 @@
             if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
                 player.Message(string.Format("This server is powered by Fougerite v.{0}!", Bootstrap.Version));
 
-            Logger.LogDebug(string.Format("Newman Connected: {0} ({1} | {2})", player.Name, player.SteamID, player.IP));
-            try
-            {
-                server.GetNewman(user.playerClient).OnConnect();
-            } catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
             return connected;
         }
 
@@ -348,14 +337,6 @@
 
             }
             catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-
-            try
-            {
-                Fougerite.Server.GetServer().GetNewman(user.playerClient).OnDisconnect();
-            } catch (Exception ex)
             {
                 Logger.LogException(ex);
             }

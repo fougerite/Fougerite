@@ -61,7 +61,7 @@ public static class LevenshteinDistance
     }
 }
 
-public static class BlueprintStringEx
+public static class FougeriteStringEx
 {
     private static readonly string BP = "BP";
     private static readonly string BLUEPRINT = "Blueprint";
@@ -118,6 +118,7 @@ public static class BlueprintStringEx
     public static string MatchItemName(this string itemName)
     {
         string baseName = itemName.BaseItem();
+        IEnumerable<string> terms = baseName.Split(new char[] { ' ' });
         IEnumerable<string> queryName = from name in ItemNames
                                               group name by baseName.Distance(name) into match
                                               orderby match.Key ascending

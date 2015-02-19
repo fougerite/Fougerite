@@ -54,10 +54,11 @@ public static class LevenshteinDistance
         return d[n, m];
     }
 
-    public static int Distance(this string s, string t)
+    public static int Distance(this string self, string test)
     {
         char[] rm = new char[] { ' ', '"', '\'', '-' };
-        return Compute(s.ToUpperInvariant().RemoveChars(rm), t.ToUpperInvariant().RemoveChars(rm));
+        return Compute(self.ToUpperInvariant().RemoveChars(rm), test.ToUpperInvariant().RemoveChars(rm));
+        // RemoveChars is an extension method in 
     }
 }
 
@@ -66,10 +67,10 @@ public static class FougeriteStringEx
     private static readonly string BP = "BP";
     private static readonly string BLUEPRINT = "Blueprint";
 
-    public static bool HasBPTerm(this string itemName)
+    public static bool HasBPTerm(this string self)
     {
         bool flag = false;
-        foreach (string term in itemName.Split(new char[] { ' ' }))
+        foreach (string term in self.Split(new char[] { ' ' }))
         {
             flag = BP.Distance(term) == 0 ? true : false;
             if (flag)
@@ -86,10 +87,10 @@ public static class FougeriteStringEx
         return flag;
     }
 
-    public static string BaseItem(this string itemName)
+    public static string BaseItem(this string self)
     {
         ICollection<string> baseterms = new List<string>();
-        foreach (string term in itemName.Split(new char[] { ' ' }))
+        foreach (string term in self.Split(new char[] { ' ' }))
         {
             if (BP.Distance(term) == 0)
                 continue;
@@ -97,39 +98,41 @@ public static class FougeriteStringEx
             if (term.Length >= BLUEPRINT.Length)
                 if (BLUEPRINT.Distance(term) <= 1)
                     continue;
-            else
-                if (BLUEPRINT.Substring(0, term.Length).Distance(term) <= 1)
-                    continue;
+                else
+                    if (BLUEPRINT.Substring(0, term.Length).Distance(term) <= 1)
+                        continue;
 
             baseterms.Add(term);
         }
         return string.Join(" ", baseterms.ToArray<string>());
     }
 
-    public static string Blueprint(this string baseItemName)
+    public static string Blueprint(this string self)
     {
-        string key = baseItemName.Replace("Research Kit 1", "Research Kit");
+        string key = self.Replace("Research Kit 1", "Research Kit");
         if (BlueprintNames.ContainsKey(key))
             return string.Format("{0} {1}", key, BlueprintNames[key]);
 
-        return baseItemName;
+        return self;
     }
 
-    public static string MatchItemName(this string itemName)
+    public static string MatchItemName(this string self)
     {
-        string baseName = itemName.BaseItem();
-        IEnumerable<string> terms = baseName.Split(new char[] { ' ' });
-        IEnumerable<string> queryName = from name in ItemNames
-                                              group name by baseName.Distance(name) into match
-                                              orderby match.Key ascending
-                                              select match.FirstOrDefault();
-        if (queryName.Count() != 1)
-            Logger.LogDebug(string.Format("[MatchItemName] search={0} matches={1}", itemName, string.Join(", ", queryName.ToArray())));
+        var queryName = from name in ItemNames
+                        group name by self.BaseItem().Distance(name) into match
+                        orderby match.Key ascending
+                        select match.FirstOrDefault();
 
-        return itemName.HasBPTerm() ? queryName.FirstOrDefault().Blueprint() : queryName.FirstOrDefault();
+        //if (queryName.Count() != 1)
+            Logger.LogDebug(string.Format("[MatchItemName] self={0} matches={1}", self, string.Join(", ", queryName.ToArray())));
+
+        if (self.HasBPTerm())
+            return queryName.FirstOrDefault().Blueprint();
+        
+        return queryName.FirstOrDefault();
     }
 
-    private static readonly IEnumerable<string> ItemNames = new string[] { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
+    public static readonly IEnumerable<string> ItemNames = new string[] { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
         "Armor Part 4", "Armor Part 5", "Armor Part 6", "Armor Part 7", "Arrow", "Bandage", "Bed", "Blood Draw Kit", "Blood", "Bolt Action Rifle", "Camp Fire", "Can of Beans", 
         "Can of Tuna", "Charcoal", "Chocolate Bar", "Cloth Boots", "Cloth Helmet", "Cloth Pants", "Cloth Vest", "Cloth", "Cooked Chicken Breast", "Empty 556 Casing",
         "Empty 9mm Casing", "Empty Shotgun Shell", "Explosive Charge", "Explosives", "F1 Grenade", "Flare", "Flashlight Mod", "Furnace", "Granola Bar", "Gunpowder", "HandCannon",

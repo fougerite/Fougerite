@@ -403,6 +403,79 @@
             }
         }
 
+        public bool IsRadPoisoned
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().HasRadiationPoisoning();
+            }
+        }
+
+        public bool IsWarm
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsWarm();
+            }
+        }
+
+        public bool IsPoisoned
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsPoisoned();
+            }
+        }
+
+        public float CalorieLevel
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().GetCalorieLevel();
+            }
+        }
+
+        public void AdjustCalorieLevel(float amount)
+        {
+            if (amount < 0)
+                this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractCalories(Math.Abs(amount));
+
+            if (amount > 0)
+                this.PlayerClient.controllable.GetComponent<Metabolism>().AddCalories(amount);
+        }
+
+        public float RadLevel
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<Metabolism>().GetRadLevel();
+            }
+        }
+
+        public void AddRads(float amount)
+        {
+            this.PlayerClient.controllable.GetComponent<Metabolism>().AddRads(amount);
+        }
+
+        public void AddAntiRad(float amount)
+        {
+            this.PlayerClient.controllable.GetComponent<Metabolism>().AddAntiRad(amount);
+        }
+
+        public void AddWater(float litres)
+        {
+            this.PlayerClient.controllable.GetComponent<Metabolism>().AddWater(litres);
+        }
+
+        public void AdjustPoisonLevel(float amount)
+        {
+            if (amount < 0)
+                this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractPosion(Math.Abs(amount));
+
+            if (amount > 0)
+                this.PlayerClient.controllable.GetComponent<Metabolism>().AddPoison(amount);
+        }
+
         public Vector3 Location
         {
             get

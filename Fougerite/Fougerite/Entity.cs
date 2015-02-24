@@ -59,7 +59,7 @@
                     this.GetObject<DeployableObject>().OnKilled();
                 } catch
                 {
-                    NetCull.Destroy(this.GetObject<DeployableObject>().networkViewID);
+                    TryNetCullDestroy();
                 }
             } else if (this.IsStructure())
             {
@@ -75,9 +75,22 @@
                     this.GetObject<StructureMaster>().OnDestroy();
                 } catch
                 {
-                    NetCull.Destroy(this.GetObject<StructureMaster>().networkViewID);
+                    TryNetCullDestroy();
                 }
             }
+        }
+
+        private void TryNetCullDestroy()
+        {
+            try
+            {
+                if (this.IsDeployableObject())
+                    NetCull.Destroy(this.GetObject<DeployableObject>().networkViewID);
+
+                if (this.IsStructureMaster())
+                    NetCull.Destroy(this.GetObject<StructureMaster>().networkViewID);
+            }
+            catch { }
         }
 
         private static void DestroyStructure(StructureComponent comp)

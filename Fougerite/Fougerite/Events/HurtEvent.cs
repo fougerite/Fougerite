@@ -2,6 +2,7 @@
 {
     using Fougerite;
     using System;
+    using UnityEngine;
 
     public class HurtEvent
     {
@@ -17,26 +18,31 @@
 
         public HurtEvent(ref DamageEvent d)
         {
-            Fougerite.Player player = Fougerite.Player.FindByPlayerClient(d.attacker.client);
-            if (player != null)
+            Logger.LogDebug(string.Format("[DamageEvent] {0}", d.ToString()));
+            if (d.attacker.client != null)
             {
-                this.Attacker = player;
+                this.Attacker = new Fougerite.Player(d.attacker.client); ;
                 this._playerattacker = true;
             }
-            else
+            else if (d.attacker.character != null)
             {
                 this.Attacker = new NPC(d.attacker.character);
                 this._playerattacker = false;
             }
-            Fougerite.Player player2 = Fougerite.Player.FindByPlayerClient(d.victim.client);
-            if (player2 != null)
+
+            if (d.victim.client != null)
             {
-                this.Victim = player2;
+                this.Victim = new Fougerite.Player(d.victim.client);
                 this._playervictim = true;
             }
-            else
+            else if (d.victim.character != null)
             {
                 this.Victim = new NPC(d.victim.character);
+                this._playervictim = false;
+            }
+            else if (d.victim.id.networkViewPrefabRoot.GetComponent<DeployableObject>() != null)
+            {
+                this.Victim = new Entity(d.victim.id.networkViewPrefabRoot.GetComponent<DeployableObject>());
                 this._playervictim = false;
             }
             this.DamageEvent = d;
@@ -58,25 +64,27 @@
                     weaponName = "Explosive Charge";
                 } else if (d.attacker.id is TimedGrenade) {
                     weaponName = "F1 Grenade";
-                } else if (d.attacker.id.ToString().Contains("MutantBear")) {
+                } else if (d.attacker.ToString().Contains("MutantBear")) {
                     weaponName = "Mutant Bear Claw";
-                } else if (d.attacker.id.ToString().Contains("Bear")) {
+                } else if (d.attacker.ToString().Contains("Bear")) {
                     weaponName = "Bear Claw";
-                } else if (d.attacker.id.ToString().Contains("MutantWolf")) {
+                } else if (d.attacker.ToString().Contains("MutantWolf")) {
                     weaponName = "Mutant Wolf Claw";
-                } else if (d.attacker.id.ToString().Contains("Wolf")) {
+                } else if (d.attacker.ToString().Contains("Wolf")) {
                     weaponName = "Wolf Claw";
-                } else if (d.attacker.id.Equals(d.victim.id)) {
-                    weaponName = String.Format("Self ({0})", DamageType);
-                } else if (d.amount == 15f) {
+                } else if (!d.attacker.IsDifferentPlayer(d.victim.client)) {
+                    weaponName = string.Format("Self ({0})", DamageType);
+                } else if (d.attacker.ToString().StartsWith("WoodSpikeWall")) {
                     weaponName = "Spike Wall";
-                } else if (d.amount == 10f) {
+                }
+                else if (d.attacker.ToString().StartsWith("LargeWoodSpikeWall"))
+                {
                     weaponName = "Large Spike Wall";
                 } else {
                     weaponName = "Hunting Bow";
                 }
             }
-            this.WeaponName = weaponName;
+            this.WeaponName = weaponName;            
         }
 
         public HurtEvent(ref DamageEvent d, Fougerite.Entity en)

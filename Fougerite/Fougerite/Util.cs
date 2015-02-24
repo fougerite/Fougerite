@@ -273,7 +273,7 @@
             foreach (Entity ent in world.Entities) {
                 if (ent.Name != "MetalDoor" && ent.Name != "WoodDoor") {
                     entPosition = ((GameObject)ent.Object).gameObject.transform.position;
-                    if (entPosition.Equals(givenPosition))
+                    if ((entPosition - givenPosition).magnitude < 2f)
                         return ent;
                     /*
                     var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
@@ -298,7 +298,7 @@
             foreach (var ent in world.Entities) {
                 if (ent.Name == "MetalDoor" || ent.Name == "WoodDoor") {
                     entPosition = ((GameObject)ent.Object).gameObject.transform.position;
-                    if (entPosition.Equals(givenPosition))
+                    if ((entPosition - givenPosition).magnitude < 2f)
                         return ent;
                     /*
                     var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);

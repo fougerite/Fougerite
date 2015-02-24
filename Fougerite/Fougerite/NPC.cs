@@ -53,5 +53,22 @@
                 this._char.name = value;
             }
         }
+
+        public Vector3 Location
+        {
+            get { return this._char.transform.position; }
+        }
+        public float X
+        {
+            get { return this._char.transform.position.x; }
+        }
+        public float Y
+        {
+            get { return this._char.transform.position.y; }
+        }
+        public float Z
+        {
+            get { return this._char.transform.position.z; }
+        }
     }
 }

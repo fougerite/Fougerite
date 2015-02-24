@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -42,6 +42,7 @@
     <Compile Include="Fougerite\Module.cs" />
     <Compile Include="Fougerite\ModuleContainer.cs" />
     <Compile Include="Fougerite\ModuleManager.cs" />
+    <Compile Include="Fougerite\FougeriteEx.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Fougerite\ChatString.cs" />
     <Compile Include="Fougerite\Logger.cs" />
@@ -85,7 +86,6 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Compile Include="Fougerite\Events\DestroyEvent.cs" />
-    <Compile Include="Fougerite\StringSearch.cs" />
     <Compile Include="Fougerite\Newman.cs" />
     <Compile Include="Fougerite\SerializableDictionary.cs" />
   </ItemGroup>

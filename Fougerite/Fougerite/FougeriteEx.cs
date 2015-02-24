@@ -56,16 +56,73 @@ public static class LevenshteinDistance
 
     public static int Distance(this string self, string test)
     {
-        char[] rm = new char[] { ' ', '"', '\'', '-' };
-        return Compute(self.ToUpperInvariant().RemoveChars(rm), test.ToUpperInvariant().RemoveChars(rm));
-        // RemoveChars is an extension method in 
+        return Compute(self.ToUpperInvariant(), test.ToUpperInvariant());
+    }
+
+    public static double Similarity(this string self, string test)
+    {
+        int distance = Compute(self.ToUpperInvariant(), test.ToUpperInvariant());
+        return 1.0 - ((double)distance / (double)Math.Max(self.Length, test.Length));
     }
 }
 
-public static class FougeriteStringEx
+public static class FougeriteEx
 {
-    private static readonly string BP = "BP";
-    private static readonly string BLUEPRINT = "Blueprint";
+    public static T[] Slice<T>(this T[] source, int start, int end)
+    {
+        // Handles negative ends.
+        if (end < 0)
+        {
+            end = source.Length + end;
+        }
+        int len = end - start;
+        // Return new array.
+        T[] res = new T[len];
+        for (int i = 0; i < len; i++)
+        {
+            res[i] = source[i + start];
+        }
+        return res;
+    }
+
+    public static string LongestCommonSubstring(this string self, string test)
+    {
+        int[,] lengths = new int[self.Length, test.Length];
+        int greatestLength = 0;
+        string lcs = string.Empty;
+
+        // Compare each consecutive character in string a with each consecutive character in string b.
+        for (int i = 0; i < self.Length; i++)
+        {
+            for (int j = 0; j < test.Length; j++)
+            {
+                //Keep a running count of the number of consecutive characters in each that are the same.
+                if (self[i].ToString().ToUpperInvariant() == test[j].ToString().ToUpperInvariant())
+                {
+                    if (i == 0 || j == 0)
+                    {
+                        lengths[i, j] = 1;
+                    }
+                    else
+                    {
+                        lengths[i, j] = lengths[i - 1, j - 1] + 1;
+                    }
+                    // When we find the greatest count so far, note the substring of which it is. 
+                    if (lengths[i, j] > greatestLength)
+                    {
+                        greatestLength = lengths[i, j];
+                        lcs = self.Substring(i - greatestLength + 1, greatestLength);
+                    }
+                }
+                else
+                {
+                    lengths[i, j] = 0;
+                }
+            }
+        }
+        // Output the substring we noted.
+        return lcs;
+    }
 
     public static bool HasBPTerm(this string self)
     {
@@ -77,9 +134,9 @@ public static class FougeriteStringEx
                 break;
 
             if (term.Length >= BLUEPRINT.Length)
-                flag = BLUEPRINT.Distance(term) <= 1 ? true : false;
-            else
-                flag = BLUEPRINT.Substring(0, term.Length).Distance(term) <= 1 ? true : false;
+                flag = BLUEPRINT.Distance(term) <= 2 ? true : false;
+            else if (term.Length >= 3)
+                flag = BLUEPRINT.Substring(0, term.Length).Distance(term) <= 2 ? true : false;
 
             if (flag)
                 break;
@@ -96,10 +153,10 @@ public static class FougeriteStringEx
                 continue;
 
             if (term.Length >= BLUEPRINT.Length)
-                if (BLUEPRINT.Distance(term) <= 1)
+                if (BLUEPRINT.Distance(term) <= 2)
                     continue;
                 else
-                    if (BLUEPRINT.Substring(0, term.Length).Distance(term) <= 1)
+                    if (BLUEPRINT.Substring(0, term.Length).Distance(term) <= 2)
                         continue;
 
             baseterms.Add(term);
@@ -119,18 +176,29 @@ public static class FougeriteStringEx
     public static string MatchItemName(this string self)
     {
         var queryName = from name in ItemNames
-                        group name by self.BaseItem().Distance(name) into match
-                        orderby match.Key ascending
+                        group name by self.BaseItem().Similarity(name) into match
+                        orderby match.Key descending
                         select match.FirstOrDefault();
 
-        //if (queryName.Count() != 1)
-            Logger.LogDebug(string.Format("[MatchItemName] self={0} matches={1}", self, string.Join(", ", queryName.ToArray())));
+        Logger.LogDebug(string.Format("[MatchItemName] self={0} matches={1}", self, string.Join(", ", queryName.ToArray())));
 
         if (self.HasBPTerm())
-            return queryName.FirstOrDefault().Blueprint();
-        
-        return queryName.FirstOrDefault();
+            return queryName.FirstOrDefault() == null ? string.Empty : queryName.First().Blueprint();
+
+        return queryName.FirstOrDefault() == null ? string.Empty : queryName.First();
     }
+
+    private static readonly string BP = "BP";
+    private static readonly string BLUEPRINT = "Blueprint";
+
+    public static readonly IEnumerable<string> ItemWords = new string[] { "556", "Ammo", "9mm", "Pistol", "Animal", "Fat", "Anti-Radiation", "Pills", "Armor", "Part", "1", "2", "3",
+        "4", "5", "6", "7", "Arrow", "Bandage", "Bed", "Blood", "Draw", "Kit", "Bolt", "Action", "Rifle", "Camp", "Fire", "Can", "of", "Beans", "Tuna", "Charcoal", "Chocolate", "Bar",
+        "Cloth", "Boots", "Helmet", "Pants", "Vest", "Cooked", "Chicken", "Breast", "Empty", "Casing", "Shotgun", "Shell", "Explosive", "Charge", "Explosives", "F1", "Grenade", "Flare",
+        "Flashlight", "Mod", "Furnace", "Granola", "Gunpowder", "HandCannon", "Handmade", "Lockpick", "Holo", "Sight", "sight", "Hunting", "Bow", "Invisible", "Kevlar", "Large", "Medkit",
+        "Spike", "Wall", "Wood", "Laser", "Leather", "Low", "Grade", "Fuel", "Quality", "Metal", "M4", "MP5A4",  "Ceiling",  "Doorway", "Foundation", "Fragments", "Ore",  "Pillar",  "Ramp",
+        "Window", "Bars",  "P250", "Paper", "Pick", "Axe", "Pipe", "Primed", "Rad", "Suit", "Raw", "Recycle", "Repair", "Bench", "Research", "Revolver", "Rock", "Shells", "Silencer", "Sleeping",
+        "Bag", "Small",  "Rations",  "Stash",  "Water", "Bottle", "Stone", "Hatchet", "Stones", "Sulfur",  "Supply", "Signal", "Torch", "Uber", "Weapon", "Barricade", "Gate",  "Gateway",  "Planks",
+        "Shelter", "Stairs",  "Storage", "Box", "Wooden", "Door", "Workbench", "Blueprint", "BP" };
 
     public static readonly IEnumerable<string> ItemNames = new string[] { "556 Ammo", "9mm Ammo", "9mm Pistol", "Animal Fat", "Anti-Radiation Pills", "Armor Part 1", "Armor Part 2", "Armor Part 3", 
         "Armor Part 4", "Armor Part 5", "Armor Part 6", "Armor Part 7", "Arrow", "Bandage", "Bed", "Blood Draw Kit", "Blood", "Bolt Action Rifle", "Camp Fire", "Can of Beans", 

@@ -20,6 +20,7 @@
         private PlayerClient ourPlayer;
         private ulong uid;
         private string name;
+        private string ipaddr;
 
         public Player()
         {
@@ -32,7 +33,8 @@
             this.ourPlayer = client;
             this.connectedAt = DateTime.UtcNow.Ticks;
             this.uid = client.netUser.userID;
-            this.name = client.netUser.user.displayname_;
+            this.name = client.netUser.displayName;
+            this.ipaddr = client.netPlayer.externalIP;
             this.FixInventoryRef();
         }
 
@@ -73,9 +75,10 @@
         public static Fougerite.Player FindBySteamID(string search)
         {
             var query = from pc in PlayerClient.All
-                                 group pc by search.Distance(pc.userID.ToString()) into match
-                                 orderby match.Key ascending
+                                 group pc by search.Similarity(pc.userID.ToString()) into match
+                                 orderby match.Key descending
                                  select match.FirstOrDefault();
+
             return new Fougerite.Player(query.FirstOrDefault());
         }
 
@@ -87,13 +90,10 @@
         public static Fougerite.Player FindByName(string search)
         {
             var query = from pc in PlayerClient.All
-                                 group pc by search.Distance(pc.netUser.user.displayname_) into match
-                                 orderby match.Key ascending
+                                 group pc by search.Similarity(pc.netUser.displayName) into match
+                                 orderby match.Key descending
                                  select match.FirstOrDefault();
-            if (query.Count() == 1)
-                return new Fougerite.Player(query.FirstOrDefault());
 
-            Logger.LogDebug("[FindByName] found more than one match, returning first.");
             Logger.LogDebug(string.Format("[FindByName] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.netUser.displayName).ToArray<string>())));
             return new Fougerite.Player(query.FirstOrDefault());
         }
@@ -363,7 +363,7 @@
         {
             get
             {
-                return this.ourPlayer.netPlayer.externalIP;
+                return this.ipaddr;
             }
         }
 
@@ -492,13 +492,13 @@
         {
             get
             {
-                return this.name; // displayname_
+                return this.name; // displayName
             }
             set
             {
                 this.name = value;
-                this.ourPlayer.netUser.user.displayname_ = value; // displayname_
-                this.ourPlayer.userName = value; // displayname_
+                this.ourPlayer.netUser.user.displayname_ = value; // displayName
+                this.ourPlayer.userName = value; // displayName
             }
         }
 

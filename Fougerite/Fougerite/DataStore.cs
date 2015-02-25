@@ -71,7 +71,7 @@
                     } else if (ini.GetBoolSetting(section, key))
                     {
                         Add(section, key, true);
-                    } else if (setting.ToUpperInvariant() == "FALSE")
+                    } else if (setting.Equals("False", StringComparison.InvariantCultureIgnoreCase))
                     {
                         Add(section, key, false);
                     } else if (setting == "__NullReference__")

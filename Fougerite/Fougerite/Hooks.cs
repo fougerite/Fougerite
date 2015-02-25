@@ -123,6 +123,7 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
+            StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
             bool external = a.argUser == null;
             bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
@@ -133,7 +134,7 @@
             string logmsg = string.Format("[ConsoleReceived] userid={0} adminRights={1} command={2}.{3} args={4}", userid, adminRights.ToString(), a.Class, a.Function, (a.HasArgs(1) ? a.ArgsStr : "none"));
             Logger.LogDebug(logmsg);
 
-            if ((a.Class.ToUpperInvariant() == "FOUGERITE") && (a.Function.ToUpperInvariant() == "RELOAD")) {
+            if (a.Class.Equals("fougerite", ic) && a.Function.Equals("reload", ic)) {
                 if (adminRights) {
                     ModuleManager.ReloadModules();
                     a.ReplyWith("Fougerite: Reloaded!");
@@ -142,7 +143,7 @@
                 OnConsoleReceived(ref a, external);
 
             if (string.IsNullOrEmpty(a.Reply))
-                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+                a.ReplyWith(string.Format("Fougerite: {0}.{1} was executed!", a.Class, a.Function));
 
             return true;
 

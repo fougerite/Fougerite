@@ -139,10 +139,9 @@ public class IniParser
 
     public bool GetBoolSetting(string sectionName, string settingName)
     {
-        if (this.GetSetting(sectionName, settingName) == null)
-            return false;
-
-        return this.GetSetting(sectionName, settingName).ToUpperInvariant() == "TRUE";
+        bool val;
+        bool.TryParse(this.GetSetting(sectionName, settingName), out val);
+        return val;
     }
 
     public bool isCommandOn(string cmdName)

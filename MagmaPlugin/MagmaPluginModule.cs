@@ -112,7 +112,7 @@
                     script = script + str2 + "\r\n";
                 } catch (Exception ex) {
                     Logger.LogException(ex);
-                    Logger.LogError(string.Format("{0} Couln't create instance at line -> {1}", brktname, str1));
+                    Logger.LogError(string.Format("{0} Couldn't create instance at line -> {1}", brktname, str1));
                     return legacy;
                 }
             }
@@ -127,9 +127,9 @@
 
         public bool FilterPlugin(string script)
         {
-            string str1 = script.ToUpperInvariant();
             foreach (string str2 in filters) {
-                if (str1.Contains(str2)) {
+                if (script.Contains(str2, true))
+                {
                     Logger.LogError(string.Format("{0} Script may not contain: {1}", brktname, str2));
                     return false;
                 }

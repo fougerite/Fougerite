@@ -39,7 +39,37 @@
 
         public Fougerite.Player FindPlayer(string search)
         {
-            return Fougerite.Player.Search(search);
+            IEnumerable<Fougerite.Player> query;
+            if (search.StartsWith("7656119"))
+            {
+                ulong uid;
+                if (ulong.TryParse(search, out uid))
+                {
+                    query = from player in this.players
+                            where player.UID == uid
+                            select player;
+
+                    if (query.Count() == 1)
+                        return query.FirstOrDefault();
+                }
+                else
+                {
+                    query = from player in this.players
+                            group player by search.Similarity(player.SteamID) into match
+                            orderby match.Key descending
+                            select match.FirstOrDefault();
+
+                    Logger.LogDebug(string.Format("[FindPlayer] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.SteamID).ToArray<string>())));
+                    return query.FirstOrDefault();
+                }
+            }
+            query = from player in this.players
+                    group player by search.Similarity(player.Name) into match
+                    orderby match.Key descending
+                    select match.FirstOrDefault();
+
+            Logger.LogDebug(string.Format("[FindPlayer] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.Name).ToArray<string>())));
+            return query.FirstOrDefault();
         }
 
         public static Fougerite.Server GetServer()
@@ -85,7 +115,7 @@
             }
         }
 
-        public System.Collections.Generic.List<Fougerite.Player> Players
+        public List<Fougerite.Player> Players
         {
             get
             {

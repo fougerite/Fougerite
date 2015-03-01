@@ -54,32 +54,12 @@
 
         public static Fougerite.Player Search(string search)
         {
-            if (search.StartsWith("7656119"))
-            {
-                ulong uid;
-                if (ulong.TryParse(search, out uid))
-                {
-                    var query = from pc in PlayerClient.All
-                                               where pc.userID == uid
-                                               select pc;
-                    if (query.Count() == 1)
-                        return new Fougerite.Player(query.FirstOrDefault());
-                } else
-                {
-                    return FindBySteamID(search);
-                }
-            }
-            return FindByName(search);
+            return Fougerite.Server.GetServer().FindPlayer(search);
         }
 
         public static Fougerite.Player FindBySteamID(string search)
         {
-            var query = from pc in PlayerClient.All
-                                 group pc by search.Similarity(pc.userID.ToString()) into match
-                                 orderby match.Key descending
-                                 select match.FirstOrDefault();
-
-            return new Fougerite.Player(query.FirstOrDefault());
+            return Fougerite.Server.GetServer().FindPlayer(search);
         }
 
         public static Fougerite.Player FindByGameID(string search)
@@ -89,26 +69,23 @@
 
         public static Fougerite.Player FindByName(string search)
         {
-            var query = from pc in PlayerClient.All
-                                 group pc by search.Similarity(pc.netUser.displayName) into match
-                                 orderby match.Key descending
-                                 select match.FirstOrDefault();
-
-            Logger.LogDebug(string.Format("[FindByName] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.netUser.displayName).ToArray<string>())));
-            return new Fougerite.Player(query.FirstOrDefault());
+            return Fougerite.Server.GetServer().FindPlayer(search);
         }
 
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
-            var query = from pc in PlayerClient.All
-                                 where pc.netPlayer == np
-                                 select pc;
-            return new Fougerite.Player(query.FirstOrDefault());
+            var query = from player in Fougerite.Server.GetServer().Players
+                                 where player.PlayerClient.netPlayer == np
+                                 select player;
+            return query.FirstOrDefault();
         }
 
         public static Fougerite.Player FindByPlayerClient(PlayerClient pc)
         {
-            return new Fougerite.Player(pc);
+            var query = from player in Fougerite.Server.GetServer().Players
+                        where player.PlayerClient == pc
+                        select player;
+            return query.FirstOrDefault();
         }
 
         public void FixInventoryRef()
@@ -502,6 +479,14 @@
             }
         }
 
+        public bool AtHome
+        {
+            get
+            {
+                return this.Structures.Any(e => (e.Object as StructureMaster).containedBounds.Contains(this.Location));
+            }
+        }
+
         public int Ping
         {
             get
@@ -559,6 +544,76 @@
             set
             {
                 this.ourPlayer.transform.position.Set(this.X, this.Y, value);
+            }
+        }
+
+        private static Fougerite.Entity[] QueryToEntity<T>(IEnumerable<T> query)
+        {
+            Fougerite.Entity[] these = new Fougerite.Entity[query.Count<T>()];
+            for (int i = 0; i < these.Length; i++)
+            {
+                these[i] = new Fougerite.Entity((query.ElementAtOrDefault<T>(i) as UnityEngine.Component).GetComponent<DeployableObject>());
+            }
+            return these;
+        }
+
+        public Fougerite.Entity[] Structures
+        {
+            get
+            {
+                var query = from s in StructureMaster.AllStructures
+                            where this.UID == s.ownerID
+                            select s;
+                Fougerite.Entity[] these = new Fougerite.Entity[query.Count()];
+                for (int i = 0; i < these.Length; i++)
+                {
+                    these[i] = new Fougerite.Entity(query.ElementAtOrDefault(i));
+                }
+                return these;
+            }
+        }
+
+        public Fougerite.Entity Sleeper
+        {
+            get
+            {
+                var query = from s in UnityEngine.Object.FindObjectsOfType(typeof(SleepingAvatar)) as SleepingAvatar[]
+                            where this.UID == (s.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                            select s;
+                return (QueryToEntity<SleepingAvatar>(query) as IEnumerable<Fougerite.Entity>).ElementAtOrDefault(0);
+            }
+        }
+
+        public Fougerite.Entity[] Shelters
+        {
+            get
+            {
+                var query = from d in UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject)) as DeployableObject[]
+                            where d.name.Contains("Shelter") && this.UID == d.ownerID
+                            select d;
+                return QueryToEntity<DeployableObject>(query);
+            }
+        }
+
+        public Fougerite.Entity[] Storage
+        {
+            get
+            {
+                var query = from s in UnityEngine.Object.FindObjectsOfType(typeof(SaveableInventory)) as SaveableInventory[]
+                            where this.UID == (s.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                            select s;
+                return QueryToEntity<SaveableInventory>(query);
+            }
+        }
+
+        public Fougerite.Entity[] Fires
+        {
+            get
+            {
+                var query = from f in UnityEngine.Object.FindObjectsOfType(typeof(FireBarrel)) as FireBarrel[]
+                            where this.UID == (f.GetComponent<DeployableObject>() as DeployableObject).ownerID
+                            select f;
+                return QueryToEntity<FireBarrel>(query);
             }
         }
     }

@@ -86,7 +86,6 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Compile Include="Fougerite\Events\DestroyEvent.cs" />
-    <Compile Include="Fougerite\Newman.cs" />
     <Compile Include="Fougerite\SerializableDictionary.cs" />
   </ItemGroup>
   <ItemGroup>

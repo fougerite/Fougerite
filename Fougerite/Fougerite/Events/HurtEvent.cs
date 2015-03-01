@@ -21,7 +21,7 @@
             Logger.LogDebug(string.Format("[DamageEvent] {0}", d.ToString()));
             if (d.attacker.client != null)
             {
-                this.Attacker = new Fougerite.Player(d.attacker.client); ;
+                this.Attacker = Fougerite.Player.FindByPlayerClient(d.attacker.client);
                 this._playerattacker = true;
             }
             else if (d.attacker.character != null)
@@ -32,7 +32,7 @@
 
             if (d.victim.client != null)
             {
-                this.Victim = new Fougerite.Player(d.victim.client);
+                this.Victim = Fougerite.Player.FindByPlayerClient(d.victim.client);
                 this._playervictim = true;
             }
             else if (d.victim.character != null)

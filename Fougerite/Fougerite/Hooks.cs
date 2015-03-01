@@ -310,6 +310,12 @@
 
             Fougerite.Server server = Fougerite.Server.GetServer();
             Fougerite.Player player = new Fougerite.Player(user.playerClient);
+            if (server.Players.Contains(player))
+            {
+                Logger.LogError(string.Format("[PlayerConnect] Server.Players already contains {0} {1}", player.Name, player.SteamID));
+                connected = user.connected;
+                return connected;
+            }
             server.Players.Add(player);
 
             if (OnPlayerConnected != null)

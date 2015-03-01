@@ -17,6 +17,7 @@
                 return;
             }
 
+            StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
             int qty = 0;
             int qtyIdx = -1;
             for (var i = 0; i < ChatArguments.Length; i++)
@@ -29,8 +30,8 @@
                     {                       
                         if (i - 1 >= 0)
                         {  
-                            string str = ChatArguments[i - 1].ToUpperInvariant();
-                            if (str == "PART" || str == "KIT")
+                            string prevArg = ChatArguments[i - 1];
+                            if (prevArg.Equals("Part", ic) || prevArg.Equals("Kit", ic))
                                 continue;
                         }
                     }
@@ -39,8 +40,8 @@
                         if (i + 1 < ChatArguments.Length)
                         {
                             string nextArg = ChatArguments[i + 1];
-                            if (nextArg.Similarity("Ammo") > 0.749
-                                || nextArg.Similarity("Casing") > 0.799)
+                            if (nextArg.Similarity("Ammo") >= 0.75
+                                || nextArg.Similarity("Casing") >= 0.8)
                                 continue;
                         }
                     }
@@ -59,7 +60,7 @@
             }
 
             string quantity = qty.ToString();
-            double bestSim = 0d;
+            double best = 0d;
             string recipName = string.Empty;
             string[] remain = qtyIdx > -1 ? ChatArguments.Slice(0, qtyIdx)
                     .Concat(ChatArguments.Slice(Math.Min(qtyIdx + 1, ChatArguments.Length), ChatArguments.Length))
@@ -75,9 +76,9 @@
                         string[] testArr = remain.Slice(i, j + 1);
                         string testStr = string.Join(" ", testArr);
                         double sim = testStr.Similarity(name);
-                        if (sim > bestSim)
+                        if (sim > best)
                         {
-                            bestSim = sim;
+                            best = sim;
                             recipName = name;
                             collect.Clear();
                             collect.AddRange(testArr);
@@ -88,8 +89,7 @@
 
             for (int i = 0; i < collect.Count(); i++)
             {
-                if (FougeriteEx.ItemWords.Any(x => x.LongestCommonSubstring(collect[i]).ToUpperInvariant()
-                    .StartsWith(collect[i].ToUpperInvariant())))
+                if (FougeriteEx.ItemWords.Any(x => x.LongestCommonSubstring(collect[i]).StartsWith(collect[i], ic)))
                     collect[i] = string.Empty;
             }
 
@@ -110,7 +110,7 @@
             try
             {
                 uLink.NetworkPlayer recipPlayer = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
-                Util.sayUser(recipPlayer, Core.Name, string.Format("{0}  gave you  {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
+                Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
             }
             catch (Exception ex)
             {

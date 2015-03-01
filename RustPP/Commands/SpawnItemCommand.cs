@@ -12,6 +12,7 @@
         {
             if (ChatArguments.Length > 0)
             {
+                StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
                 int qty = 0;
                 int qtyIdx = -1;
                 for (var i = 0; i < ChatArguments.Length; i++)
@@ -24,8 +25,8 @@
                         {
                             if (i - 1 >= 0)
                             {
-                                string str = ChatArguments[i - 1].ToUpperInvariant();
-                                if (str == "PART" || str == "KIT")
+                                string prevArg = ChatArguments[i - 1].ToUpperInvariant();
+                                if (prevArg.Equals("Part", ic) || prevArg.Equals("Kit", ic))
                                     continue;
                             }
                         }

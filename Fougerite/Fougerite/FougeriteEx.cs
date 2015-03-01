@@ -68,6 +68,8 @@ public static class LevenshteinDistance
 
 public static class FougeriteEx
 {
+    public static StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
+
     public static T[] Slice<T>(this T[] source, int start, int end)
     {
         // Handles negative ends.
@@ -97,7 +99,7 @@ public static class FougeriteEx
             for (int j = 0; j < test.Length; j++)
             {
                 //Keep a running count of the number of consecutive characters in each that are the same.
-                if (self[i].ToString().ToUpperInvariant() == test[j].ToString().ToUpperInvariant())
+                if (self[i].ToString().Equals(test[j].ToString(), ic))
                 {
                     if (i == 0 || j == 0)
                     {
@@ -129,14 +131,11 @@ public static class FougeriteEx
         bool flag = false;
         foreach (string term in self.Split(new char[] { ' ' }))
         {
-            flag = BP.Distance(term) == 0 ? true : false;
+            flag = BP.Equals(term, ic) ? true : false;
             if (flag)
                 break;
 
-            if (term.Length >= BLUEPRINT.Length)
-                flag = BLUEPRINT.Distance(term) <= 2 ? true : false;
-            else if (term.Length >= 3)
-                flag = BLUEPRINT.Substring(0, term.Length).Distance(term) <= 2 ? true : false;
+            flag = BLUEPRINT.Similarity(term) > 0.666 ? true : false;
 
             if (flag)
                 break;
@@ -146,18 +145,17 @@ public static class FougeriteEx
 
     public static string BaseItem(this string self)
     {
+        if (self.Length == 0)
+            return self;
+
         ICollection<string> baseterms = new List<string>();
         foreach (string term in self.Split(new char[] { ' ' }))
         {
-            if (BP.Distance(term) == 0)
+            if (BP.Equals(term, ic))
                 continue;
 
-            if (term.Length >= BLUEPRINT.Length)
-                if (BLUEPRINT.Distance(term) <= 2)
-                    continue;
-                else
-                    if (BLUEPRINT.Substring(0, term.Length).Distance(term) <= 2)
-                        continue;
+            if (BLUEPRINT.Similarity(term) > 0.666)
+                continue;
 
             baseterms.Add(term);
         }
@@ -166,6 +164,9 @@ public static class FougeriteEx
 
     public static string Blueprint(this string self)
     {
+        if (self.Length == 0)
+            return self;
+
         string key = self.Replace("Research Kit 1", "Research Kit");
         if (BlueprintNames.ContainsKey(key))
             return string.Format("{0} {1}", key, BlueprintNames[key]);
@@ -175,17 +176,27 @@ public static class FougeriteEx
 
     public static string MatchItemName(this string self)
     {
+        Logger.LogDebug(string.Format("[MatchItemName] self={0}", self));
+        if (self.Length == 0)
+            return self;
+
         var queryName = from name in ItemNames
                         group name by self.BaseItem().Similarity(name) into match
                         orderby match.Key descending
                         select match.FirstOrDefault();
 
-        Logger.LogDebug(string.Format("[MatchItemName] self={0} matches={1}", self, string.Join(", ", queryName.ToArray())));
+        if (queryName.FirstOrDefault() == null || queryName.Count() == 0)
+        {
+            Logger.LogError(string.Format("[MatchItemName] self={0} matches=NULL", self));
+            return self;
+        }
+
+        Logger.LogDebug(string.Format("[MatchItemName] matches={0}", string.Join(", ", queryName.ToArray())));
 
         if (self.HasBPTerm())
-            return queryName.FirstOrDefault() == null ? string.Empty : queryName.First().Blueprint();
+            return queryName.First().Blueprint();
 
-        return queryName.FirstOrDefault() == null ? string.Empty : queryName.First();
+        return queryName.First();
     }
 
     private static readonly string BP = "BP";

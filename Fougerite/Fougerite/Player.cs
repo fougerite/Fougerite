@@ -350,10 +350,6 @@
             {
                 return this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
             }
-            set
-            {
-                this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().SetBleedingLevel((float)Convert.ToInt32(value));
-            }
         }
 
         public bool IsCold
@@ -362,10 +358,6 @@
             {
                 return this.ourPlayer.controllable.GetComponent<Metabolism>().IsCold();
             }
-            set
-            {
-                this.ourPlayer.controllable.GetComponent<Metabolism>().coreTemperature = value ? ((float)(-10)) : ((float)10);
-            }
         }
 
         public bool IsInjured
@@ -373,10 +365,6 @@
             get
             {
                 return (this.ourPlayer.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
-            }
-            set
-            {
-                this.ourPlayer.controllable.GetComponent<FallDamage>().SetLegInjury((float)Convert.ToInt32(value));
             }
         }
 

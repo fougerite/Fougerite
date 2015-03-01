@@ -14,7 +14,7 @@
     public class Core
     {
         public static string Name = "Rust++";
-        public static string Version = "1.6.7";
+        public static string Version = "1.6.8";
         public static IniParser config;
         public static PList blackList = new PList();
         public static PList whiteList = new PList();

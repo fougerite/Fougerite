@@ -2,6 +2,7 @@
 {
     using Fougerite;
     using System;
+    using System.Collections.Generic;
     using UnityEngine;
 
     public class HurtEvent
@@ -22,7 +23,10 @@
             if (d.attacker.client != null)
             {
                 this.Attacker = Fougerite.Player.FindByPlayerClient(d.attacker.client);
-                this._playerattacker = true;
+                if (d.attacker.id.ToString().Contains("Metabolism"))
+                    this._playerattacker = false;
+                else
+                    this._playerattacker = true;
             }
             else if (d.attacker.character != null)
             {
@@ -80,6 +84,27 @@
                 else if (d.attacker.ToString().StartsWith("LargeWoodSpikeWall"))
                 {
                     weaponName = "Large Spike Wall";
+                }
+                else if (d.attacker.id.ToString().Contains("Metabolism"))
+                {
+                    ICollection<string> list = new List<string>();
+                    if ((this.Victim as Fougerite.Player).IsPoisoned)
+                        list.Add("Poison");
+
+                    if ((this.Victim as Fougerite.Player).IsBleeding)
+                        list.Add("Bleeding");
+
+                    if ((this.Victim as Fougerite.Player).IsRadPoisoned)
+                        list.Add("Radiation");
+
+                    if ((this.Victim as Fougerite.Player).IsStarving)
+                        list.Add("Starvation");
+
+                    if (list.Count > 0)
+                        weaponName = string.Join(",", list.ToArray());
+                    else
+                        weaponName = "Metabolism";
+                        
                 } else {
                     weaponName = "Hunting Bow";
                 }

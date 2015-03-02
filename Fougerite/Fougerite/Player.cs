@@ -392,6 +392,22 @@
             }
         }
 
+        public bool IsStarving
+        {
+            get
+            {
+                return this.CalorieLevel <= 0.0;
+            }
+        }
+
+        public bool IsHungry
+        {
+            get
+            {
+                return this.CalorieLevel < 500.0;
+            }
+        }
+
         public float CalorieLevel
         {
             get

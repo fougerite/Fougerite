@@ -20,21 +20,106 @@
         public HurtEvent(ref DamageEvent d)
         {
             Logger.LogDebug(string.Format("[DamageEvent] {0}", d.ToString()));
-            if (d.attacker.client != null)
+
+            this.DamageEvent = d;
+            this.WeaponData = null;
+            this.IsDecay = false;
+            string weaponName = "Unknown";
+
+            if (d.attacker.idMain is DeployableObject)
+            {
+                this.Attacker = new Entity(d.attacker.idMain.GetComponent<DeployableObject>());
+                this._playerattacker = false;
+                weaponName = d.attacker.id.ToString().MatchItemName();
+            }
+            else if (d.attacker.id is Metabolism && d.victim.id is Metabolism)
             {
                 this.Attacker = Fougerite.Player.FindByPlayerClient(d.attacker.client);
-                if (d.attacker.id.ToString().Contains("Metabolism"))
-                    this._playerattacker = false;
+                this._playerattacker = false;
+                this.Victim = this.Attacker;
+
+                ICollection<string> list = new List<string>();
+                if ((this.Victim as Fougerite.Player).IsStarving)
+                {
+                    list.Add("Starvation");
+                }
+                if ((this.Victim as Fougerite.Player).IsRadPoisoned)
+                {
+                    list.Add("Radiation");
+                }
+                if ((this.Victim as Fougerite.Player).IsPoisoned)
+                {
+                    list.Add("Poison");
+                }
+                if ((this.Victim as Fougerite.Player).IsBleeding)
+                {
+                    list.Add("Bleeding");
+                }
+
+                if (DamageType != "Unknown" && !list.Contains(DamageType))
+                    list.Add(DamageType);
+
+                weaponName = string.Format("Self ({0})", string.Join(",", list.ToArray()));
+            }
+            else if (d.attacker.id is SupplyCrate)
+            {
+                this.Attacker = new Entity(d.attacker.idMain.gameObject);
+                this._playerattacker = false;
+                weaponName = "Supply Crate";
+            }
+            else if (d.attacker.client != null)            
+            {
+                this.Attacker = new Fougerite.Player(d.attacker.client);
+                this._playerattacker = true;
+                if (d.attacker.id is TimedExplosive)
+                {
+                    weaponName = "Explosive Charge";
+                }
+                else if (d.attacker.id is TimedGrenade)
+                {
+                    weaponName = "F1 Grenade";
+                }
+                else if (d.extraData != null)
+                {
+                    WeaponImpact extraData = d.extraData as WeaponImpact;
+                    this.WeaponData = extraData;
+                    if (extraData.dataBlock != null)
+                    {
+                        weaponName = extraData.dataBlock.name;
+                    }
+                }
+                else if (d.victim.client != null && d.attacker.IsDifferentPlayer(d.victim.client))
+                {
+                    weaponName = "Hunting Bow";
+                }
                 else
-                    this._playerattacker = true;
+                {
+                    weaponName = "Fall Damage";
+                }
             }
             else if (d.attacker.character != null)
             {
                 this.Attacker = new NPC(d.attacker.character);
                 this._playerattacker = false;
+                weaponName = d.attacker.id.ToString().Replace("(Clone)", " Claw").Replace("Mutant", "Mutant ");
             }
+            this.WeaponName = weaponName;
 
-            if (d.victim.client != null)
+            Logger.LogDebug(string.Format("Attacker properties set: {0}, {1}, {2}", this.Attacker.ToString(), this._playerattacker.ToString(), weaponName));
+
+            if (d.victim.idMain is DeployableObject)
+            {
+                Logger.LogDebug("idMain is DeployableObject");
+                this.Victim = new Entity(d.victim.idMain.GetComponent<DeployableObject>());
+                this._playervictim = false;
+            }
+            else if (d.victim.idMain is StructureComponent)
+            {
+                Logger.LogDebug("idMain is StructureComponent");
+                this.Victim = new Entity(d.victim.idMain.GetComponent<StructureComponent>());
+                this._playervictim = false;
+            } 
+            else if (d.victim.client != null)
             {
                 this.Victim = Fougerite.Player.FindByPlayerClient(d.victim.client);
                 this._playervictim = true;
@@ -44,72 +129,8 @@
                 this.Victim = new NPC(d.victim.character);
                 this._playervictim = false;
             }
-            else if (d.victim.id.networkViewPrefabRoot.GetComponent<DeployableObject>() != null)
-            {
-                this.Victim = new Entity(d.victim.id.networkViewPrefabRoot.GetComponent<DeployableObject>());
-                this._playervictim = false;
-            }
-            this.DamageEvent = d;
-            this.WeaponData = null;
-            this.IsDecay = false;
-            string weaponName = "Unknown";
-            if (d.extraData != null)
-            {
-                WeaponImpact extraData = d.extraData as WeaponImpact;
-                this.WeaponData = extraData;
-                if (extraData.dataBlock != null)
-                {
-                    weaponName = extraData.dataBlock.name;
-                }
-            }
-            else
-            {
-                if (d.attacker.id is TimedExplosive) {
-                    weaponName = "Explosive Charge";
-                } else if (d.attacker.id is TimedGrenade) {
-                    weaponName = "F1 Grenade";
-                } else if (d.attacker.ToString().Contains("MutantBear")) {
-                    weaponName = "Mutant Bear Claw";
-                } else if (d.attacker.ToString().Contains("Bear")) {
-                    weaponName = "Bear Claw";
-                } else if (d.attacker.ToString().Contains("MutantWolf")) {
-                    weaponName = "Mutant Wolf Claw";
-                } else if (d.attacker.ToString().Contains("Wolf")) {
-                    weaponName = "Wolf Claw";
-                } else if (!d.attacker.IsDifferentPlayer(d.victim.client)) {
-                    weaponName = string.Format("Self ({0})", DamageType);
-                } else if (d.attacker.ToString().StartsWith("WoodSpikeWall")) {
-                    weaponName = "Spike Wall";
-                }
-                else if (d.attacker.ToString().StartsWith("LargeWoodSpikeWall"))
-                {
-                    weaponName = "Large Spike Wall";
-                }
-                else if (d.attacker.id.ToString().Contains("Metabolism"))
-                {
-                    ICollection<string> list = new List<string>();
-                    if ((this.Victim as Fougerite.Player).IsPoisoned)
-                        list.Add("Poison");
 
-                    if ((this.Victim as Fougerite.Player).IsBleeding)
-                        list.Add("Bleeding");
-
-                    if ((this.Victim as Fougerite.Player).IsRadPoisoned)
-                        list.Add("Radiation");
-
-                    if ((this.Victim as Fougerite.Player).IsStarving)
-                        list.Add("Starvation");
-
-                    if (list.Count > 0)
-                        weaponName = string.Join(",", list.ToArray());
-                    else
-                        weaponName = "Metabolism";
-                        
-                } else {
-                    weaponName = "Hunting Bow";
-                }
-            }
-            this.WeaponName = weaponName;            
+            Logger.LogDebug(string.Format("Victim properties set: {0}, {1}", this.Victim, this._playervictim.ToString()));
         }
 
         public HurtEvent(ref DamageEvent d, Fougerite.Entity en)

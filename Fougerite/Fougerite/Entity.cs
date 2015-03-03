@@ -1,6 +1,7 @@
 ﻿namespace Fougerite
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -37,8 +38,25 @@
                     this.hasInventory = false;
                 }
             }
+            else if (Obj is SupplyCrate)
+            {
+                this._ownerid = 76561198095992578UL;
+                var crate = Obj as SupplyCrate;
+                var inventory = crate.lootableObject._inventory;
+                if (inventory != null)
+                {
+                    this.hasInventory = true;
+                    this.inv = new EntityInv(inventory, this);
+                }
+                else
+                {
+                    this.hasInventory = false;
+                }
+            }
             else
+            {
                 this.hasInventory = false;
+            }
         }
 
         public void ChangeOwner(Fougerite.Player p)
@@ -142,6 +160,14 @@
             return (this.Object is DeployableObject);
         }
 
+        public bool IsStorage()
+        {
+            if (this.IsDeployableObject())
+                return this.GetObject<DeployableObject>().GetComponent<SaveableInventory>() != null;
+
+            return false;
+        }
+
         public bool IsStructure()
         {
             return (this.Object is StructureComponent);
@@ -155,7 +181,7 @@
         public bool IsSleeper()
         {
             if (this.IsDeployableObject())
-                return (this.Object as DeployableObject).GetComponent<SleepingAvatar>() != null;
+                return this.GetObject<DeployableObject>().GetComponent<SleepingAvatar>() != null;
 
             return false;
         }
@@ -163,9 +189,14 @@
         public bool IsFireBarrel()
         {
             if (this.IsDeployableObject())
-                return (this.Object as DeployableObject).GetComponent<FireBarrel>() != null;
+                return this.GetObject<DeployableObject>().GetComponent<FireBarrel>() != null;
 
             return false;
+        }
+
+        public bool IsSupplyCrate()
+        {
+            return (this.Object is SupplyCrate);
         }
 
         public void SetDecayEnabled(bool c)
@@ -224,18 +255,12 @@
                 {
                     return this.GetObject<StructureComponent>().GetComponent<TakeDamage>().health;
                 }
+                if (this.IsStructureMaster())
+                {
+                    float sum = this.GetObject<StructureMaster>()._structureComponents.Sum<StructureComponent>(s => s.GetComponent<TakeDamage>().health);
+                    return sum;
+                }
                 return 0f;
-            }
-            set
-            {
-                if (this.IsDeployableObject())
-                {
-                    this.GetObject<DeployableObject>().GetComponent<TakeDamage>().health = value;
-                }
-                else if (this.IsStructure())
-                {
-                    this.GetObject<StructureComponent>().GetComponent<TakeDamage>().health = value;
-                }
             }
         }
 
@@ -276,6 +301,14 @@
                 if (this.IsStructure())
                 {
                     return this.GetObject<StructureComponent>().name.Replace("(Clone)", "");
+                }
+                if (this.IsStructureMaster())
+                {
+                    return "Structure Master";
+                }
+                if (this.IsSupplyCrate())
+                {
+                    return "Supply Crate";
                 }
                 return string.Empty;
             }

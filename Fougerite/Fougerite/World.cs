@@ -369,14 +369,19 @@
         {
             get
             {
-                IEnumerable<Entity> component = from c in (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
-                                                            select new Entity(c);
-                IEnumerable<Entity> deployable = from d in (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
-                                                             select new Entity(d);
+                IEnumerable<Entity> component = from c in UnityEngine.Object.FindObjectsOfType<StructureComponent>()
+                                                select new Entity(c);
+                IEnumerable<Entity> deployable = from d in UnityEngine.Object.FindObjectsOfType<DeployableObject>()
+                                                 select new Entity(d);
+                IEnumerable<Entity> supplydrop = from s in UnityEngine.Object.FindObjectsOfType<SupplyCrate>()
+                                             select new Entity(s);
                 // this is much faster than Concat
-                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
+                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count() + supplydrop.Count());
                 entities.AddRange(component);
                 entities.AddRange(deployable);
+                if (supplydrop.Count() > 0)
+                    entities.AddRange(supplydrop);
+
                 return entities;
             }
         }

@@ -315,11 +315,6 @@
             {
                 return this.ourPlayer.controllable.health;
             }
-            set
-            {
-                this.ourPlayer.controllable.takeDamage.health = value;
-                this.ourPlayer.controllable.takeDamage.Heal(this.ourPlayer.controllable, 0f);
-            }
         }
 
         public PlayerInv Inventory
@@ -405,6 +400,14 @@
             get
             {
                 return this.CalorieLevel < 500.0;
+            }
+        }
+
+        public float BleedingLevel
+        {
+            get
+            {
+                return this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>()._bleedingLevel;
             }
         }
 
@@ -577,14 +580,14 @@
             }
         }
 
-        public Fougerite.Entity Sleeper
+        public Fougerite.Entity[] Deployables
         {
             get
             {
-                var query = from s in UnityEngine.Object.FindObjectsOfType(typeof(SleepingAvatar)) as SleepingAvatar[]
-                            where this.UID == (s.GetComponent<DeployableObject>() as DeployableObject).ownerID
-                            select s;
-                return (QueryToEntity<SleepingAvatar>(query) as IEnumerable<Fougerite.Entity>).ElementAtOrDefault(0);
+                var query = from d in UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject)) as DeployableObject[]
+                            where this.UID == d.ownerID
+                            select d;
+                return QueryToEntity<DeployableObject>(query);
             }
         }
 

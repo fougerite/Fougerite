@@ -122,5 +122,15 @@
                 return this.players;
             }
         }
+
+        public List<Entity> Sleepers
+        {
+            get
+            {
+                var query = from s in UnityEngine.Object.FindObjectsOfType<SleepingAvatar>()
+                            select new Entity(s.GetComponent<DeployableObject>());
+                return query.ToList<Entity>();
+            }
+        }
     }
 }

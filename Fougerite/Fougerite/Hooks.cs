@@ -108,7 +108,7 @@
                 Logger.ChatLog(quotedName, quotedMessage);               
                 var chatstr = new ChatString(quotedMessage);
                 if(OnChat != null)
-                    OnChat(new Player(arg.argUser.playerClient), ref chatstr);
+                    OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref chatstr);
 
                 string newchat = Facepunch.Utility.String.QuoteSafe(chatstr.NewText.Substring(1, chatstr.NewText.Length - 2)).Replace("\\\"", "" + '\u0022');
 
@@ -146,7 +146,6 @@
                 a.ReplyWith(string.Format("Fougerite: {0}.{1} was executed!", a.Class, a.Function));
 
             return true;
-
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
@@ -163,6 +162,9 @@
 
         public static float EntityDecay(object entity, float dmg)
         {
+            if (entity == null)
+                return 0f;
+
             try
             {
                 DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
@@ -193,6 +195,9 @@
 
         public static void EntityHurt(object entity, ref DamageEvent e)
         {
+            if (entity == null)
+                return;
+
             try
             {
                 HurtEvent he = new HurtEvent(ref e, new Entity(entity));

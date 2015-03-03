@@ -140,8 +140,12 @@ public class IniParser
     public bool GetBoolSetting(string sectionName, string settingName)
     {
         bool val;
-        bool.TryParse(this.GetSetting(sectionName, settingName), out val);
-        return val;
+        if (bool.TryParse(this.GetSetting(sectionName, settingName), out val))
+            return val;
+        else
+            Logger.LogError("bool.TryParse failed on string '{0}'", this.GetSetting(sectionName, settingName));
+
+        return false;
     }
 
     public bool isCommandOn(string cmdName)

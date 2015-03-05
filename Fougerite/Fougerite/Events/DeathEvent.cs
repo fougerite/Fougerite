@@ -9,7 +9,7 @@
         public DeathEvent(ref DamageEvent d)
             : base(ref d)
         {
-            this.DropItems = true;
+            this._drop = true;
         }
 
         public bool DropItems

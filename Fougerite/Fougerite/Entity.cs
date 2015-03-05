@@ -11,20 +11,38 @@
         private readonly object _obj;
         private EntityInv inv;
         private ulong _ownerid;
+        private string _name;
 
         public Entity(object Obj)
         {
             this._obj = Obj;
 
             if (Obj is StructureMaster)
+            {
                 this._ownerid = (Obj as StructureMaster).ownerID;
+                this._name = "Structure Master";
+            }
 
             if (Obj is StructureComponent)
+            {
                 this._ownerid = (Obj as StructureComponent)._master.ownerID;
-
+                string clone = this.GetObject<StructureComponent>().ToString();
+                var index = clone.IndexOf("(Clone)");
+                this._name = clone.Substring(0, index).MatchItemName();
+            }
             if (Obj is DeployableObject)
             {
                 this._ownerid = (Obj as DeployableObject).ownerID;
+                string clone = this.GetObject<DeployableObject>().ToString();
+                if (clone.Contains("Barricade"))
+                {
+                    this._name = "Wood Barricade";
+                }
+                else
+                {
+                    var index = clone.IndexOf("(Clone)");
+                    this._name = clone.Substring(0, index).MatchItemName();
+                }
                 var deployable = Obj as DeployableObject;
 
                 var inventory = deployable.GetComponent<Inventory>();
@@ -41,6 +59,7 @@
             else if (Obj is SupplyCrate)
             {
                 this._ownerid = 76561198095992578UL;
+                this._name = "Supply Crate";
                 var crate = Obj as SupplyCrate;
                 var inventory = crate.lootableObject._inventory;
                 if (inventory != null)
@@ -294,23 +313,7 @@
         {
             get
             {
-                if (this.IsDeployableObject())
-                {
-                    return this.GetObject<DeployableObject>().gameObject.name.Replace("(Clone)", "");
-                }
-                if (this.IsStructure())
-                {
-                    return this.GetObject<StructureComponent>().name.Replace("(Clone)", "");
-                }
-                if (this.IsStructureMaster())
-                {
-                    return "Structure Master";
-                }
-                if (this.IsSupplyCrate())
-                {
-                    return "Supply Crate";
-                }
-                return string.Empty;
+                return this._name;
             }
         }
 

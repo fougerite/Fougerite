@@ -46,11 +46,7 @@
         {
             get
             {
-                return this._char.name.Replace("(Clone)", "");
-            }
-            set
-            {
-                this._char.name = value;
+                return this._char.name.Contains("_A(Clone)") ? this._char.name.Replace("_A(Clone)", "") : this._char.name.Replace("(Clone)", "");
             }
         }
 

@@ -248,9 +248,8 @@
 
                 Directory.CreateDirectory(path);
                 return true;
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }
+            } catch { }
+
             return false;
         }
 

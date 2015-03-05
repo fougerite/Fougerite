@@ -177,10 +177,7 @@
                 decayList.Add(entity);
                 return de.DamageAmount;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch  { }
             return 0f;
         }
 
@@ -235,10 +232,7 @@
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void hijack(string name)
@@ -266,27 +260,20 @@
 
         public static void NPCHurt(ref DamageEvent e)
         {
-            try
+            HurtEvent he = new HurtEvent(ref e);
+            if ((he.Victim as NPC).Health > 0f)
             {
-                HurtEvent he = new HurtEvent(ref e);
-                if ((he.Victim as NPC).Health > 0f)
+                NPC victim = he.Victim as NPC;
+                victim.Health += he.DamageAmount;
+                if (OnNPCHurt != null)
+                    OnNPCHurt(he);
+                if (((he.Victim as NPC).Health - he.DamageAmount) <= 0f)
+                    (he.Victim as NPC).Kill();
+                else
                 {
-                    NPC victim = he.Victim as NPC;
-                    victim.Health += he.DamageAmount;
-                    if (OnNPCHurt != null)
-                        OnNPCHurt(he);
-                    if (((he.Victim as NPC).Health - he.DamageAmount) <= 0f)
-                        (he.Victim as NPC).Kill();
-                    else
-                    {
-                        NPC npc2 = he.Victim as NPC;
-                        npc2.Health -= he.DamageAmount;
-                    }
+                    NPC npc2 = he.Victim as NPC;
+                    npc2.Health -= he.DamageAmount;
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
             }
         }
 
@@ -298,10 +285,7 @@
                 if (OnNPCKilled != null)
                     OnNPCKilled(de);
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static bool PlayerConnect(NetUser user)
@@ -348,10 +332,7 @@
                     OnPlayerDisconnected(item);
 
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerGather(Inventory rec, ResourceTarget rt, ResourceGivePair rg, ref int amount)
@@ -372,10 +353,7 @@
                 rg._resourceItemDatablock = ge.Item;
                 rg.ResourceItemName = ge.Item;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerGatherWood(IMeleeWeaponItem rec, ResourceTarget rt, ref ItemDataBlock db, ref int amount, ref string name)
@@ -393,10 +371,7 @@
                 amount = ge.Quantity;
                 name = ge.Item;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerHurt(ref DamageEvent e)
@@ -429,27 +404,24 @@
                     OnPlayerHurt(he);
                 e = he.DamageEvent;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static bool PlayerKilled(ref DamageEvent de)
         {
+            bool flag = false;
             try
             {
                 DeathEvent event2 = new DeathEvent(ref de);
+                flag = event2.DropItems;
                 if (OnPlayerKilled != null)
                     OnPlayerKilled(event2);
 
-                return event2.DropItems;
+                flag = event2.DropItems;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                return false;
-            }
+            catch { }
+ 
+            return flag;
         }
 
         public static void PlayerSpawned(PlayerClient pc, Vector3 pos, bool camp)
@@ -463,10 +435,7 @@
                     OnPlayerSpawned(player, se);
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static Vector3 PlayerSpawning(PlayerClient pc, Vector3 pos, bool camp)
@@ -481,10 +450,7 @@
                 }
                 return new Vector3(se.X, se.Y, se.Z);
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
             return Vector3.zero;
         }
 
@@ -587,6 +553,7 @@
         {
             if (OnServerShutdown != null)
                 OnServerShutdown();
+
             DataStore.GetInstance().Save();
         }
 

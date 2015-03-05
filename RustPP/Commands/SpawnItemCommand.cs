@@ -56,15 +56,8 @@
                 string itemName = string.Join(" ", remain.ToArray()).MatchItemName();
                 Arguments.Args = new string[] { itemName, quantity };
                 Logger.LogDebug(string.Format("[SpawnItemCommand] terms={0}, itemName={1}, quantity={2}", string.Join(",", remain.ToArray()), itemName, quantity));
-                try
-                {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in your inventory.", quantity, itemName));
-                    inv.give(ref Arguments);
-                } 
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in your inventory.", quantity, itemName));
+                inv.give(ref Arguments);
             }
             else
             {

@@ -27,10 +27,7 @@
                         ConsoleNetworker.singleton.networkView.RPC<string>("CL_ConsoleMessage", player.PlayerClient.netPlayer, str);
                     }
                 }
-            } catch (Exception ex) {
-                Logger.LogDebug("ConsoleLog ex");
-                Logger.LogException(ex);
-            }
+            } catch { }
         }
 
         public object CreateArrayInstance(string name, int size)
@@ -121,18 +118,31 @@
 
         public static Hashtable HashtableFromFile(string path)
         {
-            using (FileStream stream = new FileStream(path, FileMode.Open)) {
-                BinaryFormatter formatter = new BinaryFormatter();
-                return (Hashtable)formatter.Deserialize(stream);
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Open))
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    return (Hashtable)formatter.Deserialize(stream);
+                }
             }
+            catch
+            {
+                return new Hashtable(); 
+            }            
         }
 
         public static void HashtableToFile(Hashtable ht, string path)
         {
-            using (FileStream stream = new FileStream(path, FileMode.Create)) {
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(stream, ht);
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(stream, ht);
+                }
             }
+            catch { }
         }
 
         public Vector3 Infront(Fougerite.Player p, float length)

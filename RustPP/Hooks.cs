@@ -11,17 +11,10 @@
     {
         public static void broadcastDeath(string victim, string killer, string weapon)
         {
-            try
+            if (Core.config.GetBoolSetting("Settings", "pvp_death_broadcast"))
             {
-                if (Core.config.GetBoolSetting("Settings", "pvp_death_broadcast"))
-                {
-                    char ch = '⊕';
-                    Util.sayAll(Core.Name, killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
+                char ch = '⊕';
+                Util.sayAll(Core.Name, killer + " " + ch.ToString() + " " + victim + " (" + weapon + ")");
             }
         }
 
@@ -30,33 +23,25 @@
             bool flag;
             if (obj.ownerID == controllable.playerClient.userID)
             {
-                return true;
+                flag = true;
             }
-            try
+            else if (obj is SleepingBag)
             {
-                SleepingBag bag1 = (SleepingBag)obj;
                 flag = false;
             }
-            catch
+            else
             {
-                try
-                {
-                    ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
-                    ArrayList list = (ArrayList)command.GetSharedDoors()[obj.ownerID];
-                    if (list == null)
-                    {
-                        return false;
-                    }
-                    if (list.Contains(controllable.playerClient.userID))
-                    {
-                        return true;
-                    }
-                    flag = false;
-                }
-                catch (Exception)
+                ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
+                ArrayList list = (ArrayList)command.GetSharedDoors()[obj.ownerID];
+                if (list == null)
                 {
                     flag = false;
                 }
+                if (list.Contains(controllable.playerClient.userID))
+                {
+                    flag = true;
+                }
+                flag = false;
             }
             return flag;
         }
@@ -183,10 +168,7 @@
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void structureKO(StructureComponent sc, DamageEvent e)

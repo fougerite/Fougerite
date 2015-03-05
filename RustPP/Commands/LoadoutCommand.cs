@@ -8,24 +8,19 @@
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            int items; 
+            int items;
             if (int.TryParse(Core.config.GetSetting("AdminLoadout", "items"), out items))
             {
-                try
+                for (int i = 1; i <= items; i++)
                 {
-                    for (int i = 1; i <= items; i++)
-                    {
-                        string name = Core.config.GetSetting("AdminLoadout", "item" + i + "_name");
-                        string amount = Core.config.GetSetting("AdminLoadout", "item" + i + "_amount");
-                        Arguments.Args = new string[] { name, amount };
-                        string newargs = Arguments.ArgsStr;
-                        inv.give(ref Arguments);
-                        Logger.LogDebug(string.Format("[Loadout] gave {0} to {1}", newargs, Arguments.argUser.displayName));
-                    }
-                } catch (Exception ex)
-                {
-                    Logger.LogException(ex);
+                    string name = Core.config.GetSetting("AdminLoadout", "item" + i + "_name");
+                    string amount = Core.config.GetSetting("AdminLoadout", "item" + i + "_amount");
+                    Arguments.Args = new string[] { name, amount };
+                    string newargs = Arguments.ArgsStr;
+                    inv.give(ref Arguments);
+                    Logger.LogDebug(string.Format("[Loadout] gave {0} to {1}", newargs, Arguments.argUser.displayName));
                 }
+
                 Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have spawned an Admin Loadout!");
             }
         }

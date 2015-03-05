@@ -97,25 +97,11 @@
             Arguments.Args = new string[] { recipName, itemName, quantity };
             Logger.LogDebug(string.Format("[GiveItemCommand] quantity={0} item={1} recipient={2}", quantity, itemName, recipName));
 
-            try
-            {
-                inv.giveplayer(ref Arguments);
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", quantity, itemName, recipName));                
-            } 
-            catch(Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-            
-            try
-            {
-                uLink.NetworkPlayer recipPlayer = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
-                Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            inv.giveplayer(ref Arguments);
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", quantity, itemName, recipName));
+
+            uLink.NetworkPlayer recipPlayer = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
+            Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
         }
     }
 }

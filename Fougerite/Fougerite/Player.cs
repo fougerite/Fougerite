@@ -110,10 +110,10 @@
                 {
                     this.justDied = true;
                 }
-            } catch (Exception ex)
+            }
+            catch
             {
                 this.invError = true;
-                Logger.LogException(ex);
             }
         }
 

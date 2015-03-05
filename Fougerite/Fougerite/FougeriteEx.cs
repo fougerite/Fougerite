@@ -180,6 +180,30 @@ public static class FougeriteEx
         if (self.Length == 0)
             return self;
 
+        if (self.Contains("WoodSpike"))
+            self = self.Replace("Wood", "");
+
+        if (self.Equals("Barricade_Fence_Deployable"))
+            self = "Wood Barricade";
+
+        if (self.Equals("SingleBed"))
+            self = "Bed";
+
+        if (self.Contains("WindowFrame"))
+            self = self.Replace("Frame", "");
+
+        if (self.Contains("DoorFrame"))
+            self = self.Replace("Frame", "way");
+
+        if (self.Equals("MetalBarsWindow"))
+            self = "Metal Window Bars";
+
+        if (self.Equals("WoodBoxLarge"))
+            self = "Large Wood Storage";
+
+        if (self.Equals("WoodBox"))
+            self = "Wood Storage Box";
+
         var queryName = from name in ItemNames
                         group name by self.BaseItem().Similarity(name) into match
                         orderby match.Key descending

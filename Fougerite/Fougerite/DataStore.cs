@@ -174,16 +174,8 @@
         {
             if (File.Exists(PATH))
             {
-                try
-                {
-                    Hashtable hashtable = Util.HashtableFromFile(PATH);
-                    this.datastore = hashtable;
-                    Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                this.datastore = Util.HashtableFromFile(PATH); ;
+                Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
             }
         }
 

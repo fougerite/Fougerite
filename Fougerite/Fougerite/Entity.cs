@@ -28,7 +28,7 @@
                 this._ownerid = (Obj as StructureComponent)._master.ownerID;
                 string clone = this.GetObject<StructureComponent>().ToString();
                 var index = clone.IndexOf("(Clone)");
-                this._name = clone.Substring(0, index).MatchItemName();
+                this._name = clone.Substring(0, index);
             }
             if (Obj is DeployableObject)
             {
@@ -41,7 +41,7 @@
                 else
                 {
                     var index = clone.IndexOf("(Clone)");
-                    this._name = clone.Substring(0, index).MatchItemName();
+                    this._name = clone.Substring(0, index);
                 }
                 var deployable = Obj as DeployableObject;
 

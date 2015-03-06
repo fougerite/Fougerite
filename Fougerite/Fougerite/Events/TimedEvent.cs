@@ -30,6 +30,18 @@
             this.Args = args;
         }
 
+        public TimedEvent(string name, double interval, bool flag)
+            : this(name, interval)
+        {
+            this._timer.AutoReset = flag;
+        }
+
+        public TimedEvent(string name, double interval, object[] args, bool flag)
+            : this(name, interval, args)
+        {
+            this._timer.AutoReset = flag;
+        }
+
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (this.OnFire != null)
@@ -54,6 +66,12 @@
             this._timer.Stop();
         }
 
+        public bool AutoReset
+        {
+            get { return this._timer.AutoReset; }
+            set { this._timer.AutoReset = value; }
+        }
+
         public object[] Args
         {
             get
@@ -66,6 +84,7 @@
             }
         }
 
+        
         public double Interval
         {
             get

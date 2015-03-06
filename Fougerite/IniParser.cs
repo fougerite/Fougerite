@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Fougerite;
 
 public class IniParser
 {
@@ -139,10 +140,9 @@ public class IniParser
 
     public bool GetBoolSetting(string sectionName, string settingName)
     {
-        if (this.GetSetting(sectionName, settingName) == null)
-            return false;
-
-        return this.GetSetting(sectionName, settingName).ToUpperInvariant() == "TRUE";
+        bool val;
+        bool.TryParse(this.GetSetting(sectionName, settingName), out val);
+        return val == true;
     }
 
     public bool isCommandOn(string cmdName)

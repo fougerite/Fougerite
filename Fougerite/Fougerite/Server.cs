@@ -1,6 +1,7 @@
 ﻿namespace Fougerite
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     public class Server
@@ -8,10 +9,9 @@
         private ItemsBlocks _items;
         private StructureMaster _serverStructs = new StructureMaster();
         public Fougerite.Data data = new Fougerite.Data();
-        private System.Collections.Generic.List<Fougerite.Player> players = new System.Collections.Generic.List<Fougerite.Player>();
+        private List<Fougerite.Player> players = new List<Fougerite.Player>();
         private static Fougerite.Server server;
         public string server_message_name = "Fougerite";
-        public Util util = new Util();
 
         public void Broadcast(string arg)
         {
@@ -37,24 +37,39 @@
             }
         }
 
-        public Fougerite.Player FindPlayer(string s)
+        public Fougerite.Player FindPlayer(string search)
         {
-            Fougerite.Player player = Fougerite.Player.FindBySteamID(s);
-            if (player != null)
+            IEnumerable<Fougerite.Player> query;
+            if (search.StartsWith("7656119"))
             {
-                return player;
+                ulong uid;
+                if (ulong.TryParse(search, out uid))
+                {
+                    query = from player in this.players
+                            where player.UID == uid
+                            select player;
+
+                    if (query.Count() == 1)
+                        return query.FirstOrDefault();
+                }
+                else
+                {
+                    query = from player in this.players
+                            group player by search.Similarity(player.SteamID) into match
+                            orderby match.Key descending
+                            select match.FirstOrDefault();
+
+                    Logger.LogDebug(string.Format("[FindPlayer] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.SteamID).ToArray<string>())));
+                    return query.FirstOrDefault();
+                }
             }
-            player = Fougerite.Player.FindByGameID(s);
-            if (player != null)
-            {
-                return player;
-            }
-            player = Fougerite.Player.FindByName(s);
-            if (player != null)
-            {
-                return player;
-            }
-            return null;
+            query = from player in this.players
+                    group player by search.Similarity(player.Name) into match
+                    orderby match.Key descending
+                    select match.FirstOrDefault();
+
+            Logger.LogDebug(string.Format("[FindPlayer] search={0} matches={1}", search, string.Join(", ", query.Select(p => p.Name).ToArray<string>())));
+            return query.FirstOrDefault();
         }
 
         public static Fougerite.Server GetServer()
@@ -72,7 +87,7 @@
             ServerSaveManager.AutoSave();
         }
 
-        public System.Collections.Generic.List<string> ChatHistoryMessages
+        public List<string> ChatHistoryMessages
         {
             get
             {
@@ -80,7 +95,7 @@
             }
         }
 
-        public System.Collections.Generic.List<string> ChatHistoryUsers
+        public List<string> ChatHistoryUsers
         {
             get
             {
@@ -100,7 +115,7 @@
             }
         }
 
-        public System.Collections.Generic.List<Fougerite.Player> Players
+        public List<Fougerite.Player> Players
         {
             get
             {
@@ -108,11 +123,13 @@
             }
         }
 
-        public StructureMaster ServerStructures
+        public List<Entity> Sleepers
         {
             get
             {
-                return this._serverStructs;
+                var query = from s in UnityEngine.Object.FindObjectsOfType<SleepingAvatar>()
+                            select new Entity(s.GetComponent<DeployableObject>());
+                return query.ToList<Entity>();
             }
         }
     }

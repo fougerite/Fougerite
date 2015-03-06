@@ -180,10 +180,7 @@
 
                 return true;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
 
             return false;
         }
@@ -220,10 +217,8 @@
                 File.WriteAllText(path, "");
                 return new IniParser(path);
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
+
             return null;
         }
 

@@ -19,7 +19,7 @@
         public readonly string Name;
         public readonly string Code;
         public readonly DirectoryInfo RootDirectory;
-        public readonly Dictionary<String, TimedEvent> Timers;
+        public readonly Dictionary<string, TimedEvent> Timers;
         private readonly string brktname = "[Jint]";
 
         public Plugin(DirectoryInfo directory, string name, string code)
@@ -36,7 +36,6 @@
                 .SetValue("DataStore", DataStore.GetInstance())
                 .SetValue("Util", Util.GetUtil())
                 .SetValue("World", World.GetWorld())
-                .SetValue("Structures", new LookUp.Structures())
                 .SetValue("Plugin", this)
                 .Execute(code);
 
@@ -249,9 +248,8 @@
 
                 Directory.CreateDirectory(path);
                 return true;
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }
+            } catch { }
+
             return false;
         }
 
@@ -263,7 +261,7 @@
 
         public string FromJsonFile(string path)
         {
-            string json = @"";
+            string json = string.Empty;
             path = ValidateRelativePath(path + ".json");
             if (File.Exists(path))
                 json = File.ReadAllText(path);

@@ -72,19 +72,31 @@
         {
             string path = GetPluginScriptPath(name);
             string[] strArray = File.ReadAllLines(path);
-            string script = "";
-            string legacy = "var Magma = Fougerite;\r\n";
-            foreach (string str1 in strArray) {
-                string str2 = str1.Replace("toLowerCase(", "Data.ToLower(").Replace("GetStaticField(", "Util.GetStaticField(").Replace("SetStaticField(", "Util.SetStaticField(").Replace("InvokeStatic(", "Util.InvokeStatic(").Replace("IsNull(", "Util.IsNull(").Replace("Datastore", "DataStore");
-                try {
-                    if (str2.Contains("new ")) {
-                        string[] strArray2 = str2.Split(new string[1] {
+            if (strArray[0].Contains("NOMANGLE", true))
+            {
+                return string.Join("\r\n", strArray) + "\r\n";
+            }
+            else
+            {
+                string script = string.Empty;
+                string legacy = "var Magma = Fougerite;\r\n";
+                foreach (string str1 in strArray)
+                {
+                    string str2 = str1.Replace("toLowerCase(", "Data.ToLower(").Replace("GetStaticField(", "Util.GetStaticField(").Replace("SetStaticField(", "Util.SetStaticField(").Replace("InvokeStatic(", "Util.InvokeStatic(").Replace("IsNull(", "Util.IsNull(").Replace("Datastore", "DataStore");
+                    try
+                    {
+                        if (str2.Contains("new "))
+                        {
+                            string[] strArray2 = str2.Split(new string[1] {
                             "new "
                         }, StringSplitOptions.None);
-                        if ((strArray2[0].Contains("\"") || strArray2[0].Contains("'")) && (strArray2[1].Contains("\"") || strArray2[1].Contains("'"))) {
-                            script = script + str2 + "\r\n";
-                            continue;
-                        } else if (str2.Contains("];")) {
+                            if ((strArray2[0].Contains("\"") || strArray2[0].Contains("'")) && (strArray2[1].Contains("\"") || strArray2[1].Contains("'")))
+                            {
+                                script = script + str2 + "\r\n";
+                                continue;
+                            }
+                            else if (str2.Contains("];"))
+                            {
                                 string str3 = str2.Split(new string[1] {
                                     "new "
                                 }, StringSplitOptions.None)[1].Split(new string[1] {
@@ -94,42 +106,50 @@
                                 string str5 = str3.Split('[')[1];
                                 string str6 = str3.Split('[')[0];
                                 str2 = str4 + "Util.CreateArrayInstance('" + str6 + "', " + str5 + ");";
-                            } else if (str2.Contains(");")) {
-                                    string str3 = str2.Split(new string[1] {
+                            }
+                            else if (str2.Contains(");"))
+                            {
+                                string str3 = str2.Split(new string[1] {
                                         "new "
                                     }, StringSplitOptions.None)[1].Split(new string[1] {
                                         ");"
                                     }, StringSplitOptions.None)[0];
-                                    string str4 = str2.Replace("new " + str3, "").Replace(");", "");
-                                    string str5 = str3.Split('(')[1];
-                                    string str6 = str3.Split('(')[0];
-                                    string str7 = str4 + "Util.CreateInstance('" + str6 + "'";
-                                    if (str5 != "")
-                                        str7 = str7 + ", " + str5;
-                                    str2 = str7 + ");";
-                                }
+                                string str4 = str2.Replace("new " + str3, "").Replace(");", "");
+                                string str5 = str3.Split('(')[1];
+                                string str6 = str3.Split('(')[0];
+                                string str7 = str4 + "Util.CreateInstance('" + str6 + "'";
+                                if (str5 != "")
+                                    str7 = str7 + ", " + str5;
+                                str2 = str7 + ");";
+                            }
+                        }
+                        script = script + str2 + "\r\n";
                     }
-                    script = script + str2 + "\r\n";
-                } catch (Exception ex) {
-                    Logger.LogException(ex);
-                    Logger.LogError(string.Format("{0} Couln't create instance at line -> {1}", brktname, str1));
+                    catch (Exception ex)
+                    {
+                        Logger.LogException(ex);
+                        Logger.LogError(string.Format("{0} Couldn't create instance at line -> {1}", brktname, str1));
+                        return legacy;
+                    }
+                }
+                if (FilterPlugin(script))
+                {
+                    Logger.LogDebug(string.Format("{0} Loaded: {1}", brktname, path));
+                    return legacy + script;
+                }
+                else
+                {
+                    Logger.LogError(string.Format("{0} SKIPPED: May not load {1} due to restrictions on the API", brktname, path));
                     return legacy;
                 }
-            }
-            if (FilterPlugin(script)) {
-                Logger.LogDebug(string.Format("{0} Loaded: {1}", brktname, path));
-                return legacy + script;
-            } else {
-                Logger.LogError(string.Format("{0} SKIPPED: May not load {1} due to restrictions on the API", brktname, path));
-                return legacy;
             }
         }
 
         public bool FilterPlugin(string script)
         {
-            string str1 = script.ToUpperInvariant();
             foreach (string str2 in filters) {
-                if (str1.Contains(str2)) {
+                if (script.Contains(str2, true))
+                {
                     Logger.LogError(string.Format("{0} Script may not contain: {1}", brktname, str2));
                     return false;
                 }

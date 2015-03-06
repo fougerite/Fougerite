@@ -48,20 +48,14 @@
             List<Administrator> match = new List<Administrator>();
             for (int i = 0; i < name.Count; i++)
             {
-                try
+                match.AddRange(Administrator.AdminList.FindAll(delegate(Administrator a)
                 {
-                    match.AddRange(Administrator.AdminList.FindAll(delegate(Administrator a) {
-                        if (i == 0)
-                            return a.DisplayName.ToUpperInvariant().Contains(name[0].ToUpperInvariant());
+                    if (i == 0)
+                        return a.DisplayName.Contains(name[0], true);
 
-                        return a.DisplayName.ToUpperInvariant().Contains(string.Join(" ", name.GetRange(0, i).ToArray()).ToUpperInvariant());
-                    })
-                    );
-                } catch (Exception ex)
-                {
-                    Logger.LogDebug("[AddFlag] match.AddRange:");
-                    Logger.LogException(ex);
-                }
+                    return a.DisplayName.Contains(string.Join(" ", name.GetRange(0, i).ToArray()), true);
+                })
+                );
             }
             if (match.Count == 0)
             {

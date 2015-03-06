@@ -12,152 +12,6 @@
         private static DataStore instance;
         public static string PATH = Path.Combine(Config.GetPublicFolder(), "FougeriteDatastore.ds");
 
-        private object StringifyIfVector3(object keyorval)
-        {
-            if (keyorval == null)
-                return keyorval;
-
-            try {
-                if (typeof(Vector3).Equals(keyorval.GetType())) {
-                    return "Vector3," +
-                    ((Vector3)keyorval).x.ToString("G9") + "," +
-                    ((Vector3)keyorval).y.ToString("G9") + "," +
-                    ((Vector3)keyorval).z.ToString("G9");
-                }
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }
-            return keyorval;
-        }
-
-        private object ParseIfVector3String(object keyorval)
-        {
-            if (keyorval == null)
-                return keyorval;
-
-            try {
-                if (typeof(string).Equals(keyorval.GetType())) {
-                    if ((keyorval as string).StartsWith("Vector3,")) {
-                        string[] v3array = (keyorval as string).Split(new char[] { ',' });
-                        Vector3 parse = new Vector3(Single.Parse(v3array[1]), 
-                                            Single.Parse(v3array[2]),
-                                            Single.Parse(v3array[3]));
-                        return parse;
-                    }
-                }
-            } catch (Exception ex) {
-                Logger.LogException(ex);
-            }          
-            return keyorval;
-        }
-
-        public bool ToIni(string inifilename = "DataStore")
-        {
-            string inipath = Path.Combine(Config.GetPublicFolder(), inifilename.RemoveChars(new char[] { '.', '/', '\\', '%', '$' }).RemoveWhiteSpaces() + ".ini");
-            File.WriteAllText(inipath, "");
-            IniParser ini = new IniParser(inipath);
-            ini.Save();
-
-            foreach (string section in this.datastore.Keys) {
-                Hashtable ht = (Hashtable)this.datastore[section];
-                foreach (object setting in ht.Keys) {
-                    try {
-                        string key = "NullReference";
-                        string val = "NullReference";
-                        if (setting != null) {
-                            if (setting.GetType().GetMethod("ToString", Type.EmptyTypes) == null) {
-                                key = "type:" + setting.GetType().ToString();
-                            } else {
-                                key = setting.ToString();
-                            }
-                        }
-
-                        if (ht[setting] != null) {
-                            if (ht[setting].GetType().GetMethod("ToString", Type.EmptyTypes) == null) {
-                                val = "type:" + ht[setting].GetType().ToString();
-                            } else {
-                                val = ht[setting].ToString();
-                            }            
-                        }
-
-                        ini.AddSetting(section, key, val);
-                    } catch (Exception ex) {
-                        Logger.LogException(ex);
-                    }
-                }
-            }
-            ini.Save();
-            return true;           
-        }
-
-        public void Add(string tablename, object key, object val)
-        {
-
-            if (key == null)
-                key = "NullReference";
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null)
-            {
-                hashtable = new Hashtable();
-                this.datastore.Add(tablename, hashtable);
-            }
-            hashtable[StringifyIfVector3(key)] = StringifyIfVector3(val);
-        }
-
-        public bool ContainsKey(string tablename, object key)
-        {
-
-            if (key == null)
-                return false;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable != null)
-            {
-                return hashtable.ContainsKey(StringifyIfVector3(key));
-            }
-            return false;
-        }
-
-        public bool ContainsValue(string tablename, object val)
-        {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable != null)
-            {
-                return hashtable.ContainsValue(StringifyIfVector3(val));
-            }
-            return false;
-        }
-
-        public int Count(string tablename)
-        {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null)
-            {
-                return 0;
-            }
-            return hashtable.Count;
-        }
-
-        public void Flush(string tablename)
-        {
-            if (((Hashtable)this.datastore[tablename]) != null)
-            {
-                this.datastore.Remove(tablename);
-            }
-        }
-
-        public object Get(string tablename, object key)
-        {
-
-            if (key == null)
-                return null;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null)
-            {
-                return null;
-            }
-            return ParseIfVector3String(hashtable[StringifyIfVector3(key)]);
-        }
-
         public static DataStore GetInstance()
         {
             if (instance == null)
@@ -167,58 +21,173 @@
             return instance;
         }
 
+        public void ToIni(string tablename, IniParser ini)
+        {
+            string nullref = "__NullReference__";
+            Hashtable ht = (Hashtable)this.datastore[tablename];
+            if (ht == null || ini == null)
+                return;
+
+            foreach (object key in ht.Keys)
+            {
+                string setting = key.ToString();
+                string val = nullref;
+                if (ht[setting] != null)
+                {
+                    float tryfloat;
+                    if (float.TryParse((string)ht[setting], out tryfloat))
+                    {
+                        val = ((float)ht[setting]).ToString("G9");
+                    } 
+                    var t = ht[setting].GetType();
+                    if (t == typeof(Vector4) || t == typeof(Vector3) || t == typeof(Vector2) || t == typeof(Quaternion) || t == typeof(Bounds))
+                    {
+                        val = ((Vector3)ht[setting]).ToString("F5");
+                    } else
+                    {
+                        val = ht[setting].ToString();
+                    }
+                }
+                ini.AddSetting(tablename, setting, val);
+            }
+            ini.Save();
+        }
+
+        public void FromIni(IniParser ini)
+        {
+            foreach (string section in ini.Sections)
+            {
+                foreach (string key in ini.EnumSection(section))
+                {
+                    string setting = ini.GetSetting(section, key);
+                    float valuef;
+                    int valuei;
+                    if (float.TryParse(setting, out valuef))
+                    {
+                        Add(section, key, valuef);
+                    } else if (int.TryParse(setting, out valuei))
+                    {
+                        Add(section, key, valuei);
+                    } else if (ini.GetBoolSetting(section, key))
+                    {
+                        Add(section, key, true);
+                    } else if (setting.Equals("False", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        Add(section, key, false);
+                    } else if (setting == "__NullReference__")
+                    {
+                        Add(section, key, null);
+                    } else
+                    {
+                        Add(section, key, ini.GetSetting(section, key));
+                    }
+                }
+            }
+        }
+
+        public void Add(string tablename, object key, object val)
+        {
+            if (key == null)
+                return;
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+            {
+                hashtable = new Hashtable();
+                this.datastore.Add(tablename, hashtable);
+            }
+            hashtable[key] = val;
+        }
+
+        public bool ContainsKey(string tablename, object key)
+        {
+            if (key == null)
+                return false;
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+                return false;
+
+            return hashtable.ContainsKey(key);
+        }
+
+        public bool ContainsValue(string tablename, object val)
+        {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+                return false;
+
+            return hashtable.ContainsValue(val);
+        }
+
+        public int Count(string tablename)
+        {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+            {
+                return 0;
+            }
+            return hashtable.Count;
+        }
+
+        public void Flush(string tablename)
+        {
+            if ((this.datastore[tablename] as Hashtable) != null)
+            {
+                this.datastore.Remove(tablename);
+            }
+        }
+
+        public object Get(string tablename, object key)
+        {
+            if (key == null)
+                return null;
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
+                return null;
+
+            return hashtable[key];
+        }
+
         public Hashtable GetTable(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            Hashtable parse = new Hashtable(hashtable.Count);
-            foreach (DictionaryEntry entry in hashtable) {
-                parse.Add(ParseIfVector3String(entry.Key), ParseIfVector3String(entry.Value));
-            }
-            return parse;
+
+            return hashtable;
         }
 
         public object[] Keys(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            List<object> parse = new List<object>(hashtable.Keys.Count);
-            foreach (object key in hashtable.Keys) {
-                parse.Add(ParseIfVector3String(key));
-            }
-            return parse.ToArray<object>();
+
+            object[] array = new object[hashtable.Keys.Count];
+            hashtable.Keys.CopyTo(array, 0);
+            return array;
         }
 
         public void Load()
         {
             if (File.Exists(PATH))
             {
-                try
-                {
-                    Hashtable hashtable = Util.HashtableFromFile(PATH);
-                    this.datastore = hashtable;
-                    Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                this.datastore = Util.HashtableFromFile(PATH); ;
+                Util.GetUtil().ConsoleLog("Fougerite DataStore Loaded", false);
             }
         }
 
         public void Remove(string tablename, object key)
         {
-
             if (key == null)
                 return;
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
+
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
             if (hashtable != null)
             {
-                hashtable.Remove(StringifyIfVector3(key));
+                hashtable.Remove(key);
             }
         }
 
@@ -233,15 +202,13 @@
 
         public object[] Values(string tablename)
         {
-            Hashtable hashtable = (Hashtable)this.datastore[tablename];
-            if (hashtable == null) {
+            Hashtable hashtable = this.datastore[tablename] as Hashtable;
+            if (hashtable == null)
                 return null;
-            }
-            List<object> parse = new List<object>(hashtable.Values.Count);
-            foreach (object val in hashtable.Values) {
-                parse.Add(ParseIfVector3String(val));
-            }
-            return parse.ToArray<object>();
+
+            object[] array = new object[hashtable.Values.Count];
+            hashtable.Values.CopyTo(array, 0);
+            return array;
         }
     }
 }

@@ -135,15 +135,8 @@
             {
                 NetUser user = NetUser.FindByUserID(administrator.UserID);
                 if (user != null)
-                {
-                    try
-                    {
-                        Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
-                    } catch (Exception ex)
-                    {
-                        Logger.LogError("[NotifyAdmins] exception:");
-                        Logger.LogException(ex);
-                    }
+                {   
+                    Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
                 }
             }
         }

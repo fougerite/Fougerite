@@ -7,23 +7,25 @@
 
     public class Zone3D
     {
-        private System.Collections.Generic.List<Vector2> _points;
+        private List<Vector2> _points;
         private bool _protected;
         private bool _pvp;
-        private System.Collections.Generic.List<Entity> tmpPoints;
+        private List<Entity> tmpPoints;
 
         public Zone3D(string name)
         {
             this.PVP = true;
             this.Protected = false;
-            this.tmpPoints = new System.Collections.Generic.List<Entity>();
-            this.Points = new System.Collections.Generic.List<Vector2>();
-            DataStore.GetInstance().Add("3DZonesList", name, this);
+            this.tmpPoints = new List<Entity>();
+            this.Points = new List<Vector2>();
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            if (!zones.ContainsKey(name))
+                zones.Add(name, this);
         }
 
         public bool Contains(Entity en)
         {
-            return this.Contains(new Vector3(en.X, en.Y, en.Z));
+            return this.Contains((en.Object as GameObject).gameObject.transform.position);
         }
 
         public bool Contains(Fougerite.Player p)
@@ -50,21 +52,17 @@
 
         public static Zone3D Get(string name)
         {
-            return (DataStore.GetInstance().Get("3DZonesList", name) as Zone3D);
+            return World.GetWorld().zones[name] as Zone3D;
         }
 
         public static Zone3D GlobalContains(Entity e)
         {
-            Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
-            if (table != null)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
-                foreach (object obj2 in table.Values)
+                if (zone.Contains(e))
                 {
-                    Zone3D zoned = obj2 as Zone3D;
-                    if (zoned.Contains(e))
-                    {
-                        return zoned;
-                    }
+                    return zone;
                 }
             }
             return null;
@@ -72,16 +70,12 @@
 
         public static Zone3D GlobalContains(Fougerite.Player p)
         {
-            Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
-            if (table != null)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
-                foreach (object obj2 in table.Values)
+                if (zone.Contains(p))
                 {
-                    Zone3D zoned = obj2 as Zone3D;
-                    if (zoned.Contains(p))
-                    {
-                        return zoned;
-                    }
+                    return zone;
                 }
             }
             return null;
@@ -118,23 +112,15 @@
             }
         }
 
-        public System.Collections.Generic.List<Entity> Entities
+        public List<Entity> Entities
         {
             get
             {
-                System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
-                foreach (Entity entity in World.GetWorld().Entities)
-                {
-                    if (this.Contains(entity))
-                    {
-                        list.Add(entity);
-                    }
-                }
-                return list;
+                return World.GetWorld().Entities;
             }
         }
 
-        public System.Collections.Generic.List<Vector2> Points
+        public List<Vector2> Points
         {
             get
             {

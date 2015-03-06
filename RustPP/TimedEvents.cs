@@ -27,18 +27,9 @@
 
         public static void savealldata()
         {
-            try
-            {
-                AvatarSaveProc.SaveAll();
-                ServerSaveManager.AutoSave();
-                Helper.CreateSaves();
-                DataStore.GetInstance().Save();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                Logger.Log("Error while auto-saving!");
-            }
+            AvatarSaveProc.SaveAll();
+            ServerSaveManager.AutoSave();
+            Helper.CreateSaves();
         }
 
         public static void shutdown()
@@ -60,17 +51,7 @@
             if (time == 0)
             {
                 Util.sayAll(Core.Name, "Server Shutdown NOW!");
-                try
-                {
-                    AvatarSaveProc.SaveAll();
-                    ServerSaveManager.AutoSave();
-                    Helper.CreateSaves();
-                    DataStore.GetInstance().Save();
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                savealldata();
                 Process.GetCurrentProcess().Kill();
             }
             else

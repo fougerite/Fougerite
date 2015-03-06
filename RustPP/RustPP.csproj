@@ -84,13 +84,7 @@
     <Compile Include="TimedEvents.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Configs\admins.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Configs\rules.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configs\whitelist.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

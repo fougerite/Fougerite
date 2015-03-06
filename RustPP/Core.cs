@@ -14,7 +14,7 @@
     public class Core
     {
         public static string Name = "Rust++";
-        public static string Version = "1.6.7";
+        public static string Version = "1.6.8";
         public static IniParser config;
         public static PList blackList = new PList();
         public static PList whiteList = new PList();
@@ -48,22 +48,15 @@
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
             {
                 SerializableDictionary<ulong, List<ulong>> doorsDict;
-                try
+                doorsDict = Helper.ObjectFromXML<SerializableDictionary<ulong, List<ulong>>>(RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
+                Hashtable doorsSave = new Hashtable();
+                foreach (KeyValuePair<ulong, List<ulong>> kvp in doorsDict)
                 {
-                    doorsDict = Helper.ObjectFromXML<SerializableDictionary<ulong, List<ulong>>>(RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
-                    Hashtable doorsSave = new Hashtable();
-                    foreach (KeyValuePair<ulong, List<ulong>> kvp in doorsDict)
-                    {
-                        ArrayList arr = new ArrayList(kvp.Value);
-                        doorsSave.Add(kvp.Key, arr);
-                    }
-                    command.SetSharedDoors(doorsSave);
-                    success = true;
-                } catch (Exception ex)
-                {
-                    Logger.LogError(string.Format("[{0} Core.Init] exception loading doorsSave.xml", Core.Name));
-                    Logger.LogException(ex);
+                    ArrayList arr = new ArrayList(kvp.Value);
+                    doorsSave.Add(kvp.Key, arr);
                 }
+                command.SetSharedDoors(doorsSave);
+                success = true;
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")) && !success)
                 command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
@@ -91,16 +84,9 @@
             success = false;
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
             {
-                try
-                {
-                    SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
-                    userCache = new Dictionary<ulong, string>(userDict);
-                    success = true;
-                } catch (Exception ex)
-                {
-                    Logger.LogError(string.Format("[{0} Core.Init] exception loading userCache.xml", Core.Name));
-                    Logger.LogException(ex);
-                }
+                SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                userCache = new Dictionary<ulong, string>(userDict);
+                success = true;
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")) && !success)
             {

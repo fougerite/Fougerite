@@ -1,0 +1,89 @@
+Fougerite.Player - Static Methods
+public static int LD(string s, string t)
+// returns an integer indicating the Levenshtein Distance between the two strings passed
+// It is equal to the number of edits = deletions/insertions or changes to a single letter =
+// which would be needed to transform one string into the other. All the FindBy* methods use it
+// to allow "fuzzy" matching of player names.  Partial names and even misspelled names (one error)
+// are tolerated and the best match is returned
+public static Fougerite.Player Player.FindBySteamID(string uid)
+public static Fougerite.Player Player.FindByGameID(string uid)
+public static Fougerite.Player Player.FindByName(string search)
+public static Fougerite.Player Player.FindByNetworkPlayer(uLink.NetworkPlayer np)
+public static Fougerite.Player Player.FindByPlayerClient(PlayerClient pc)
+
+Fougerite.Player - Instance Methods
+public Fougerite.Player Player.Find(string search)
+public bool HasBlueprint(BlueprintDataBlock dataBlock)
+public void Player.InventoryNotice(string arg)
+public void Player.Kill()
+public void Player.Message(string arg)
+public void Player.MessageFrom(string playername, string arg)
+public void Player.Notice(string arg)
+public void Player.Notice(string icon, string text, float duration = 4f)
+public void Player.SendCommand(string cmd)
+public bool Player.TeleportTo(Fougerite.Player p)
+public bool Player.TeleportTo(Fougerite.Player p, float distance = 1.5f)
+// TeleportTo with a Player as argument places the teleportee 1.5m in front of the target player (default) or other distance as specified
+// If teleportee is Player.Admin and the target player is non-Admin the admin teleportee is place 1.5m (default) behind the target player
+// It uses SafeTeleport underneath, and so returns true if the player was safely teleported, false if it was aborted for safety
+public bool Player.SafeTeleportTo(float x, float y, float z)
+public bool Player.SafeTeleportTo(float x, float z)
+public bool Player.SafeTeleportTo(Vector3 target)
+// SafeTeleportTo returns true if the player was teleported, false if the teleport was aborted for safety
+public bool Player.TeleportTo(float x, float y, float z)
+public bool Player.TeleportTo(Vector3 target)
+// RustServerManagement.TeleportPlayerToWorld returns true for success, and so all TeleportTo methods now pass that back
+public bool Player.Admin
+public ulong Player.UID
+// the unsigned long integer value of the Steam ID.  Only useful for Python plugins.
+public string Player.GameID
+public string Player.SteamID
+public float Player.Health
+public PlayerInv Player.Inventory
+public string Player.IP
+public bool Player.IsBleeding
+public bool Player.IsCold
+public bool Player.IsInjured
+public Vector3 Player.Location
+public string Player.Name
+public int Player.Ping
+public PlayerClient Player.PlayerClient
+public long Player.TimeOnline
+public float Player.X
+public float Player.Y
+public float Player.Z
+
+Fougerite.Entity - Instance Methods
+public readonly bool hasInventory
+// true for Furnace, Campfire, Storage Boxes, Stash, Repair Bench
+public void ChangeOwner(Fougerite.Player p)
+public void Destroy()
+public List<Entity> GetLinkedStructs()
+// returns a List of StructureComponents if Entity contains a StructureComponent, StructureMaster, or
+// any deployable object deployed on a structure.  The List is empty and List.Count is zero if there
+// are no linked structures (previous Fougerite versions returned a null List)
+public TakeDamage GetTakeDamage()
+public bool IsDeployableObject()
+public bool IsStructure()
+public bool IsStructureMaster()
+// StructureMaster is newly supported by Entity in 1.0.7C and later
+public bool IsSleeper()
+// previously supported, but now distinguishable from others
+public bool IsFireBarrel()
+// previously supported, but now distinguishable from others
+public void SetDecayEnabled(bool c)
+// this method does nothing anymore, and will soon be deprecated
+public void UpdateHealth()
+public Fougerite.Player Creator
+public string OwnerID
+public string CreatorID
+public float Health
+public int InstanceID
+public EntityInv Inventory
+public string Name
+public object Object
+public Fougerite.Player Owner
+public Vector3 Location
+public float X
+public float Y
+public float Z

@@ -50,15 +50,7 @@
             ConfigFile = Path.Combine(ConfigsFolder, "Rust++.cfg");
 
             Core.Init();
-
-            try
-            {
-                Core.config = new IniParser(ConfigFile);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            Core.config = new IniParser(ConfigFile);
 
             if (Core.config == null)
             {
@@ -227,13 +219,7 @@
             {   
                 Fougerite.Hooks.talkerTimers.Add(p.userID, Environment.TickCount);
             }
-            try
-            {
-                Notice.Inventory(player, "☎ " + p.netUser.displayName);
-            } catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            Notice.Inventory(player, "☎ " + p.netUser.displayName);
         }
 
         void ServerShutdown()

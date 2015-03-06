@@ -3,6 +3,7 @@
     using Facepunch.Utility;
     using Fougerite.Events;
     using Rust;
+    using RustProto;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -107,7 +108,7 @@
                 Logger.ChatLog(quotedName, quotedMessage);               
                 var chatstr = new ChatString(quotedMessage);
                 if(OnChat != null)
-                    OnChat(new Player(arg.argUser.playerClient), ref chatstr);
+                    OnChat(Fougerite.Player.FindByPlayerClient(arg.argUser.playerClient), ref chatstr);
 
                 string newchat = Facepunch.Utility.String.QuoteSafe(chatstr.NewText.Substring(1, chatstr.NewText.Length - 2)).Replace("\\\"", "" + '\u0022');
 
@@ -122,11 +123,18 @@
 
         public static bool ConsoleReceived(ref ConsoleSystem.Arg a)
         {
-
+            StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
             bool external = a.argUser == null;
             bool adminRights = (a.argUser != null && a.argUser.admin) || external;
 
-            if ((a.Class.ToUpperInvariant() == "FOUGERITE") && (a.Function.ToUpperInvariant() == "RELOAD")) {
+            string userid = "[external][external]";
+            if (adminRights && !external)
+                userid = string.Format("[{0}][{1}]", a.argUser.displayName, a.argUser.userID.ToString());
+
+            string logmsg = string.Format("[ConsoleReceived] userid={0} adminRights={1} command={2}.{3} args={4}", userid, adminRights.ToString(), a.Class, a.Function, (a.HasArgs(1) ? a.ArgsStr : "none"));
+            Logger.LogDebug(logmsg);
+
+            if (a.Class.Equals("fougerite", ic) && a.Function.Equals("reload", ic)) {
                 if (adminRights) {
                     ModuleManager.ReloadModules();
                     a.ReplyWith("Fougerite: Reloaded!");
@@ -135,10 +143,9 @@
                 OnConsoleReceived(ref a, external);
 
             if (string.IsNullOrEmpty(a.Reply))
-                a.ReplyWith("Fougerite: " + a.Class + "." + a.Function + " was executed!");
+                a.ReplyWith(string.Format("Fougerite: {0}.{1} was executed!", a.Class, a.Function));
 
             return true;
-
         }
 
         public static bool CheckOwner(DeployableObject obj, Controllable controllable)
@@ -151,11 +158,13 @@
                 OnDoorUse(Fougerite.Player.FindByPlayerClient(controllable.playerClient), de);
 
             return de.Open;
-           
         }
 
         public static float EntityDecay(object entity, float dmg)
         {
+            if (entity == null)
+                return 0f;
+
             try
             {
                 DecayEvent de = new DecayEvent(new Entity(entity), ref dmg);
@@ -168,10 +177,7 @@
                 decayList.Add(entity);
                 return de.DamageAmount;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch  { }
             return 0f;
         }
 
@@ -186,6 +192,9 @@
 
         public static void EntityHurt(object entity, ref DamageEvent e)
         {
+            if (entity == null)
+                return;
+
             try
             {
                 HurtEvent he = new HurtEvent(ref e, new Entity(entity));
@@ -223,10 +232,7 @@
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void hijack(string name)
@@ -254,27 +260,20 @@
 
         public static void NPCHurt(ref DamageEvent e)
         {
-            try
+            HurtEvent he = new HurtEvent(ref e);
+            if ((he.Victim as NPC).Health > 0f)
             {
-                HurtEvent he = new HurtEvent(ref e);
-                if ((he.Victim as NPC).Health > 0f)
+                NPC victim = he.Victim as NPC;
+                victim.Health += he.DamageAmount;
+                if (OnNPCHurt != null)
+                    OnNPCHurt(he);
+                if (((he.Victim as NPC).Health - he.DamageAmount) <= 0f)
+                    (he.Victim as NPC).Kill();
+                else
                 {
-                    NPC victim = he.Victim as NPC;
-                    victim.Health += he.DamageAmount;
-                    if (OnNPCHurt != null)
-                        OnNPCHurt(he);
-                    if (((he.Victim as NPC).Health - he.DamageAmount) <= 0f)
-                        (he.Victim as NPC).Kill();
-                    else
-                    {
-                        NPC npc2 = he.Victim as NPC;
-                        npc2.Health -= he.DamageAmount;
-                    }
+                    NPC npc2 = he.Victim as NPC;
+                    npc2.Health -= he.DamageAmount;
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
             }
         }
 
@@ -286,10 +285,7 @@
                 if (OnNPCKilled != null)
                     OnNPCKilled(de);
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static bool PlayerConnect(NetUser user)
@@ -298,17 +294,26 @@
 
             if (user.playerClient == null) {
                 Logger.LogDebug("PlayerConnect user.playerClient is null");
-                return false;
+                return connected;
             }
-            Fougerite.Player item = new Fougerite.Player(user.playerClient);
-            Fougerite.Server.GetServer().Players.Add(item);
-            Logger.LogDebug(string.Format("User Connected: {0} ({1} | {2})", item.Name, item.SteamID.ToString(), item.PlayerClient.netPlayer.ipAddress));
+
+            Fougerite.Server server = Fougerite.Server.GetServer();
+            Fougerite.Player player = new Fougerite.Player(user.playerClient);
+            if (server.Players.Contains(player))
+            {
+                Logger.LogError(string.Format("[PlayerConnect] Server.Players already contains {0} {1}", player.Name, player.SteamID));
+                connected = user.connected;
+                return connected;
+            }
+            server.Players.Add(player);
+
             if (OnPlayerConnected != null)
-                OnPlayerConnected(item);
+                OnPlayerConnected(player);
 
             connected = user.connected;
+
             if (Fougerite.Config.GetBoolValue("Fougerite", "tellversion"))
-                item.Message("This server is powered by Fougerite v." + Bootstrap.Version + "!");
+                player.Message(string.Format("This server is powered by Fougerite v.{0}!", Bootstrap.Version));
 
             return connected;
         }
@@ -325,11 +330,9 @@
                 Logger.LogDebug("User Disconnected: " + item.Name + " (" + item.SteamID + ")");
                 if (OnPlayerDisconnected != null)
                     OnPlayerDisconnected(item);
+
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerGather(Inventory rec, ResourceTarget rt, ResourceGivePair rg, ref int amount)
@@ -350,10 +353,7 @@
                 rg._resourceItemDatablock = ge.Item;
                 rg.ResourceItemName = ge.Item;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerGatherWood(IMeleeWeaponItem rec, ResourceTarget rt, ref ItemDataBlock db, ref int amount, ref string name)
@@ -371,10 +371,7 @@
                 amount = ge.Quantity;
                 name = ge.Item;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static void PlayerHurt(ref DamageEvent e)
@@ -407,27 +404,24 @@
                     OnPlayerHurt(he);
                 e = he.DamageEvent;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static bool PlayerKilled(ref DamageEvent de)
         {
+            bool flag = false;
             try
             {
                 DeathEvent event2 = new DeathEvent(ref de);
+                flag = event2.DropItems;
                 if (OnPlayerKilled != null)
                     OnPlayerKilled(event2);
 
-                return event2.DropItems;
+                flag = event2.DropItems;
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                return false;
-            }
+            catch { }
+ 
+            return flag;
         }
 
         public static void PlayerSpawned(PlayerClient pc, Vector3 pos, bool camp)
@@ -441,10 +435,7 @@
                     OnPlayerSpawned(player, se);
                 }
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
         }
 
         public static Vector3 PlayerSpawning(PlayerClient pc, Vector3 pos, bool camp)
@@ -459,10 +450,7 @@
                 }
                 return new Vector3(se.X, se.Y, se.Z);
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            catch { }
             return Vector3.zero;
         }
 
@@ -565,6 +553,7 @@
         {
             if (OnServerShutdown != null)
                 OnServerShutdown();
+
             DataStore.GetInstance().Save();
         }
 

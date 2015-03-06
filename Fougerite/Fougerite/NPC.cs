@@ -46,12 +46,25 @@
         {
             get
             {
-                return this._char.name.Replace("(Clone)", "");
+                return this._char.name.Contains("_A(Clone)") ? this._char.name.Replace("_A(Clone)", "") : this._char.name.Replace("(Clone)", "");
             }
-            set
-            {
-                this._char.name = value;
-            }
+        }
+
+        public Vector3 Location
+        {
+            get { return this._char.transform.position; }
+        }
+        public float X
+        {
+            get { return this._char.transform.position.x; }
+        }
+        public float Y
+        {
+            get { return this._char.transform.position.y; }
+        }
+        public float Z
+        {
+            get { return this._char.transform.position.z; }
         }
     }
 }

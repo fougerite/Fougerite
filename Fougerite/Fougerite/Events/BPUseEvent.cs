@@ -1,16 +1,17 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
 
     public class BPUseEvent
     {
         private BlueprintDataBlock _bdb;
         private bool _cancel;
+        private IBlueprintItem _item;
 
-        public BPUseEvent(BlueprintDataBlock bdb)
+        public BPUseEvent(BlueprintDataBlock bdb, IBlueprintItem item)
         {
             this.DataBlock = bdb;
             this.Cancel = false;
+            this._item = item;
         }
 
         public bool Cancel
@@ -34,6 +35,14 @@
             set
             {
                 this._bdb = value;
+            }
+        }
+
+        public IBlueprintItem Item
+        {
+            get
+            {
+                return this._item;
             }
         }
 

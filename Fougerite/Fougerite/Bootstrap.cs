@@ -1,16 +1,15 @@
 namespace Fougerite
 {
-    using Facepunch;
-    using Rust.Steam;
     using System;
     using System.IO;
-    using System.Timers;
-    using System.Text;
     using UnityEngine;
+    using UnityEngine.Cloud.Analytics;
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.8";
+        public static string Version = "1.1.2";
+        public static bool CR = false;
+        public static bool BI = false;
 
         public static void AttachBootstrap()
         {
@@ -38,6 +37,14 @@ namespace Fougerite
             if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
                 Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
                 return false;
+            }
+            if (Fougerite.Config.GetValue("Fougerite", "RemovePlayersFromCache") != null)
+            {
+                CR = Fougerite.Config.GetBoolValue("Fougerite", "RemovePlayersFromCache");
+            }
+            if (Fougerite.Config.GetValue("Fougerite", "BanOnInvalidPacket") != null)
+            {
+                BI = Fougerite.Config.GetBoolValue("Fougerite", "BanOnInvalidPacket");
             }
             if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {

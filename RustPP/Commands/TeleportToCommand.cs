@@ -11,10 +11,27 @@
 
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
+            if (ChatArguments.Length == 3)
+            {
+                float n, n2, n3;
+                bool b = float.TryParse(ChatArguments[0], out n);
+                bool b2 = float.TryParse(ChatArguments[1], out n2);
+                bool b3 = float.TryParse(ChatArguments[2], out n3);
+                if (b && b2 && b3)
+                {
+                    Fougerite.Player plr = Fougerite.Server.Cache[Arguments.argUser.userID];
+                    if (plr != null)
+                    {
+                        plr.TeleportTo(n, n2, n3);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported to the coords!");
+                        return;
+                    }
+                }
+            }
             string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
             if (playerName == string.Empty)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere playerName");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tpto playerName");
                 return;
             } 
             List<string> list = new List<string>();

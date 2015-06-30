@@ -1,6 +1,5 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
     using UnityEngine;
 
     public class SpawnEvent

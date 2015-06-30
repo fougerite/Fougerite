@@ -1,7 +1,5 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
-
     public class GatherEvent
     {
         private string _item;
@@ -9,6 +7,8 @@
         private int _qty;
         private string _type;
         private ResourceTarget res;
+        private ItemDataBlock dataBlock = null;
+        private ResourceGivePair resourceGivePair = null;
 
         public GatherEvent(ResourceTarget r, ItemDataBlock db, int qty)
         {
@@ -16,6 +16,7 @@
             this._qty = qty;
             this._item = db.name;
             this._type = "Tree";
+            this.dataBlock = db;
             this.Override = false;
         }
 
@@ -25,6 +26,7 @@
             this._qty = qty;
             this._item = gp.ResourceItemDataBlock.name;
             this._type = this.res.type.ToString();
+            this.resourceGivePair = gp;
             this.Override = false;
         }
 
@@ -85,6 +87,30 @@
             get
             {
                 return this._type;
+            }
+        }
+
+        public ResourceTarget ResourceTarget
+        {
+            get
+            {
+                return this.res;
+            }
+        }
+
+        public ItemDataBlock ItemDataBlock
+        {
+            get
+            {
+                return this.dataBlock;
+            }
+        }
+
+        public ResourceGivePair ResourceGivePair
+        {
+            get
+            {
+                return this.resourceGivePair;
             }
         }
     }

@@ -4,12 +4,40 @@
 
     public class ChatString
     {
-        public string NewText;
+        private string ntext;
         private string origText;
 
         public ChatString(string str)
         {
-            this.NewText = this.origText = str;
+            this.ntext = this.origText = str;
+        }
+
+        public string OriginalMessage
+        {
+            get
+            {
+                return origText;
+            }
+        }
+
+        public string NewText
+        {
+            get
+            {
+                return ntext;
+            }
+            set
+            {
+                // Rust doesn't like empty strings on chat
+                if (string.IsNullOrEmpty(value))
+                {
+                    ntext = "          ";
+                }
+                else
+                {
+                    ntext = value;
+                }
+            }
         }
 
         public bool Contains(string str)
@@ -37,6 +65,7 @@
             return this.origText.Substring(start, length);
         }
 
+        [Obsolete("Use OriginalMessage instead", false)]
         public override string ToString()
         {
             return this.origText;

@@ -1,6 +1,6 @@
-﻿namespace Fougerite
+﻿
+namespace Fougerite
 {
-    using System;
     using System.Linq;
     using System.Collections.Generic;
     using UnityEngine;
@@ -82,9 +82,19 @@
         {
             if (this.IsDeployableObject() && !(bool)(this.Object as DeployableObject).GetComponent<SleepingAvatar>())
                 this.GetObject<DeployableObject>().SetupCreator(p.PlayerClient.controllable);
-
-            if (this.IsStructureMaster())
+            else if (this.IsStructureMaster())
                 this.GetObject<StructureMaster>().SetupCreator(p.PlayerClient.controllable);
+            else if (this.IsStructure())
+            {
+                foreach (var st in GetLinkedStructs())
+                {
+                    if (st.GetObject<StructureMaster>() != null)
+                    {
+                        this.GetObject<StructureMaster>().SetupCreator(p.PlayerClient.controllable);
+                        break;
+                    }
+                }
+            }
         }
 
         public void Destroy()
@@ -277,6 +287,39 @@
                 if (this.IsStructureMaster())
                 {
                     float sum = this.GetObject<StructureMaster>()._structureComponents.Sum<StructureComponent>(s => s.GetComponent<TakeDamage>().health);
+                    return sum;
+                }
+                return 0f;
+            }
+            set
+            {
+                if (this.IsDeployableObject())
+                {
+                    this.GetObject<DeployableObject>().GetComponent<TakeDamage>().health = value;
+                }
+                else if (this.IsStructure())
+                {
+                    this.GetObject<StructureComponent>().GetComponent<TakeDamage>().health = value;
+                }
+                this.UpdateHealth();
+            }
+        }
+
+        public float MaxHealth
+        {
+            get
+            {
+                if (this.IsDeployableObject())
+                {
+                    return this.GetObject<DeployableObject>().GetComponent<TakeDamage>().maxHealth;
+                }
+                if (this.IsStructure())
+                {
+                    return this.GetObject<StructureComponent>().GetComponent<TakeDamage>().maxHealth;
+                }
+                if (this.IsStructureMaster())
+                {
+                    float sum = this.GetObject<StructureMaster>()._structureComponents.Sum<StructureComponent>(s => s.GetComponent<TakeDamage>().maxHealth);
                     return sum;
                 }
                 return 0f;

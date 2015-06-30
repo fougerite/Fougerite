@@ -1,6 +1,5 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
 
     public class DeathEvent : HurtEvent
     {

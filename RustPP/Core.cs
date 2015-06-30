@@ -1,4 +1,6 @@
-﻿namespace RustPP
+﻿using System.Runtime.CompilerServices;
+
+namespace RustPP
 {
     using Fougerite;
     using RustPP.Commands;
@@ -14,7 +16,7 @@
     public class Core
     {
         public static string Name = "Rust++";
-        public static string Version = "1.6.8";
+        public static string Version = "1.6.9";
         public static IniParser config;
         public static PList blackList = new PList();
         public static PList whiteList = new PList();
@@ -82,14 +84,39 @@
                 Administrator.AdminList = Helper.ObjectFromXML<List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
             }
             success = false;
+            bool clearer = false;
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
             {
-                SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
-                userCache = new Dictionary<ulong, string>(userDict);
-                success = true;
+                FileInfo fi = new FileInfo(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                float mega = (fi.Length / 1024f) / 1024f;
+                if (mega > 0.65)
+                {
+                    try
+                    {
+                        //string n = Path.Combine(RustPPModule.ConfigsFolder, "userCache-OLD-" + DateTime.Now.ToShortDateString() + ".xml");
+                        System.IO.File.Move(RustPPModule.GetAbsoluteFilePath("userCache.xml"),
+                            Path.Combine(RustPPModule.ConfigsFolder,
+                                "userCache-OLD-" + DateTime.Now.ToShortDateString() + ".xml"));
+                        clearer = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("Rust++ failed to copy the usercache file.");
+                    }
+                }
+                else 
+                { 
+                    SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                    userCache = new Dictionary<ulong, string>(userDict);
+                    success = true;
+                }
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")) && !success)
             {
+                if (clearer)
+                {
+                    File.WriteAllText(RustPPModule.GetAbsoluteFilePath("cache.rpp"), string.Empty);
+                }
                 userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
                 if (!File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
                     Helper.ObjectToXML<SerializableDictionary<ulong, string>>(new SerializableDictionary<ulong, string>(userCache), RustPPModule.GetAbsoluteFilePath("userCache.xml"));

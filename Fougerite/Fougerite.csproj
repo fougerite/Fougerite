@@ -30,6 +30,17 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <None Include="SQLite.cssss" />
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MoonSharp.Interpreter">
+      <HintPath>..\References\MoonSharp.Interpreter.dll</HintPath>
+    </Reference>
+    <Reference Include="RustPP">
+      <HintPath>..\bin\modules\RustPP\RustPP.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\References\UnityEngine.dll</HintPath>
@@ -38,6 +49,13 @@
       <HintPath>..\References\System.Core.dll</HintPath>
     </Reference>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Fougerite\Events\PlayerApprovalEvent.cs" />
+    <Compile Include="Fougerite\Events\SteamDenyEvent.cs" />
+    <Compile Include="Fougerite\Events\CraftingEvent.cs" />
+    <Compile Include="Fougerite\Events\InventoryModEvent.cs" />
+    <Compile Include="Fougerite\FInventory.cs" />
+    <Compile Include="Fougerite\RustPPExtension.cs" />
+    <Compile Include="Fougerite\Sleeper.cs" />
     <Compile Include="Fougerite\Config.cs" />
     <Compile Include="Fougerite\Module.cs" />
     <Compile Include="Fougerite\ModuleContainer.cs" />
@@ -72,9 +90,6 @@
     <Compile Include="IniParser.cs" />
     <Compile Include="Fougerite\Util.cs" />
     <Compile Include="Fougerite\Bootstrap.cs" />
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\References\Assembly-CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="Facepunch.ID">
       <HintPath>..\References\Facepunch.ID.dll</HintPath>
     </Reference>
@@ -87,6 +102,9 @@
     <Reference Include="System.Xml" />
     <Compile Include="Fougerite\Events\DestroyEvent.cs" />
     <Compile Include="Fougerite\SerializableDictionary.cs" />
+    <Reference Include="UnityEngine.Cloud.Analytics">
+      <HintPath>..\..\IronPythonModule-master\IronPythonModule\ref\UnityEngine.Cloud.Analytics.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Fougerite.cfg">

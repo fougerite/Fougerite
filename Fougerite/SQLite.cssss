@@ -1,0 +1,40 @@
+﻿using System.Data.SQLite;
+using System.IO;
+
+namespace Fougerite
+{
+    public class SQLite
+    {
+        private SQLiteConnection m_dbConnection;
+        public string SQLitePath;
+
+        public SQLite()
+        {
+            SQLitePath = Util.GetRootFolder() + "\\Save\\SQLite\\";
+            FileInfo f = new FileInfo(SQLitePath);
+            if (!f.Exists) f.Create();
+        }
+
+        public void createNewDatabase(string name)
+        {
+            SQLiteConnection.CreateFile(SQLitePath + name);
+        }
+
+        public void connectToDatabase(string connection)
+        {
+            m_dbConnection = new SQLiteConnection(connection);
+            m_dbConnection.Open();
+        }
+
+        public SQLiteCommand GetReturnCommand(string cmd)
+        {
+            SQLiteCommand command = new SQLiteCommand(cmd, m_dbConnection);
+            return command;
+        }
+
+        public SQLiteConnection SQLiteConnection
+        {
+            get { return this.m_dbConnection; }
+        }
+    }
+}

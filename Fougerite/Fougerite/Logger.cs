@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using UnityEngine;
-
+﻿
 namespace Fougerite
 {
+    using System;
+    using System.IO;
+    using UnityEngine;
     public static class Logger
     {
         struct Writer

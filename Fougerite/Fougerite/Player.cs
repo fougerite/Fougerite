@@ -1,19 +1,18 @@
-﻿namespace Fougerite
+﻿
+namespace Fougerite
 {
-    using Facepunch.Utility;
     using Fougerite.Events;
-    using Rust;
     using System;
     using System.Linq;
     using System.Timers;
     using System.Collections.Generic;
-    using System.Runtime.InteropServices;
-    using uLink;
     using UnityEngine;
+    using RustPP.Permissions;
 
     public class Player
     {
         private long connectedAt;
+        private long connectedAt2;
         private PlayerInv inv;
         private bool invError;
         private bool justDied;
@@ -32,18 +31,85 @@
             this.justDied = true;
             this.ourPlayer = client;
             this.connectedAt = DateTime.UtcNow.Ticks;
+            this.connectedAt2 = System.Environment.TickCount;
             this.uid = client.netUser.userID;
             this.name = client.netUser.displayName;
             this.ipaddr = client.netPlayer.externalIP;
             this.FixInventoryRef();
         }
 
+        public bool IsOnline
+        {
+            get
+            {
+                if (this.ourPlayer != null)
+                {
+                    if (this.ourPlayer.netUser != null)
+                    {
+                        if (this.ourPlayer.netUser.connected && Fougerite.Server.GetServer().Players.Contains(this))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        public bool IsAlive
+        {
+            get
+            {
+                if (this.IsOnline)
+                {
+                    return this.PlayerClient.controllable.alive;
+                }
+                return false;
+            }
+        }
+
+        public long ConnectedAt
+        {
+            get { return this.connectedAt; }
+        }
+
+        public long ConnectedAt2
+        {
+            get { return this.connectedAt2; }
+        }
+
+        public void Damage(float dmg)
+        {
+            if (this.IsOnline)
+            {
+                TakeDamage.HurtSelf(this.PlayerClient.controllable.character, dmg);
+            }
+        }
+
+        public void OnConnect(NetUser user)
+        {
+            this.justDied = true;
+            this.ourPlayer = user.playerClient;
+            this.connectedAt = DateTime.UtcNow.Ticks;
+            this.name = user.displayName;
+            this.ipaddr = user.networkPlayer.externalIP;
+            this.FixInventoryRef();
+        }
+
+        public void OnDisconnect()
+        {
+            this.justDied = false;
+        }
+
         public void Disconnect()
         {
-            NetUser netUser = this.ourPlayer.netUser;
-            if (netUser.connected && (netUser != null))
+            if (this.IsOnline)
             {
-                netUser.Kick(NetError.NoError, true);
+                NetUser netUser = this.ourPlayer.netUser;
+                if (netUser.connected && (netUser != null))
+                {
+                    netUser.Kick(NetError.NoError, true);
+                }
             }
         }
 
@@ -75,8 +141,8 @@
         public static Fougerite.Player FindByNetworkPlayer(uLink.NetworkPlayer np)
         {
             var query = from player in Fougerite.Server.GetServer().Players
-                                 where player.PlayerClient.netPlayer == np
-                                 select player;
+                        where player.PlayerClient.netPlayer == np
+                        select player;
             return query.FirstOrDefault();
         }
 
@@ -93,20 +159,12 @@
             Hooks.OnPlayerKilled += new Hooks.KillHandlerDelegate(this.Hooks_OnPlayerKilled);
         }
 
-        public bool HasBlueprint(BlueprintDataBlock dataBlock)
-        {
-            PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
-            if (invent.KnowsBP(dataBlock))
-                return true;
-            return false;
-        }
-
         private void Hooks_OnPlayerKilled(DeathEvent de)
         {
             try
             {
                 Fougerite.Player victim = de.Victim as Fougerite.Player;
-                if (victim.GameID == this.GameID)
+                if (victim.UID == this.UID)
                 {
                     this.justDied = true;
                 }
@@ -119,169 +177,256 @@
 
         public void InventoryNotice(string arg)
         {
-            Rust.Notice.Inventory(this.ourPlayer.netPlayer, arg);
+            if (this.IsOnline)
+            {
+                Rust.Notice.Inventory(this.ourPlayer.netPlayer, arg);
+            }
         }
 
         public void Kill()
         {
-            TakeDamage.KillSelf(this.ourPlayer.controllable.character, null);
+            if (this.IsOnline)
+            {
+                TakeDamage.KillSelf(this.ourPlayer.controllable.character, null);
+            }
         }
 
         public void Message(string arg)
         {
-            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            if (this.IsOnline)
+            {
+                this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(Fougerite.Server.GetServer().server_message_name) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            }
         }
 
         public void MessageFrom(string playername, string arg)
         {
-            this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(playername) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            if (this.IsOnline)
+            {
+                this.SendCommand("chat.add " + Facepunch.Utility.String.QuoteSafe(playername) + " " + Facepunch.Utility.String.QuoteSafe(arg));
+            }
         }
 
         public void Notice(string arg)
         {
-            Rust.Notice.Popup(this.ourPlayer.netPlayer, "!", arg, 4f);
+            if (this.IsOnline)
+            {
+                Rust.Notice.Popup(this.ourPlayer.netPlayer, "!", arg, 4f);
+            }
         }
 
         public void Notice(string icon, string text, float duration = 4f)
         {
-            Rust.Notice.Popup(this.ourPlayer.netPlayer, icon, text, duration);
+            if (this.IsOnline)
+            {
+                Rust.Notice.Popup(this.ourPlayer.netPlayer, icon, text, duration);
+            }
         }
 
         public void SendCommand(string cmd)
         {
-            ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, cmd);
+            if (this.IsOnline)
+            {
+                ConsoleNetworker.SendClientCommand(this.ourPlayer.netPlayer, cmd);
+            }
         }
 
         public bool TeleportTo(Fougerite.Player p)
         {
-            return this.TeleportTo(p, 1.5f);
+            if (this.IsOnline)
+            {
+                return this.TeleportTo(p, 1.5f);
+            }
+
+            return false;
         }
 
         public bool TeleportTo(Fougerite.Player p, float distance = 1.5f)
-        { 
-            if (this == p) // lol
-                return false;
+        {
+            if (this.IsOnline)
+            {
+                if (this == p) // lol
+                    return false;
 
-            Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
-            Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
-            return this.SafeTeleportTo(target);
+                Transform transform = p.PlayerClient.controllable.transform;                                            // get the target player's transform
+                Vector3 target = transform.TransformPoint(new Vector3(0f, 0f, (this.Admin ? -distance : distance)));    // rcon admin teleports behind target player
+                return this.SafeTeleportTo(target);
+            }
+            return false;
         }
 
         public bool SafeTeleportTo(float x, float y, float z)
         {
-            return this.SafeTeleportTo(new Vector3(x, y, z));
+            if (this.IsOnline)
+            {
+                return this.SafeTeleportTo(new Vector3(x, y, z));
+            }
+
+            return false;
         }
 
         public bool SafeTeleportTo(float x, float z)
         {
-            return this.SafeTeleportTo(new Vector3(x, 0f, z));
+            if (this.IsOnline)
+            {
+                return this.SafeTeleportTo(new Vector3(x, 0f, z));
+            }
+
+            return false;
         }
 
         public bool SafeTeleportTo(Vector3 target)
         {
-            float maxSafeDistance = 360f;
-            float seaLevel = 256f;
-            double ms = 500d;
-            string me = "SafeTeleport";
-
-            float bumpConst = 0.75f;
-            Vector3 bump = Vector3.up * bumpConst;
-            Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
-            RaycastHit hit;
-            IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
-                                                               where s.containedBounds.Contains(terrain)
-                                                               select s;
-            if (terrain.y > target.y)
-                target = terrain + bump * 2;
-
-            if (structures.Count() == 1)
+            if (this.IsOnline)
             {
-                if (Physics.Raycast(target, Vector3.down, out hit))
+                float maxSafeDistance = 360f;
+                float seaLevel = 256f;
+                double ms = 500d;
+                string me = "SafeTeleport";
+
+                float bumpConst = 0.75f;
+                Vector3 bump = Vector3.up * bumpConst;
+                Vector3 terrain = new Vector3(target.x, Terrain.activeTerrain.SampleHeight(target), target.z);
+                RaycastHit hit;
+                IEnumerable<StructureMaster> structures = from s in StructureMaster.AllStructures
+                                                          where s.containedBounds.Contains(terrain)
+                                                          select s;
+                if (terrain.y > target.y)
+                    target = terrain + bump * 2;
+
+                if (structures.Count() == 1)
                 {
-                    if (hit.collider.name == "HB Hit")
+                    if (Physics.Raycast(target, Vector3.down, out hit))
                     {
-                        // this.Message("There you are.");
+                        if (hit.collider.name == "HB Hit")
+                        {
+                            // this.Message("There you are.");
+                            return false;
+                        }
+                    }
+                    StructureMaster structure = structures.FirstOrDefault<StructureMaster>();
+                    if (!structure.containedBounds.Contains(target) || hit.distance > 8f)
+                        target = hit.point + bump;
+
+                    float distance = Vector3.Distance(this.Location, target);
+
+                    if (distance < maxSafeDistance)
+                    {
+                        return this.TeleportTo(target);
+                    }
+                    else
+                    {
+                        if (this.TeleportTo(terrain + bump * 2))
+                        {
+                            System.Timers.Timer timer = new System.Timers.Timer();
+                            timer.Interval = ms;
+                            timer.AutoReset = false;
+                            timer.Elapsed += delegate(object x, ElapsedEventArgs y)
+                            {
+                                this.TeleportTo(target);
+                            };
+                            timer.Start();
+                            return true;
+                        }
                         return false;
                     }
                 }
-                StructureMaster structure = structures.FirstOrDefault<StructureMaster>();
-                if (!structure.containedBounds.Contains(target) || hit.distance > 8f)
-                    target = hit.point + bump;
-
-                float distance = Vector3.Distance(this.Location, target);
-
-                if (distance < maxSafeDistance)
+                else if (structures.Count() == 0)
                 {
+                    if (terrain.y < seaLevel)
+                    {
+                        this.Message("That would put you in the ocean.");
+                        return false;
+                    }
+
+                    if (Physics.Raycast(terrain + Vector3.up * 300f, Vector3.down, out hit))
+                    {
+                        if (hit.collider.name == "HB Hit")
+                        {
+                            this.Message("There you are.");
+                            return false;
+                        }
+                        Vector3 worldPos = target - Terrain.activeTerrain.transform.position;
+                        Vector3 tnPos = new Vector3(Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.x, worldPos.x), 0, Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.z, worldPos.z));
+                        float gradient = Terrain.activeTerrain.terrainData.GetSteepness(tnPos.x, tnPos.z);
+                        if (gradient > 50f)
+                        {
+                            this.Message("It's too steep there.");
+                            return false;
+                        }
+                        target = hit.point + bump * 2;
+                    }
+                    float distance = Vector3.Distance(this.Location, target);
+                    Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
+                        this.Location.ToString(), target.ToString(), distance.ToString("F2"), terrain.ToString()));
+
                     return this.TeleportTo(target);
-                } else
+                }
+                else
                 {
-                    if (this.TeleportTo(terrain + bump * 2))
-                    {
-                        System.Timers.Timer timer = new System.Timers.Timer();
-                        timer.Interval = ms;
-                        timer.AutoReset = false;
-                        timer.Elapsed += delegate(object x, ElapsedEventArgs y) {
-                            this.TeleportTo(target);
-                        };
-                        timer.Start();
-                        return true;
-                    }
-                    return false;
-                }            
-            } else if (structures.Count() == 0)
-            {
-                if (terrain.y < seaLevel)
-                {
-                    this.Message("That would put you in the ocean.");
+                    Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
+                    Logger.LogDebug(string.Format("[{0}] target={1} terrain{2}", me, target.ToString(), terrain.ToString()));
+                    this.Message("Cannot execute safely with the parameters supplied.");
                     return false;
                 }
-
-                if (Physics.Raycast(terrain + Vector3.up * 300f, Vector3.down, out hit))
-                {
-                    if (hit.collider.name == "HB Hit")
-                    {
-                        this.Message("There you are.");
-                        return false;
-                    }
-                    Vector3 worldPos = target - Terrain.activeTerrain.transform.position;
-                    Vector3 tnPos = new Vector3(Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.x, worldPos.x), 0, Mathf.InverseLerp(0, Terrain.activeTerrain.terrainData.size.z, worldPos.z));
-                    float gradient = Terrain.activeTerrain.terrainData.GetSteepness(tnPos.x, tnPos.z);
-                    if (gradient > 50f)
-                    {
-                        this.Message("It's too steep there.");
-                        return false;
-                    }
-                    target = hit.point + bump * 2;
-                }
-                float distance = Vector3.Distance(this.Location, target);
-                Logger.LogDebug(string.Format("[{0}] player={1}({2}) from={3} to={4} distance={5} terrain={6}", me, this.Name, this.GameID,
-                    this.Location.ToString(), target.ToString(), distance.ToString("F2"), terrain.ToString()));
-
-                return this.TeleportTo(target);
-            } else
-            {
-                Logger.LogDebug(string.Format("[{0}] structures.Count is {1}. Weird.", me, structures.Count().ToString()));
-                Logger.LogDebug(string.Format("[{0}] target={1} terrain{2}", me, target.ToString(), terrain.ToString()));
-                this.Message("Cannot execute safely with the parameters supplied.");
-                return false;
             }
+            return false;
         }
 
         public bool TeleportTo(float x, float y, float z)
         {
-            return this.TeleportTo(new Vector3(x, y, z));
+            if (this.IsOnline)
+            {
+                return this.TeleportTo(new Vector3(x, y, z));
+            }
+            return false;
         }
 
         public bool TeleportTo(Vector3 target)
         {
-            return RustServerManagement.Get().TeleportPlayerToWorld(this.ourPlayer.netPlayer, target);
+            if (this.IsOnline)
+            {
+                Fougerite.Hooks.PlayerTeleport(this, this.Location, target);
+                return RustServerManagement.Get().TeleportPlayerToWorld(this.ourPlayer.netPlayer, target);
+            }
+            return false;
         }
 
         public bool Admin
         {
             get
             {
-                return this.ourPlayer.netUser.admin;
+                if (this.IsOnline)
+                {
+                    return this.ourPlayer.netUser.admin;
+                }
+                return false;
+            }
+
+        }
+
+        public bool Moderator
+        {
+            get
+            {
+                if (this.IsOnline)
+                {
+                    if (Fougerite.Server.GetServer().HasRustPP)
+                    {
+                        if (Fougerite.Server.GetServer().GetRustPPAPI().IsAdmin(this.UID))
+                        {
+                            if (Fougerite.Server.GetServer().GetRustPPAPI().GetAdmin(this.UID).HasPermission("Moderator"))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    if (DataStore.GetInstance().ContainsKey("Moderators", SteamID))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
@@ -309,11 +454,73 @@
             }
         }
 
+        public bool HasBlueprint(BlueprintDataBlock dataBlock)
+        {
+            if (this.IsOnline)
+            {
+                PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
+                if (invent.KnowsBP(dataBlock))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool HasBlueprint(string name)
+        {
+            if (this.IsOnline)
+            {
+                foreach (BlueprintDataBlock blueprintDataBlock in this.Blueprints())
+                {
+                    if (name.ToLower().Equals(blueprintDataBlock.name.ToLower()))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public ICollection<BlueprintDataBlock> Blueprints()
+        {
+            if (!this.IsOnline)
+            {
+                return null;
+            }
+            PlayerInventory invent = this.Inventory.InternalInventory as PlayerInventory;
+            ICollection<BlueprintDataBlock> collection = new List<BlueprintDataBlock>();
+            foreach (BlueprintDataBlock blueprintDataBlock in invent.GetBoundBPs())
+            {
+                collection.Add(blueprintDataBlock);
+            }
+            return collection;
+        }
+
         public float Health
         {
             get
             {
-                return this.ourPlayer.controllable.health;
+                if (this.IsOnline)
+                {
+                    return this.ourPlayer.controllable.health;
+                }
+                return 0f;
+            }
+            set
+            {
+                if (!this.IsOnline)
+                    return;
+
+                if (value < 0f)
+                {
+                    this.ourPlayer.controllable.takeDamage.health = 0f;
+                }
+                else
+                {
+                    this.ourPlayer.controllable.takeDamage.health = value;
+                }
+                this.ourPlayer.controllable.takeDamage.Heal(this.ourPlayer.controllable, 0f);
             }
         }
 
@@ -321,13 +528,17 @@
         {
             get
             {
-                if (this.invError || this.justDied)
+                if (this.IsOnline)
                 {
-                    this.inv = new PlayerInv(this);
-                    this.invError = false;
-                    this.justDied = false;
+                    if (this.invError || this.justDied)
+                    {
+                        this.inv = new PlayerInv(this);
+                        this.invError = false;
+                        this.justDied = false;
+                    }
+                    return this.inv;
                 }
-                return this.inv;
+                return null;
             }
         }
 
@@ -343,7 +554,11 @@
         {
             get
             {
-                return this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.ourPlayer.controllable.GetComponent<HumanBodyTakeDamage>().IsBleeding();
+                }
+                return false;
             }
         }
 
@@ -351,7 +566,11 @@
         {
             get
             {
-                return this.ourPlayer.controllable.GetComponent<Metabolism>().IsCold();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.ourPlayer.controllable.GetComponent<Metabolism>().IsCold();
+                }
+                return false;
             }
         }
 
@@ -359,7 +578,11 @@
         {
             get
             {
-                return (this.ourPlayer.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return (this.ourPlayer.controllable.GetComponent<FallDamage>().GetLegInjury() != 0f);
+                }
+                return false;
             }
         }
 
@@ -367,7 +590,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().HasRadiationPoisoning();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().HasRadiationPoisoning();
+                }
+                return false;
             }
         }
 
@@ -375,7 +602,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsWarm();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().IsWarm();
+                }
+                return false;
             }
         }
 
@@ -383,7 +614,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().IsPoisoned();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().IsPoisoned();
+                }
+                return false;
             }
         }
 
@@ -391,7 +626,11 @@
         {
             get
             {
-                return this.CalorieLevel <= 0.0;
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.CalorieLevel <= 0.0;
+                }
+                return false;
             }
         }
 
@@ -399,7 +638,11 @@
         {
             get
             {
-                return this.CalorieLevel < 500.0;
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.CalorieLevel < 500.0;
+                }
+                return false;
             }
         }
 
@@ -407,7 +650,11 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>()._bleedingLevel;
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<HumanBodyTakeDamage>()._bleedingLevel;
+                }
+                return 0f;
             }
         }
 
@@ -415,60 +662,109 @@
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().GetCalorieLevel();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().GetCalorieLevel();
+                }
+                return 0f;
+
+            }
+        }
+
+        public float CoreTemperature
+        {
+            get
+            {
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature;
+                    //return (float) Util.GetUtil().GetInstanceField(typeof(Metabolism), m, "coreTemperature");
+                }
+                return 0f;
+            }
+            set
+            {
+                if (this.IsOnline && this.IsAlive)
+                {
+                    Metabolism m = this.PlayerClient.controllable.GetComponent<Metabolism>();
+                    this.PlayerClient.controllable.GetComponent<Metabolism>().coreTemperature = value;
+                    //Util.GetUtil().SetInstanceField(typeof(Metabolism), m, "coreTemperature", value);
+                }
             }
         }
 
         public void AdjustCalorieLevel(float amount)
         {
-            if (amount < 0)
-                this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractCalories(Math.Abs(amount));
+            if (!this.IsOnline && !this.IsAlive) {return;}
 
-            if (amount > 0)
-                this.PlayerClient.controllable.GetComponent<Metabolism>().AddCalories(amount);
+            if (amount < 0) {this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractCalories(Math.Abs(amount));}
+            else if (amount > 0) {this.PlayerClient.controllable.GetComponent<Metabolism>().AddCalories(amount);}
         }
 
         public float RadLevel
         {
             get
             {
-                return this.PlayerClient.controllable.GetComponent<Metabolism>().GetRadLevel();
+                if (this.IsOnline && this.IsAlive)
+                {
+                    return this.PlayerClient.controllable.GetComponent<Metabolism>().GetRadLevel();
+                }
+                return 0f;
             }
         }
 
         public void AddRads(float amount)
         {
-            this.PlayerClient.controllable.GetComponent<Metabolism>().AddRads(amount);
+            if (this.IsOnline && this.IsAlive)
+            {
+                this.PlayerClient.controllable.GetComponent<Metabolism>().AddRads(amount);
+            }
         }
 
         public void AddAntiRad(float amount)
         {
-            this.PlayerClient.controllable.GetComponent<Metabolism>().AddAntiRad(amount);
+            if (this.IsOnline && this.IsAlive)
+            {
+                this.PlayerClient.controllable.GetComponent<Metabolism>().AddAntiRad(amount);
+            }
         }
 
         public void AddWater(float litres)
         {
-            this.PlayerClient.controllable.GetComponent<Metabolism>().AddWater(litres);
+            if (this.IsOnline && this.IsAlive)
+            {
+                this.PlayerClient.controllable.GetComponent<Metabolism>().AddWater(litres);
+            }
         }
 
         public void AdjustPoisonLevel(float amount)
         {
-            if (amount < 0)
-                this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractPosion(Math.Abs(amount));
+            if (this.IsOnline && this.IsAlive)
+            {
+                if (amount < 0)
+                    this.PlayerClient.controllable.GetComponent<Metabolism>().SubtractPosion(Math.Abs(amount));
 
-            if (amount > 0)
-                this.PlayerClient.controllable.GetComponent<Metabolism>().AddPoison(amount);
+                else if (amount > 0)
+                    this.PlayerClient.controllable.GetComponent<Metabolism>().AddPoison(amount);
+            }
         }
 
         public Vector3 Location
         {
             get
             {
-                return this.ourPlayer.lastKnownPosition;
+                if (this.IsOnline)
+                {
+                    return this.ourPlayer.lastKnownPosition;
+                }
+                return Vector3.zero;
             }
             set
             {
-                this.ourPlayer.transform.position.Set(value.x, value.y, value.z);
+                if (this.IsOnline)
+                {
+                    this.ourPlayer.transform.position.Set(value.x, value.y, value.z);
+                }
             }
         }
 
@@ -480,9 +776,35 @@
             }
             set
             {
-                this.name = value;
-                this.ourPlayer.netUser.user.displayname_ = value; // displayName
-                this.ourPlayer.userName = value; // displayName
+                if (this.IsOnline)
+                {
+                    this.name = value;
+                    if (this.IsOnline)
+                    {
+                        RustProto.User u = this.ourPlayer.netUser.user;
+                        //Util.GetUtil().SetInstanceField(typeof(RustProto.User), u, "displayname_", value); // displayName
+                        this.ourPlayer.netUser.user.displayname_ = value;
+                        this.ourPlayer.userName = value; // displayName
+                    }
+                }
+            }
+        }
+
+        public Sleeper Sleeper
+        {
+            get
+            {
+                if (this.IsOnline)
+                {
+                    return null;
+                }
+
+                var query = from sleeper in UnityEngine.Object.FindObjectsOfType<SleepingAvatar>()
+                            let deployable = sleeper.GetComponent<DeployableObject>()
+                            where deployable.ownerID == this.uid
+                            select new Sleeper(deployable);
+
+                return query.FirstOrDefault();
             }
         }
 
@@ -490,7 +812,15 @@
         {
             get
             {
-                return this.Structures.Any(e => (e.Object as StructureMaster).containedBounds.Contains(this.Location));
+                if (this.IsOnline)
+                {
+                    return this.Structures.Any(e => (e.Object as StructureMaster).containedBounds.Contains(this.Location));
+                }
+                else if (this.Sleeper != null)
+                {
+                    return this.Structures.Any(e => (e.Object as StructureMaster).containedBounds.Contains(this.Sleeper.Location));
+                }
+                return false;
             }
         }
 
@@ -498,7 +828,11 @@
         {
             get
             {
-                return this.ourPlayer.netPlayer.averagePing;
+                if (this.IsOnline)
+                {
+                    return this.ourPlayer.netPlayer.averagePing;
+                }
+                return int.MaxValue;
             }
         }
 
@@ -506,7 +840,11 @@
         {
             get
             {
-                return this.ourPlayer;
+                if (this.IsOnline)
+                {
+                    return this.ourPlayer;
+                }
+                return null;
             }
         }
 
@@ -514,7 +852,11 @@
         {
             get
             {
-                return ((DateTime.UtcNow.Ticks - this.connectedAt) / 0x2710L);
+                if (this.IsOnline)
+                {
+                    return ((DateTime.UtcNow.Ticks - this.connectedAt)/0x2710L);
+                }
+                return 0L;
             }
         }
 
@@ -526,7 +868,10 @@
             }
             set
             {
-                this.ourPlayer.transform.position.Set(value, this.Y, this.Z);
+                if (this.IsOnline)
+                {
+                    this.ourPlayer.transform.position.Set(value, this.Y, this.Z);
+                }
             }
         }
 
@@ -538,7 +883,10 @@
             }
             set
             {
-                this.ourPlayer.transform.position.Set(this.X, value, this.Z);
+                if (this.IsOnline)
+                {
+                    this.ourPlayer.transform.position.Set(this.X, value, this.Z);
+                }
             }
         }
 
@@ -550,7 +898,10 @@
             }
             set
             {
-                this.ourPlayer.transform.position.Set(this.X, this.Y, value);
+                if (this.IsOnline)
+                {
+                    this.ourPlayer.transform.position.Set(this.X, this.Y, value);
+                }
             }
         }
 

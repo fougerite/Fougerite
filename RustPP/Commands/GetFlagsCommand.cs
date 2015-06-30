@@ -3,18 +3,44 @@
     using Fougerite;
     using RustPP.Permissions;
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     public class GetFlagsCommand : ChatCommand
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
+            string queryName = Arguments.ArgsStr.Trim(new char[] { ' ', '"' });
+
             string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
-            if (playerName == string.Empty)
+            if (queryName == string.Empty)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Get Admin Flags Usage:  /getflags playerName");
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, "Get Admin Flags Usage:  /getflags playerName");
                 return;
             }
+            var query = from admin in Administrator.AdminList
+                        let sim = admin.DisplayName.Similarity(queryName)
+                        where sim > 0.4d
+                        group admin by sim into matches
+                        select matches.FirstOrDefault();
+
+            if (query.Count() == 1)
+            {
+                GetFlags(query.First(), Arguments.argUser);
+                return;
+            }
+            else
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, string.Format("{0}  administrators match  {1}: ", query.Count(), queryName));
+                for (int i = 1; i < query.Count(); i++)
+                {
+                    Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, string.Format("{0} - {1}", i, query.ElementAt(i).DisplayName));
+                }
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, "0 - Cancel");
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, "Please enter the number matching the administrator you were looking for.");
+                RustPP.Core.adminAddWaitList[Arguments.argUser.userID] = query;
+            }
+
             List<Administrator> list = new List<Administrator>();
             list.Add(new Administrator(0, "Cancel"));
             foreach (Administrator administrator in Administrator.AdminList)

@@ -36,7 +36,7 @@
                                     command.Execute(ref arg, ref chatArgs);
                                 } else
                                 {
-                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You need RCON access to be able to use this command.");
+                                    Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, "You need RCON access to be able to use this command.");
                                 }
                             } else if (Administrator.IsAdmin(arg.argUser.userID))
                             {
@@ -45,11 +45,11 @@
                                     command.Execute(ref arg, ref chatArgs);
                                 } else
                                 {
-                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "Only administrators with the " + command.AdminFlags + " permission can use that command.");
+                                    Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, string.Format("Only administrators with the {0} permission can use that command.", command.AdminFlags));
                                 }
                             } else
                             {
-                                Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You don't have access to use this command");
+                                Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, "You don't have access to use this command");
                             }
                         } else
                         {
@@ -112,7 +112,7 @@
         {
             get
             {
-                return Core.config.isCommandOn(this.Command.Remove(0, 1));
+                return RustPP.Core.config.isCommandOn(this.Command.Remove(0, 1));
             }
         }
     }

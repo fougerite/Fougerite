@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace Fougerite
 {
+    using System;
     public class ModuleContainer : IDisposable
     {
         public Module Plugin

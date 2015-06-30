@@ -1,6 +1,5 @@
 ﻿namespace Fougerite
 {
-    using System;
 
     public class PlayerInv
     {

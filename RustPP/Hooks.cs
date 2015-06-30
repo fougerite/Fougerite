@@ -1,10 +1,11 @@
-﻿namespace RustPP
+﻿using Fougerite.Events;
+
+namespace RustPP
 {
     using Fougerite;
     using RustPP.Commands;
     using RustPP.Permissions;
     using RustPP.Social;
-    using System;
     using System.Collections;
 
     internal class Hooks
@@ -77,27 +78,50 @@
             }
         }
 
-        public static bool IsFriend(DamageEvent e) // ref
+        public static bool IsFriend(HurtEvent e) // ref
         {
+            //Server.GetServer().Broadcast("1");
             GodModeCommand command = (GodModeCommand)ChatCommand.GetCommand("god");
-            try
+            //Server.GetServer().Broadcast("2");
+            //Server.GetServer().Broadcast("2 " + command.IsOn(e.victim.userID));
+            Fougerite.Player victim = Fougerite.Server.Cache[e.DamageEvent.victim.userID];
+            if (victim != null)
             {
-                FriendsCommand command2 = (FriendsCommand)ChatCommand.GetCommand("friends");
-                FriendList list = (FriendList)command2.GetFriendsLists()[e.attacker.userID];
-                if (Core.config.GetBoolSetting("Settings", "friendly_fire"))
+                if (command.IsOn(victim.UID))
                 {
-                    return command.IsOn(e.victim.userID);
+                    //Server.GetServer().Broadcast("3");
+                    return true;
                 }
-                if (list == null)
+                //Server.GetServer().Broadcast("4");
+                Fougerite.Player attacker = Fougerite.Server.Cache[e.DamageEvent.attacker.userID];
+                if (attacker != null)
                 {
-                    return command.IsOn(e.victim.userID);
+                    FriendsCommand command2 = (FriendsCommand) ChatCommand.GetCommand("friends");
+                    bool b = Core.config.GetBoolSetting("Settings", "friendly_fire");
+                    //Server.GetServer().Broadcast("5 " + b);
+                    try
+                    {
+                        //Server.GetServer().Broadcast("6");
+                        FriendList list = (FriendList) command2.GetFriendsLists()[attacker.UID];
+                        //Server.GetServer().Broadcast("7 " + list);
+                        if (list == null || b ||
+                            (DataStore.GetInstance().ContainsKey("HGIG", attacker.SteamID)
+                             && DataStore.GetInstance().ContainsKey("HGIG", victim.SteamID)))
+                        {
+                            //Server.GetServer().Broadcast("8");
+                            return false;
+                        }
+                        //Server.GetServer().Broadcast("9");
+                        return list.isFriendWith(victim.UID);
+                    }
+                    catch
+                    {
+                        //Server.GetServer().Broadcast("end");
+                        return command.IsOn(victim.UID);
+                    }
                 }
-                return (list.isFriendWith(e.victim.userID) || command.IsOn(e.victim.userID));
             }
-            catch
-            {
-                return command.IsOn(e.victim.userID);
-            }
+            return false;
         }
 
         public static bool KeepItem()
@@ -138,7 +162,7 @@
                     {
                         if (client.userID != user.userID)
                         {
-                            Util.sayUser(client.netPlayer, Core.Name, user.displayName + " has joined the server");
+                            Util.sayUser(client.netPlayer, Core.Name, user.displayName + " " + RustPPModule.JoinMsg);
                         }
                     }
                 }
@@ -149,21 +173,21 @@
             return true;
         }
 
-        public static void logoffNotice(NetUser user)
+        public static void logoffNotice(Fougerite.Player user)
         {
             try
             {
-                if (Core.tempConnect.Contains(user.userID))
+                if (Core.tempConnect.Contains(user.UID))
                 {
-                    Core.tempConnect.Remove(user.userID);
+                    Core.tempConnect.Remove(user.UID);
                 }
                 else if (Core.config.GetBoolSetting("Settings", "leave_notice"))
                 {
                     foreach (PlayerClient client in PlayerClient.All)
                     {
-                        if (client.userID != user.userID)
+                        if (client.userID != user.UID)
                         {
-                            Util.sayUser(client.netPlayer, Core.Name, user.displayName + " has left the server");
+                            Util.sayUser(client.netPlayer, Core.Name, user.Name + " " + RustPPModule.LeaveMsg);
                         }
                     }
                 }

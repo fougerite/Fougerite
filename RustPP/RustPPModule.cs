@@ -21,7 +21,7 @@
         }
         public override string Author
         {
-            get { return "xEnt22, mikec"; }
+            get { return "xEnt22, mikec, DreTaX"; }
         }
         public override string Description
         {
@@ -44,6 +44,11 @@
 
         public static string ConfigFile;
         public static string ConfigsFolder;
+        public static string JoinMsg = "has joined the server";
+        public static string LeaveMsg = "has left the server";
+        public static string StarterMsg = "You have spawned a Starter Kit!";
+        public static string StarterCDMsg = "You must wait awhile before using this..";
+
         public override void Initialize()
         {
             ConfigsFolder = ModuleFolder;
@@ -62,6 +67,22 @@
             {
                 Core.Name = Core.config.GetSetting("Settings", "chatname");
             }
+            if (Core.config.ContainsSetting("Settings", "joinmsg"))
+            {
+                JoinMsg = Core.config.GetSetting("Settings", "joinmsg");
+            }
+            if (Core.config.ContainsSetting("Settings", "leavemsg"))
+            {
+                LeaveMsg = Core.config.GetSetting("Settings", "leavemsg");
+            }
+            if (Core.config.ContainsSetting("Settings", "startermsg"))
+            {
+                StarterMsg = Core.config.GetSetting("Settings", "startermg");
+            }
+            if (Core.config.ContainsSetting("Settings", "startercdmsg"))
+            {
+                StarterCDMsg = Core.config.GetSetting("Settings", "startercdmsg");
+            }
             TimedEvents.startEvents();
 
             Fougerite.Hooks.OnDoorUse += DoorUse;
@@ -74,6 +95,7 @@
             Fougerite.Hooks.OnShowTalker += ShowTalker;
             Fougerite.Hooks.OnChatRaw += ChatReceived;
             Fougerite.Hooks.OnChat += Chat;
+            Server.GetServer().LookForRustPP();
         }
 
         public override void DeInitialize()
@@ -106,11 +128,11 @@
             {
                 command.PartialNameTP(ref arg, arg.GetInt(0));
                 arg.ArgsStr = string.Empty;
-            } else if (Core.friendWaitList.Contains(arg.argUser.userID))
+            /* }  else if (Core.friendWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("addfriend") as AddFriendCommand).PartialNameAddFriend(ref arg, arg.GetInt(0));
                 Core.friendWaitList.Remove(arg.argUser.userID);
-                arg.ArgsStr = string.Empty;
+                arg.ArgsStr = string.Empty; */
             } else if (Core.shareWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("share") as ShareCommand).PartialNameDoorShare(ref arg, arg.GetInt(0));
@@ -146,11 +168,11 @@
                 (ChatCommand.GetCommand("addwl") as WhiteListAddCommand).PartialNameWhitelist(ref arg, arg.GetInt(0));
                 Core.whiteWaitList.Remove(arg.argUser.userID);
                 arg.ArgsStr = string.Empty;
-            } else if (Core.adminAddWaitList.Contains(arg.argUser.userID))
+            /* } else if (Core.adminAddWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("addadmin") as AddAdminCommand).PartialNameNewAdmin(ref arg, arg.GetInt(0));
                 Core.adminAddWaitList.Remove(arg.argUser.userID);
-                arg.ArgsStr = string.Empty;
+                arg.ArgsStr = string.Empty; */
             } else if (Core.adminRemoveWaitList.Contains(arg.argUser.userID))
             {
                 (ChatCommand.GetCommand("unadmin") as RemoveAdminCommand).PartialNameRemoveAdmin(ref arg, arg.GetInt(0));
@@ -231,11 +253,11 @@
         void PlayerKilled(DeathEvent event2)
         {
             event2.DropItems = !RustPP.Hooks.KeepItem();
-            if (!(event2.Attacker is NPC)) // Not NPC
+            if (!(event2.Attacker is NPC))
             {
                 Fougerite.Player attacker = event2.Attacker as Fougerite.Player;
                 Fougerite.Player victim = event2.Victim as Fougerite.Player;
-                if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))
+                if (attacker != victim)
                     RustPP.Hooks.broadcastDeath(victim.Name, attacker.Name, event2.WeaponName);
             }
         }
@@ -255,16 +277,16 @@
             }
         }
 
-        void PlayerHurt(HurtEvent he) // Dirty Hack?
+        void PlayerHurt(HurtEvent he)
         {
-            if (RustPP.Hooks.IsFriend(he.DamageEvent))
+            if (RustPP.Hooks.IsFriend(he))
                 he.DamageAmount = 0f;
         }
 
         void PlayerDisconnect(Fougerite.Player player)
         {
             if (Core.IsEnabled())
-                RustPP.Hooks.logoffNotice(player.PlayerClient.netUser);
+                RustPP.Hooks.logoffNotice(player);
         }
 
         void PlayerConnect(Fougerite.Player player)

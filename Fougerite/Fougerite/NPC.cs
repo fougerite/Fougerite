@@ -1,6 +1,6 @@
-﻿namespace Fougerite
+﻿
+namespace Fougerite
 {
-    using System;
     using UnityEngine;
 
     public class NPC

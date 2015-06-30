@@ -22,7 +22,7 @@
                 int num = (int)this.starterkits[Arguments.argUser.playerClient.userID];
                 if ((Environment.TickCount - num) < (int.Parse(Core.config.GetSetting("Settings", "starterkit_cooldown")) * 0x3e8))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You must wait awhile before using this..");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, RustPPModule.StarterCDMsg);
                 }
                 else
                 {
@@ -39,7 +39,7 @@
                     ConsoleSystem.Arg arg = Arguments;
                     inv.give(ref arg);
                 }
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have spawned a Starter Kit!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, RustPPModule.StarterMsg);
             }
         }
     }

@@ -1,6 +1,6 @@
-﻿namespace Fougerite
+﻿
+namespace Fougerite
 {
-    using System;
     using System.Net;
     using System.Text;
 
@@ -16,7 +16,7 @@
 
         public string POST(string url, string data)
         {
-            using (WebClient client = new WebClient())
+            using (System.Net.WebClient client = new System.Net.WebClient())
             {
                 client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                 byte[] bytes = client.UploadData(url, "POST", Encoding.ASCII.GetBytes(data));

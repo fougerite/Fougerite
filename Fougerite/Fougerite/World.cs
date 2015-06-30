@@ -5,8 +5,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Timers;
-    using uLink;
     using UnityEngine;
 
     public class World
@@ -285,41 +283,50 @@
 
         public object Spawn(string prefab, float x, float y, float z)
         {
-            return this.Spawn(prefab, x, y, z, 1);
+            return this.Spawn(prefab, new Vector3(x, y, z), 1);
         }
 
         private object Spawn(string prefab, Vector3 location, Quaternion rotation, int rep)
         {
             object obj2 = null;
-            for (int i = 0; i < rep; i++)
-            {
-                if (prefab == ":player_soldier")
+            try { 
+                for (int i = 0; i < rep; i++)
                 {
-                    obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
-                } else if (prefab.Contains("C130"))
-                {
-                    obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
-                } else
-                {
-                    GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
-                    obj2 = obj3;
-                    StructureComponent component = obj3.GetComponent<StructureComponent>();
-                    if (component != null)
+                    if (prefab == ":player_soldier")
                     {
-                        obj2 = new Entity(component);
-                    } else
+                        obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
+                    } 
+                    else if (prefab.Contains("C130"))
                     {
-                        DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
-                        if (obj4 != null)
+                        obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
+                    } 
+                    else
+                    {
+                        GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
+                        obj2 = obj3;
+                        StructureComponent component = obj3.GetComponent<StructureComponent>();
+                        if (component != null)
                         {
-                            obj4.ownerID = 0L;
-                            obj4.creatorID = 0L;
-                            obj4.CacheCreator();
-                            obj4.CreatorSet();
-                            obj2 = new Entity(obj4);
+                            obj2 = new Entity(component);
+                        } 
+                        else
+                        {
+                            DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
+                            if (obj4 != null)
+                            {
+                                obj4.ownerID = 0L;
+                                obj4.creatorID = 0L;
+                                obj4.CacheCreator();
+                                obj4.CreatorSet();
+                                obj2 = new Entity(obj4);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.LogDebug(e.ToString());
             }
             return obj2;
         }
@@ -331,7 +338,7 @@
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot)
         {
-            return this.Spawn(prefab, x, y, z, rot, 1);
+            return this.Spawn(prefab, new Vector3(x, y, z), rot, 1);
         }
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot, int rep)
@@ -380,7 +387,9 @@
                 entities.AddRange(component);
                 entities.AddRange(deployable);
                 if (supplydrop.Count() > 0)
+                {
                     entities.AddRange(supplydrop);
+                }
 
                 return entities;
             }

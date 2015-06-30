@@ -17,16 +17,19 @@
             }
             List<Administrator> list = new List<Administrator>();
             list.Add(new Administrator(0, "Cancel"));
-            Administrator administrator = Administrator.AdminList.Find(delegate(Administrator obj) {
-                return obj.DisplayName.Equals(playerName, StringComparison.OrdinalIgnoreCase);   
+            Administrator administrator = Administrator.AdminList.Find(delegate(Administrator obj)
+            {
+                return obj.DisplayName.Equals(playerName, StringComparison.OrdinalIgnoreCase);
             });
             if (administrator != null)
             {
                 RemoveAdmin(administrator, Arguments.argUser);
-            } else
+            }
+            else
             {
-                list.AddRange(Administrator.AdminList.FindAll(delegate(Administrator obj) {
-                    return obj.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant());  
+                list.AddRange(Administrator.AdminList.FindAll(delegate(Administrator obj)
+                {
+                    return obj.DisplayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant());
                 }));
             }
             if (list.Count == 1)
@@ -60,7 +63,8 @@
             if (exAdmin.UserID == myAdmin.userID)
             {
                 Util.sayUser(myAdmin.networkPlayer, Core.Name, "You can't remove yourself as admin.");
-            } else
+            }
+            else
             {
                 Administrator.NotifyAdmins(string.Format("{0} is no longer an administrator; removed by {1}.", exAdmin.DisplayName, myAdmin.displayName));
                 Administrator.DeleteAdmin(exAdmin.UserID);

@@ -7,6 +7,10 @@ namespace GlitchFix
 {
     public class GlitchFix : Fougerite.Module
     {
+        private bool enabled;
+        private bool GiveBack;
+        private IniParser Config;
+
         public override string Name
         {
             get { return "GlitchFix"; }
@@ -32,18 +36,18 @@ namespace GlitchFix
             get { return 2; }
         }
 
-        private IniParser Config;
-
         public override void Initialize()
         {
             Config = new IniParser(Path.Combine(ModuleFolder, "GlitchFix.cfg"));
-            if (Config.GetSetting("Settings", "enabled").ToLower() == "true")
+            enabled = Config.GetSetting("Settings", "enabled").ToLower() == "true";
+            GiveBack = Config.GetSetting("Settings", "giveback").ToLower() == "true";
+            if (enabled)
                 Fougerite.Hooks.OnEntityDeployed += EntityDeployed;
         }
 
         public override void DeInitialize()
         {
-            if (Config.GetSetting("Settings", "enabled").ToLower() == "true")
+            if (enabled)
                 Fougerite.Hooks.OnEntityDeployed -= EntityDeployed;
         }
 
@@ -51,19 +55,20 @@ namespace GlitchFix
         {
             if (Entity != null)
             {
-                if (Entity.Name.Contains("Foundation") || Entity.Name.Contains("Ramp"))
+                if (Entity.Name.Contains("Foundation") || Entity.Name.Contains("Ramp") || Entity.Name.Contains("Pillar"))
                 {
                     var name = Entity.Name;
-                    bool GiveBack = Config.GetSetting("Settings", "giveback").ToLower() == "true";
-                    var two = Util.GetUtil().CreateVector(Entity.X, Entity.Y, Entity.Z);
-                    var deploylist = UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject));
+                    var location = Entity.Location;
+                    DeployableObject[] deploylist = UnityEngine.Object.FindObjectsOfType(typeof(DeployableObject)) as DeployableObject[];
                     foreach (DeployableObject ent in deploylist)
                     {
                         if (ent.name.Contains("WoodBox") || ent.name.Contains("Stash"))
                         {
-                            var dist = Util.GetUtil().GetVectorsDistance(two, ent.gameObject.transform.position);
-                            if (dist > 3.7) continue;
-                            if (Player != null && GiveBack)
+                            if (Util.GetUtil().GetVectorsDistance(location, ent.gameObject.transform.position) > 3.7)
+                            {
+                                continue;
+                            }
+                            if (Player.IsOnline && GiveBack)
                             {
                                 switch (name)
                                 {
@@ -80,15 +85,17 @@ namespace GlitchFix
                             return;
                         }
                     }
-                    var structurelist = UnityEngine.Object.FindObjectsOfType(typeof(StructureComponent));
+                    StructureComponent[] structurelist = UnityEngine.Object.FindObjectsOfType(typeof(StructureComponent)) as StructureComponent[];
                     foreach (StructureComponent structure in structurelist)
                     {
                         if (structure.name.Contains("Ramp") && Entity.InstanceID != structure.GetInstanceID())
                         {
                             {
-                                var dist = Util.GetUtil().GetVectorsDistance(two, structure.gameObject.transform.position);
-                                if (dist != 0) continue;
-                                if (GiveBack && Player != null)
+                                if (Util.GetUtil().GetVectorsDistance(location, structure.gameObject.transform.position) != 0)
+                                {
+                                    continue;
+                                }
+                                if (GiveBack && Player.IsOnline)
                                 {
                                     switch (name)
                                     {

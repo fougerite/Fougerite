@@ -6,7 +6,6 @@
     using System.Xml.Schema;
     using System.Xml.Serialization;
     using System.Collections.Generic;
-    using System.Collections;
     using System.Linq;
 
     [XmlRoot("Dictionary")]

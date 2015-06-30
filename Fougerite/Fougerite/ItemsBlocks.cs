@@ -1,8 +1,5 @@
 ﻿namespace Fougerite
 {
-    using System;
-    using System.Collections.Generic;
-
     public class ItemsBlocks : System.Collections.Generic.List<ItemDataBlock>
     {
         public ItemsBlocks(System.Collections.Generic.List<ItemDataBlock> items)

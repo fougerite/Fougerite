@@ -1,7 +1,6 @@
 ﻿namespace Fougerite
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -25,7 +24,7 @@
 
         public bool Contains(Entity en)
         {
-            return this.Contains((en.Object as GameObject).gameObject.transform.position);
+            return this.Contains(en.Location);
         }
 
         public bool Contains(Fougerite.Player p)
@@ -103,12 +102,20 @@
         public void ShowMarkers()
         {
             this.HideMarkers();
-            foreach (Vector2 vector in this.Points)
+            try
             {
-                float ground = World.GetWorld().GetGround(vector.x, vector.y);
-                Vector3 location = new Vector3(vector.x, ground, vector.y);
-                Entity item = World.GetWorld().Spawn(";struct_metal_pillar", location) as Entity;
-                this.tmpPoints.Add(item);
+                foreach (Vector2 vector in this.Points)
+                {
+                    float ground = World.GetWorld().GetGround(vector.x, vector.y);
+                    Vector3 location = new Vector3(vector.x, ground, vector.y);
+                    object o = World.GetWorld().Spawn(";struct_metal_pillar", location);
+                    Entity item = new Entity(o);
+                    this.tmpPoints.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogDebug(e.ToString());
             }
         }
 

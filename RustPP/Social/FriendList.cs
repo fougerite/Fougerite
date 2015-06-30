@@ -32,28 +32,26 @@
 
         public bool isFriendWith(string name)
         {
-            bool flag = false;
             foreach (Friend friend in this)
             {
                 if (friend.GetDisplayName().Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    flag = true;
+                    return true;
                 }
             }
-            return flag;
+            return false;
         }
 
         public bool isFriendWith(ulong userID)
         {
-            bool flag = false;
             foreach (Friend friend in this)
             {
                 if (friend.GetUserID() == userID)
                 {
-                    flag = true;
+                    return true;
                 }
             }
-            return flag;
+            return false;
         }
 
         public void OutputList(ref ConsoleSystem.Arg arg)

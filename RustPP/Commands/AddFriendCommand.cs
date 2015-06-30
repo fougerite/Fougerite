@@ -25,7 +25,8 @@
                 {
                     AddFriend(new PList.Player(entry.Key, entry.Value), Arguments.argUser);
                     return;
-                } else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
+                }
+                else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(entry.Key, entry.Value);
             }
             if (list.Count == 1)
@@ -36,7 +37,8 @@
                     {
                         AddFriend(new PList.Player(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
-                    } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
+                    }
+                    else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(client.netUser.userID, client.netUser.displayName);
                 }
             }

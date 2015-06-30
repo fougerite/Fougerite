@@ -1,10 +1,7 @@
 ﻿namespace Fougerite
 {
-    using Facepunch.Utility;
     using System;
     using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
 
     public class Data
     {

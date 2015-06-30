@@ -14,7 +14,7 @@
 
 		public DestroyEvent(ref DamageEvent d, Entity ent, bool isdecay)
 		{
-			Fougerite.Player player = Fougerite.Player.FindByPlayerClient(d.attacker.client);
+			Fougerite.Player player = Server.Cache[d.attacker.client.userID];
 			if (player != null) {
 				this.Attacker = player;
 			}

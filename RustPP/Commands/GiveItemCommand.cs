@@ -4,6 +4,7 @@
     using Fougerite;
     using System;
     using System.Linq;
+    using System.Collections;
     using System.Collections.Generic;
 
     internal class GiveItemCommand : ChatCommand
@@ -61,12 +62,12 @@
 
             string quantity = qty.ToString();
             double best = 0d;
-            string recipName = string.Empty;
             string[] remain = qtyIdx > -1 ? ChatArguments.Slice(0, qtyIdx)
                     .Concat(ChatArguments.Slice(Math.Min(qtyIdx + 1, ChatArguments.Length), ChatArguments.Length))
                     .ToArray() : ChatArguments;
 
             List<string> collect = new List<string>();
+            ICollection<string> matches = new List<string>();
             foreach (string name in PlayerClient.All.Select(pc => pc.netUser.displayName))
             {
                 for (int i = 0; i < remain.Length; i++)
@@ -76,11 +77,17 @@
                         string[] testArr = remain.Slice(i, j + 1);
                         string testStr = string.Join(" ", testArr);
                         double sim = testStr.Similarity(name);
-                        if (sim > best)
+                        if (sim > best && sim > 0.333d)
                         {
                             best = sim;
-                            recipName = name;
+                            matches.Clear();
+                            matches.Add(name);
                             collect.Clear();
+                            collect.AddRange(testArr);
+                        }
+                        else if (sim == best)
+                        {
+                            matches.Add(name);
                             collect.AddRange(testArr);
                         }
                     }
@@ -93,15 +100,24 @@
                     collect[i] = string.Empty;
             }
 
-            string itemName = string.Join(" ", remain.Except(collect).ToArray()).MatchItemName();
-            Arguments.Args = new string[] { recipName, itemName, quantity };
-            Logger.LogDebug(string.Format("[GiveItemCommand] quantity={0} item={1} recipient={2}", quantity, itemName, recipName));
+            if (matches.Count == 1)
+            {
+                string recipName = matches.First();
+                string itemName = string.Join(" ", remain.Except(collect).ToArray()).MatchItemName();
+                Arguments.Args = new string[] { recipName, itemName, quantity };
+                Logger.LogDebug(string.Format("[GiveItemCommand] quantity={0} item={1} recipient={2}", quantity, itemName, recipName));
 
-            inv.giveplayer(ref Arguments);
-            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", quantity, itemName, recipName));
+                inv.giveplayer(ref Arguments);
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", quantity, itemName, recipName));
 
-            uLink.NetworkPlayer recipPlayer = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
-            Util.sayUser(recipPlayer, Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, qty.ToString(), itemName));
+                uLink.NetworkPlayer np = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
+                Util.sayUser(np, RustPP.Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, quantity, itemName));
+            }
+            else
+            {
+                var str = Arguments.ArgsStr.Replace(string.Join(" ", collect.ToArray()), "");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("Unsure about {0}. Please be more specific.", str));
+            }
         }
     }
 }

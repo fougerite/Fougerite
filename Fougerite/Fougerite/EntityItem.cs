@@ -1,7 +1,5 @@
 namespace Fougerite
 {
-    using System;
-
     public class EntityItem
     {
         private readonly Inventory internalInv;

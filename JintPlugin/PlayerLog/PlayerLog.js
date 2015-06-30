@@ -1,7 +1,7 @@
 var Unity = importNamespace('UnityEngine');
 var PlayerLogData = function(pl, ev, epoch) {
 	this.name = pl.Name;
-	this.gid = pl.GameID;
+	this.gid = pl.SteamID;
 	this.nuid = pl.PlayerClient.netUser.user.Userid.toString();
 	this.ip = pl.IP;
 	this.loc = pl.Location.ToString();
@@ -21,8 +21,8 @@ function On_Command(Player, cmd, args) {
 }
 	
 function On_PlayerConnected(Player) {
-	DataStore.Add('Player_Connect', Player.GameID, Plugin.Timestamp);
-	DataStore.Add('PlayerNameByID', Player.GameID, Player.Name);
+    DataStore.Add('Player_Connect', Player.SteamID, Plugin.Timestamp);
+    DataStore.Add('PlayerNameByID', Player.SteamID, Player.Name);
 }
 
 function On_PlayerSpawned(Player, se) {

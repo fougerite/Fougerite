@@ -1,6 +1,5 @@
 ﻿namespace Fougerite
 {
-    using Facepunch.Utility;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -9,7 +8,6 @@
     using System.Runtime.InteropServices;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Text.RegularExpressions;
-    using uLink;
     using UnityEngine;
 
     public class Util
@@ -64,6 +62,11 @@
             return new Vector3(x, y, z);
         }
 
+        public Vector2 CreateVector2(float x, float y)
+        {
+            return new Vector2(x, y);
+        }
+
         public void DestroyObject(GameObject go)
         {
             NetCull.Destroy(go);
@@ -113,7 +116,11 @@
         public float GetVectorsDistance(Vector3 v1, Vector3 v2)
         {
             return Vector3.Distance(v1, v2);
-            ;
+        }
+
+        public float GetVector2sDistance(Vector2 v1, Vector2 v2)
+        {
+            return Vector2.Distance(v1, v2);
         }
 
         public static Hashtable HashtableFromFile(string path)
@@ -237,6 +244,12 @@
             }
         }
 
+        public TimeSpan ConvertToTime(long ticks)
+        {
+            TimeSpan ts = TimeSpan.FromTicks(ticks);
+            return ts;
+        }
+
         public bool TryFindType(string typeName, out System.Type t)
         {
             lock (this.typeCache) {
@@ -263,8 +276,7 @@
 
         public bool ContainsString(string str, string key)
         {
-            if (str.Contains(key))
-                return true;
+            if (str.Contains(key)) { return true; }
             return false;
         }
 
@@ -279,18 +291,10 @@
         public Entity GetEntityatCoords(Vector3 givenPosition)
         {
             World world = World.GetWorld();
-            Vector3 entPosition;
             foreach (Entity ent in world.Entities) {
-                if (ent.Name != "MetalDoor" && ent.Name != "WoodDoor") {
-                    entPosition = ((GameObject)ent.Object).gameObject.transform.position;
-                    if ((entPosition - givenPosition).magnitude < 2f)
+                if (!ent.Name.Contains("Door")) {
+                    if (GetVectorsDistance(givenPosition, ent.Location) < 0.1f)
                         return ent;
-                    /*
-                    var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
-                    var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
-                    if (Distance < 0.1f)
-                        return ent;
-                   */
                 }
             }
             return null;
@@ -304,18 +308,10 @@
         public Entity GetDooratCoords(Vector3 givenPosition)
         {
             World world = World.GetWorld();
-            Vector3 entPosition;
             foreach (var ent in world.Entities) {
-                if (ent.Name == "MetalDoor" || ent.Name == "WoodDoor") {
-                    entPosition = ((GameObject)ent.Object).gameObject.transform.position;
-                    if ((entPosition - givenPosition).magnitude < 2f)
+                if (ent.Name.Contains("Door")) {
+                    if (GetVectorsDistance(ent.Location, givenPosition) < 2f)
                         return ent;
-                    /*
-                    var FoundEntity = CreateVector(ent.X, ent.Y, ent.Z);
-                    var Distance = GetVectorsDistance(GivenEntity, FoundEntity);
-                    if (Distance < 2f)
-                        return ent;
-                    */
                 }
             }
             return null;
@@ -324,6 +320,43 @@
         public Entity GetDooratCoords(float x, float y, float z)
         {
             return GetDooratCoords(new Vector3(x, y, z));
+        }
+
+        public object GetInstanceField(Type type, object instance, string fieldName)
+        {
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Static;
+            try
+            {
+                FieldInfo field = type.GetField(fieldName, bindFlags);
+                object v = field.GetValue(instance);
+                return v;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("[Reflection] Failed to get value of " + fieldName + "! " + ex.ToString());
+                return null;
+            }
+        }
+
+        public void SetInstanceField(Type type, object instance, string fieldName, object val)
+        {
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Static;
+            FieldInfo field = type.GetField(fieldName, bindFlags);
+            try
+            {
+                field.SetValue(instance, val);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("[Reflection] Failed to set value of " + fieldName + "! " + ex.ToString());
+            }
+        }
+
+        public ulong TimeInMillis
+        {
+            get { return NetCull.timeInMillis; }
         }
     }
 }

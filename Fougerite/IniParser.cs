@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Fougerite;
 
@@ -52,6 +50,17 @@ public class IniParser
                     this.keyPairs.Add(pair, str3);
                     this.tmpList.Add(pair);
                 }
+            }
+        }
+        FileInfo fi = new FileInfo(iniPath);
+        float mega = (fi.Length / 1024f) / 1024f;
+        if (fi.Exists)
+        {
+            if (mega > 0.65)
+            {
+                Logger.LogWarning("[WARNING] Ini File at: " + iniFilePath + " passed the safe size.");
+                Logger.LogWarning("[WARNING] Inifiles after a time with huge datas can cause bad performance.");
+                Logger.LogWarning("[WARNING] We recommend you to delete the inifile, and recreate It.");
             }
         }
     }
@@ -204,6 +213,14 @@ public class IniParser
         {
             this.keyPairs[pair] = value;
         }
+    }
+
+    public bool ContainsSetting(string sectionName, string settingName)
+    {
+        SectionPair pair;
+        pair.Section = sectionName;
+        pair.Key = settingName;
+        return this.keyPairs.Contains(pair);
     }
 
     [StructLayout(LayoutKind.Sequential)]

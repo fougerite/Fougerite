@@ -1,8 +1,6 @@
 ﻿namespace Fougerite.Events
 {
     using System;
-    using System.Runtime.CompilerServices;
-    using System.Threading;
     using System.Timers;
 
     public class TimedEvent
@@ -44,15 +42,26 @@
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (this.OnFire != null)
+            try
             {
-                this.OnFire(this.Name);
+                if (this.OnFire != null)
+                {
+                    this.OnFire(this.Name);
+                }
+                if (this.OnFireArgs != null)
+                {
+                    this.OnFireArgs(this.Name, this.Args);
+                }
+                this.lastTick = DateTime.UtcNow.Ticks;
             }
-            if (this.OnFireArgs != null)
+            catch (Exception ex)
             {
-                this.OnFireArgs(this.Name, this.Args);
+                Logger.LogDebug("Error occured at timer: " + this.Name + " Error: " + ex.ToString());
+                this.Stop();
+                Logger.LogDebug("Trying to restart timer.");
+                this.Start();
+                Logger.LogDebug("Restarted!");
             }
-            this.lastTick = DateTime.UtcNow.Ticks;
         }
 
         public void Start()
@@ -64,6 +73,12 @@
         public void Stop()
         {
             this._timer.Stop();
+        }
+
+        public void Kill()
+        {
+            Stop();
+            this._timer.Dispose();
         }
 
         public bool AutoReset

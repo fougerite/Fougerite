@@ -3,13 +3,13 @@
     using Fougerite;
     using RustPP.Permissions;
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     internal class AddAdminCommand : ChatCommand
     {
         public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
             string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
             if (playerName == string.Empty)
             {
@@ -20,22 +20,22 @@
             list.Add(new Administrator(0, "Cancel"));
             foreach (KeyValuePair<ulong, string> entry in Core.userCache)
             {
-                if (entry.Value.Equals(playerName, ic))
+                if (entry.Value.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                 {
                     NewAdmin(new Administrator(entry.Key, entry.Value), Arguments.argUser);
                     return;
-                } else if (entry.Value.Contains(playerName, true))
+                } else if (entry.Value.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                     list.Add(new Administrator(entry.Key, entry.Value));
             }
             if (list.Count == 1)
             {
                 foreach (PlayerClient client in PlayerClient.All)
                 {
-                    if (client.netUser.displayName.Equals(playerName, ic))
+                    if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
                     {                
                         NewAdmin(new Administrator(client.netUser.userID, client.netUser.displayName), Arguments.argUser);
                         return;
-                    } else if (client.netUser.displayName.Contains(playerName, true))
+                    } else if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                         list.Add(new Administrator(client.netUser.userID, client.netUser.displayName));
                 }
             }

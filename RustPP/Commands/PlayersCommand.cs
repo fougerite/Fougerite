@@ -5,7 +5,7 @@
 
     public class PlayersCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Concat(new object[] { PlayerClient.All.Count, " Player", (PlayerClient.All.Count > 1) ? "s" : "", " Online: " }));
             int num = 0;

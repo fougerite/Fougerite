@@ -10,6 +10,7 @@
     {
         public static bool init = false;
         public static int time = 60;
+        public static System.Timers.Timer timer;
 
         private static void advertise_begin()
         {
@@ -21,27 +22,16 @@
 
         private static void airdrop_begin()
         {
-            int num = int.Parse(Core.config.GetSetting("Settings", "amount_of_airdrops"));
-            for (int i = 0; i < num; i++)
-            {
-                SupplyDropZone.CallAirDrop();
-            }
+            int num = int.Parse(Core.config.GetSetting("Settings", "airdrop_count"));
+            World.GetWorld().Airdrop(num);
         }
 
         public static void savealldata()
         {
-            try
-            {
-                AvatarSaveProc.SaveAll();
-                ServerSaveManager.AutoSave();
-                Helper.CreateSaves();
-                DataStore.GetInstance().Save();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-                Logger.Log("Error while auto-saving!");
-            }
+            AvatarSaveProc.SaveAll();
+            ServerSaveManager.AutoSave();
+            Helper.CreateSaves();
+            DataStore.GetInstance().Save();
         }
 
         public static void shutdown()
@@ -63,17 +53,7 @@
             if (time == 0)
             {
                 Util.sayAll(Core.Name, "Server Shutdown NOW!");
-                try
-                {
-                    AvatarSaveProc.SaveAll();
-                    ServerSaveManager.AutoSave();
-                    Helper.CreateSaves();
-                    DataStore.GetInstance().Save();
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                savealldata();
                 Process.GetCurrentProcess().Kill();
             }
             else
@@ -88,7 +68,7 @@
             if (!init)
             {
                 init = true;
-                if (Core.config.GetSetting("Settings", "pvp") == "true")
+                if (Core.config.GetBoolSetting("Settings", "pvp"))
                 {
                     server.pvp = true;
                 }
@@ -96,7 +76,7 @@
                 {
                     server.pvp = false;
                 }
-                if (Core.config.GetSetting("Settings", "instant_craft") == "true")
+                if (Core.config.GetBoolSetting("Settings", "instant_craft"))
                 {
                     crafting.instant = true;
                 }
@@ -112,7 +92,7 @@
                 {
                     sleepers.on = false;
                 }
-                if (Core.config.GetSetting("Settings", "enforce_truth") == "true")
+                if (Core.config.GetBoolSetting("Settings", "enforce_truth"))
                 {
                     truth.punish = true;
                 }
@@ -120,13 +100,13 @@
                 {
                     truth.punish = false;
                 }
-                if (Core.config.GetSetting("Settings", "voice_proximity") == "false")
+                if (!Core.config.GetBoolSetting("Settings", "voice_proximity"))
                 {
                     voice.distance = 2.147484E+09f;
                 }
-                if (Core.config.GetSetting("Settings", "notice_enabled") == "true")
+                if (Core.config.GetBoolSetting("Settings", "notice_enabled"))
                 {
-                    System.Timers.Timer timer = new System.Timers.Timer();
+                    timer = new System.Timers.Timer();
                     timer.Interval = int.Parse(Core.config.GetSetting("Settings", "notice_interval"));
                     timer.AutoReset = true;
                     timer.Elapsed += delegate(object x, ElapsedEventArgs y)

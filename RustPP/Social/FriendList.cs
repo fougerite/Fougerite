@@ -1,27 +1,23 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Social
+﻿namespace RustPP.Social
 {
     using Fougerite;
     using System;
     using System.Collections;
+    using System.Collections.Generic;
 
     [Serializable]
     public class FriendList : ArrayList
     {
         public void AddFriend(string fName, ulong fUID)
         {
-            Contract.Requires(!string.IsNullOrEmpty(fName));
             this.Add(new Friend(fName, fUID));
         }
 
         public string GetRealName(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             foreach (Friend friend in this)
             {
-                if (name.ToLower() == friend.GetDisplayName().ToLower())
+                if (name.Equals(friend.GetDisplayName(), StringComparison.OrdinalIgnoreCase))
                 {
                     return friend.GetDisplayName();
                 }
@@ -36,99 +32,90 @@ namespace RustPP.Social
 
         public bool isFriendWith(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
-            bool flag = false;
             foreach (Friend friend in this)
             {
-                if (friend.GetDisplayName().ToLower() == name.ToLower())
+                if (friend.GetDisplayName().Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    flag = true;
+                    return true;
                 }
             }
-            return flag;
+            return false;
         }
 
         public bool isFriendWith(ulong userID)
         {
-            bool flag = false;
             foreach (Friend friend in this)
             {
                 if (friend.GetUserID() == userID)
                 {
-                    flag = true;
+                    return true;
                 }
             }
-            return flag;
+            return false;
         }
 
         public void OutputList(ref ConsoleSystem.Arg arg)
         {
-            ArrayList list = new ArrayList();
-            ArrayList list2 = new ArrayList();
+            List<string> onlineFriends = new List<string>();
+            List<string> offlineFriends = new List<string>();
             foreach (Friend friend in this)
             {
                 PlayerClient client;
-                try
+                if (PlayerClient.FindByUserID(friend.GetUserID(), out client))
                 {
-                    client = EnumerableToArray.ToArray<PlayerClient>(PlayerClient.FindAllWithString(friend.GetUserID().ToString()))[0];
-                }
-                catch
+                    onlineFriends.Add(client.netUser.displayName);
+                    friend.SetDisplayName(client.netUser.displayName);
+                } else
                 {
-                    list2.Add(friend.GetDisplayName());
-                    continue;
-                }
-                list.Add(client.netUser.displayName + " (Online)");
-                friend.SetDisplayName(client.netUser.displayName);
-            }
-            if (list.Count > 0)
-            {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Concat(new object[] { "You currently have ", list.Count, " friend", (list.Count > 1) ? "s" : "", " online." }));
-            }
-            else
-            {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, "None of your friend is playing right now.");
-            }
-            foreach (string str in list2)
-            {
-                list.Add(str);
-            }
-            int num = 0;
-            int num2 = 0;
-            string str2 = "";
-            foreach (string str3 in list)
-            {
-                num2++;
-                if (num2 >= 60)
-                {
-                    num = 0;
-                    break;
-                }
-                str2 = str2 + str3 + ", ";
-                if (num == 6)
-                {
-                    num = 0;
-                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
-                    str2 = "";
-                }
-                else
-                {
-                    num++;
+                    offlineFriends.Add(friend.GetDisplayName());
                 }
             }
-            if (num != 0)
+
+            int friendsPerRow = 7;
+            Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                string.Format("You currently have {0} friend{1} online:",
+                    (onlineFriends.Count == 0 ? "no" : onlineFriends.Count.ToString()), ((onlineFriends.Count != 1) ? "s" : string.Empty)));
+
+            if (onlineFriends.Count <= friendsPerRow && onlineFriends.Count > 0)
             {
-                Util.sayUser(arg.argUser.networkPlayer, Core.Name, str2.Substring(0, str2.Length - 3));
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", onlineFriends.ToArray()));
+            } else if (onlineFriends.Count > 0)
+            {
+                int i = friendsPerRow;
+                for (; i <= onlineFriends.Count; i += friendsPerRow)
+                {
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray()));
+                }
+                if (offlineFriends.Count % friendsPerRow > 0 || i - friendsPerRow == friendsPerRow)
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", onlineFriends.GetRange(i - friendsPerRow, offlineFriends.Count % friendsPerRow).ToArray()));
+            }
+
+            Util.sayUser(arg.argUser.networkPlayer, Core.Name,
+                string.Format("You have {0} offline friend{1}:",
+                    (offlineFriends.Count == 0 ? "no" : offlineFriends.Count.ToString()), ((offlineFriends.Count != 1) ? "s" : string.Empty)));
+           
+            if (offlineFriends.Count <= friendsPerRow && offlineFriends.Count > 0)
+            {
+                Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", offlineFriends.ToArray()));
+            } else if (offlineFriends.Count > 0)
+            {
+                int i = friendsPerRow;
+                for (; i <= offlineFriends.Count; i += friendsPerRow)
+                {
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", offlineFriends.GetRange(i - friendsPerRow, friendsPerRow).ToArray()));
+                }
+                if (offlineFriends.Count % friendsPerRow > 0 || i - friendsPerRow == friendsPerRow)
+                {
+                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, string.Join(", ", offlineFriends.GetRange(i - friendsPerRow, offlineFriends.Count % friendsPerRow).ToArray()));
+                }
             }
         }
 
         public void RemoveFriend(string fName)
         {
-            Contract.Requires(!string.IsNullOrEmpty(fName));
-
             foreach (Friend friend in this)
             {
-                if (fName.ToLower() == friend.GetDisplayName().ToLower())
+                if (fName.Equals(friend.GetDisplayName(), StringComparison.OrdinalIgnoreCase))
                 {
                     this.Remove(friend);
                     break;
@@ -152,7 +139,7 @@ namespace RustPP.Social
         private class Friend
         {
             private string _displayName;
-            private readonly ulong _userID;
+            private ulong _userID;
 
             public Friend(string dName, ulong uID)
             {

@@ -585,6 +585,10 @@ namespace ServerTests
 
         //
 
+        void ChatReceived(ref ConsoleSystem.Arg arg)
+        {
+        }
+
         void Chat(Fougerite.Player p, ref ChatString text)
         {
         }

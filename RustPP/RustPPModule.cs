@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RustPP
+﻿namespace RustPP
 {
     using Fougerite;
     using Fougerite.Events;
     using Rust;
     using RustPP.Commands;
+    using System;
     using System.Collections;
+    using System.Collections.Generic;
+    using System.Text;
     using System.IO;
     using System.Reflection;
     using System.Timers;
+    using UnityEngine;
 
     public class RustPPModule : Fougerite.Module
     {
@@ -21,7 +21,7 @@ namespace RustPP
         }
         public override string Author
         {
-            get { return "xEnt22"; }
+            get { return "xEnt22, mikec, DreTaX"; }
         }
         public override string Description
         {
@@ -44,26 +44,44 @@ namespace RustPP
 
         public static string ConfigFile;
         public static string ConfigsFolder;
+        public static string JoinMsg = "has joined the server";
+        public static string LeaveMsg = "has left the server";
+        public static string StarterMsg = "You have spawned a Starter Kit!";
+        public static string StarterCDMsg = "You must wait awhile before using this..";
+
         public override void Initialize()
         {
             ConfigsFolder = ModuleFolder;
             ConfigFile = Path.Combine(ConfigsFolder, "Rust++.cfg");
 
             Core.Init();
-
-            try
-            {
-                Core.config = new IniParser(ConfigFile);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
+            Core.config = new IniParser(ConfigFile);
 
             if (Core.config == null)
             {
                 Logger.LogError("[RPP] Can't load config!");
                 return;
+            }
+            string chatname = Core.config.GetSetting("Settings", "chatname");
+            if (!string.IsNullOrEmpty(chatname))
+            {
+                Core.Name = Core.config.GetSetting("Settings", "chatname");
+            }
+            if (Core.config.ContainsSetting("Settings", "joinmsg"))
+            {
+                JoinMsg = Core.config.GetSetting("Settings", "joinmsg");
+            }
+            if (Core.config.ContainsSetting("Settings", "leavemsg"))
+            {
+                LeaveMsg = Core.config.GetSetting("Settings", "leavemsg");
+            }
+            if (Core.config.ContainsSetting("Settings", "startermsg"))
+            {
+                StarterMsg = Core.config.GetSetting("Settings", "startermg");
+            }
+            if (Core.config.ContainsSetting("Settings", "startercdmsg"))
+            {
+                StarterCDMsg = Core.config.GetSetting("Settings", "startercdmsg");
             }
             TimedEvents.startEvents();
 
@@ -76,7 +94,8 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown += ServerShutdown;
             Fougerite.Hooks.OnShowTalker += ShowTalker;
             Fougerite.Hooks.OnChatRaw += ChatReceived;
-            Fougerite.Hooks.OnCommandRaw += HandleCommand;
+            Fougerite.Hooks.OnChat += Chat;
+            Server.GetServer().LookForRustPP();
         }
 
         public override void DeInitialize()
@@ -92,8 +111,8 @@ namespace RustPP
             Fougerite.Hooks.OnServerShutdown -= ServerShutdown;
             Fougerite.Hooks.OnShowTalker -= ShowTalker;
             Fougerite.Hooks.OnChatRaw -= ChatReceived;
-            Fougerite.Hooks.OnCommandRaw -= HandleCommand;
-            
+            Fougerite.Hooks.OnChat -= Chat;
+            TimedEvents.timer.Stop();
             Logger.LogDebug("DeInitialized RPP");
         }
 
@@ -102,88 +121,127 @@ namespace RustPP
             TimedEvents.startEvents();
         }
 
-        void HandleCommand(ref ConsoleSystem.Arg arg)
-        {
-            Core.handleCommand(arg);
-        }
-
         void ChatReceived(ref ConsoleSystem.Arg arg)
         {
-            string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, "text"));
-            Fougerite.Player p = new Fougerite.Player(arg.argUser.playerClient);
-
             var command = ChatCommand.GetCommand("tpto") as TeleportToCommand;
-            if (command.GetTPWaitList().Contains(p.PlayerClient.userID))
+            if (command.GetTPWaitList().Contains(arg.argUser.userID))
             {
-                int num;
-                if (int.TryParse(str, out num)) command.PartialNameTP(p, num);
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    command.GetTPWaitList().Remove(p.PlayerClient.userID);
-                }
-                arg = null;
-            }
-            else if (Core.banWaitList.Contains(p.PlayerClient.userID))
+                command.PartialNameTP(ref arg, arg.GetInt(0));
+                arg.ArgsStr = string.Empty;
+            /* }  else if (Core.friendWaitList.Contains(arg.argUser.userID))
             {
-                int num2;
-                if (int.TryParse(str, out num2))
-                {
-                    (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(p, num2);
-                }
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    Core.banWaitList.Remove(p.PlayerClient.userID);
-                }
-                arg = null;
-            }
-            else if (Core.kickWaitList.Contains(p.PlayerClient.userID))
+                (ChatCommand.GetCommand("addfriend") as AddFriendCommand).PartialNameAddFriend(ref arg, arg.GetInt(0));
+                Core.friendWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty; */
+            } else if (Core.shareWaitList.Contains(arg.argUser.userID))
             {
-                int num3;
-                if (int.TryParse(str, out num3))
-                {
-                    (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(p, num3);
-                }
-                else
-                {
-                    Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Invalid Choice!");
-                    Core.kickWaitList.Remove(p.PlayerClient.userID);
-                }
-                arg = null;
+                (ChatCommand.GetCommand("share") as ShareCommand).PartialNameDoorShare(ref arg, arg.GetInt(0));
+                Core.shareWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.banWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("ban") as BanCommand).PartialNameBan(ref arg, arg.GetInt(0));
+                Core.banWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.kickWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("kick") as KickCommand).PartialNameKick(ref arg, arg.GetInt(0));
+                Core.kickWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.killWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("kill") as KillCommand).PartialNameKill(ref arg, arg.GetInt(0));
+                Core.killWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unfriendWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unfriend") as UnfriendCommand).PartialNameUnfriend(ref arg, arg.GetInt(0));
+                Core.unfriendWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unshareWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unshare") as UnshareCommand).PartialNameUnshareDoors(ref arg, arg.GetInt(0));
+                Core.unshareWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.whiteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addwl") as WhiteListAddCommand).PartialNameWhitelist(ref arg, arg.GetInt(0));
+                Core.whiteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            /* } else if (Core.adminAddWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addadmin") as AddAdminCommand).PartialNameNewAdmin(ref arg, arg.GetInt(0));
+                Core.adminAddWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty; */
+            } else if (Core.adminRemoveWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unadmin") as RemoveAdminCommand).PartialNameRemoveAdmin(ref arg, arg.GetInt(0));
+                Core.adminRemoveWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminFlagsWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("getflags") as GetFlagsCommand).PartialNameGetFlags(ref arg, arg.GetInt(0));
+                Core.adminFlagsWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.muteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("mute") as MuteCommand).PartialNameMute(ref arg, arg.GetInt(0));
+                Core.muteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unmuteWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unmute") as UnmuteCommand).PartialNameUnmute(ref arg, arg.GetInt(0));
+                Core.unmuteWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminFlagWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("addflag") as AddFlagCommand).PartialNameAddFlags(ref arg, arg.GetInt(0));
+                Core.adminFlagWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.adminUnflagWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unflag") as RemoveFlagsCommand).PartialNameRemoveFlags(ref arg, arg.GetInt(0));
+                Core.adminUnflagWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
+            } else if (Core.unbanWaitList.Contains(arg.argUser.userID))
+            {
+                (ChatCommand.GetCommand("unban") as UnbanCommand).PartialNameUnban(ref arg, arg.GetInt(0));
+                Core.unbanWaitList.Remove(arg.argUser.userID);
+                arg.ArgsStr = string.Empty;
             }
 
-            if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID)) // p.PlayerClient.userID
+            if (Core.IsEnabled())
+                Core.handleCommand(ref arg);
+        }
+
+        void Chat(Fougerite.Player p, ref ChatString text)
+        {
+            if (Core.IsEnabled() && Core.muteList.Contains(p.PlayerClient.netUser.userID))
             {
-                arg = null;
-                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "You are muted.");
+                text.NewText = string.Empty;
+                Util.sayUser(p.PlayerClient.netUser.networkPlayer, Core.Name, "You are muted.");
             }
         }
 
         void ShowTalker(uLink.NetworkPlayer player, PlayerClient p)
         {
-            if (Core.IsEnabled())
+            if (!Core.IsEnabled())
+                return;
+
+            if (!Core.config.GetBoolSetting("Settings", "voice_notifications"))
+                return;
+
+            if (Fougerite.Hooks.talkerTimers.ContainsKey(p.userID))
             {
-                try
-                {
-                    if (Core.config.GetSetting("Settings", "voice_notifications") == "true")
-                    {
-                        if (Fougerite.Hooks.talkerTimers.ContainsKey(p.userID))
-                        {
-                            if ((Environment.TickCount - ((int)Fougerite.Hooks.talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
-                                return;
-                            Fougerite.Hooks.talkerTimers[p.userID] = Environment.TickCount;
-                        }
-                        else
-                            Fougerite.Hooks.talkerTimers.Add(p.userID, Environment.TickCount);
-                        Notice.Inventory(player, "☎ " + p.netUser.displayName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
-                }
+                if ((Environment.TickCount - ((int)Fougerite.Hooks.talkerTimers[p.userID])) < int.Parse(Core.config.GetSetting("Settings", "voice_notification_delay")))
+                    return;
+
+                Fougerite.Hooks.talkerTimers[p.userID] = Environment.TickCount;
+            } else
+            {   
+                Fougerite.Hooks.talkerTimers.Add(p.userID, Environment.TickCount);
             }
+            Notice.Inventory(player, "☎ " + p.netUser.displayName);
         }
 
         void ServerShutdown()
@@ -195,11 +253,11 @@ namespace RustPP
         void PlayerKilled(DeathEvent event2)
         {
             event2.DropItems = !RustPP.Hooks.KeepItem();
-            if (!(event2.Attacker is NPC)) // Not NPC
+            if (!(event2.Attacker is NPC))
             {
                 Fougerite.Player attacker = event2.Attacker as Fougerite.Player;
                 Fougerite.Player victim = event2.Victim as Fougerite.Player;
-                if ((attacker.Name != victim.Name) && (Fougerite.Server.GetServer().FindPlayer(attacker.Name) != null))
+                if (attacker != victim)
                     RustPP.Hooks.broadcastDeath(victim.Name, attacker.Name, event2.WeaponName);
             }
         }
@@ -209,7 +267,7 @@ namespace RustPP
             if (Core.IsEnabled() && !de.Open)
             {
                 ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
-                ArrayList list = (ArrayList)command.GetSharedDoors()[de.Entity.OwnerID];
+                ArrayList list = (ArrayList)command.GetSharedDoors()[(de.Entity.Object as DeployableObject).ownerID];
                 if (list == null)
                     de.Open = false;
                 else if (list.Contains(p.PlayerClient.userID))
@@ -219,16 +277,16 @@ namespace RustPP
             }
         }
 
-        void PlayerHurt(HurtEvent he) // Dirty Hack?
+        void PlayerHurt(HurtEvent he)
         {
-            if (RustPP.Hooks.IsFriend(he.DamageEvent))
+            if (RustPP.Hooks.IsFriend(he))
                 he.DamageAmount = 0f;
         }
 
         void PlayerDisconnect(Fougerite.Player player)
         {
             if (Core.IsEnabled())
-                RustPP.Hooks.logoffNotice(player.PlayerClient.netUser);
+                RustPP.Hooks.logoffNotice(player);
         }
 
         void PlayerConnect(Fougerite.Player player)

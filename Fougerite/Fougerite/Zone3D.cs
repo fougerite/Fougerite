@@ -1,9 +1,6 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -12,37 +9,26 @@ namespace Fougerite
         private List<Vector2> _points;
         private bool _protected;
         private bool _pvp;
-        private readonly List<Entity> tmpPoints;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_points != null);
-            Contract.Invariant(tmpPoints != null);
-        }
+        private List<Entity> tmpPoints;
 
         public Zone3D(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this.PVP = true;
             this.Protected = false;
             this.tmpPoints = new List<Entity>();
             this.Points = new List<Vector2>();
-            DataStore.GetInstance().Add("3DZonesList", name, this);
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            if (!zones.ContainsKey(name))
+                zones.Add(name, this);
         }
 
         public bool Contains(Entity en)
         {
-            Contract.Requires(en != null);
-
-            return this.Contains(new Vector3(en.X, en.Y, en.Z));
+            return this.Contains(en.Location);
         }
 
         public bool Contains(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
-
             return this.Contains(p.Location);
         }
 
@@ -65,25 +51,17 @@ namespace Fougerite
 
         public static Zone3D Get(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
-            return (DataStore.GetInstance().Get("3DZonesList", name) as Zone3D);
+            return World.GetWorld().zones[name] as Zone3D;
         }
 
         public static Zone3D GlobalContains(Entity e)
         {
-            Contract.Requires(e != null);
-
-            Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
-            if (table != null)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
-                foreach (object obj2 in table.Values)
+                if (zone.Contains(e))
                 {
-                    Zone3D zoned = obj2 as Zone3D;
-                    if (zoned.Contains(e))
-                    {
-                        return zoned;
-                    }
+                    return zone;
                 }
             }
             return null;
@@ -91,18 +69,12 @@ namespace Fougerite
 
         public static Zone3D GlobalContains(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
-
-            Hashtable table = DataStore.GetInstance().GetTable("3DZonesList");
-            if (table != null)
+            Dictionary<string, Zone3D> zones = World.GetWorld().zones;
+            foreach (Zone3D zone in zones.Values)
             {
-                foreach (object obj2 in table.Values)
+                if (zone.Contains(p))
                 {
-                    Zone3D zoned = obj2 as Zone3D;
-                    if (zoned.Contains(p))
-                    {
-                        return zoned;
-                    }
+                    return zone;
                 }
             }
             return null;
@@ -130,32 +102,32 @@ namespace Fougerite
         public void ShowMarkers()
         {
             this.HideMarkers();
-            foreach (Vector2 vector in this.Points)
+            try
             {
-                float ground = World.GetWorld().GetGround(vector.x, vector.y);
-                Vector3 location = new Vector3(vector.x, ground, vector.y);
-                Entity item = World.GetWorld().Spawn(";struct_metal_pillar", location) as Entity;
-                this.tmpPoints.Add(item);
+                foreach (Vector2 vector in this.Points)
+                {
+                    float ground = World.GetWorld().GetGround(vector.x, vector.y);
+                    Vector3 location = new Vector3(vector.x, ground, vector.y);
+                    object o = World.GetWorld().Spawn(";struct_metal_pillar", location);
+                    Entity item = new Entity(o);
+                    this.tmpPoints.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogDebug(e.ToString());
             }
         }
 
-        public System.Collections.Generic.List<Entity> Entities
+        public List<Entity> Entities
         {
             get
             {
-                System.Collections.Generic.List<Entity> list = new System.Collections.Generic.List<Entity>();
-                foreach (Entity entity in World.GetWorld().Entities)
-                {
-                    if (this.Contains(entity))
-                    {
-                        list.Add(entity);
-                    }
-                }
-                return list;
+                return World.GetWorld().Entities;
             }
         }
 
-        public System.Collections.Generic.List<Vector2> Points
+        public List<Vector2> Points
         {
             get
             {
@@ -163,7 +135,6 @@ namespace Fougerite
             }
             set
             {
-                Contract.Requires(value != null);
                 this._points = value;
             }
         }

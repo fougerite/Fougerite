@@ -1,24 +1,14 @@
-﻿using System.Diagnostics.Contracts;
-
+﻿
 namespace Fougerite
 {
-    using System;
     using UnityEngine;
 
     public class NPC
     {
-        private readonly Character _char;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_char != null);
-        }
+        private Character _char;
 
         public NPC(Character c)
         {
-            Contract.Requires(c != null);
-
             this._char = c;
         }
 
@@ -34,6 +24,10 @@ namespace Fougerite
             {
                 return this._char;
             }
+            set
+            {
+                this._char = value;
+            }
         }
 
         public float Health
@@ -44,8 +38,6 @@ namespace Fougerite
             }
             set
             {
-                if (_char.takeDamage == null)
-                    throw new InvalidOperationException("NPC's takeDamage field is null.");
                 this._char.takeDamage.health = value;
             }
         }
@@ -54,14 +46,25 @@ namespace Fougerite
         {
             get
             {
-                if (_char.name == null)
-                    throw new InvalidOperationException("NPC's name is null.");
-                return this._char.name.Replace("(Clone)", "");
+                return this._char.name.Contains("_A(Clone)") ? this._char.name.Replace("_A(Clone)", "") : this._char.name.Replace("(Clone)", "");
             }
-            set
-            {
-                this._char.name = value;
-            }
+        }
+
+        public Vector3 Location
+        {
+            get { return this._char.transform.position; }
+        }
+        public float X
+        {
+            get { return this._char.transform.position.x; }
+        }
+        public float Y
+        {
+            get { return this._char.transform.position.y; }
+        }
+        public float Z
+        {
+            get { return this._char.transform.position.z; }
         }
     }
 }

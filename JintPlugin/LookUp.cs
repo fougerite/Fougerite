@@ -5,31 +5,21 @@
     using System.Linq;
     using UnityEngine;
 
-    internal class LookUp
+    public struct LookUp
     {
-        internal static LookUp lookup;
-
-        internal static LookUp GetLookUp()
-        {
-            if (lookup == null) {
-                lookup = new LookUp();
-            }
-            return lookup;
-        }
-
-        internal enum Material
+        public enum Material
         {
             Metal,
             Wood,
         }
 
-        internal enum Fire
+        public enum Fire
         {
             Furnace,
             Campfire,
         }
 
-        internal enum Store
+        public enum Store
         {
             WoodBox,
             LargeWoodBox,
@@ -39,15 +29,15 @@
             RepairBench,
         }
 
-        internal enum Respawn
+        public enum Respawn
         {
             Bed,
             Bag,
         }
 
-        internal static class Structures
+        public class Structures
         {
-            internal static StructureMaster[] All
+            public static StructureMaster[] All
             {
                 get
                 {
@@ -56,7 +46,7 @@
 
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -70,7 +60,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -78,14 +68,14 @@
                 }
             }
 
-            internal static StructureMaster[] EqualTo(float sqrmag)
+            public static StructureMaster[] EqualTo(float sqrmag)
             {
                 return (from s in StructureMaster.AllStructures
                             where s.containedBounds.size.sqrMagnitude == sqrmag
                             select s).ToArray<StructureMaster>();
             }
 
-            internal static StructureMaster[] OneRoom
+            public static StructureMaster[] OneRoom
             {
                 get
                 {
@@ -93,69 +83,69 @@
                 }
             }
 
-            internal static StructureMaster[] EqualTo(StructureMaster structure)
+            public static StructureMaster[] EqualTo(StructureMaster structure)
             {
                 return Structures.EqualTo(structure.containedBounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] EqualTo(Bounds bounds)
+            public static StructureMaster[] EqualTo(Bounds bounds)
             {
                 return Structures.EqualTo(bounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] EqualTo(Vector3 size)
+            public static StructureMaster[] EqualTo(Vector3 size)
             {
                 return Structures.EqualTo(size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] LargerThan(float sqrmag)
+            public static StructureMaster[] LargerThan(float sqrmag)
             {
                 return (from s in StructureMaster.AllStructures
                             where s.containedBounds.size.sqrMagnitude > sqrmag
                             select s).ToArray<StructureMaster>();
             }
 
-            internal static StructureMaster[] LargerThan(StructureMaster structure)
+            public static StructureMaster[] LargerThan(StructureMaster structure)
             {
                 return Structures.LargerThan(structure.containedBounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] LargerThan(Bounds bounds)
+            public static StructureMaster[] LargerThan(Bounds bounds)
             {
                 return Structures.LargerThan(bounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] LargerThan(Vector3 size)
+            public static StructureMaster[] LargerThan(Vector3 size)
             {
                 return Structures.LargerThan(size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] SmallerThan(float sqrmag)
+            public static StructureMaster[] SmallerThan(float sqrmag)
             {
                 return (from s in StructureMaster.AllStructures
                             where s.containedBounds.size.sqrMagnitude < sqrmag
                             select s).ToArray<StructureMaster>();
             }
 
-            internal static StructureMaster[] SmallerThan(StructureMaster structure)
+            public static StructureMaster[] SmallerThan(StructureMaster structure)
             {
                 return Structures.SmallerThan(structure.containedBounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] SmallerThan(Bounds bounds)
+            public static StructureMaster[] SmallerThan(Bounds bounds)
             {
                 return Structures.SmallerThan(bounds.size.sqrMagnitude);
             }
 
-            internal static StructureMaster[] SmallerThan(Vector3 size)
+            public static StructureMaster[] SmallerThan(Vector3 size)
             {
                 return Structures.SmallerThan(size.sqrMagnitude);
             }
         }
 
-        internal static class Respawns
+        public class Respawns
         {
-            internal static DeployedRespawn[] All
+            public static DeployedRespawn[] All
             {
                 get
                 {
@@ -163,7 +153,7 @@
                 }
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -177,7 +167,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -186,9 +176,9 @@
             }
         }
 
-        internal static class Sleepers
+        public class Sleepers
         {
-            internal static SleepingAvatar[] All
+            public static SleepingAvatar[] All
             {
                 get
                 {
@@ -196,7 +186,7 @@
                 }
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -210,7 +200,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -219,10 +209,10 @@
             }
         }
 
-        internal static class Storage
+        public class Storage
         {
 
-            internal static SaveableInventory[] All
+            public static SaveableInventory[] All
             {
                 get
                 {
@@ -230,7 +220,7 @@
                 }
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -244,7 +234,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -253,9 +243,9 @@
             }
         }
 
-        internal static class Fires
+        public class Fires
         {
-            internal static FireBarrel[] All
+            public static FireBarrel[] All
             {
                 get
                 {
@@ -263,7 +253,7 @@
                 }
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -277,7 +267,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -286,9 +276,9 @@
             }
         }
 
-        internal static class Shelters
+        public class Shelters
         {
-            internal static DeployableObject[] All
+            public static DeployableObject[] All
             {
                 get
                 {
@@ -298,7 +288,7 @@
                 }
             }
 
-            internal static Dictionary<string, int> Census
+            public static Dictionary<string, int> Census
             {
                 get
                 {
@@ -312,7 +302,7 @@
                 }
             }
 
-            internal static string[] Owners
+            public static string[] Owners
             {
                 get
                 {               
@@ -321,90 +311,90 @@
             }
         }
 
-        internal StructureMaster[] Filter(StructureMaster[] structures, string id)
+        public static StructureMaster[] Filter(StructureMaster[] structures, string id)
         {
             return (from s in structures
                        where s.ownerID.ToString() == id
                        select s).ToArray<StructureMaster>();
         }
 
-        internal StructureMaster[] Filter(StructureMaster[] structures, string[] id)
+        public static StructureMaster[] Filter(StructureMaster[] structures, string[] id)
         {
             return (from s in structures
                         where id.Contains(s.ownerID.ToString())
                         select s).ToArray<StructureMaster>();
         }
 
-        internal StructureMaster[] Filter(StructureMaster[] structures, Material material)
+        public static StructureMaster[] Filter(StructureMaster[] structures, Material material)
         {
             return (from s in structures
                         where s.GetMaterialType().ToString() == material.ToString()
                         select s).ToArray<StructureMaster>();
         }
 
-        internal StructureMaster[] Filter(StructureMaster[] structures, Vector3 loc, float distance)
+        public static StructureMaster[] Filter(StructureMaster[] structures, Vector3 loc, float distance)
         {
             return (from s in structures
                         where s.containedBounds.SqrDistance(loc) <= distance * distance
                         select s).ToArray<StructureMaster>();
         }
 
-        internal DeployedRespawn[] Filter(DeployedRespawn[] bedsnbags, string id)
+        public static DeployedRespawn[] Filter(DeployedRespawn[] bedsnbags, string id)
         {
             return (from b in bedsnbags
                         where b.ownerID.ToString() == id
                         select b).ToArray<DeployedRespawn>();
         }
 
-        internal DeployedRespawn[] Filter(DeployedRespawn[] bedsnbags, string[] id)
+        public static DeployedRespawn[] Filter(DeployedRespawn[] bedsnbags, string[] id)
         {
             return (from b in bedsnbags
                         where id.Contains(b.ownerID.ToString())
                         select b).ToArray<DeployedRespawn>();
         }
 
-        internal SleepingAvatar[] Filter(SleepingAvatar[] sleepers, string id)
+        public static SleepingAvatar[] Filter(SleepingAvatar[] sleepers, string id)
         {
             return (from s in sleepers
                         where s.ownerID.ToString() == id
                         select s).ToArray<SleepingAvatar>();
         }
 
-        internal SaveableInventory[] Filter(SaveableInventory[] saveable, Store kind)
+        public static SaveableInventory[] Filter(SaveableInventory[] saveable, Store kind)
         {
             return (from s in saveable
                         where s.name.StartsWith(kind.ToString())
                         select s).ToArray<SaveableInventory>();
         }
 
-        internal FireBarrel[] Filter(FireBarrel[] sleepers, string id)
+        public static FireBarrel[] Filter(FireBarrel[] sleepers, string id)
         {
             return (from s in sleepers
                         where s.GetComponent<DeployableObject>().ownerID.ToString() == id
                         select s).ToArray<FireBarrel>();
         }
 
-        internal FireBarrel[] Filter(FireBarrel[] fires, Fire kind)
+        public static FireBarrel[] Filter(FireBarrel[] fires, Fire kind)
         {
             return (from f in fires
                         where f.name.StartsWith(kind.ToString())
                         select f).ToArray<FireBarrel>();
         }
 
-        internal DeployableObject[] Filter(DeployableObject[] shelters, string id)
+        public static DeployableObject[] Filter(DeployableObject[] shelters, string id)
         {
             return (from s in shelters
                         where s.ownerID.ToString() == id
                         select s).ToArray<DeployableObject>();
         }
 
-        internal string CensusToJson(Dictionary<string, int> census)
+        public static string CensusToJson(Dictionary<string, int> census)
         {
-            string json = "{";
+            string json = "[ ";
             foreach (KeyValuePair<string, int> kvp in census) {
-                json += " \"" + kvp.Key + "\": " + kvp.Value.ToString() + ",";
+                json += " { \"" + kvp.Key.Replace("\"","\\\"") + "\": " + kvp.Value.ToString() + " },";
             }
-            return json.TrimEnd(new char[1]{ ',' }) + " }";
+            return json.TrimEnd(new char[1]{ ',' }) + " ]";
         }
     }
 }

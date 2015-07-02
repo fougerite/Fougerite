@@ -3,36 +3,65 @@
     using Facepunch.Utility;
     using Fougerite;
     using System;
+    using System.Linq;
+    using System.Collections.Generic;
 
     internal class SpawnItemCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            if (ChatArguments.Length > 0)
             {
-                str = str + ChatArguments[i] + " ";
-            }
-            string[] strArray = Facepunch.Utility.String.SplitQuotesStrings(str.Trim());
-            if (strArray.Length == 2)
-            {
-                string oldValue = strArray[0].Replace("\"", "");
-                string str3 = "";
-                for (int j = 1; j < ChatArguments.Length; j++)
+                StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
+                int qty = 0;
+                int qtyIdx = -1;
+                for (var i = 0; i < ChatArguments.Length; i++)
                 {
-                    str3 = str3 + ChatArguments[j] + " ";
+                    string arg = ChatArguments[i];
+                    int test;
+                    if (int.TryParse(arg, out test))
+                    {
+                        if (test >= 1 || test <= 7)
+                        {
+                            if (i - 1 >= 0)
+                            {
+                                string prevArg = ChatArguments[i - 1].ToUpperInvariant();
+                                if (prevArg.Equals("Part", ic) || prevArg.Equals("Kit", ic))
+                                    continue;
+                            }
+                        }
+                        if (test == 556)
+                        {
+                            if (i + 1 < ChatArguments.Length)
+                            {
+                                string nextArg = ChatArguments[i + 1];
+                                if (nextArg.Similarity("Ammo") > 0.749
+                                    || nextArg.Similarity("Casing") > 0.799)
+                                    continue;
+                            }
+                        }
+                        qty = test;
+                        qtyIdx = i;
+                    }
                 }
-                string str4 = str3.Replace("\"", "");
-                if ((oldValue != "") && (str4 != ""))
+                if (qty == 0)
                 {
-                    string[] strArray2 = str4.Replace(oldValue, "").Trim().Split(new char[] { ' ' });
-                    Arguments.Args = new string[] { oldValue, strArray2[strArray2.Length - 1] };
-                    inv.give(ref Arguments);
+                    qty = 1;
                 }
+                string quantity = qty.ToString();
+                string[] remain = qtyIdx > -1 ? ChatArguments.Slice(0, qtyIdx)
+                    .Concat(ChatArguments.Slice(Math.Min(qtyIdx + 1, ChatArguments.Length), ChatArguments.Length))
+                    .ToArray() : ChatArguments;
+
+                string itemName = string.Join(" ", remain.ToArray()).MatchItemName();
+                Arguments.Args = new string[] { itemName, quantity };
+                Logger.LogDebug(string.Format("[SpawnItemCommand] terms={0}, itemName={1}, quantity={2}", string.Join(",", remain.ToArray()), itemName, quantity));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("{0}  {1} were placed in your inventory.", quantity, itemName));
+                inv.give(ref Arguments);
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /i \"itemName\" \"quantity\"");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /i  (quantity)  itemName");
             }
         }
     }

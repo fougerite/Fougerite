@@ -1,57 +1,32 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite.Events
+﻿namespace Fougerite.Events
 {
-    using System;
-
     public class GatherEvent
     {
         private string _item;
         private bool _over;
         private int _qty;
-        private readonly string _type;
-        
-        private readonly ResourceTarget res;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_type != null);
-            Contract.Invariant(_item != null);
-            Contract.Invariant(_qty >= 0);
-        }
+        private string _type;
+        private ResourceTarget res;
+        private ItemDataBlock dataBlock = null;
+        private ResourceGivePair resourceGivePair = null;
 
         public GatherEvent(ResourceTarget r, ItemDataBlock db, int qty)
         {
-            // r can be null here.
-            Contract.Requires(db != null);
-            Contract.Requires(qty >= 0);
-
-            if (db.name == null)
-                throw new InvalidOperationException("ItemDataBlock's name is null.");
-
             this.res = r;
             this._qty = qty;
             this._item = db.name;
             this._type = "Tree";
+            this.dataBlock = db;
             this.Override = false;
         }
 
         public GatherEvent(ResourceTarget r, ResourceGivePair gp, int qty)
         {
-            Contract.Requires(r != null);
-            Contract.Requires(gp != null);
-            Contract.Requires(qty >= 0);
-
-            if (gp.ResourceItemDataBlock == null)
-                throw new InvalidOperationException("ResourceGivePair's ResourceItemDataBlock property is null.");
-            if (gp.ResourceItemDataBlock.name == null)
-                throw new InvalidOperationException("ResourceItemDataBlock's name is null.");
-
             this.res = r;
             this._qty = qty;
             this._item = gp.ResourceItemDataBlock.name;
             this._type = this.res.type.ToString();
+            this.resourceGivePair = gp;
             this.Override = false;
         }
 
@@ -71,7 +46,6 @@ namespace Fougerite.Events
             }
             set
             {
-                Contract.Requires(value != null);
                 this._item = value;
             }
         }
@@ -104,7 +78,6 @@ namespace Fougerite.Events
             }
             set
             {
-                Contract.Requires(value >= 0);
                 this._qty = value;
             }
         }
@@ -114,6 +87,30 @@ namespace Fougerite.Events
             get
             {
                 return this._type;
+            }
+        }
+
+        public ResourceTarget ResourceTarget
+        {
+            get
+            {
+                return this.res;
+            }
+        }
+
+        public ItemDataBlock ItemDataBlock
+        {
+            get
+            {
+                return this.dataBlock;
+            }
+        }
+
+        public ResourceGivePair ResourceGivePair
+        {
+            get
+            {
+                return this.resourceGivePair;
             }
         }
     }

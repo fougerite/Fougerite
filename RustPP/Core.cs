@@ -1,9 +1,13 @@
-﻿namespace RustPP
+﻿using System.Runtime.CompilerServices;
+
+namespace RustPP
 {
     using Fougerite;
     using RustPP.Commands;
     using RustPP.Permissions;
+    using RustPP.Social;
     using System;
+    using System.Linq;
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
@@ -11,25 +15,65 @@
 
     public class Core
     {
-        public static Hashtable banWaitList = new Hashtable();
-        public static PList blackList = new PList();
-        public static IniParser config;
-        public static Hashtable kickWaitList = new Hashtable();
-        public static System.Collections.Generic.List<ulong> muteList = new System.Collections.Generic.List<ulong>();
-        public static System.Collections.Generic.List<ulong> tempConnect = new System.Collections.Generic.List<ulong>();
-        public static Dictionary<ulong, string> userCache;
-        public static string Version = "1.6.0";
-        public static PList whiteList = new PList();
         public static string Name = "Rust++";
+        public static string Version = "1.6.9";
+        public static IniParser config;
+        public static PList blackList = new PList();
+        public static PList whiteList = new PList();
+        public static PList muteList = new PList();
+        public static List<ulong> tempConnect = new List<ulong>();
+        public static Dictionary<ulong, string> userCache;
+        public static Hashtable banWaitList = new Hashtable();
+        public static Hashtable unbanWaitList = new Hashtable();
+        public static Hashtable kickWaitList = new Hashtable();
+        public static Hashtable killWaitList = new Hashtable();
+        public static Hashtable whiteWaitList = new Hashtable();
+        public static Hashtable adminFlagsWaitList = new Hashtable();
+        public static Hashtable adminFlagWaitList = new Hashtable();
+        public static Hashtable adminFlagsList = new Hashtable();
+        public static Hashtable adminUnflagWaitList = new Hashtable();
+        public static Hashtable adminAddWaitList = new Hashtable();
+        public static Hashtable adminRemoveWaitList = new Hashtable();
+        public static Hashtable muteWaitList = new Hashtable();
+        public static Hashtable unmuteWaitList = new Hashtable();
+        public static Hashtable friendWaitList = new Hashtable();
+        public static Hashtable unfriendWaitList = new Hashtable();
+        public static Hashtable shareWaitList = new Hashtable();
+        public static Hashtable unshareWaitList = new Hashtable();
 
         public static void Init()
         {
             InitializeCommands();
             ShareCommand command = ChatCommand.GetCommand("share") as ShareCommand;
             FriendsCommand command2 = ChatCommand.GetCommand("friends") as FriendsCommand;
-            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")))
+            bool success = false;
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
             {
+                SerializableDictionary<ulong, List<ulong>> doorsDict;
+                doorsDict = Helper.ObjectFromXML<SerializableDictionary<ulong, List<ulong>>>(RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
+                Hashtable doorsSave = new Hashtable();
+                foreach (KeyValuePair<ulong, List<ulong>> kvp in doorsDict)
+                {
+                    ArrayList arr = new ArrayList(kvp.Value);
+                    doorsSave.Add(kvp.Key, arr);
+                }
+                command.SetSharedDoors(doorsSave);
+                success = true;
+            }
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")) && !success)
                 command.SetSharedDoors(Helper.ObjectFromFile<Hashtable>(RustPPModule.GetAbsoluteFilePath("doorsSave.rpp")));
+
+            if (!File.Exists(RustPPModule.GetAbsoluteFilePath("doorsSave.xml")))
+            {
+                SerializableDictionary<ulong, List<ulong>> doorsSave = new SerializableDictionary<ulong, List<ulong>>();
+                foreach (DictionaryEntry entry in command.GetSharedDoors())
+                {
+                    ulong key = (ulong)entry.Key;
+                    ArrayList value = (ArrayList)entry.Value;
+                    List<ulong> list = new List<ulong>(value.OfType<ulong>());
+                    doorsSave.Add(key, list);
+                }
+                Helper.ObjectToXML<SerializableDictionary<ulong, List<ulong>>>(doorsSave, RustPPModule.GetAbsoluteFilePath("doorsSave.xml"));
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("friendsSave.rpp")))
             {
@@ -37,45 +81,84 @@
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("admins.xml")))
             {
-                Administrator.AdminList = Helper.ObjectFromXML<System.Collections.Generic.List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
+                Administrator.AdminList = Helper.ObjectFromXML<List<Administrator>>(RustPPModule.GetAbsoluteFilePath("admins.xml"));
             }
-            if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")))
+            success = false;
+            bool clearer = false;
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
             {
-                userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
+                FileInfo fi = new FileInfo(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                float mega = (fi.Length / 1024f) / 1024f;
+                if (mega > 0.65)
+                {
+                    try
+                    {
+                        //string n = Path.Combine(RustPPModule.ConfigsFolder, "userCache-OLD-" + DateTime.Now.ToShortDateString() + ".xml");
+                        System.IO.File.Move(RustPPModule.GetAbsoluteFilePath("userCache.xml"),
+                            Path.Combine(RustPPModule.ConfigsFolder,
+                                "userCache-OLD-" + DateTime.Now.ToShortDateString() + ".xml"));
+                        clearer = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("Rust++ failed to copy the usercache file.");
+                    }
+                }
+                else 
+                { 
+                    SerializableDictionary<ulong, string> userDict = Helper.ObjectFromXML<SerializableDictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+                    userCache = new Dictionary<ulong, string>(userDict);
+                    success = true;
+                }
             }
-            else
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("cache.rpp")) && !success)
+            {
+                if (clearer)
+                {
+                    File.WriteAllText(RustPPModule.GetAbsoluteFilePath("cache.rpp"), string.Empty);
+                }
+                userCache = Helper.ObjectFromFile<Dictionary<ulong, string>>(RustPPModule.GetAbsoluteFilePath("cache.rpp"));
+                if (!File.Exists(RustPPModule.GetAbsoluteFilePath("userCache.xml")))
+                    Helper.ObjectToXML<SerializableDictionary<ulong, string>>(new SerializableDictionary<ulong, string>(userCache), RustPPModule.GetAbsoluteFilePath("userCache.xml"));
+            }
+            else if (!success)
             {
                 userCache = new Dictionary<ulong, string>();
             }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("whitelist.xml")))
             {
-                whiteList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("whitelist.xml")));
-            }
-            else
+                whiteList = new PList(Helper.ObjectFromXML<List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("whitelist.xml")));
+            } else
             {
                 whiteList = new PList();
             }
+            if (File.Exists(RustPPModule.GetAbsoluteFilePath("mutelist.xml")))
+            {
+                muteList = new PList(Helper.ObjectFromXML<List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("mutelist.xml")));
+            } else
+            {
+                muteList = new PList();
+            }
             if (File.Exists(RustPPModule.GetAbsoluteFilePath("bans.xml")))
             {
-                blackList = new PList(Helper.ObjectFromXML<System.Collections.Generic.List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("bans.xml")));
-            }
-            else
+                blackList = new PList(Helper.ObjectFromXML<List<PList.Player>>(RustPPModule.GetAbsoluteFilePath("bans.xml")));
+            } else
             {
                 blackList = new PList();
             }
         }
 
-        public static void handleCommand(ConsoleSystem.Arg arg)
+        public static void handleCommand(ref ConsoleSystem.Arg arg)
         {
             string displayname = arg.argUser.user.Displayname;
-            string[] strArray = arg.GetString(0, "text").Trim().Split(new char[] { ' ' });
+            string[] strArray = arg.GetString(0).Trim().Split(new char[] { ' ' });
             string cmd = strArray[0].Trim();
             string[] chatArgs = new string[strArray.Length - 1];
             for (int i = 1; i < strArray.Length; i++)
             {
                 chatArgs[i - 1] = strArray[i];
             }
-            ChatCommand.CallCommand(cmd, arg, chatArgs);
+            ChatCommand.CallCommand(cmd, ref arg, ref chatArgs);
         }
 
         private static void InitializeCommands()
@@ -169,25 +252,12 @@
 
         public static bool IsEnabled()
         {
-            if (config == null)
-            {
-                return false;
-            }
-            string setting = config.GetSetting("Settings", "rust++_enabled");
-            switch (setting)
-            {
-                case null:
-                    return false;
-
-                case "false":
-                    return false;
-            }
-            return (setting == "true");
+            return config.GetBoolSetting("Settings", "rust++_enabled");
         }
 
         public static void motd(uLink.NetworkPlayer player)
         {
-            if (config.GetSetting("Settings", "motd") == "true")
+            if (config.GetBoolSetting("Settings", "motd"))
             {
                 int num = 1;
                 do

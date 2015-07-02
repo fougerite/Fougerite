@@ -1,18 +1,30 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
     using Facepunch;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using uLink;
     using UnityEngine;
 
     public class World
     {
         private static World world;
+        public Dictionary<string, Zone3D> zones;
+
+        public World()
+        {
+            this.zones = new Dictionary<string, Zone3D>();
+        }
+
+        public static World GetWorld()
+        {
+            if (world == null)
+            {
+                world = new World();
+            }
+            return world;
+        }
 
         public void Airdrop()
         {
@@ -21,12 +33,33 @@ namespace Fougerite
 
         public void Airdrop(int rep)
         {
-            Contract.Requires(rep >= 0);
-
+            System.Random rand = new System.Random();
+            Vector3 rpog;
             for (int i = 0; i < rep; i++)
             {
-                SupplyDropZone.CallAirDrop();
+                RandomPointOnGround(ref rand, out rpog);
+                SupplyDropZone.CallAirDropAt(rpog);
             }
+        }
+
+        private static void RandomPointOnGround(ref System.Random rand, out Vector3 onground)
+        {
+            float z = (float)rand.Next(-6100, -1000);
+            float x = (float)3600;
+            if (z < -4900 && z >= -6100)
+            {
+                x = (float)rand.Next(3600, 6100);
+            }
+            if (z < 2400 && z >= -4900)
+            {
+                x = (float)rand.Next(3600, 7300);
+            }
+            if (z <= -1000 && z >= -2400)
+            {
+                x = (float)rand.Next(3600, 6700);
+            }
+            float y = Terrain.activeTerrain.SampleHeight(new Vector3(x, 500, z));
+            onground = new Vector3(x, y, z);
         }
 
         public void AirdropAt(float x, float y, float z)
@@ -36,36 +69,51 @@ namespace Fougerite
 
         public void AirdropAt(float x, float y, float z, int rep)
         {
-            for (int i = 0; i < rep; i++)
-            {
-                SupplyDropZone.CallAirDropAt(new Vector3(x, y, z));
-            }
+            Vector3 target = new Vector3(x, y, z);
+            this.AirdropAt(target, rep);
         }
 
         public void AirdropAtPlayer(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
-
-            this.AirdropAtPlayer(p, 1);
+            this.AirdropAt(p.X, p.Y, p.Z, 1);
         }
 
         public void AirdropAtPlayer(Fougerite.Player p, int rep)
         {
-            Contract.Requires(p != null);
-            Contract.Requires(rep >= 0);
+            this.AirdropAt(p.X, p.Y, p.Z, rep);
+        }
 
+        public void AirdropAt(Vector3 target, int rep)
+        {
+            Vector3 original = target;
+            System.Random rand = new System.Random();
+            int r, reset;
+            r = reset = 20;
             for (int i = 0; i < rep; i++)
             {
-                SupplyDropZone.CallAirDropAt(p.Location);
+                r--;
+                if (r == 0)
+                {
+                    r = reset;
+                    target = original;
+                }
+                target.y = original.y + rand.Next(-5, 20) * 20;
+                SupplyDropZone.CallAirDropAt(target);
+                Jitter(ref target);
             }
+        }
+
+        private static void Jitter(ref Vector3 target)
+        {
+            Vector2 jitter = UnityEngine.Random.insideUnitCircle;
+            target.x += jitter.x * 100;
+            target.z += jitter.y * 100;
         }
 
         public void Blocks()
         {
             foreach (ItemDataBlock block in DatablockDictionary.All)
             {
-                Contract.Assert(block != null);
-
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Name: " + block.name + "\n");
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "ID: " + block.uniqueID + "\n");
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Flags: " + block._itemFlags.ToString() + "\n");
@@ -80,7 +128,6 @@ namespace Fougerite
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Combinations:\n");
                 foreach (ItemDataBlock.CombineRecipe recipe in block.Combinations)
                 {
-                    Contract.Assert(recipe != null);
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "\t" + recipe.ToString() + "\n");
                 }
                 File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Icon: " + block.icon + "\n");
@@ -91,9 +138,6 @@ namespace Fougerite
                 if (block is BulletWeaponDataBlock)
                 {
                     BulletWeaponDataBlock block2 = (BulletWeaponDataBlock)block;
-                    Contract.Assert(block2 != null);
-                    Contract.Assert(block2.ammoType != null);
-
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Min Damage: " + block2.damageMin + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Max Damage: " + block2.damageMax + "\n");
                     File.AppendAllText(Util.GetAbsoluteFilePath("BlocksData.txt"), "Ammo: " + block2.ammoType.ToString() + "\n");
@@ -118,19 +162,16 @@ namespace Fougerite
 
         public StructureMaster CreateSM(Fougerite.Player p)
         {
-            Contract.Requires(p != null);
             return this.CreateSM(p, p.X, p.Y, p.Z, p.PlayerClient.transform.rotation);
         }
 
         public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z)
         {
-            Contract.Requires(p != null);
             return this.CreateSM(p, x, y, z, Quaternion.identity);
         }
 
         public StructureMaster CreateSM(Fougerite.Player p, float x, float y, float z, Quaternion rot)
         {
-            Contract.Requires(p != null);
             StructureMaster master = NetCull.InstantiateClassic<StructureMaster>(Bundling.Load<StructureMaster>("content/structures/StructureMasterPrefab"), new Vector3(x, y, z), rot, 0);
             master.SetupCreator(p.PlayerClient.controllable);
             return master;
@@ -138,14 +179,19 @@ namespace Fougerite
 
         public Zone3D CreateZone(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
             return new Zone3D(name);
         }
 
         public float GetGround(float x, float z)
         {
             Vector3 above = new Vector3(x, 2000f, z);
-            return (float)((RaycastHit) Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+            return (float)((RaycastHit)Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
+        }
+
+        public float GetGround(Vector3 target)
+        {
+            Vector3 above = new Vector3(target.x, 2000f, target.z);
+            return (float)((RaycastHit)Physics.RaycastAll(above, Vector3.down, 2000f)[0]).point.y;
         }
 
         public float GetTerrainHeight(Vector3 target)
@@ -158,67 +204,26 @@ namespace Fougerite
             return GetTerrainHeight(new Vector3(x, y, z));
         }
 
+        public float GetTerrainSteepness(Vector3 target)
+        {
+            return Terrain.activeTerrain.terrainData.GetSteepness(target.x, target.z);
+        }
+
+        public float GetTerrainSteepness(float x, float z)
+        {
+            return Terrain.activeTerrain.terrainData.GetSteepness(x, z);
+        }
+
         public float GetGroundDist(float x, float y, float z)
         {
-            Vector3 origin = new Vector3(x, y, z);
-            return GetGroundDist(origin);
+            float ground = GetGround(x, z);
+            return y - ground;
         }
 
-        [Flags]
-        public enum Layers
+        public float GetGroundDist(Vector3 target)
         {
-            Default = 0,
-            TransparentFX = 1,
-            IgnoreRaycast = 2,
-            Water = 4,
-            NGUILayer = 8,
-            NGUILayer2D = 9,
-            Static = 10,
-            Sprite = 11,
-            CULL500 = 12,
-            ViewModel = 13,
-            GrassDisplacement = 14,
-            CharacterCollision = 16,
-            Hitbox = 17,
-            Debris = 18,
-            Terrain = 19,
-            Mechanical = 20,
-            RayOnly = 21,
-            MeshBatched = 22,
-            Skybox = 23,
-            Zone = 26,
-            Ragdoll = 27,
-            Vehicle = 28,
-            PlayerClip = 29,
-            GameUI = 31
-        }
-
-        public float GetGroundDist(Vector3 origin)
-        {
-            RaycastHit Hit;
-
-            float Distance = float.NaN;
-
-            Layers mask = Layers.Static | Layers.Terrain;
-            if (Physics.Raycast(origin, Vector3.down, out Hit, float.MaxValue, (int)mask))
-            {
-                Logger.LogDebug("GetGroundDist: " + Hit.transform.name + " - " + Hit.transform.tag);
-                Distance = Hit.distance;
-            }
-
-            Distance = (float) Math.Round(Distance - 1.5f, 2); // 1.5 - player height
-            return (Distance < 0.5f ? 0 : Distance); // if Distance < 0.5 we may say that he is grounded o_O
-        }
-
-        public static World GetWorld()
-        {
-            Contract.Ensures(Contract.Result<World>() != null);
-
-            if (world == null)
-            {
-                world = new World();
-            }
-            return world;
+            float ground = GetGround(target);
+            return target.y - ground;
         }
 
         public void Lists()
@@ -249,8 +254,7 @@ namespace Fougerite
                 {
                     DeployableItemDataBlock block2 = block as DeployableItemDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block2.ObjectToPlace.name + "\", \"" + block2.DeployableObjectPrefabName + "\"],\n");
-                }
-                else if (block is StructureComponentDataBlock)
+                } else if (block is StructureComponentDataBlock)
                 {
                     StructureComponentDataBlock block3 = block as StructureComponentDataBlock;
                     File.AppendAllText(Util.GetAbsoluteFilePath("Prefabs.txt"), "[\"" + block3.structureToPlacePrefab.name + "\", \"" + block3.structureToPlaceName + "\"],\n");
@@ -258,119 +262,113 @@ namespace Fougerite
             }
         }
 
+
+        public void DataBlocks()
+        {
+            foreach (ItemDataBlock block in DatablockDictionary.All)
+            {
+                File.AppendAllText(Util.GetAbsoluteFilePath("DataBlocks.txt"), string.Format("name={0} uniqueID={1}\n", block.name, block.uniqueID));
+            }
+        }
+
         public object Spawn(string prefab, Vector3 location)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            
             return this.Spawn(prefab, location, 1);
         }
 
         public object Spawn(string prefab, Vector3 location, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-            
             return this.Spawn(prefab, location, Quaternion.identity, rep);
         }
 
         public object Spawn(string prefab, float x, float y, float z)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            
-            return this.Spawn(prefab, x, y, z, 1);
+            return this.Spawn(prefab, new Vector3(x, y, z), 1);
         }
 
         private object Spawn(string prefab, Vector3 location, Quaternion rotation, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             object obj2 = null;
-            for (int i = 0; i < rep; i++)
-            {
-                if (prefab == ":player_soldier")
+            try { 
+                for (int i = 0; i < rep; i++)
                 {
-                    obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
-                }
-                else if (prefab.Contains("C130"))
-                {
-                    obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
-                }
-                else
-                {
-                    GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
-                    obj2 = obj3;
-                    StructureComponent component = obj3.GetComponent<StructureComponent>();
-                    if (component != null)
+                    if (prefab == ":player_soldier")
                     {
-                        obj2 = new Entity(component);
-                    }
+                        obj2 = NetCull.InstantiateDynamic(uLink.NetworkPlayer.server, prefab, location, rotation);
+                    } 
+                    else if (prefab.Contains("C130"))
+                    {
+                        obj2 = NetCull.InstantiateClassic(prefab, location, rotation, 0);
+                    } 
                     else
                     {
-                        DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
-                        if (obj4 != null)
+                        GameObject obj3 = NetCull.InstantiateStatic(prefab, location, rotation);
+                        obj2 = obj3;
+                        StructureComponent component = obj3.GetComponent<StructureComponent>();
+                        if (component != null)
                         {
-                            obj4.ownerID = 0L;
-                            obj4.creatorID = 0L;
-                            obj4.CacheCreator();
-                            obj4.CreatorSet();
-                            obj2 = new Entity(obj4);
+                            obj2 = new Entity(component);
+                        } 
+                        else
+                        {
+                            DeployableObject obj4 = obj3.GetComponent<DeployableObject>();
+                            if (obj4 != null)
+                            {
+                                obj4.ownerID = 0L;
+                                obj4.creatorID = 0L;
+                                obj4.CacheCreator();
+                                obj4.CreatorSet();
+                                obj2 = new Entity(obj4);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.LogDebug(e.ToString());
             }
             return obj2;
         }
 
         public object Spawn(string prefab, float x, float y, float z, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, new Vector3(x, y, z), Quaternion.identity, rep);
         }
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-
-            return this.Spawn(prefab, x, y, z, rot, 1);
+            return this.Spawn(prefab, new Vector3(x, y, z), rot, 1);
         }
 
         public object Spawn(string prefab, float x, float y, float z, Quaternion rot, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, new Vector3(x, y, z), rot, rep);
         }
 
         public object SpawnAtPlayer(string prefab, Fougerite.Player p)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(p != null);
-
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, 1);
         }
 
         public object SpawnAtPlayer(string prefab, Fougerite.Player p, int rep)
         {
-            Contract.Requires(!string.IsNullOrEmpty(prefab));
-            Contract.Requires(p != null);
-            Contract.Requires(rep >= 0);
-
             return this.Spawn(prefab, p.Location, p.PlayerClient.transform.rotation, rep);
         }
 
         public float DayLength
         {
+            get { return env.daylength; }
+            set { env.daylength = value; }
+        }
+
+        public List<Entity> StructureMasters
+        {
             get
             {
-                return env.daylength;
-            }
-            set
-            {
-                env.daylength = value;
+                IEnumerable<Entity> structures = from s in StructureMaster.AllStructures
+                                                             select new Entity(s);
+                return structures.ToList<Entity>();
             }
         }
 
@@ -378,40 +376,41 @@ namespace Fougerite
         {
             get
             {
-                IEnumerable<Entity> component = from c in
-                    (UnityEngine.Object.FindObjectsOfType<StructureComponent>() as StructureComponent[])
-                    select new Entity(c);
-                IEnumerable<Entity> deployable = from d in
-                    (UnityEngine.Object.FindObjectsOfType<DeployableObject>() as DeployableObject[])
-                    select new Entity(d);
+                IEnumerable<Entity> component = from c in UnityEngine.Object.FindObjectsOfType<StructureComponent>()
+                                                select new Entity(c);
+                IEnumerable<Entity> deployable = from d in UnityEngine.Object.FindObjectsOfType<DeployableObject>()
+                                                 select new Entity(d);
+                IEnumerable<Entity> supplydrop = from s in UnityEngine.Object.FindObjectsOfType<SupplyCrate>()
+                                             select new Entity(s);
                 // this is much faster than Concat
-                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count());
+                List<Entity> entities = new List<Entity>(component.Count() + deployable.Count() + supplydrop.Count());
                 entities.AddRange(component);
                 entities.AddRange(deployable);
+                if (supplydrop.Count() > 0)
+                {
+                    entities.AddRange(supplydrop);
+                }
+
                 return entities;
             }
         }
 
         public float NightLength
         {
-            get
-            {
-                return env.nightlength;
-            }
-            set
-            {
-                env.nightlength = value;
-            }
+            get { return env.nightlength; }
+            set { env.nightlength = value; }
         }
 
-        public float Time {
+        public float Time
+        {
             get
             {
                 try
                 {
                     float hour = EnvironmentControlCenter.Singleton.GetTime();
                     return hour;
-                } catch (NullReferenceException) {
+                } catch (NullReferenceException)
+                {
                     return 12f;
                 }
             }
@@ -424,7 +423,9 @@ namespace Fougerite
                 try
                 {
                     EnvironmentControlCenter.Singleton.SetTime(hour);
-                } catch(Exception) { }
+                } catch (Exception)
+                {
+                }
             }
         }
     }

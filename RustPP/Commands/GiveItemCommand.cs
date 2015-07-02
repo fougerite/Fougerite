@@ -3,44 +3,120 @@
     using Facepunch.Utility;
     using Fougerite;
     using System;
+    using System.Linq;
+    using System.Collections;
+    using System.Collections.Generic;
 
     internal class GiveItemCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            string usage = "Give Item usage:  /give  playerName  itemName  (quantity)";
+            if (ChatArguments.Length < 2) // minimum arguments = 2
             {
-                str = str + ChatArguments[i] + " ";
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, usage);
+                return;
             }
-            string[] strArray = Facepunch.Utility.String.SplitQuotesStrings(str.Trim());
-            if (strArray.Length == 3)
+
+            StringComparison ic = StringComparison.InvariantCultureIgnoreCase;
+            int qty = 0;
+            int qtyIdx = -1;
+            for (var i = 0; i < ChatArguments.Length; i++)
             {
-                string str2 = strArray[0].Replace("\"", "");
-                string str3 = "";
-                for (int j = 1; j < ChatArguments.Length; j++)
+                string arg = ChatArguments[i];
+                int test;
+                if (int.TryParse(arg, out test))
                 {
-                    str3 = str3 + ChatArguments[j] + " ";
-                }
-                string str4 = str3.Replace("\"", "");
-                if ((str2 != "") && (str4 != ""))
-                {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        if (client.netUser.displayName.ToLower() == str2.ToLower())
-                        {
-                            string oldValue = strArray[2].Replace("\"", "");
-                            Arguments.Args = new string[] { str2, str4.Replace(oldValue, "").Trim(), oldValue };
-                            inv.giveplayer(ref Arguments);
-                            return;
+                    if (test >= 1 || test <= 7)
+                    {                       
+                        if (i - 1 >= 0)
+                        {  
+                            string prevArg = ChatArguments[i - 1];
+                            if (prevArg.Equals("Part", ic) || prevArg.Equals("Kit", ic))
+                                continue;
                         }
                     }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
+                    if (test == 556)
+                    {
+                        if (i + 1 < ChatArguments.Length)
+                        {
+                            string nextArg = ChatArguments[i + 1];
+                            if (nextArg.Similarity("Ammo") >= 0.75
+                                || nextArg.Similarity("Casing") >= 0.8)
+                                continue;
+                        }
+                    }
+                    qty = test;
+                    qtyIdx = i;
                 }
+            }
+            if (qty == 0)
+            {
+                qty = 1;
+            } 
+            else if (ChatArguments.Length < 3) // qty given, but there is < 3 arguments => invalid
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, usage);
+                return;
+            }
+
+            string quantity = qty.ToString();
+            double best = 0d;
+            string[] remain = qtyIdx > -1 ? ChatArguments.Slice(0, qtyIdx)
+                    .Concat(ChatArguments.Slice(Math.Min(qtyIdx + 1, ChatArguments.Length), ChatArguments.Length))
+                    .ToArray() : ChatArguments;
+
+            List<string> collect = new List<string>();
+            ICollection<string> matches = new List<string>();
+            foreach (string name in PlayerClient.All.Select(pc => pc.netUser.displayName))
+            {
+                for (int i = 0; i < remain.Length; i++)
+                {
+                    for (int j = i; j < remain.Length; j++)
+                    {
+                        string[] testArr = remain.Slice(i, j + 1);
+                        string testStr = string.Join(" ", testArr);
+                        double sim = testStr.Similarity(name);
+                        if (sim > best && sim > 0.333d)
+                        {
+                            best = sim;
+                            matches.Clear();
+                            matches.Add(name);
+                            collect.Clear();
+                            collect.AddRange(testArr);
+                        }
+                        else if (sim == best)
+                        {
+                            matches.Add(name);
+                            collect.AddRange(testArr);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < collect.Count(); i++)
+            {
+                if (FougeriteEx.ItemWords.Any(x => x.LongestCommonSubstring(collect[i]).StartsWith(collect[i], ic)))
+                    collect[i] = string.Empty;
+            }
+
+            if (matches.Count == 1)
+            {
+                string recipName = matches.First();
+                string itemName = string.Join(" ", remain.Except(collect).ToArray()).MatchItemName();
+                Arguments.Args = new string[] { recipName, itemName, quantity };
+                Logger.LogDebug(string.Format("[GiveItemCommand] quantity={0} item={1} recipient={2}", quantity, itemName, recipName));
+
+                inv.giveplayer(ref Arguments);
+                Util.sayUser(Arguments.argUser.networkPlayer, RustPP.Core.Name, string.Format("{0}  {1} were placed in {2}'s inventory.", quantity, itemName, recipName));
+
+                uLink.NetworkPlayer np = Fougerite.Player.FindByName(recipName).PlayerClient.netPlayer;
+                Util.sayUser(np, RustPP.Core.Name, string.Format("{0} gave you  {1}  {2}", Arguments.argUser.displayName, quantity, itemName));
             }
             else
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Spawn Item usage:  /give \"playerName\" \"itemName\" \"quantity\"");
+                var str = Arguments.ArgsStr.Replace(string.Join(" ", collect.ToArray()), "");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("Unsure about {0}. Please be more specific.", str));
             }
         }
     }

@@ -6,7 +6,7 @@
 
     public class HistoryCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             for (int i = 1 + int.Parse(Core.config.GetSetting("Settings", "chat_history_amount")); i > 0; i--)
             {

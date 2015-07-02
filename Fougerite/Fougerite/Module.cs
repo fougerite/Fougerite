@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-
+﻿
 namespace Fougerite
 {
+    using System;
     public abstract class Module : IDisposable
     {
         public virtual string ModuleFolder

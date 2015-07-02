@@ -3,54 +3,45 @@
     using Facepunch.Utility;
     using Fougerite;
     using System;
+    using System.Linq;
     using System.Collections;
+    using System.Collections.Generic;
 
     public class PrivateMessagesCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            string str = "";
-            for (int i = 0; i < ChatArguments.Length; i++)
+            if (ChatArguments.Length < 2)
             {
-                str = str + ChatArguments[i] + " ";
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Private Message Usage:  /pm playerName message");
+                return;
             }
-            string[] strArray = Facepunch.Utility.String.SplitQuotesStrings(str.Trim());
-            if (strArray.Length == 2)
+            string search = ChatArguments[0];
+            for (int i = 1; i < ChatArguments.Length; i++)
             {
-                string str2 = strArray[0].Replace("\"", "");
-                string str3 = "";
-                for (int j = 1; j < ChatArguments.Length; j++)
+                PlayerClient recipient = Fougerite.Player.FindByName(search).PlayerClient as PlayerClient;
+                if (recipient == null)
                 {
-                    str3 = str3 + ChatArguments[j] + " ";
+                    search += string.Format(" {0}", ChatArguments[i]);
+                    continue;
                 }
-                string str4 = str3.Replace("\"", "");
-                if ((str2 != null) && (str4 != null))
+
+                string message = Arguments.ArgsStr.Replace(search, "").Trim(new char[] { ' ', '"' }).Replace('"', 'ˮ');
+                if (message == string.Empty)
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Private Message Usage:  /pm playerName message");
+                else
                 {
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        if (client.netUser.displayName.ToLower() == str2.ToLower())
-                        {
-                            Util.say(client.netPlayer, "\"PM from " + Arguments.argUser.displayName + "\"", "\"" + str4 + "\"");
-                            Util.say(Arguments.argUser.networkPlayer, "\"PM to " + client.netUser.displayName + "\"", "\"" + str4 + "\"");
-                            Hashtable replies = (ChatCommand.GetCommand("r") as ReplyCommand).GetReplies();
-                            if (replies.ContainsKey(client.netUser.displayName))
-                            {
-                                replies[client.netUser.displayName] = Arguments.argUser.displayName;
-                            }
-                            else
-                            {
-                                replies.Add(client.netUser.displayName, Arguments.argUser.displayName);
-                            }
-                            return;
-                        }
-                    }
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str2);
+                    Util.say(recipient.netPlayer, string.Format("\"PM from {0}\"", Arguments.argUser.displayName.Replace('"', 'ˮ')), string.Format("\"{0}\"", message));
+                    Util.say(Arguments.argUser.networkPlayer, string.Format("\"PM to {0}\"", recipient.netUser.displayName.Replace('"', 'ˮ')), string.Format("\"{0}\"", message));
+                    Hashtable replies = (ChatCommand.GetCommand("r") as ReplyCommand).GetReplies();
+                    if (replies.ContainsKey(recipient.netUser.displayName))
+                        replies[recipient.netUser.displayName] = Arguments.argUser.displayName;
+                    else
+                        replies.Add(recipient.netUser.displayName, Arguments.argUser.displayName);
                 }
+                return;
             }
-            else
-            {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Private Message Usage:  /pm \"player\" \"message\"");
-            }
+            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, string.Format("No player found matching the name: {0}", search.Replace('"', 'ˮ')));
         }
     }
 }

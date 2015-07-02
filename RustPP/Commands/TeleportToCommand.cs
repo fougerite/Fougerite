@@ -9,58 +9,60 @@
     {
         public static Hashtable tpWaitList = new Hashtable();
 
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            if (ChatArguments == null)
+            if (ChatArguments.Length == 3)
             {
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tpto \"playerName\"");
+                float n, n2, n3;
+                bool b = float.TryParse(ChatArguments[0], out n);
+                bool b2 = float.TryParse(ChatArguments[1], out n2);
+                bool b3 = float.TryParse(ChatArguments[2], out n3);
+                if (b && b2 && b3)
+                {
+                    Fougerite.Player plr = Fougerite.Server.Cache[Arguments.argUser.userID];
+                    if (plr != null)
+                    {
+                        plr.TeleportTo(n, n2, n3);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported to the coords!");
+                        return;
+                    }
+                }
             }
-            else
+            string playerName = string.Join(" ", ChatArguments).Trim(new char[] { ' ', '"' });
+            if (playerName == string.Empty)
             {
-                string str = "";
-                for (int i = 0; i < ChatArguments.Length; i++)
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tpto playerName");
+                return;
+            } 
+            List<string> list = new List<string>();
+            list.Add("ToTarget");
+            foreach (PlayerClient client in PlayerClient.All)
+            {
+                if (client.netUser.displayName.ToUpperInvariant().Contains(playerName.ToUpperInvariant()))
                 {
-                    str = str + ChatArguments[i] + " ";
+                    if (client.netUser.displayName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Arguments.Args = new string[] { Arguments.argUser.displayName, client.netUser.displayName };
+                        teleport.toplayer(ref Arguments);
+                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported to " + client.netUser.displayName);
+                        return;
+                    }
+                    list.Add(client.netUser.displayName);
                 }
-                str = str.Trim();
-                if (!(str != ""))
+            }
+            if (list.Count != 0)
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
+                for (int j = 1; j < list.Count; j++)
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Teleport Usage:  /tphere \"playerName\"");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
                 }
-                else
-                {
-                    System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-                    list.Add("ToTarget");
-                    foreach (PlayerClient client in PlayerClient.All)
-                    {
-                        if (client.netUser.displayName.ToLower().Contains(str.ToLower()))
-                        {
-                            if (client.netUser.displayName.ToLower() == str.ToLower())
-                            {
-                                Arguments.Args = new string[] { Arguments.argUser.displayName, client.netUser.displayName };
-                                teleport.toplayer(ref Arguments);
-                                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have teleported to " + client.netUser.displayName);
-                                return;
-                            }
-                            list.Add(client.netUser.displayName);
-                        }
-                    }
-                    if (list.Count != 0)
-                    {
-                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, ((list.Count - 1)).ToString() + " Player" + (((list.Count - 1) > 1) ? "s" : "") + " were found: ");
-                        for (int j = 1; j < list.Count; j++)
-                        {
-                            Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, j + " - " + list[j]);
-                        }
-                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
-                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
-                        tpWaitList.Add(Arguments.argUser.userID, list);
-                    }
-                    else
-                    {
-                        Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + str);
-                    }
-                }
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "0 - Cancel");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Please enter the number matching the player you were looking for.");
+                tpWaitList[Arguments.argUser.userID] = list;
+            } else
+            {
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "No player found with the name: " + playerName);
             }
         }
 
@@ -69,30 +71,30 @@
             return tpWaitList;
         }
 
-        public void PartialNameTP(Fougerite.Player p, int choice)
+        public void PartialNameTP(ref ConsoleSystem.Arg Arguments, int choice)
         {
-            if (!tpWaitList.Contains(p.PlayerClient.userID)) return;
-
-            List<string> list = (List<string>)tpWaitList[p.PlayerClient.userID];
-            string str = list[choice];
-            if (choice == 0)
+            if (tpWaitList.Contains(Arguments.argUser.userID))
             {
-                Util.sayUser(p.PlayerClient.netPlayer, Core.Name, "Cancelled!");
-                tpWaitList.Remove(p.PlayerClient.userID);
-            }
-            else
-            {
-                ConsoleSystem.Arg arg;
-                if (list[0] == "ToTarget")
+                System.Collections.Generic.List<string> list = (System.Collections.Generic.List<string>)tpWaitList[Arguments.argUser.userID];
+                string str = list[choice];
+                if (choice == 0)
                 {
-                    arg = new ConsoleSystem.Arg("teleport.toplayer " + Facepunch.Utility.String.QuoteSafe(p.Name) + " " + Facepunch.Utility.String.QuoteSafe(str));
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Cancelled!");
+                    tpWaitList.Remove(Arguments.argUser.userID);
                 }
                 else
                 {
-                    arg = new ConsoleSystem.Arg("teleport.toplayer " + Facepunch.Utility.String.QuoteSafe(str) + " " + Facepunch.Utility.String.QuoteSafe(p.Name));
+                    if (list[0] == "ToTarget")
+                    {
+                        Arguments.Args = new string[] { Arguments.argUser.displayName, str };
+                    }
+                    else
+                    {
+                        Arguments.Args = new string[] { str, Arguments.argUser.displayName };
+                    }
+                    teleport.toplayer(ref Arguments);
+                    tpWaitList.Remove(Arguments.argUser.userID);
                 }
-                teleport.toplayer(ref arg);
-                tpWaitList.Remove(p.PlayerClient.userID);
             }
         }
     }

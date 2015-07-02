@@ -1,17 +1,12 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
-    using Facepunch.Utility;
     using System;
     using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
 
     public class Data
     {
-        public readonly System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
-        public readonly System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
+        public System.Collections.Generic.List<string> chat_history = new System.Collections.Generic.List<string>();
+        public System.Collections.Generic.List<string> chat_history_username = new System.Collections.Generic.List<string>();
         private static Fougerite.Data data;
         private static DataStore ds = DataStore.GetInstance();
         public Hashtable Fougerite_shared_data = new Hashtable();
@@ -33,8 +28,6 @@ namespace Fougerite
 
         public static Fougerite.Data GetData()
         {
-            Contract.Ensures(Contract.Result<Data>() != null);
-
             if (data == null)
             {
                 data = new Fougerite.Data();
@@ -61,43 +54,41 @@ namespace Fougerite
 
         public string[] SplitQuoteStrings(string str)
         {
-            Contract.Requires(str != null);
-
             return Facepunch.Utility.String.SplitQuotesStrings(str);
         }
 
         public int StrLen(string str)
         {
-            Contract.Requires(str != null);
-
             return str.Length;
         }
 
-        public string Substring(string str, int from, int length)
+        public string Substring(string str, int from, int to)
         {
-            Contract.Requires(str != null);
-            Contract.Requires(from >= 0);
-            Contract.Requires(length >= 0);
-            Contract.Requires(from + length < str.Length);
-
-            return str.Substring(from, length);
+            return str.Substring(from, to);
         }
 
         public int ToInt(string num)
         {
-            Contract.Requires(num != null);
             return int.Parse(num);
+        }
+
+        public ulong ToUlong(string num)
+        {
+            return Convert.ToUInt64(num);
+        }
+
+        public long Tolong(string num)
+        {
+            return Convert.ToUInt32(num);
         }
 
         public string ToLower(string str)
         {
-            Contract.Requires(str != null);
             return str.ToLower();
         }
 
         public string ToUpper(string str)
         {
-            Contract.Requires(str != null);
             return str.ToUpper();
         }
     }

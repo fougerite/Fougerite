@@ -1,11 +1,10 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
     using UnityEngine;
 
     public class SpawnEvent
     {
-        private readonly bool _atCamp;
+        private bool _atCamp;
         private float _x;
         private float _y;
         private float _z;

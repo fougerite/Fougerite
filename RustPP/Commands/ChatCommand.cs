@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -10,36 +8,19 @@ namespace RustPP.Commands
 
     public abstract class ChatCommand
     {
-        private static readonly List<ChatCommand> classInstances = new List<ChatCommand>();
-
         private string _adminFlags;
         private bool _adminRestricted;
         private string _cmd;
-
-        [ContractInvariantMethod]
-        private static void StaticInvariant()
-        {
-            Contract.Invariant(classInstances != null);
-            Contract.Invariant(Contract.ForAll(classInstances, command => command != null));
-            Contract.Invariant(Contract.ForAll(classInstances, command => command.Command != null));
-        }
+        private static List<ChatCommand> classInstances = new List<ChatCommand>();
 
         public static void AddCommand(string cmdString, ChatCommand command)
         {
-            Contract.Requires(!string.IsNullOrEmpty(cmdString));
-            Contract.Requires(command != null);
-
             command.Command = cmdString;
             classInstances.Add(command);
         }
 
-        public static void CallCommand(string cmd, ConsoleSystem.Arg arg, string[] chatArgs)
+        public static void CallCommand(string cmd, ref ConsoleSystem.Arg arg, ref string[] chatArgs)
         {
-            Contract.Requires(!string.IsNullOrEmpty(cmd));
-            Contract.Requires(arg != null);
-            Contract.Requires(arg.argUser != null);
-            Contract.Requires(chatArgs != null);
-
             foreach (ChatCommand command in classInstances)
             {
                 if (command.Command == cmd)
@@ -52,32 +33,27 @@ namespace RustPP.Commands
                             {
                                 if (arg.argUser.admin)
                                 {
-                                    command.Execute(arg, chatArgs);
-                                }
-                                else
+                                    command.Execute(ref arg, ref chatArgs);
+                                } else
                                 {
-                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You need RCON access to be able to use this command.");
+                                    Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, "You need RCON access to be able to use this command.");
                                 }
-                            }
-                            else if (Administrator.IsAdmin(arg.argUser.userID))
+                            } else if (Administrator.IsAdmin(arg.argUser.userID))
                             {
                                 if (Administrator.GetAdmin(arg.argUser.userID).HasPermission(command.AdminFlags))
                                 {
-                                    command.Execute(arg, chatArgs);
-                                }
-                                else
+                                    command.Execute(ref arg, ref chatArgs);
+                                } else
                                 {
-                                    Util.sayUser(arg.argUser.networkPlayer, Core.Name, "Only administrators with the " + command.AdminFlags.ToString() + " permission can use that command.");
+                                    Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, string.Format("Only administrators with the {0} permission can use that command.", command.AdminFlags));
                                 }
-                            }
-                            else
+                            } else
                             {
-                                Util.sayUser(arg.argUser.networkPlayer, Core.Name, "You don't have access to use this command");
+                                Util.sayUser(arg.argUser.networkPlayer, RustPP.Core.Name, "You don't have access to use this command");
                             }
-                        }
-                        else
+                        } else
                         {
-                            command.Execute(arg, chatArgs);
+                            command.Execute(ref arg, ref chatArgs);
                         }
                     }
                     break;
@@ -85,11 +61,7 @@ namespace RustPP.Commands
             }
         }
 
-        public virtual void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
-        {
-            Contract.Requires(Arguments != null);
-            Contract.Requires(ChatArguments != null);
-        }
+        public abstract void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments);
 
         public static ChatCommand GetCommand(string cmdString)
         {
@@ -140,7 +112,7 @@ namespace RustPP.Commands
         {
             get
             {
-                return Core.config.isCommandOn(this.Command.Remove(0, 1));
+                return RustPP.Core.config.isCommandOn(this.Command.Remove(0, 1));
             }
         }
     }

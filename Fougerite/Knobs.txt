@@ -1,0 +1,1769 @@
+// airdrop.min_players
+// airdrop.drop(arg)
+public class airdrop : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static int min_players = 50;
+
+  [ConsoleSystem.Admin]
+  public static void drop(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith("Called airdrop...");
+    SupplyDropZone.CallAirDrop();
+  }
+}
+// chat.enabled
+// chat.serverLog
+// chat.say(arg)
+public class chat : ConsoleSystem
+{
+  [ConsoleSystem.Help("Enable or disable chat displaying", "")]
+  [ConsoleSystem.Client]
+  [ConsoleSystem.Admin]
+  public static bool enabled = true;
+  [ConsoleSystem.Admin]
+  public static bool serverlog = true;
+
+  [ConsoleSystem.User]
+  public static void say(ref ConsoleSystem.Arg arg)
+  {
+    if (!chat.enabled || !arg.argUser.CanChat())
+      return;
+    string str1 = arg.GetString(0, "text");
+    if (str1.Length > 128)
+      str1 = str1.Substring(0, 128);
+    string str2 = String.QuoteSafe(arg.argUser.user.Displayname);
+    string str3 = String.QuoteSafe(str1);
+    if (chat.serverlog)
+      Debug.Log((object) ("[CHAT] " + str2 + ":" + str3));
+    ConsoleNetworker.Broadcast("chat.add " + str2 + " " + str3);
+    arg.argUser.NoteChatted();
+  }
+}
+// conditionloss.damagemultiplier
+// conditionloss.armorhealthmult
+public class conditionloss : ConsoleSystem
+{
+  [ConsoleSystem.Help("Multiply the amount of condition loss when it happens", "")]
+  [ConsoleSystem.Admin]
+  public static float damagemultiplier = 1f;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Incoming damage is multiplied by this and applied as condition loss to armor i.e. 100 dmg * 0.333 = 33% condition loss", "")]
+  public static float armorhealthmult = 0.25f;
+}
+// config.ConfigName()
+// config.save(arg)
+// config.load(arg)
+public class config : ConsoleSystem
+{
+  public const string defaultConfig = "";
+
+  public static string ConfigName()
+  {
+    return server.datadir + "cfg/server.cfg";
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Client]
+  [ConsoleSystem.Help("Save the current config to config.cfg", "")]
+  [ConsoleSystem.User]
+  public static void save(ref ConsoleSystem.Arg arg)
+  {
+    File.WriteAllText(config.ConfigName(), ConsoleSystem.SaveToConfigString());
+    arg.ReplyWith("Saved config.cfg");
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Load the current config from config.cfg", "")]
+  [ConsoleSystem.User]
+  [ConsoleSystem.Client]
+  public static void load(ref ConsoleSystem.Arg arg)
+  {
+    string path = config.ConfigName();
+    string strFile = string.Empty;
+    if (File.Exists(path))
+      strFile = File.ReadAllText(path);
+    ConsoleSystem.RunFile(strFile);
+    arg.ReplyWith("Loaded " + path);
+  }
+}
+// crafting.timescale
+// crafting.workbench_speed
+// crafting.instant
+// crafting.instant_admins
+// crafting.complete(arg)
+// crafting.cancel(arg)
+public class crafting : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static float timescale = 1f;
+  [ConsoleSystem.Admin]
+  public static float workbench_speed = 3f;
+  [ConsoleSystem.Admin]
+  public static bool instant;
+  [ConsoleSystem.Admin]
+  public static bool instant_admins;
+
+  [ConsoleSystem.Help("completes every single crafting job in progress (for all crafting character)", "")]
+  [ConsoleSystem.Admin]
+  public static void complete(ref ConsoleSystem.Arg args)
+  {
+    CraftingInventory.CompleteAllCraftingInProgress();
+  }
+
+  [ConsoleSystem.Help("cancels every single crafting job in progress (for all crafting character)", "")]
+  [ConsoleSystem.Admin]
+  public static void cancel(ref ConsoleSystem.Arg args)
+  {
+    CraftingInventory.CancelAllCraftingInProgress();
+  }
+}
+// decay.deploy_maxhealth_sec
+// decay.decaytickrate
+// decay.maxperframe
+// decay.maxtestperframe
+public class decay : ConsoleSystem
+{
+  [ConsoleSystem.Help("Number of seconds until decay deals max health amount of damage", "")]
+  [ConsoleSystem.Admin]
+  public static float deploy_maxhealth_sec = 43200f;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("How often decay is processed", "")]
+  public static float decaytickrate = 300f;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Maximum amount of env decays to process per frame. Use zero to process all env decays every frame", "")]
+  public static int maxperframe = 100;
+  [ConsoleSystem.Help("Maximum amount of env decays to process with raycasts. Use zero to process all env decays every frame", "")]
+  [ConsoleSystem.Admin]
+  public static int maxtestperframe = 8;
+}
+// dmg.godmode(arg)
+// dmg.godadmins
+public class dmg : ConsoleSystem
+{
+  public static bool godadmins;
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Set all admins to be god true/false", "")]
+  public static void godmode(ref ConsoleSystem.Arg arg)
+  {
+    if (!arg.HasArgs(1))
+    {
+      arg.ReplyWith("No valid arguments");
+    }
+    else
+    {
+      bool result = false;
+      int num = 0;
+      if (bool.TryParse(arg.Args[0], out result))
+      {
+        dmg.godadmins = result;
+        using (List<PlayerClient>.Enumerator enumerator = PlayerClient.All.GetEnumerator())
+        {
+          while (enumerator.MoveNext())
+          {
+            PlayerClient current = enumerator.Current;
+            NetUser user;
+            if (NetUser.Find(current, out user) && user.CanAdmin() && (UnityEngine.Object) current.controllable != (UnityEngine.Object) null)
+            {
+              TakeDamage component = current.controllable.GetComponent<TakeDamage>();
+              if ((bool) ((UnityEngine.Object) component))
+              {
+                component.SetGodMode(result);
+                ++num;
+              }
+            }
+          }
+        }
+        ConsoleSystem.Arg obj = arg;
+        object[] objArray = new object[4];
+        int index1 = 0;
+        string str1 = "Set ";
+        objArray[index1] = (object) str1;
+        int index2 = 1;
+        // ISSUE: variable of a boxed type
+        __Boxed<int> local1 = (ValueType) num;
+        objArray[index2] = (object) local1;
+        int index3 = 2;
+        string str2 = " Admins godmode to : ";
+        objArray[index3] = (object) str2;
+        int index4 = 3;
+        // ISSUE: variable of a boxed type
+        __Boxed<bool> local2 = (ValueType) (bool) (result ? 1 : 0);
+        objArray[index4] = (object) local2;
+        string strValue = string.Concat(objArray);
+        obj.ReplyWith(strValue);
+      }
+      else
+        arg.ReplyWith("Could not parse bool");
+    }
+  }
+}
+// env.daylength
+// env.nightlength
+public class env : ConsoleSystem
+{
+  [ConsoleSystem.Help("The length of a day in real minutes", "")]
+  [ConsoleSystem.Admin]
+  public static float daylength = 45f;
+  [ConsoleSystem.Help("The length of a night in real minutes", "")]
+  [ConsoleSystem.Admin]
+  public static float nightlength = 15f;
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Gets or sets the current time", "")]
+  public static void time(ref ConsoleSystem.Arg arg)
+  {
+    if (!(bool) ((Object) EnvironmentControlCenter.Singleton))
+      return;
+    if ((double) arg.GetFloat(0, -1f) >= 0.0)
+    {
+      EnvironmentControlCenter.Singleton.SetTime(arg.GetFloat(0, 0.0f));
+      arg.ReplyWith("Set Time To: " + EnvironmentControlCenter.Singleton.GetTime().ToString());
+    }
+    else
+      arg.ReplyWith("Current Time: " + EnvironmentControlCenter.Singleton.GetTime().ToString());
+  }
+}
+// falldamage.min_vel
+// falldamage.max_vel
+// falldamage.enabled
+// falldamage.injury_length
+internal class falldamage : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Fall velocity to begin fall damage calculations - min 18", "")]
+  public static float min_vel = 24f;
+  [ConsoleSystem.Help("Fall Velocity when damage of maxhealth will be applied", "")]
+  [ConsoleSystem.Admin]
+  public static float max_vel = 38f;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("enable/disable fall damage", "")]
+  public static bool enabled = true;
+  [ConsoleSystem.Help("Average amount of time a leg injury lasts", "")]
+  [ConsoleSystem.Admin]
+  public static float injury_length = 40f;
+}
+// footsteps.quality
+public class footsteps : ConsoleSystem
+{
+  [ConsoleSystem.Help("Footstep Quality, 0 = default sound, 1 = dynamic for local, 2 = dynamic for all. 0-2 (default 2)", "")]
+  [ConsoleSystem.Client]
+  [ConsoleSystem.Saved]
+  public static int quality = 2;
+}
+// global.fpslog
+// global.logprint
+// global.echo(arg)
+// global.find(arg)
+// global.findsv(arg)
+// global.quit(arg)
+// global.suicide(arg)
+// global.status(arg) 
+// global.say(arg)
+// global.users(arg)
+// global.banlist(banlist)
+// global.banlistex(arg)
+// global.listid(arg)
+// global.kick(arg)
+// global.ban(arg)
+// global.banid(arg)
+// global.removeid(arg)
+// global.unbanall(arg)
+public class global : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Prints fps at said interval", "interval (seconds)")]
+  [ConsoleSystem.Client]
+  [ConsoleSystem.User]
+  public static float fpslog = -1f;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("When set to True, all console printing will go through Debug.Log", "")]
+  public static bool logprint;
+
+  [ConsoleSystem.Client]
+  [ConsoleSystem.User]
+  [ConsoleSystem.Help("Search for a command", "string Name")]
+  [ConsoleSystem.Admin]
+  public static void find(ref ConsoleSystem.Arg arg)
+  {
+    if (!arg.HasArgs(1))
+      return;
+    string str1 = arg.Args[0];
+    string str2 = string.Empty;
+    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+    {
+      System.Type[] types = assembly.GetTypes();
+      for (int index1 = 0; index1 < types.Length; ++index1)
+      {
+        if (types[index1].IsSubclassOf(typeof (ConsoleSystem)))
+        {
+          MethodInfo[] methods = types[index1].GetMethods();
+          for (int index2 = 0; index2 < methods.Length; ++index2)
+          {
+            if (methods[index2].IsStatic && (!(str1 != "*") || types[index1].Name.Contains(str1) || methods[index2].Name.Contains(str1)) && arg.CheckPermissions(methods[index2].GetCustomAttributes(true)))
+            {
+              string str3 = str2;
+              string[] strArray = new string[5];
+              int index3 = 0;
+              string str4 = str3;
+              strArray[index3] = str4;
+              int index4 = 1;
+              string name = types[index1].Name;
+              strArray[index4] = name;
+              int index5 = 2;
+              string str5 = ".";
+              strArray[index5] = str5;
+              int index6 = 3;
+              string str6 = global.BuildMethodString(ref methods[index2]);
+              strArray[index6] = str6;
+              int index7 = 4;
+              string str7 = "\n";
+              strArray[index7] = str7;
+              str2 = string.Concat(strArray);
+            }
+          }
+          FieldInfo[] fields = types[index1].GetFields();
+          for (int index2 = 0; index2 < fields.Length; ++index2)
+          {
+            if (fields[index2].IsStatic && (!(str1 != "*") || types[index1].Name.Contains(str1) || fields[index2].Name.Contains(str1)) && arg.CheckPermissions(fields[index2].GetCustomAttributes(true)))
+            {
+              string str3 = str2;
+              string[] strArray = new string[5];
+              int index3 = 0;
+              string str4 = str3;
+              strArray[index3] = str4;
+              int index4 = 1;
+              string name = types[index1].Name;
+              strArray[index4] = name;
+              int index5 = 2;
+              string str5 = ".";
+              strArray[index5] = str5;
+              int index6 = 3;
+              string str6 = global.BuildFieldsString(ref fields[index2]);
+              strArray[index6] = str6;
+              int index7 = 4;
+              string str7 = "\n";
+              strArray[index7] = str7;
+              str2 = string.Concat(strArray);
+            }
+          }
+          PropertyInfo[] properties = types[index1].GetProperties();
+          for (int index2 = 0; index2 < properties.Length; ++index2)
+          {
+            if ((!(str1 != "*") || types[index1].Name.Contains(str1) || properties[index2].Name.Contains(str1)) && arg.CheckPermissions(properties[index2].GetCustomAttributes(true)))
+            {
+              string str3 = str2;
+              string[] strArray = new string[5];
+              int index3 = 0;
+              string str4 = str3;
+              strArray[index3] = str4;
+              int index4 = 1;
+              string name = types[index1].Name;
+              strArray[index4] = name;
+              int index5 = 2;
+              string str5 = ".";
+              strArray[index5] = str5;
+              int index6 = 3;
+              string str6 = global.BuildPropertyString(ref properties[index2]);
+              strArray[index6] = str6;
+              int index7 = 4;
+              string str7 = "\n";
+              strArray[index7] = str7;
+              str2 = string.Concat(strArray);
+            }
+          }
+        }
+      }
+    }
+    arg.ReplyWith("Finding " + str1 + ":\n" + str2);
+  }
+
+  [ConsoleSystem.User]
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Search for a command (server-side)", "string Name")]
+  public static void findsv(ref ConsoleSystem.Arg arg)
+  {
+    global.find(ref arg);
+  }
+
+  public static string BuildMethodString(ref MethodInfo method)
+  {
+    string str1 = string.Empty;
+    string str2 = "no help";
+    foreach (object obj in method.GetCustomAttributes(true))
+    {
+      if (obj is ConsoleSystem.Help)
+      {
+        string str3 = (obj as ConsoleSystem.Help).argsDescription;
+        str2 = (obj as ConsoleSystem.Help).helpDescription;
+        str1 = " " + str3.Trim() + " ";
+      }
+    }
+    string[] strArray = new string[5];
+    int index1 = 0;
+    string name = method.Name;
+    strArray[index1] = name;
+    int index2 = 1;
+    string str4 = "(";
+    strArray[index2] = str4;
+    int index3 = 2;
+    string str5 = str1;
+    strArray[index3] = str5;
+    int index4 = 3;
+    string str6 = ") : ";
+    strArray[index4] = str6;
+    int index5 = 4;
+    string str7 = str2;
+    strArray[index5] = str7;
+    return string.Concat(strArray);
+  }
+
+  public static string BuildFieldsString(ref FieldInfo field)
+  {
+    string str = "no help";
+    foreach (object obj in field.GetCustomAttributes(true))
+    {
+      if (obj is ConsoleSystem.Help)
+        str = (obj as ConsoleSystem.Help).helpDescription;
+    }
+    return field.Name + " : " + str;
+  }
+
+  public static string BuildPropertyString(ref PropertyInfo field)
+  {
+    string str = "no help";
+    foreach (object obj in field.GetCustomAttributes(true))
+    {
+      if (obj is ConsoleSystem.Help)
+        str = (obj as ConsoleSystem.Help).helpDescription;
+    }
+    return field.Name + " : " + str;
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.User]
+  [ConsoleSystem.Client]
+  [ConsoleSystem.Help("Prints something to the debug output", "string output")]
+  public static void echo(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(arg.ArgsStr);
+  }
+
+  [ConsoleSystem.Help("Quits the game", "")]
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Client]
+  public static void quit(ref ConsoleSystem.Arg arg)
+  {
+    ConsoleSystem.Run("server.close", false);
+    ConsoleSystem.Run("save.all", false);
+    global.Console_AllowClose();
+    Application.Quit();
+  }
+
+  [DllImport("librust")]
+  public static extern void Console_AllowClose();
+
+  [ConsoleSystem.User]
+  [ConsoleSystem.Help("Kill yourself", "")]
+  public static void suicide(ref ConsoleSystem.Arg arg)
+  {
+    Character character = arg.playerCharacter();
+    if ((bool) ((UnityEngine.Object) character) && character.alive)
+    {
+      DamageEvent damage;
+      int num = (int) TakeDamage.Kill((IDBase) character, (IDBase) character, out damage, (object) null);
+      arg.ReplyWith("You suicided!");
+      Debug.Log((object) string.Format("{0} has suicided", (object) arg.argUser.user.Displayname));
+    }
+    else
+      arg.ReplyWith("You dead!");
+  }
+
+  [ConsoleSystem.Help("Print out currently connected clients etc", "")]
+  [ConsoleSystem.Admin]
+  public static void status(ref ConsoleSystem.Arg arg)
+  {
+    string str1 = "hostname: " + server.hostname + "\n" + "version : " + 1069.ToString() + " secure (secure mode enabled, connected to Steam3)\n" + "map     : " + server.map + "\n";
+    string[] strArray = new string[6];
+    int index1 = 0;
+    string str2 = str1;
+    strArray[index1] = str2;
+    int index2 = 1;
+    string str3 = "players : ";
+    strArray[index2] = str3;
+    int index3 = 2;
+    string str4 = NetCull.connections.Length.ToString();
+    strArray[index3] = str4;
+    int index4 = 3;
+    string str5 = " (";
+    strArray[index4] = str5;
+    int index5 = 4;
+    string str6 = NetCull.maxConnections.ToString();
+    strArray[index5] = str6;
+    int index6 = 5;
+    string str7 = " max)\n\n";
+    strArray[index6] = str7;
+    string str8 = string.Concat(strArray) + "id".PadRight(18) + "name".PadRight(38) + "ping".PadRight(6) + "connected".PadRight(12) + "addr".PadRight(12) + "\n";
+    foreach (uLink.NetworkPlayer networkPlayer in NetCull.connections)
+    {
+      object localData = networkPlayer.GetLocalData();
+      string str9 = string.Empty;
+      string str10 = string.Empty;
+      string str11 = string.Empty;
+      string str12 = string.Empty;
+      string str13 = string.Empty;
+      if (localData is NetUser)
+      {
+        NetUser netUser = (NetUser) localData;
+        str9 = netUser.user.Userid.ToString();
+        string str14 = netUser.displayName.ToString();
+        if (str14.Length >= 32)
+          str14 = str14.Substring(0, 32) + "..";
+        str10 = Facepunch.Utility.String.QuoteSafe(str14);
+        str11 = netUser.networkPlayer.lastPing.ToString();
+        str13 = netUser.networkPlayer.ipAddress;
+        str12 = netUser.SecondsConnected().ToString() + "s";
+      }
+      else if (localData is ClientConnection)
+      {
+        str9 = "n/a";
+        str10 = "\"none\"";
+        str12 = "-";
+        str13 = networkPlayer.ipAddress.ToString();
+      }
+      str8 = str8 + str9.PadRight(18) + str10.PadRight(38) + str11.PadRight(6) + str12.PadRight(12) + str13.PadRight(12) + "\n";
+    }
+    string strValue = str8 + "\n";
+    arg.ReplyWith(strValue);
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Sends a message in chat", "")]
+  public static void say(ref ConsoleSystem.Arg arg)
+  {
+    string str = Facepunch.Utility.String.QuoteSafe(arg.GetString(0, string.Empty));
+    if (str == string.Empty)
+      return;
+    ConsoleNetworker.Broadcast("chat.add \"SERVER CONSOLE\" " + str);
+  }
+
+  [ConsoleSystem.Help("Show user info for players on server.", "")]
+  [ConsoleSystem.Admin]
+  public static void users(ref ConsoleSystem.Arg arg)
+  {
+    string str1 = "<slot:userid:\"name\">\n";
+    int num = 0;
+    foreach (uLink.NetworkPlayer networkPlayer in NetCull.connections)
+    {
+      object localData = networkPlayer.GetLocalData();
+      if (localData is NetUser)
+      {
+        NetUser netUser = (NetUser) localData;
+        string str2 = str1;
+        object[] objArray = new object[5];
+        int index1 = 0;
+        string str3 = str2;
+        objArray[index1] = (object) str3;
+        int index2 = 1;
+        // ISSUE: variable of a boxed type
+        __Boxed<int> local = (ValueType) netUser.networkPlayer.id;
+        objArray[index2] = (object) local;
+        int index3 = 2;
+        string str4 = ":\"";
+        objArray[index3] = (object) str4;
+        int index4 = 3;
+        string displayName = netUser.displayName;
+        objArray[index4] = (object) displayName;
+        int index5 = 4;
+        string str5 = "\"\n";
+        objArray[index5] = (object) str5;
+        str1 = string.Concat(objArray);
+        ++num;
+      }
+    }
+    string strValue = str1 + num.ToString() + "users\n";
+    arg.ReplyWith(strValue);
+  }
+
+  [ConsoleSystem.Help("List of banned users (sourceds compat)", "")]
+  [ConsoleSystem.Admin]
+  public static void banlist(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(BanList.BanListString(false));
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("List of banned users - shows reasons and usernames", "")]
+  public static void banlistex(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(BanList.BanListStringEx());
+  }
+
+  [ConsoleSystem.Help("List of banned users, by ID (sourceds compat)", "")]
+  [ConsoleSystem.Admin]
+  public static void listid(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(BanList.BanListString(true));
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("kick  a user from the server", "")]
+  public static void kick(ref ConsoleSystem.Arg arg)
+  {
+    PlayerClient[] playerClients = arg.GetPlayerClients(0);
+    foreach (PlayerClient playerClient in playerClients)
+    {
+      NetUser netUser = playerClient.netUser;
+      if (netUser != null)
+        netUser.Kick(NetError.Facepunch_Kick_RCON, true);
+    }
+    if (playerClients.Length > 0)
+      arg.ReplyWith("Kicked " + (object) playerClients.Length + " users!");
+    else
+      arg.ReplyWith("Couldn't find anyone!");
+  }
+
+  [ConsoleSystem.Help("Bans a user from the server", "")]
+  [ConsoleSystem.Admin]
+  public static void ban(ref ConsoleSystem.Arg arg)
+  {
+    PlayerClient[] playerClients = arg.GetPlayerClients(0);
+    foreach (PlayerClient playerClient in playerClients)
+    {
+      NetUser netUser = playerClient.netUser;
+      if (netUser != null)
+      {
+        string displayName = netUser.displayName;
+        string @string = arg.GetString(1, string.Empty);
+        BanList.Add(netUser.user.Userid, displayName, @string);
+      }
+    }
+    if (playerClients.Length > 0)
+    {
+      BanList.Save();
+      arg.ReplyWith("Banned " + (object) playerClients.Length + " users!");
+    }
+    else
+      arg.ReplyWith("Couldn't find anyone!");
+  }
+
+  [ConsoleSystem.Help("Bans a userid from the server", "")]
+  [ConsoleSystem.Admin]
+  public static void banid(ref ConsoleSystem.Arg arg)
+  {
+    ulong uint64 = arg.GetUInt64(0, 0UL);
+    if ((long) uint64 == 0L)
+      return;
+    string string1 = arg.GetString(1, string.Empty);
+    string string2 = arg.GetString(2, string.Empty);
+    BanList.Add(uint64, string1, string2);
+    BanList.Save();
+  }
+
+  [ConsoleSystem.Help("Unbans a userid from the server", "")]
+  [ConsoleSystem.Admin]
+  public static void removeid(ref ConsoleSystem.Arg arg)
+  {
+    ulong uint64 = arg.GetUInt64(0, 0UL);
+    if ((long) uint64 == 0L)
+    {
+      arg.ReplyWith("removeid:  couldn't find 0");
+    }
+    else
+    {
+      if (BanList.Remove(uint64))
+        arg.ReplyWith("removeid:  filter removed for " + uint64.ToString());
+      else
+        arg.ReplyWith("removeid:  couldn't find " + uint64.ToString());
+      BanList.Save();
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Removes all bans", "")]
+  public static void unbanall(ref ConsoleSystem.Arg arg)
+  {
+    BanList.Clear();
+    BanList.Save();
+  }
+}
+// gunshots.aiscared
+public class gunshots : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static bool aiscared = true;
+}
+// interp.ratio
+// interp.delayms
+public class interp : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("This value determins how much time to append to interp delay ( on clients ) based on server.sendrate", "")]
+  public static float ratio
+  {
+    get
+    {
+      return Interpolation.clientInterpRatio;
+    }
+    set
+    {
+      if (float.IsInfinity(value) || float.IsNaN(value))
+        return;
+      Interpolation.clientInterpRatio = Mathf.Max(0.0f, value);
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("This value adds a fixed amount of delay ( in milliseconds ) to interp delay ( on clients ).", "")]
+  public static int delayms
+  {
+    get
+    {
+      return Interpolation.clientInterpDelay;
+    }
+    set
+    {
+      if (value < 0)
+        Interpolation.clientInterpDelay = 0;
+      else
+        Interpolation.clientInterpDelay = value;
+    }
+  }
+}
+// inv.loglevel
+// inv.clientupdates
+// inv.give(arg)
+// inv.givearmor(arg)
+// inv.giveall(arg)
+// inv.giveplayer(arg)
+// inv.giveplayerarmor(arg)
+// inv.ammo(arg)
+public class inv : ConsoleSystem
+{
+  private const string give_usage = "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]";
+  private const string giveplayer_usage = "<player name> <case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]";
+  [ConsoleSystem.Admin]
+  public static int loglevel;
+  [ConsoleSystem.Admin]
+  public static bool clientupdates;
+
+  [DebuggerHidden]
+  private static IEnumerable<Inventory> OneInventory(Inventory inventory)
+  {
+    // ISSUE: object of a compiler-generated type is created
+    // ISSUE: variable of a compiler-generated type
+    inv.\u003COneInventory\u003Ec__Iterator47 inventoryCIterator47 = new inv.\u003COneInventory\u003Ec__Iterator47()
+    {
+      inventory = inventory,
+      \u003C\u0024\u003Einventory = inventory
+    };
+    int num = -2;
+    // ISSUE: reference to a compiler-generated field
+    inventoryCIterator47.\u0024PC = num;
+    return (IEnumerable<Inventory>) inventoryCIterator47;
+  }
+
+  [DebuggerHidden]
+  private static IEnumerable<PlayerClient> OnePlayerClient(PlayerClient playerClient)
+  {
+    // ISSUE: object of a compiler-generated type is created
+    // ISSUE: variable of a compiler-generated type
+    inv.\u003COnePlayerClient\u003Ec__Iterator48 clientCIterator48 = new inv.\u003COnePlayerClient\u003Ec__Iterator48()
+    {
+      playerClient = playerClient,
+      \u003C\u0024\u003EplayerClient = playerClient
+    };
+    int num = -2;
+    // ISSUE: reference to a compiler-generated field
+    clientCIterator48.\u0024PC = num;
+    return (IEnumerable<PlayerClient>) clientCIterator48;
+  }
+
+  private static IEnumerable<Inventory> Inventories(PlayerClient client)
+  {
+    return inv.Inventories(inv.OnePlayerClient(client));
+  }
+
+  [DebuggerHidden]
+  private static IEnumerable<Inventory> Inventories(IEnumerable<PlayerClient> clients)
+  {
+    // ISSUE: object of a compiler-generated type is created
+    // ISSUE: variable of a compiler-generated type
+    inv.\u003CInventories\u003Ec__Iterator49 inventoriesCIterator49 = new inv.\u003CInventories\u003Ec__Iterator49()
+    {
+      clients = clients,
+      \u003C\u0024\u003Eclients = clients
+    };
+    int num = -2;
+    // ISSUE: reference to a compiler-generated field
+    inventoriesCIterator49.\u0024PC = num;
+    return (IEnumerable<Inventory>) inventoriesCIterator49;
+  }
+
+  private static string RunGiveCommand(ref ConsoleSystem.Arg arg, int shift, IEnumerable<Inventory> onInventories)
+  {
+    if (!arg.HasArgs(1))
+      return (string) null;
+    string name = arg.Args[shift];
+    ItemDataBlock byName = DatablockDictionary.GetByName(name);
+    if ((Object) byName == (Object) null)
+      return string.Format("No item named :{0}: to give!", (object) name);
+    int int1 = arg.GetInt(shift + 1, 1);
+    Inventory.Uses.Quantity uses;
+    Inventory.Uses.Quantity.TryParse(arg.GetString(shift + 2, "Random"), out uses);
+    int int2 = arg.GetInt(shift + 3, -1);
+    int num1 = 0;
+    int num2 = 0;
+    bool flag1 = false;
+    if (!byName.IsSplittable())
+    {
+      int b = (int) byName.GetMaxEligableSlots();
+      foreach (Inventory inventory in onInventories)
+      {
+        bool flag2 = false;
+        if ((bool) ((Object) inventory))
+        {
+          for (int index = 0; index < int1; ++index)
+          {
+            if (!inventory.noVacantSlots)
+            {
+              IInventoryItem inventoryItem = inventory.AddItem(byName, Inventory.Slot.Preference.Define(Inventory.Slot.Kind.Default, false, Inventory.Slot.KindFlags.Belt), uses);
+              if (!object.ReferenceEquals((object) inventoryItem, (object) null))
+              {
+                flag2 = true;
+                ++num1;
+                if (int2 != -1 && b > 0)
+                {
+                  IHeldItem heldItem = inventoryItem as IHeldItem;
+                  if (!object.ReferenceEquals((object) heldItem, (object) null))
+                  {
+                    flag1 = true;
+                    heldItem.SetTotalModSlotCount(Mathf.Min(int2, b));
+                  }
+                }
+              }
+              else
+                break;
+            }
+          }
+          if (flag2)
+            ++num2;
+        }
+      }
+    }
+    else
+    {
+      foreach (Inventory inventory in onInventories)
+      {
+        if ((bool) ((Object) inventory))
+        {
+          int num3 = inventory.AddItemAmount(byName, int1);
+          int num4 = int1 - num3;
+          num1 += num4;
+          if (num4 > 0)
+            ++num2;
+        }
+      }
+    }
+    if (num2 == 0)
+      return string.Format("There were no inventories able to handle the arguments \"{0}\"", (object) arg.ArgsStr);
+    if (num2 != 1)
+      return string.Format("Gave {0} {1}(s) between {2} inventories", (object) num1, (object) byName.name, (object) num2);
+    if (num1 > 1)
+      return string.Format("Gave {0} {1}(s) to 1 inventory", (object) num1, (object) byName.name);
+    else
+      return string.Format("Gave 1 {0} to 1 inventory", (object) byName.name);
+  }
+
+  [ConsoleSystem.Help("give item(s) to calling alive admin with inventory", "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]")]
+  [ConsoleSystem.Admin]
+  public static void give(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(inv.RunGiveCommand(ref arg, 0, inv.Inventories(arg.playerClient())) ?? "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]");
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("give armor(s) to calling alive admin with inventory", "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]")]
+  public static void givearmor(ref ConsoleSystem.Arg arg)
+  {
+    ConsoleSystem.Arg feet;
+    ConsoleSystem.Arg legs;
+    ConsoleSystem.Arg torso;
+    ConsoleSystem.Arg helmet;
+    if (!inv.SplitArgsForArmor(ref arg, 0, out feet, out legs, out torso, out helmet))
+      return;
+    inv.giveplayer(ref feet);
+    inv.giveplayer(ref legs);
+    inv.giveplayer(ref torso);
+    inv.giveplayer(ref helmet);
+    inv.JoinArgsForResult(ref arg, ref feet, ref legs, ref torso, ref helmet);
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("give item(s) to every alive player with a inventory", "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]")]
+  public static void giveall(ref ConsoleSystem.Arg arg)
+  {
+    if (!(bool) ((Object) ServerManagement.Get()))
+      arg.ReplyWith("no server management");
+    else
+      arg.ReplyWith(inv.RunGiveCommand(ref arg, 0, inv.Inventories((IEnumerable<PlayerClient>) PlayerClient.All)) ?? "<case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]");
+  }
+
+  [ConsoleSystem.Help("give item(s) to every alive player with inventory and matching name", "<player name> <case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]")]
+  [ConsoleSystem.Admin]
+  public static void giveplayer(ref ConsoleSystem.Arg arg)
+  {
+    if (!(bool) ((Object) ServerManagement.Get()))
+      arg.ReplyWith("no server management");
+    else
+      arg.ReplyWith(inv.RunGiveCommand(ref arg, 1, inv.Inventories(PlayerClient.FindAllWithString(arg.GetString(0, string.Empty)))) ?? "<player name> <case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]");
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("give armor(s) to every alive player with inventory and matching name", "<player name> <case sensitive name of item> [number of stacks or uses=1] [number of ammo=random] [number of mod slots=random]")]
+  public static void giveplayerarmor(ref ConsoleSystem.Arg arg)
+  {
+    ConsoleSystem.Arg feet;
+    ConsoleSystem.Arg legs;
+    ConsoleSystem.Arg torso;
+    ConsoleSystem.Arg helmet;
+    if (!inv.SplitArgsForArmor(ref arg, 0, out feet, out legs, out torso, out helmet))
+      return;
+    inv.giveplayer(ref feet);
+    inv.giveplayer(ref legs);
+    inv.giveplayer(ref torso);
+    inv.giveplayer(ref helmet);
+    inv.JoinArgsForResult(ref arg, ref feet, ref legs, ref torso, ref helmet);
+  }
+
+  private static bool SplitArgsForArmor(ref ConsoleSystem.Arg arg, int itemArg, out ConsoleSystem.Arg feet, out ConsoleSystem.Arg legs, out ConsoleSystem.Arg torso, out ConsoleSystem.Arg helmet)
+  {
+    feet = legs = torso = helmet = arg;
+    if (!arg.HasArgs(itemArg + 1))
+      return false;
+    feet.Args = (string[]) arg.Args.Clone();
+    legs.Args = (string[]) arg.Args.Clone();
+    torso.Args = (string[]) arg.Args.Clone();
+    helmet.Args = (string[]) arg.Args.Clone();
+    feet.Args[itemArg] = arg.Args[itemArg] + " Boots";
+    legs.Args[itemArg] = arg.Args[itemArg] + " Pants";
+    torso.Args[itemArg] = arg.Args[itemArg] + " Vest";
+    helmet.Args[itemArg] = arg.Args[itemArg] + " Helmet";
+    return true;
+  }
+
+  private static void JoinArgsForResult(ref ConsoleSystem.Arg arg, ref ConsoleSystem.Arg feet, ref ConsoleSystem.Arg legs, ref ConsoleSystem.Arg torso, ref ConsoleSystem.Arg helmet)
+  {
+    ConsoleSystem.Arg obj = arg;
+    string format = "{0}\n{1}\n{2}\n{3}";
+    object[] objArray = new object[4];
+    int index1 = 0;
+    string str1 = feet.Reply;
+    objArray[index1] = (object) str1;
+    int index2 = 1;
+    string str2 = legs.Reply;
+    objArray[index2] = (object) str2;
+    int index3 = 2;
+    string str3 = torso.Reply;
+    objArray[index3] = (object) str3;
+    int index4 = 3;
+    string str4 = helmet.Reply;
+    objArray[index4] = (object) str4;
+    string strValue = string.Format(format, objArray);
+    obj.ReplyWith(strValue);
+  }
+
+  [ConsoleSystem.Help("gives you the ammo for the current active item if any", "[number of ammo to give]")]
+  [ConsoleSystem.Admin]
+  public static void ammo(ref ConsoleSystem.Arg arg)
+  {
+    foreach (Inventory inventory in inv.Inventories((IEnumerable<PlayerClient>) arg.PlayerClients))
+    {
+      if ((bool) ((Object) inventory))
+      {
+        IHeldItem heldItem = inventory._activeItem as IHeldItem;
+        if (object.ReferenceEquals((object) heldItem, (object) null))
+        {
+          arg.ReplyWith(string.Format("Theres no active item for {0}", (object) inventory.name));
+          return;
+        }
+        else
+        {
+          ItemDataBlock ammoType;
+          if (((HeldItemDataBlock) heldItem.datablock).PollForAmmoDatablock(out ammoType))
+          {
+            int @int = arg.GetInt(0, ammoType._maxUses);
+            int num = inventory.AddItemAmount(ammoType, @int);
+            arg.ReplyWith(string.Format("Gave {0} {1}", (object) (@int - num), (object) ammoType.name));
+            return;
+          }
+          else
+          {
+            arg.ReplyWith(string.Format("{0} does not take any ammo?", (object) heldItem));
+            return;
+          }
+        }
+      }
+    }
+    arg.ReplyWith(string.Format("Theres no inventory for {0}", (object) arg.playerClient()));
+  }
+}
+// lockentry.changepassword(arg)
+// lockentry.passwordentry(arg)
+public class lockentry : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static void changepassword(ref ConsoleSystem.Arg arg)
+  {
+    RaycastHit hitInfo;
+    if (arg.Args.Length < 1 || !Physics.Raycast(arg.playerCharacter().eyesRay, out hitInfo, 6f))
+      return;
+    IDMain main = IDBase.GetMain(hitInfo.collider.gameObject);
+    if ((Object) main == (Object) null)
+      return;
+    PasswordLockableObject component = main.GetComponent<PasswordLockableObject>();
+    if ((Object) component == (Object) null)
+      return;
+    component.SetPassword(arg.Args[0]);
+    Notice.Popup(arg.argUser.networkPlayer, "\xF084", "Password is now : " + arg.Args[0], 4f);
+  }
+
+  [ConsoleSystem.User]
+  public static void passwordentry(ref ConsoleSystem.Arg arg)
+  {
+    if (arg.Args.Length < 2)
+      return;
+    bool result = false;
+    bool.TryParse(arg.Args[1], out result);
+    string str = arg.Args[0];
+    if (str.Length != 4)
+      return;
+    foreach (char c in str)
+    {
+      if (!char.IsDigit(c))
+        return;
+    }
+    RaycastHit hitInfo;
+    if (!Physics.Raycast(arg.playerCharacter().eyesRay, out hitInfo, 5f, 1048576))
+      return;
+    IDMain main = IDBase.GetMain(hitInfo.collider.gameObject);
+    if ((Object) main == (Object) null)
+      return;
+    PasswordLockableObject component1 = main.GetComponent<PasswordLockableObject>();
+    if ((Object) component1 == (Object) null)
+      return;
+    if (result)
+    {
+      DeployableObject component2 = main.GetComponent<DeployableObject>();
+      if (!(bool) ((Object) component2) || (long) component2.ownerID != (long) arg.argUser.userID)
+        return;
+      component1.SetPassword(str);
+      Notice.Popup(arg.argUser.networkPlayer, "\xF084", "Password is now : " + str, 4f);
+    }
+    else if (component1.CanCheckPasswordYet())
+    {
+      if (component1.CheckPassword(str))
+      {
+        Notice.Popup(arg.argUser.networkPlayer, "\xF09C", "You can now access this door!", 4f);
+        component1.AddUser(arg.argUser.userID);
+      }
+      else
+      {
+        Notice.Popup(arg.argUser.networkPlayer, "\xF084", "Incorrect password.", 4f);
+        component1.MarkFail();
+      }
+    }
+    else
+      Notice.Popup(arg.argUser.networkPlayer, "\xF084", "Too fast! Try again later.", 4f);
+  }
+}
+// netcull.log
+// netcull.list(arg)
+public class netcull : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static bool log = true;
+
+  [ConsoleSystem.Admin]
+  public static void list(ref ConsoleSystem.Arg arg)
+  {
+    arg.ReplyWith(NetworkCullInfo.List.ListNetworkCullInfoLists());
+  }
+}
+// notice.popup(arg)
+// notice.popupall(arg)
+// notice.inventory(arg)
+// notice.test(arg)
+public class notice : ConsoleSystem
+{
+  [ConsoleSystem.Client]
+  public static void popup(ref ConsoleSystem.Arg arg)
+  {
+    float @float = arg.GetFloat(0, 2f);
+    string string1 = arg.GetString(1, "!");
+    string string2 = arg.GetString(2, "This is the text");
+    PopupUI.singleton.CreateNotice(@float, string1, string2);
+  }
+
+  [ConsoleSystem.Admin]
+  public static void popupall(ref ConsoleSystem.Arg arg)
+  {
+    foreach (uLink.NetworkPlayer player in NetCull.connections)
+    {
+      object[] objArray = new object[5];
+      int index1 = 0;
+      string str1 = "notice.popup ";
+      objArray[index1] = (object) str1;
+      int index2 = 1;
+      // ISSUE: variable of a boxed type
+      __Boxed<int> local = (ValueType) 10;
+      objArray[index2] = (object) local;
+      int index3 = 2;
+      string str2 = " q \"";
+      objArray[index3] = (object) str2;
+      int index4 = 3;
+      string @string = arg.GetString(0, "No Message");
+      objArray[index4] = (object) @string;
+      int index5 = 4;
+      string str3 = "\"";
+      objArray[index5] = (object) str3;
+      string cmd = string.Concat(objArray);
+      ConsoleNetworker.SendClientCommand(player, cmd);
+    }
+  }
+
+  [ConsoleSystem.Client]
+  public static void inventory(ref ConsoleSystem.Arg arg)
+  {
+    string @string = arg.GetString(0, "This is the text");
+    PopupUI.singleton.CreateInventory(@string);
+  }
+
+  [ConsoleSystem.Client]
+  public static void test(ref ConsoleSystem.Arg arg)
+  {
+    PopupUI.singleton.StartCoroutine("DoTests");
+  }
+}
+// objects.count(arg)
+// objects.prefabs(arg)
+internal class objects : ConsoleSystem
+{
+  [ConsoleSystem.Help("Logs object counts", "")]
+  [ConsoleSystem.Admin]
+  public static void count(ref ConsoleSystem.Arg arg)
+  {
+    System.Type type;
+    if (arg.HasArgs(1))
+    {
+      type = (System.Type) null;
+      string[] strArray = new string[4];
+      int index1 = 0;
+      string str1 = string.Empty;
+      strArray[index1] = str1;
+      int index2 = 1;
+      string str2 = ", UnityEngine";
+      strArray[index2] = str2;
+      int index3 = 2;
+      string str3 = ", Assembly-CSharp-firstpass";
+      strArray[index3] = str3;
+      int index4 = 3;
+      string str4 = ", Assembly-CSharp";
+      strArray[index4] = str4;
+      foreach (string str5 in strArray)
+      {
+        string typeName = arg.ArgsStr + str5;
+        try
+        {
+          type = System.Type.GetType(typeName, true, true);
+          if (!typeof (UnityEngine.Object).IsAssignableFrom(type))
+          {
+            type = (System.Type) null;
+            throw new InvalidOperationException();
+          }
+          else
+            break;
+        }
+        catch
+        {
+          try
+          {
+            type = System.Type.GetType("UnityEngine." + typeName, true, true);
+            if (!typeof (UnityEngine.Object).IsAssignableFrom(type))
+            {
+              type = (System.Type) null;
+              throw new InvalidOperationException();
+            }
+            else
+              break;
+          }
+          catch
+          {
+          }
+        }
+      }
+      if (type == null)
+      {
+        arg.ReplyWith("No type or unassignable to UnityEngine.Object");
+        return;
+      }
+    }
+    else
+      type = typeof (UnityEngine.Object);
+    arg.ReplyWith(ManagedLeakDetector.Poll(type));
+  }
+
+  [DebuggerHidden]
+  private static IEnumerable<string> RuntimePrefabNames()
+  {
+    // ISSUE: object of a compiler-generated type is created
+    // ISSUE: variable of a compiler-generated type
+    objects.\u003CRuntimePrefabNames\u003Ec__Iterator29 namesCIterator29_1 = new objects.\u003CRuntimePrefabNames\u003Ec__Iterator29();
+    // ISSUE: variable of a compiler-generated type
+    objects.\u003CRuntimePrefabNames\u003Ec__Iterator29 namesCIterator29_2 = namesCIterator29_1;
+    int num = -2;
+    // ISSUE: reference to a compiler-generated field
+    namesCIterator29_2.\u0024PC = num;
+    return (IEnumerable<string>) namesCIterator29_2;
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Logs prefab names by count", "")]
+  public static void prefabs(ref ConsoleSystem.Arg arg)
+  {
+    Dictionary<string, int> dictionary = new Dictionary<string, int>();
+    foreach (string key in objects.RuntimePrefabNames())
+    {
+      int num;
+      dictionary[key] = !dictionary.TryGetValue(key, out num) ? 1 : num + 1;
+    }
+    List<KeyValuePair<string, int>> list = new List<KeyValuePair<string, int>>((IEnumerable<KeyValuePair<string, int>>) dictionary);
+    list.Sort((Comparison<KeyValuePair<string, int>>) ((a, b) =>
+    {
+      int num = b.Value.CompareTo(a.Value);
+      if (num == 0)
+        return a.Key.CompareTo(b.Key);
+      else
+        return num;
+    }));
+    StringBuilder stringBuilder = new StringBuilder();
+    using (List<KeyValuePair<string, int>>.Enumerator enumerator = list.GetEnumerator())
+    {
+      while (enumerator.MoveNext())
+      {
+        KeyValuePair<string, int> current = enumerator.Current;
+        stringBuilder.AppendFormat("{1,-10} | \"{0}\"\n", (object) current.Key, (object) current.Value);
+      }
+    }
+    arg.ReplyWith(stringBuilder.ToString());
+  }
+}
+// packet.dropclockthresh
+// packet.verify
+// packet.loglevel
+// packet.dropms
+// packet.dropsec
+public class packet : ConsoleSystem
+{
+  [ConsoleSystem.Help("Fix clock sync threshold, when someones timestamps have been corrected this many times their clock will resync. ( 0 for off )", "")]
+  [ConsoleSystem.Admin]
+  public static int dropclockthresh = 2;
+  [ConsoleSystem.Help("Enable/disable packet dropping caused by invalid timestamps", "")]
+  [ConsoleSystem.Admin]
+  public static bool verify = true;
+  [ConsoleSystem.Help("Setting this to non zero values will allow log messages ( for things like rpc drops )", "")]
+  [ConsoleSystem.Admin]
+  public static int loglevel;
+
+  [ConsoleSystem.Saved]
+  [ConsoleSystem.Help("Set the alloted transit time (in millis) for rpcs whom use NetCull.VerifyRPC", "")]
+  [ConsoleSystem.Admin]
+  public static int dropms
+  {
+    get
+    {
+      if (NetCull.allottedTransitTimeInMillis > (ulong) int.MaxValue)
+        return int.MaxValue;
+      else
+        return (int) NetCull.allottedTransitTimeInMillis;
+    }
+    set
+    {
+      if (value < 0)
+        NetCull.allottedTransitTimeInMillis = 10800000UL;
+      else
+        NetCull.allottedTransitTimeInMillis = (ulong) value;
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Set the alloted transit time (in seconds) for rpcs whom use NetCull.VerifyRPC", "")]
+  public static float dropsec
+  {
+    get
+    {
+      return (float) NetCull.allottedTransitTime;
+    }
+    set
+    {
+      if ((double) value < 0.0)
+        packet.dropms = -1;
+      else
+        NetCull.allottedTransitTime = (double) value;
+    }
+  }
+}
+// player.backpackLockTime
+internal class player : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static float backpackLockTime;
+}
+// profile.record(arg)
+public class profile : ConsoleSystem
+{
+  [ConsoleSystem.Help("Starts profiling for x seconds.", "int seconds")]
+  [ConsoleSystem.Admin]
+  public static void record(ref ConsoleSystem.Arg arg)
+  {
+    int iSeconds = arg.GetInt(0, 10);
+    if (iSeconds <= 0)
+      iSeconds = 10;
+    new GameObject("profiler").AddComponent<RustProfiler>().StartRecording(iSeconds);
+    arg.ReplyWith("Recording started!");
+  }
+}
+// rcon.password
+// rcon.login(arg)
+public class rcon : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Remote connection password for admin. - use: rcon.password password", "")]
+  public static string password = string.Empty;
+
+  [ConsoleSystem.User]
+  [ConsoleSystem.Help("Remote connection login - use: rcon.login password", "")]
+  public static void login(ref ConsoleSystem.Arg arg)
+  {
+    if (rcon.password == string.Empty)
+      arg.ReplyWith("Rcon not set up.");
+    else if (!arg.HasArgs(1))
+      arg.ReplyWith("Specify a Password.");
+    else if (arg.argUser.CanAdmin())
+      arg.ReplyWith("Already logged in.");
+    else if (arg.Args[0] == rcon.password)
+    {
+      arg.argUser.SetAdmin(true);
+      arg.ReplyWith("Logged in as admin.");
+    }
+    else
+      arg.argUser.Kick(NetError.Facepunch_Kick_RCON, true);
+  }
+}
+// save.autosavetime
+// save.friendly
+// save.profile
+// save.avatars(arg)
+// save.load(arg)
+// save.tofile(arg)
+// save.world(arg)
+// save.all(arg)
+internal class save : ConsoleSystem
+{
+  [ConsoleSystem.Help("The amount of seconds between auto saves", "")]
+  [ConsoleSystem.Admin]
+  public static int autosavetime = 600;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Should save a json formatted save too (for debugging)", "")]
+  public static bool friendly;
+  [ConsoleSystem.Help("turn on to display more timing info on world saves", "")]
+  [ConsoleSystem.Admin]
+  public static bool profile;
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Saves all avatars of alive users", "")]
+  public static void avatars(ref ConsoleSystem.Arg arg)
+  {
+    int num = AvatarSaveProc.SaveAll();
+    arg.ReplyWith(string.Format("Saved {0} avatar(s)", (object) num));
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Load a map. Careful - this doesn't clear the map first!", "string Filename")]
+  public static void load(ref ConsoleSystem.Arg arg)
+  {
+    if (!arg.HasArgs(1))
+      return;
+    string strValue = ServerSaveManager.Load(arg.ArgsStr);
+    arg.ReplyWith(strValue);
+  }
+
+  [ConsoleSystem.Help("Saves to a file", "string Name")]
+  [ConsoleSystem.Admin]
+  public static void tofile(ref ConsoleSystem.Arg arg)
+  {
+    string path = string.Empty;
+    if (arg.HasArgs(1))
+      path = arg.ArgsStr;
+    ServerSaveManager.Save(path);
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Performs a auto save and restarts auto save timer", "")]
+  public static void world(ref ConsoleSystem.Arg arg)
+  {
+    if (ServerSaveManager.AutoSave())
+      return;
+    arg.ReplyWith("Could not save right now.");
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("saves world and all alive avatars", "")]
+  public static void all(ref ConsoleSystem.Arg arg)
+  {
+    save.avatars(ref arg);
+    ServerSaveManager.AutoSave();
+    arg.ReplyWith("saved all.");
+  }
+}
+// server.framerate
+// server.clienttimeout
+// server.hostname
+// server.maxplayers
+// server.port
+// server.pvp
+// server.map
+// server.datadir
+// server.sendrate
+// server.lan
+// server.ip
+// server.timesrc
+// server.sendbuffer
+// server.receivebuffer
+// server.log
+// server.steamgroup
+// server.setlog(arg)
+public class server : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("The server's target framerate. 30 is fine.", "")]
+  public static int framerate = 30;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("How long until unresponsive clients timeout.", "")]
+  public static int clienttimeout = 300;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("The name of the current server", "")]
+  public static string hostname = "Untitled Rust Server";
+  [ConsoleSystem.Help("The maximum allowed connected players", "")]
+  [ConsoleSystem.Admin]
+  public static int maxplayers = 1000;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("The port for the server to use. Requires restart.", "")]
+  public static int port = 28015;
+  [ConsoleSystem.Help("Should players be allowed to damage other players", "")]
+  [ConsoleSystem.Admin]
+  public static bool pvp = true;
+  [ConsoleSystem.Help("The scene file to use", "")]
+  [ConsoleSystem.Admin]
+  public static string map = "rust_island_2013";
+  [ConsoleSystem.Help("Folder in which to store data. Must end in slash.", "")]
+  [ConsoleSystem.Admin]
+  public static string datadir = "serverdata/";
+
+  [ConsoleSystem.Help("Sendrate. Higher = more cpu, more network. Lower = less frequent updates, delayed game play.", "")]
+  [ConsoleSystem.Admin]
+  public static float sendrate
+  {
+    get
+    {
+      return NetCull.sendRate;
+    }
+    set
+    {
+      NetCull.sendRate = value;
+    }
+  }
+
+  [ConsoleSystem.Help("Allow for more communication to be had by unconnected players (useful over lan)", "")]
+  [ConsoleSystem.Admin]
+  public static bool lan
+  {
+    get
+    {
+      return NetCull.config.allowInternalUnconnectedMessages;
+    }
+    set
+    {
+      NetCull.config.allowInternalUnconnectedMessages = value;
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("The local ip to use for server. use \"\" for any", "")]
+  public static string ip
+  {
+    get
+    {
+      return NetCull.config.localIP;
+    }
+    set
+    {
+      NetCull.config.localIP = value;
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Time measurement source (0=stopwatch, 1=tickcount, 2=datetime)", "")]
+  public static int timesrc
+  {
+    get
+    {
+      return (int) NetCull.config.timeMeasurementFunction;
+    }
+    set
+    {
+      NetCull.config.timeMeasurementFunction = (NetworkTimeMeasurementFunction) value;
+    }
+  }
+
+  [ConsoleSystem.Help("the send buffer size ( must be inside of a .cfg )", "")]
+  [ConsoleSystem.Admin]
+  public static int sendbuffer
+  {
+    get
+    {
+      return NetCull.config.sendBufferSize;
+    }
+    set
+    {
+      NetCull.config.sendBufferSize = value;
+    }
+  }
+
+  [ConsoleSystem.Help("the receive buffer size ( must be inside of a .cfg )", "")]
+  [ConsoleSystem.Admin]
+  public static int receivebuffer
+  {
+    get
+    {
+      return NetCull.config.receiveBufferSize;
+    }
+    set
+    {
+      NetCull.config.receiveBufferSize = value;
+    }
+  }
+
+  [ConsoleSystem.Help("gets/sets the minimum log level", "")]
+  [ConsoleSystem.Admin]
+  public static int log
+  {
+    get
+    {
+      return (int) NetworkLog.minLevel;
+    }
+    set
+    {
+      NetworkLog.minLevel = (NetworkLogLevel) value;
+    }
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("If set only users in this steam group can join the server. This should be the huge numberic ID of the steam group.", "")]
+  public static string steamgroup
+  {
+    get
+    {
+      return Rust.Steam.Server.SteamGroup.ToString();
+    }
+    set
+    {
+      ulong.TryParse(value, out Rust.Steam.Server.SteamGroup);
+    }
+  }
+
+  [ConsoleSystem.Help("gets/sets log flags to given log level", "")]
+  [ConsoleSystem.Admin]
+  public static void setlog(ref ConsoleSystem.Arg Arg)
+  {
+    NetworkLog.SetLevel((NetworkLogFlags) Arg.GetEnum(typeof (NetworkLogFlags), 0, (Enum) NetworkLogFlags.None), (NetworkLogLevel) Arg.GetEnum(typeof (NetworkLogLevel), 1, (Enum) NetworkLogLevel.Warning));
+  }
+}
+// sleepers.pointsolver
+// sleepers.on
+// sleepers.loglevel
+// sleepers.clear(arg)
+// sleepers.kill(arg)
+public class sleepers : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static int pointsolver = 7;
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Saved]
+  public static bool on = true;
+  [ConsoleSystem.Admin]
+  public static int loglevel;
+
+  [ConsoleSystem.Admin]
+  public static void clear(ref ConsoleSystem.Arg arg)
+  {
+    if (arg.Args.Length > 0)
+      SleepingAvatar.Close(arg.GetUInt64(0, 0UL));
+    else
+      SleepingAvatar.CloseAll(false, true);
+  }
+
+  [ConsoleSystem.Admin]
+  public static void kill(ref ConsoleSystem.Arg arg)
+  {
+    SleepingAvatar.CloseAll(true, true);
+  }
+}
+// structure.minpercentdmg
+// structure.framelimit
+// structure.maxframeattempt
+// structure.touchall(arg)
+Public class structure : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static float minpercentdmg = 0.1f;
+  [ConsoleSystem.Admin]
+  public static int framelimit = 1;
+  [ConsoleSystem.Admin]
+  public static int maxframeattempt = 1000;
+
+  [ConsoleSystem.Admin]
+  public static void touchall(ref ConsoleSystem.Arg args)
+  {
+    using (List<StructureMaster>.Enumerator enumerator = StructureMaster.AllStructures.GetEnumerator())
+    {
+      while (enumerator.MoveNext())
+      {
+        StructureMaster current = enumerator.Current;
+        if ((bool) ((Object) current))
+          current.Touched();
+      }
+    }
+  }
+}
+// teleport.toplayer(arg)
+// teleport.topos(arg)
+public class teleport : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Teleport one player to another. if only one player is entered then the calling player will be fromName and entered will be destName", "string fromName, string destName")]
+  public static void toplayer(ref ConsoleSystem.Arg arg)
+  {
+    RustServerManagement serverManagement = RustServerManagement.Get();
+    if (!(bool) ((Object) serverManagement))
+      return;
+    int num1 = 0;
+    string partialNameOrIDInt1;
+    string partialNameOrIDInt2;
+    if (arg.HasArgs(2))
+    {
+      partialNameOrIDInt1 = arg.Args[0];
+      partialNameOrIDInt2 = arg.Args[1];
+      using (IEnumerator<PlayerClient> enumerator = PlayerClient.FindAllWithString(partialNameOrIDInt1).GetEnumerator())
+      {
+        bool flag = false;
+        while (!flag)
+        {
+          if (enumerator.MoveNext())
+          {
+            int num2 = 0;
+            foreach (PlayerClient playerClient in PlayerClient.FindAllWithString(partialNameOrIDInt2))
+            {
+              if (serverManagement.TeleportPlayerToPlayer(enumerator.Current.netPlayer, playerClient.netPlayer))
+              {
+                ++num2;
+                if (!enumerator.MoveNext())
+                {
+                  flag = true;
+                  break;
+                }
+              }
+            }
+            if (num2 != 0)
+              num1 += num2;
+            else
+              break;
+          }
+          else
+            break;
+        }
+      }
+    }
+    else if (arg.HasArgs(1))
+    {
+      partialNameOrIDInt2 = arg.Args[0];
+      if (arg.argUser != null)
+      {
+        partialNameOrIDInt1 = !arg.argUser.user.HasDisplayname ? (string) null : arg.argUser.user.Displayname;
+        PlayerClient playerClient1 = arg.argUser.playerClient;
+        if ((bool) ((Object) playerClient1))
+        {
+          partialNameOrIDInt1 = partialNameOrIDInt1 ?? playerClient1.userName;
+          foreach (PlayerClient playerClient2 in PlayerClient.FindAllWithString(partialNameOrIDInt2))
+          {
+            if (serverManagement.TeleportPlayerToPlayer(playerClient1.netPlayer, playerClient2.netPlayer))
+            {
+              num1 = 1;
+              break;
+            }
+          }
+        }
+      }
+      else
+      {
+        arg.ReplyWith("with 1 argument the arg.argUser was null ( 2 are required when calling from server console )");
+        return;
+      }
+    }
+    else
+    {
+      arg.ReplyWith("invalid args");
+      return;
+    }
+    arg.ReplyWith(string.Format("moved {0} player(s) named \"{1}\" to other players with name \"{2}\"", (object) num1, (object) partialNameOrIDInt1, (object) partialNameOrIDInt2));
+  }
+
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("Teleport player to a point in world space", "string fromName, float x, float y, float z")]
+  public static void topos(ref ConsoleSystem.Arg arg)
+  {
+    RustServerManagement serverManagement = RustServerManagement.Get();
+    if (!(bool) ((Object) serverManagement) || !arg.HasArgs(4))
+      return;
+    string partialNameOrIDInt = arg.Args[0];
+    Vector3 worldPoint = new Vector3(arg.GetFloat(1, 0.0f), arg.GetFloat(2, 0.0f), arg.GetFloat(3, 0.0f));
+    if ((double) worldPoint.magnitude == 0.0)
+      return;
+    foreach (PlayerClient playerClient in PlayerClient.FindAllWithString(partialNameOrIDInt))
+      serverManagement.TeleportPlayerToWorld(playerClient.netPlayer, worldPoint);
+  }
+}
+// truth.punish
+// truth.threshold
+public class truth : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static bool punish = true;
+  [ConsoleSystem.Admin]
+  public static int threshold = 400;
+}
+// voice.distance
+public class voice : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  [ConsoleSystem.Help("The voice distance", "")]
+  public static float distance = 100f;
+}
+// wildlife.forceupdate
+internal class wildlife : ConsoleSystem
+{
+  [ConsoleSystem.Admin]
+  public static bool forceupdate;
+}
+//

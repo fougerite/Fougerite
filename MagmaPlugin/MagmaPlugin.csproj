@@ -31,6 +31,8 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AdvancedTimer.cs" />
+    <Compile Include="MagmaTE.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MagmaPluginModule.cs" />
     <Compile Include="MagmaPlugin.cs" />
@@ -41,7 +43,6 @@
     <ProjectReference Include="..\Fougerite\Fougerite.csproj">
       <Project>{BD30E9D1-3322-48A4-B846-A969E32DC3F3}</Project>
       <Name>Fougerite</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -82,4 +83,9 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Drop++\Drop++.cfg" />
+    <None Include="Drop++\Drop++.js" />
+  </ItemGroup>
 </Project>

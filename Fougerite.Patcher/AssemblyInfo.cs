@@ -1,6 +1,6 @@
 ﻿// Assembly Fougerite.Patcher, Version 1.0.0.0
 
-[assembly: System.Reflection.AssemblyCopyright("Copyright \x00a9 Riketta")]
+[assembly: System.Reflection.AssemblyCopyright("Copyright © 2015 Pluton Team")]
 [assembly: System.Reflection.AssemblyDescription("")]
 [assembly: System.Reflection.AssemblyConfiguration("")]
 [assembly: System.Reflection.AssemblyCompany("")]

@@ -6,7 +6,7 @@
 
     public class SaveAllCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             AvatarSaveProc.SaveAll();
             Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "Saved ALL Avatar files!");

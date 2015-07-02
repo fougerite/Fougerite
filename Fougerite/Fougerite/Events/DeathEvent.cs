@@ -1,6 +1,5 @@
 ﻿namespace Fougerite.Events
 {
-    using System;
 
     public class DeathEvent : HurtEvent
     {
@@ -9,7 +8,7 @@
         public DeathEvent(ref DamageEvent d)
             : base(ref d)
         {
-            this.DropItems = true;
+            this._drop = true;
         }
 
         public bool DropItems

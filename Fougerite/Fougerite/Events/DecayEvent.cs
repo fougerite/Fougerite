@@ -1,7 +1,5 @@
 ﻿namespace Fougerite.Events
 {
-    using Fougerite;
-    using System;
 
     public class DecayEvent
     {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Permissions
+﻿namespace RustPP.Permissions
 {
     using Fougerite;
     using RustPP;
@@ -11,15 +9,16 @@ namespace RustPP.Permissions
     [Serializable]
     public class Administrator
     {
-        private System.Collections.Generic.List<string> _flags;
+        private List<string> _flags;
         private string _name;
         private ulong _userid;
         [XmlIgnore]
-        private static System.Collections.Generic.List<Administrator> admins = new System.Collections.Generic.List<Administrator>();
+        private static List<Administrator> admins = new List<Administrator>();
         public static string[] PermissionsFlags = new string[] { 
-      "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport", "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin", "CanDeleteAdmin", 
-      "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON"
-     };
+            "CanMute", "CanUnmute", "CanWhiteList", "CanKill", "CanKick", "CanBan", "CanUnban", "CanTeleport",
+            "CanLoadout", "CanAnnounce", "CanSpawnItem", "CanGiveItem", "CanReload", "CanSaveAll", "CanAddAdmin",
+            "CanDeleteAdmin", "CanGetFlags", "CanAddFlags", "CanUnflag", "CanInstaKO", "CanGodMode", "RCON", "Moderator"
+        };
 
         public Administrator()
         {
@@ -27,47 +26,43 @@ namespace RustPP.Permissions
 
         public Administrator(ulong userID, string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this._userid = userID;
             this._name = name;
-            this._flags = new System.Collections.Generic.List<string>();
+            this._flags = new List<string>();
             AddFlagsToList(this._flags, Core.config.GetSetting("Settings", "default_admin_flags"));
         }
 
         public Administrator(ulong userID, string name, string flags)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(flags != null);
-
             this._userid = userID;
             this._name = name;
-            this._flags = new System.Collections.Generic.List<string>();
+            this._flags = new List<string>();
             AddFlagsToList(this._flags, flags);
         }
 
         public static void AddAdmin(Administrator admin)
         {
-            Contract.Requires(admin != null);
-
             admins.Add(admin);
         }
 
-        private static void AddFlagsToList(System.Collections.Generic.List<string> l, string str)
+        private static void AddFlagsToList(List<string> l, string flagstr)
         {
-            Contract.Requires(l != null);
-            Contract.Requires(str != null);
-
-            foreach (string str2 in str.Split(new char[] { '|' }))
+            foreach (string flag in flagstr.Split(new char[] { '|' }))
             {
-                if (!l.Contains(str2.ToLower()))
-                {
-                    l.Add(str2);
-                }
+                string proper = Administrator.GetProperName(flag);
+                if (l.Contains(proper) || proper.Equals(string.Empty))
+                    continue;
+
+                l.Add(proper);
             }
         }
 
         public static void DeleteAdmin(ulong admin)
+        {
+            admins.Remove(GetAdmin(admin));
+        }
+
+        public static void DeleteAdmin(string admin)
         {
             admins.Remove(GetAdmin(admin));
         }
@@ -77,33 +72,34 @@ namespace RustPP.Permissions
             foreach (Administrator administrator in admins)
             {
                 if (userID == administrator.UserID)
-                {
                     return administrator;
-                }
             }
             return null;
         }
 
-        public static string GetProperName(string flag)
+        public static Administrator GetAdmin(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(flag));
-
-            foreach (string str in PermissionsFlags)
+            foreach (Administrator administrator in admins)
             {
-                if (str.ToLower() == flag.ToLower())
-                {
-                    return str;
-                }
+                if (name.Equals(administrator.DisplayName, StringComparison.OrdinalIgnoreCase))
+                    return administrator;
             }
-            return "";
+            return null;
+        }
+
+        public static string GetProperName(string name)
+        {
+            foreach (string flag in PermissionsFlags)
+            {
+                if (flag.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    return flag;
+            }
+            return string.Empty;
         }
 
         public bool HasPermission(string perm)
         {
-            Contract.Requires(!string.IsNullOrEmpty(perm));
-
-            return (this.Flags.FindIndex(delegate(string x)
-            {
+            return (this.Flags.FindIndex(delegate(string x) {
                 return x.Equals(perm, StringComparison.OrdinalIgnoreCase);
             }) != -1);
         }
@@ -113,51 +109,40 @@ namespace RustPP.Permissions
             foreach (Administrator administrator in admins)
             {
                 if (uid == administrator.UserID)
-                {
                     return true;
-                }
+            }
+            return false;
+        }
+
+        public static bool IsAdmin(string name)
+        {
+            foreach (Administrator administrator in admins)
+            {
+                if (name.Equals(administrator.DisplayName, StringComparison.OrdinalIgnoreCase))
+                    return true;
             }
             return false;
         }
 
         public static bool IsValidFlag(string flag)
         {
-            Contract.Requires(!string.IsNullOrEmpty(flag));
-
-            bool flag2 = false;
-            foreach (string str in PermissionsFlags)
-            {
-                if (str.ToLower() == flag.ToLower())
-                {
-                    flag2 = true;
-                }
-            }
-            return flag2;
+            return GetProperName(flag) != string.Empty;
         }
 
         public static void NotifyAdmins(string msg)
         {
-            Contract.Requires(msg != null);
-
             foreach (Administrator administrator in admins)
             {
-                try
-                {
-                    NetUser user = NetUser.FindByUserID(administrator.UserID);
-                    if (user != null)
-                    {
-                        Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogException(ex);
+                NetUser user = NetUser.FindByUserID(administrator.UserID);
+                if (user != null)
+                {   
+                    Util.sayUser(user.networkPlayer, Core.Name + "Admins", msg);
                 }
             }
         }
 
         [XmlIgnore]
-        public static System.Collections.Generic.List<Administrator> AdminList
+        public static List<Administrator> AdminList
         {
             get
             {
@@ -181,7 +166,7 @@ namespace RustPP.Permissions
             }
         }
 
-        public System.Collections.Generic.List<string> Flags
+        public List<string> Flags
         {
             get
             {

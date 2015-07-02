@@ -1,18 +1,15 @@
-using System.Diagnostics.Contracts;
-
 namespace Fougerite
 {
-    using Facepunch;
-    using Rust.Steam;
     using System;
     using System.IO;
-    using System.Timers;
-    using System.Text;
     using UnityEngine;
+    using UnityEngine.Cloud.Analytics;
 
     public class Bootstrap : Facepunch.MonoBehaviour
     {
-        public static string Version = "1.0.5(MC6)";
+        public static string Version = "1.1.3";
+        public static bool CR = false;
+        public static bool BI = false;
 
         public static void AttachBootstrap()
         {
@@ -36,45 +33,43 @@ namespace Fougerite
 
         public bool ApplyOptions()
         {
-            // look for the string 'false' to disable.  not a bool check
+            // look for the string 'false' to disable.  **not a bool check**
             if (Fougerite.Config.GetValue("Fougerite", "enabled") == "false") {
                 Debug.Log("Fougerite is disabled. No modules loaded. No hooks called.");
                 return false;
             }
-
+            if (Fougerite.Config.GetValue("Fougerite", "RemovePlayersFromCache") != null)
+            {
+                CR = Fougerite.Config.GetBoolValue("Fougerite", "RemovePlayersFromCache");
+            }
+            if (Fougerite.Config.GetValue("Fougerite", "BanOnInvalidPacket") != null)
+            {
+                BI = Fougerite.Config.GetBoolValue("Fougerite", "BanOnInvalidPacket");
+            }
             if (!Fougerite.Config.GetBoolValue("Fougerite", "deployabledecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
-                decay.decaytickrate = float.MaxValue;
-                decay.maxperframe = 1;
-                decay.maxtestperframe = 1;
+                decay.decaytickrate = float.MaxValue / 2;
+                decay.deploy_maxhealth_sec = float.MaxValue;
+                decay.maxperframe = -1;
+                decay.maxtestperframe = -1;
             }
             if (!Fougerite.Config.GetBoolValue("Fougerite", "structuredecay") && !Fougerite.Config.GetBoolValue("Fougerite", "decay"))
             {
-                structure.maxframeattempt = 0;
+                structure.maxframeattempt = -1;
+                structure.framelimit = -1;
+                structure.minpercentdmg = float.MaxValue;
             }
             return true;
         }
-        /*
-        public void WriteRuntimeConfig()
-        {
-            string RuntimeConfig = Path.Combine(Fougerite.Config.GetPublicFolder, "runtime.cfg");
-            StringBuilder sb = new StringBuilder();
-            var a = env.daylength;
-            var b = env.nightlength;
 
-        }
-        */
         public void Start()
         {
             string FougeriteDirectoryConfig = Path.Combine(Util.GetServerFolder(), "FougeriteDirectory.cfg");
             Config.Init(FougeriteDirectoryConfig);
             Logger.Init();
 
-            Contract.ContractFailed += (sender, args) => args.SetUnwind();
-
             Rust.Steam.Server.SetModded();
             Rust.Steam.Server.Official = false;
-
 
             if (ApplyOptions()) {
                 ModuleManager.LoadModules();

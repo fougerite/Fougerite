@@ -2,27 +2,32 @@
 {
     using Fougerite;
     using RustPP;
+    using RustPP.Permissions;
     using System;
 
     public class HelpCommand : ChatCommand
     {
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
-            int num = 1;
-            do
+            int i = 1;
+            string setting = Core.config.GetSetting("Settings", "help_string" + i);
+            while (setting != null)
+            {                 
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
+                i++;
+                setting = Core.config.GetSetting("Settings", "help_string" + i);
+            }
+            if (Administrator.IsAdmin(Arguments.argUser.userID))
             {
-                string setting = Core.config.GetSetting("Settings", "help_string" + num);
-                if (setting != null)
+                i = 1;
+                setting = Core.config.GetSetting("Settings", "admin_help_string" + i);
+                while (setting != null)
                 {
                     Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, setting);
-                    num++;
-                }
-                else
-                {
-                    num = 0;
+                    i++;
+                    setting = Core.config.GetSetting("Settings", "admin_help_string" + i);
                 }
             }
-            while (num != 0);
         }
     }
 }

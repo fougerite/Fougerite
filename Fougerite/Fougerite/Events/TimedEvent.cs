@@ -1,35 +1,21 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite.Events
+﻿namespace Fougerite.Events
 {
     using System;
-    using System.Runtime.CompilerServices;
-    using System.Threading;
     using System.Timers;
 
     public class TimedEvent
     {
         private object[] _args;
-        private readonly string _name;
-        private readonly System.Timers.Timer _timer;
+        private string _name;
+        private System.Timers.Timer _timer;
         private long lastTick;
 
         public event TimedEventFireDelegate OnFire;
 
         public event TimedEventFireArgsDelegate OnFireArgs;
 
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(_timer != null);
-            Contract.Invariant(!string.IsNullOrEmpty(_name));
-        }
-
         public TimedEvent(string name, double interval)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(interval >= 0);
-
             this._name = name;
             this._timer = new System.Timers.Timer();
             this._timer.Interval = interval;
@@ -39,23 +25,43 @@ namespace Fougerite.Events
         public TimedEvent(string name, double interval, object[] args)
             : this(name, interval)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(interval >= 0);
-            Contract.Requires(args != null);
             this.Args = args;
+        }
+
+        public TimedEvent(string name, double interval, bool flag)
+            : this(name, interval)
+        {
+            this._timer.AutoReset = flag;
+        }
+
+        public TimedEvent(string name, double interval, object[] args, bool flag)
+            : this(name, interval, args)
+        {
+            this._timer.AutoReset = flag;
         }
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (this.OnFire != null)
+            try
             {
-                this.OnFire(this.Name);
+                if (this.OnFire != null)
+                {
+                    this.OnFire(this.Name);
+                }
+                if (this.OnFireArgs != null)
+                {
+                    this.OnFireArgs(this.Name, this.Args);
+                }
+                this.lastTick = DateTime.UtcNow.Ticks;
             }
-            if (this.OnFireArgs != null)
+            catch (Exception ex)
             {
-                this.OnFireArgs(this.Name, this.Args);
+                Logger.LogDebug("Error occured at timer: " + this.Name + " Error: " + ex.ToString());
+                this.Stop();
+                Logger.LogDebug("Trying to restart timer.");
+                this.Start();
+                Logger.LogDebug("Restarted!");
             }
-            this.lastTick = DateTime.UtcNow.Ticks;
         }
 
         public void Start()
@@ -67,6 +73,18 @@ namespace Fougerite.Events
         public void Stop()
         {
             this._timer.Stop();
+        }
+
+        public void Kill()
+        {
+            Stop();
+            this._timer.Dispose();
+        }
+
+        public bool AutoReset
+        {
+            get { return this._timer.AutoReset; }
+            set { this._timer.AutoReset = value; }
         }
 
         public object[] Args
@@ -81,6 +99,7 @@ namespace Fougerite.Events
             }
         }
 
+        
         public double Interval
         {
             get
@@ -98,6 +117,10 @@ namespace Fougerite.Events
             get
             {
                 return this._name;
+            }
+            set
+            {
+                this._name = value;
             }
         }
 

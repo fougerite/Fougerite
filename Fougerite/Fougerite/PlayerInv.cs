@@ -1,58 +1,28 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace Fougerite
+﻿namespace Fougerite
 {
-    using System;
 
     public class PlayerInv
     {
-        private readonly PlayerItem[] _armorItems;
-        private readonly PlayerItem[] _barItems;
-        private readonly PlayerItem[] _items;
-        private readonly Fougerite.Player player;
-        private readonly Inventory _inv;
-
-        [ContractInvariantMethod]
-        private void Invariant()
-        {
-            Contract.Invariant(player != null);
-            Contract.Invariant(_inv != null);
-        }
+        private PlayerItem[] _armorItems;
+        private PlayerItem[] _barItems;
+        private Inventory _inv;
+        private PlayerItem[] _items;
+        private Fougerite.Player player;
 
         public PlayerInv(Fougerite.Player player)
         {
-            Contract.Requires(player != null);
-
             this.player = player;
             this._inv = player.PlayerClient.controllable.GetComponent<Inventory>();
-            if (_inv == null)
-                throw new InvalidOperationException("Player's inventory component is null.");
-            Contract.Assert(_inv != null);
-
-            this._items = new PlayerItem[30];
-            this._armorItems = new PlayerItem[4];
-            this._barItems = new PlayerItem[6];
-
-            for (int i = 0; i < this._inv.slotCount; i++)
-            {
-                if (i < 30) this.Items[i] = new PlayerItem(this._inv, i);
-                else if (i < 0x24) this.BarItems[i - 30] = new PlayerItem(this._inv, i);
-                else if (i < 40) this.ArmorItems[i - 0x24] = new PlayerItem(this._inv, i);
-            }
+            this.InitItems();
         }
 
         public void AddItem(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this.AddItem(name, 1);
         }
 
         public void AddItem(string name, int amount)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(amount >= 0);
-
             string[] strArray = new string[] { name, amount.ToString() };
             ConsoleSystem.Arg arg = new ConsoleSystem.Arg("");
             arg.Args = strArray;
@@ -62,16 +32,11 @@ namespace Fougerite
 
         public void AddItemTo(string name, int slot)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this.AddItemTo(name, slot, 1);
         }
 
         public void AddItemTo(string name, int slot, int amount)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(amount >= 0);
-
             ItemDataBlock byName = DatablockDictionary.GetByName(name);
             if (byName != null)
             {
@@ -128,8 +93,6 @@ namespace Fougerite
 
         public void DropItem(PlayerItem pi)
         {
-            Contract.Requires(pi != null);
-
             DropHelper.DropItem(this.InternalInventory, pi.Slot);
         }
 
@@ -153,16 +116,11 @@ namespace Fougerite
 
         public bool HasItem(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             return this.HasItem(name, 1);
         }
 
         public bool HasItem(string name, int number)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(number >= 0);
-
             int num = 0;
             foreach (PlayerItem item in this.Items)
             {
@@ -200,6 +158,28 @@ namespace Fougerite
             return (num >= number);
         }
 
+        private void InitItems()
+        {
+            this.Items = new PlayerItem[30];
+            this.ArmorItems = new PlayerItem[4];
+            this.BarItems = new PlayerItem[6];
+            for (int i = 0; i < this._inv.slotCount; i++)
+            {
+                if (i < 30)
+                {
+                    this.Items[i] = new PlayerItem(ref this._inv, i);
+                }
+                else if (i < 0x24)
+                {
+                    this.BarItems[i - 30] = new PlayerItem(ref this._inv, i);
+                }
+                else if (i < 40)
+                {
+                    this.ArmorItems[i - 0x24] = new PlayerItem(ref this._inv, i);
+                }
+            }
+        }
+
         public void MoveItem(int s1, int s2)
         {
             this._inv.MoveItemAtSlotToEmptySlot(this._inv, s1, s2);
@@ -207,8 +187,6 @@ namespace Fougerite
 
         public void RemoveItem(PlayerItem pi)
         {
-            Contract.Requires(pi != null);
-
             foreach (PlayerItem item in this.Items)
             {
                 if (item == pi)
@@ -242,11 +220,6 @@ namespace Fougerite
 
         public void RemoveItem(string name, int number)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-            Contract.Requires(number >= 0);
-
-            if (number == 0) return;
-
             int qty = number;
             foreach (PlayerItem item in this.Items)
             {
@@ -324,8 +297,6 @@ namespace Fougerite
 
         public void RemoveItemAll(string name)
         {
-            Contract.Requires(!string.IsNullOrEmpty(name));
-
             this.RemoveItem(name, 0x1869f);
         }
 
@@ -335,6 +306,10 @@ namespace Fougerite
             {
                 return this._armorItems;
             }
+            set
+            {
+                this._armorItems = value;
+            }
         }
 
         public PlayerItem[] BarItems
@@ -342,6 +317,10 @@ namespace Fougerite
             get
             {
                 return this._barItems;
+            }
+            set
+            {
+                this._barItems = value;
             }
         }
 
@@ -359,6 +338,10 @@ namespace Fougerite
             {
                 return this._inv;
             }
+            set
+            {
+                this._inv = value;
+            }
         }
 
         public PlayerItem[] Items
@@ -366,6 +349,10 @@ namespace Fougerite
             get
             {
                 return this._items;
+            }
+            set
+            {
+                this._items = value;
             }
         }
     }

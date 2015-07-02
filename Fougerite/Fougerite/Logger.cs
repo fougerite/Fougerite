@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using UnityEngine;
-
+﻿
 namespace Fougerite
 {
+    using System;
+    using System.IO;
+    using UnityEngine;
     public static class Logger
     {
         struct Writer
@@ -147,7 +145,7 @@ namespace Fougerite
             for (int i = 1; i < stackTrace.FrameCount; i++)
                 Trace += stackTrace.GetFrame(i).GetMethod().DeclaringType.Name + "->" + stackTrace.GetFrame(i).GetMethod().Name + " | ";
 
-            string Message = "[Exception] [ " + Trace + "]\r\n" + (Ex == null ? "(null) exception" : Ex.ToString());
+            string Message = "[Exception] [ " + Trace + "]\r\n" + Ex.ToString();
             WriteLog(Message);
         }
 

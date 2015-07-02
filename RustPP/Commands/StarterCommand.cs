@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace RustPP.Commands
+﻿namespace RustPP.Commands
 {
     using Fougerite;
     using RustPP;
@@ -9,9 +7,9 @@ namespace RustPP.Commands
 
     public class StarterCommand : ChatCommand
     {
-        private readonly Hashtable starterkits = new Hashtable();
+        private Hashtable starterkits = new Hashtable();
 
-        public override void Execute(ConsoleSystem.Arg Arguments, string[] ChatArguments)
+        public override void Execute(ref ConsoleSystem.Arg Arguments, ref string[] ChatArguments)
         {
             bool flag = false;
             if (!this.starterkits.ContainsKey(Arguments.argUser.playerClient.userID))
@@ -24,7 +22,7 @@ namespace RustPP.Commands
                 int num = (int)this.starterkits[Arguments.argUser.playerClient.userID];
                 if ((Environment.TickCount - num) < (int.Parse(Core.config.GetSetting("Settings", "starterkit_cooldown")) * 0x3e8))
                 {
-                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You must wait awhile before using this..");
+                    Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, RustPPModule.StarterCDMsg);
                 }
                 else
                 {
@@ -41,7 +39,7 @@ namespace RustPP.Commands
                     ConsoleSystem.Arg arg = Arguments;
                     inv.give(ref arg);
                 }
-                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, "You have spawned a Starter Kit!");
+                Util.sayUser(Arguments.argUser.networkPlayer, Core.Name, RustPPModule.StarterMsg);
             }
         }
     }

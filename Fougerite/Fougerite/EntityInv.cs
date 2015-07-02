@@ -1,6 +1,5 @@
 namespace Fougerite
 {
-    using System;
 
     public class EntityInv
     {
@@ -44,7 +43,7 @@ namespace Fougerite
             }
         }
 
-        public void ClearAll ()
+        public void ClearAll()
         {
             this._inv.Clear();
         }

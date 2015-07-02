@@ -112,7 +112,7 @@
             Fougerite.Hooks.OnShowTalker -= ShowTalker;
             Fougerite.Hooks.OnChatRaw -= ChatReceived;
             Fougerite.Hooks.OnChat -= Chat;
-
+            TimedEvents.timer.Stop();
             Logger.LogDebug("DeInitialized RPP");
         }
 

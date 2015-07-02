@@ -1,4 +1,6 @@
-﻿namespace Fougerite
+﻿using System.Linq;
+
+namespace Fougerite
 {
     using System;
     using System.Collections;
@@ -286,6 +288,11 @@
             if (byName != null)
                 return byName;
             return null;
+        }
+
+        public BlueprintDataBlock BlueprintOfItem(ItemDataBlock item)
+        {
+            return DatablockDictionary.All.OfType<BlueprintDataBlock>().FirstOrDefault(obj => obj.resultItem == item);
         }
 
         public Entity GetEntityatCoords(Vector3 givenPosition)

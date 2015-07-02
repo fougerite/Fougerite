@@ -235,6 +235,7 @@ namespace JintPlugin
                         }
                     }
                 }
+                if (d) { plugin.CommandList.Clear(); }
                 plugins[name] = plugin;
 
                 Logger.Log(string.Format("{0} {1} plugin was loaded successfuly.", brktname, name));

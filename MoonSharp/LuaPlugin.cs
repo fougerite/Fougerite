@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Fougerite;
 using Fougerite.Events;
 using MoonSharp.Interpreter;
+using MoonSharp.Interpreter.Interop;
 using UnityEngine;
 
 namespace MoonSharpModule
@@ -18,8 +19,8 @@ namespace MoonSharpModule
         public readonly object Class;
         public readonly DirectoryInfo RootDir;
         public readonly IList<string> Globals;
-        public readonly MoonSharp.Interpreter.Table Tables;
-        public readonly MoonSharp.Interpreter.Script script;
+        public readonly Table Tables;
+        public readonly Script script;
         public readonly Dictionary<string, MoonSharpTE> Timers;
         public readonly List<MoonSharpTE> ParallelTimers;
 
@@ -32,17 +33,17 @@ namespace MoonSharpModule
 			Name = name;
 			Code = code;
 			RootDir = path;
-            MoonSharp.Interpreter.Script script = new MoonSharp.Interpreter.Script();
+            UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+            script = new Script();
             script.DoString(code);
-            script.Globals.Set("Util", MoonSharp.Interpreter.UserData.Create(Fougerite.Util.GetUtil()));
-            script.Globals.Set("Plugin", MoonSharp.Interpreter.UserData.Create(this));
-            script.Globals.Set("Server", MoonSharp.Interpreter.UserData.Create(Fougerite.Server.GetServer()));
-            script.Globals.Set("DataStore", MoonSharp.Interpreter.UserData.Create(Fougerite.DataStore.GetInstance()));
-            script.Globals.Set("Data", MoonSharp.Interpreter.UserData.Create(Fougerite.Data.GetData()));
-            script.Globals.Set("Web", MoonSharp.Interpreter.UserData.Create(new Fougerite.Web()));
-            script.Globals.Set("World", MoonSharp.Interpreter.UserData.Create(Fougerite.World.GetWorld()));
-            this.script = script;
-            foreach (MoonSharp.Interpreter.DynValue v in script.Globals.Keys)
+            script.Globals.Set("Util", UserData.Create(Fougerite.Util.GetUtil()));
+            script.Globals.Set("Plugin", UserData.Create(this));
+            script.Globals.Set("Server", UserData.Create(Fougerite.Server.GetServer()));
+            script.Globals.Set("DataStore", UserData.Create(Fougerite.DataStore.GetInstance()));
+            script.Globals.Set("Data", UserData.Create(Fougerite.Data.GetData()));
+            script.Globals.Set("Web", UserData.Create(new Fougerite.Web()));
+            script.Globals.Set("World", UserData.Create(Fougerite.World.GetWorld()));
+            foreach (DynValue v in script.Globals.Keys)
             {
                 Globals.Add(v.ToString().Replace('"'.ToString(), ""));
             }
@@ -53,16 +54,9 @@ namespace MoonSharpModule
         {
             try
             {
-                MoonSharp.Interpreter.DynValue luaFactFunction = script.Globals.Get(func);
+                DynValue luaFactFunction = script.Globals.Get(func);
                 if (luaFactFunction != null)
                 {
-                    foreach (var x in obj)
-                    {
-                        if (!UserData.IsTypeRegistered(x.GetType()))
-                        {
-                            UserData.RegisterType(x.GetType());
-                        }
-                    }
                     script.Call(luaFactFunction, obj);
                 }
                 else
@@ -72,23 +66,7 @@ namespace MoonSharpModule
             }
             catch (Exception ex)
             {
-                string x = ex.ToString();
-                if (!x.Contains("cannot convert clr"))
-                {
-                    Fougerite.Logger.LogError("Invoke failed: " + ex.ToString());
-                    return;
-                }
-                string[] lines = x.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-                foreach (var l in lines)
-                {
-                    string b =
-                        l.Replace("Invoke failed: MoonSharp.Interpreter.ScriptRuntimeException: cannot convert clr type ", "");
-                    b = b.Replace("MoonSharp.Interpreter.ScriptRuntimeException: cannot convert clr type ", "");
-                    var t = Util.GetUtil().TryFindReturnType(b);
-                    if(!UserData.IsTypeRegistered(t)) {UserData.RegisterType(t);}
-                    break;
-                }
-                this.Invoke(func, obj);
+                Fougerite.Logger.LogError("Invoke failed: " + ex.ToString());
             }
         }
 
@@ -212,6 +190,11 @@ namespace MoonSharpModule
         public void OnPlayerSpawned(Fougerite.Player player, SpawnEvent evt)
         {
             this.Invoke("On_PlayerSpawned", new object[] { player, evt });
+        }
+
+        public void OnResearch(ResearchEvent evt)
+        {
+            this.Invoke("On_Research", new object[] { evt });
         }
 
         public void OnServerInit()

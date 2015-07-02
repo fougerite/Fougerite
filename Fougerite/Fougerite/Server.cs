@@ -325,11 +325,10 @@ namespace Fougerite
             get
             {
                 string path = Path.Combine(Util.GetRootFolder(), Path.Combine("Save", "GlobalBanList.ini"));
-                FileInfo fi = new FileInfo(path);
                 IniParser ini;
-                if (!fi.Exists)
+                if (!File.Exists(path))
                 {
-                    fi.Create();
+                    File.Create(path).Dispose();
                     ini = new IniParser(path);
                     ini.AddSetting("Ips", "0.0.0.0", "1");
                     ini.AddSetting("Ids", "76561197998999999", "1");

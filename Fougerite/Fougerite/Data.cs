@@ -72,6 +72,16 @@
             return int.Parse(num);
         }
 
+        public ulong ToUlong(string num)
+        {
+            return Convert.ToUInt64(num);
+        }
+
+        public long Tolong(string num)
+        {
+            return Convert.ToUInt32(num);
+        }
+
         public string ToLower(string str)
         {
             return str.ToLower();

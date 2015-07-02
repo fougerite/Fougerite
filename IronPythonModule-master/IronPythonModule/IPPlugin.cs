@@ -395,6 +395,11 @@ namespace IronPythonModule {
 			this.Invoke("On_PlayerSpawned", new object[] { player, evt });
 		}
 
+        public void OnResearch(ResearchEvent evt)
+        {
+            this.Invoke("On_Research", new object[] { evt });
+        }
+
 		public void OnServerInit() {
 			this.Invoke("On_ServerInit", new object[0]);
 		}
@@ -457,7 +462,7 @@ namespace IronPythonModule {
 	            {
 	                Engine.Operations.InvokeMember(Class, evt.Name + "Callback", evt);
 	            }
-	            catch (Microsoft.Scripting.ArgumentTypeException ex)
+	            catch (Microsoft.Scripting.ArgumentTypeException)
 	            {
                     this.Invoke(evt.Name + "Callback", new object[0]);
 	            }

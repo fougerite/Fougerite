@@ -67,6 +67,11 @@ namespace Fougerite
             return new Administrator(userID, name);
         }
 
+        public void RustPPSave()
+        {
+            Helper.CreateSaves();
+        }
+
         public Dictionary<ulong, string> Cache
         {
             get

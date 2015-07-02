@@ -1,4 +1,5 @@
 ﻿
+using Rust;
 using uLink;
 
 namespace Fougerite
@@ -51,6 +52,7 @@ namespace Fougerite
         public static event SteamDenyDelegate OnSteamDeny;
         public static event PlayerApprovalDelegate OnPlayerApproval;
         public static event PlayerMoveDelegate OnPlayerMove;
+        public static event ResearchDelegate OnResearch;
 
         public static void BlueprintUse(IBlueprintItem item, BlueprintDataBlock bdb)
         {
@@ -154,6 +156,30 @@ namespace Fougerite
                     ModuleManager.ReloadModules();
                     a.ReplyWith("Fougerite: Reloaded!");
                 }
+            }
+            else if (a.Class.Equals("fougerite", ic) && a.Function.Equals("save", ic))
+            {
+                AvatarSaveProc.SaveAll();
+                ServerSaveManager.AutoSave();
+                if (Fougerite.Server.GetServer().HasRustPP)
+                {
+                    Fougerite.Server.GetServer().GetRustPPAPI().RustPPSave();
+                }
+                DataStore.GetInstance().Save();
+                a.ReplyWith("Fougerite: Saved!");
+            }
+            else if (a.Class.Equals("fougerite", ic) && a.Function.Equals("rustpp", ic))
+            {
+                foreach (var module in Fougerite.ModuleManager.Modules)
+                {
+                    if (module.Plugin.Name.Equals("RustPPModule"))
+                    {
+                        module.DeInitialize();
+                        module.Initialize();
+                        break;
+                    }
+                }
+                a.ReplyWith("Rust++ Reloaded!");
             }
             else if (OnConsoleReceived != null)
             {
@@ -742,16 +768,18 @@ namespace Fougerite
                 {
                     if (!srv.IsBannedIP(ip))
                     {
-                        srv.BanPlayerIP(ip, name);
+                        srv.BanPlayerIP(ip, name + "-Console");
                         Logger.LogDebug("[FougeriteBan] Detected banned ID, but IP is not banned: "
                             + name + " - " + ip + " - " + uid);
                     }
                     if (!srv.IsBannedID(uid.ToString()))
                     {
-                        srv.BanPlayerID(uid.ToString(), name);
+                        srv.BanPlayerID(uid.ToString(), name + "-Console");
                         Logger.LogDebug("[FougeriteBan] Detected banned IP, but ID is not banned: "
                             + name + " - " + ip + " - " + uid);
                     }
+                    Debug.Log("[FougeriteBan]  Disconnected: " + name
+                        + " - " + ip + " - " + uid, null);
                     Logger.LogDebug("[FougeriteBan] Disconnected: " + name
                         + " - " + ip + " - " + uid);
                     approval.Deny(uLink.NetworkConnectionError.ConnectionBanned);
@@ -808,10 +836,14 @@ namespace Fougerite
             }
         }
 
-        /*public static void ResearchItem(ResearchToolItem<> item, IInventoryItem otherItem)
+        public static void ResearchItem(IInventoryItem otherItem)
         {
-            
-        }*/
+            if (OnResearch != null)
+            {
+                ResearchEvent researchEvent = new ResearchEvent(otherItem);
+                OnResearch(researchEvent);
+            }
+        }
 
         public static void ResetHooks()
         {
@@ -924,6 +956,9 @@ namespace Fougerite
             OnPlayerMove = delegate(HumanController param0, Vector3 param1, int param2, ushort param3, uLink.NetworkMessageInfo param4)
             {
             };
+            OnResearch = delegate(ResearchEvent param0)
+            {
+            };
 
             foreach (Fougerite.Player player in Fougerite.Server.GetServer().Players)
             {
@@ -999,5 +1034,6 @@ namespace Fougerite
         public delegate void SteamDenyDelegate(SteamDenyEvent sde);
         public delegate void PlayerApprovalDelegate(PlayerApprovalEvent e);
         public delegate void PlayerMoveDelegate(HumanController hc, Vector3 origin, int encoded, ushort stateFlags, uLink.NetworkMessageInfo info);
+        public delegate void ResearchDelegate(ResearchEvent re);
     }
 }

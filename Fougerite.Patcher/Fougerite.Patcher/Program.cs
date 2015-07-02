@@ -6,7 +6,7 @@ namespace Fougerite.Patcher
 {
     internal class Program
     {
-        public static string Version = "1.5.1";
+        public static string Version = "1.5.2";
 
         private static void Main(string[] args)
         {
@@ -17,6 +17,7 @@ namespace Fougerite.Patcher
 
             if (!firstPass && !secondPass) 
             {
+                Logger.Log("Fougerite Patcher V" + Version);
                 Logger.Log("No command specified.");
                 Logger.Log("Launch patcher with args: \"-1\" (fields update) or\\and \"-2\" (methods update).");
                 Logger.Log("Or enter \"0\" to patch with both flags");

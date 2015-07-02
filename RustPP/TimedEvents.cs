@@ -10,6 +10,7 @@
     {
         public static bool init = false;
         public static int time = 60;
+        public static System.Timers.Timer timer;
 
         private static void advertise_begin()
         {
@@ -30,6 +31,7 @@
             AvatarSaveProc.SaveAll();
             ServerSaveManager.AutoSave();
             Helper.CreateSaves();
+            DataStore.GetInstance().Save();
         }
 
         public static void shutdown()
@@ -104,7 +106,7 @@
                 }
                 if (Core.config.GetBoolSetting("Settings", "notice_enabled"))
                 {
-                    System.Timers.Timer timer = new System.Timers.Timer();
+                    timer = new System.Timers.Timer();
                     timer.Interval = int.Parse(Core.config.GetSetting("Settings", "notice_interval"));
                     timer.AutoReset = true;
                     timer.Elapsed += delegate(object x, ElapsedEventArgs y)

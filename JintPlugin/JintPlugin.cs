@@ -172,6 +172,9 @@ namespace JintPlugin
                 case "On_PlayerApproval":
                     Hooks.OnPlayerApproval += OnPlayerApproval;
                     break;
+                case "On_Research":
+                    Hooks.OnResearch += OnResearch;
+                    break;
                 }
             }
         }
@@ -270,6 +273,9 @@ namespace JintPlugin
                     break;
                 case "On_PlayerApproval":
                     Hooks.OnPlayerApproval -= OnPlayerApproval;
+                    break;
+                case "On_Research":
+                    Hooks.OnResearch -= OnResearch;
                     break;
                 }
             }
@@ -653,6 +659,11 @@ namespace JintPlugin
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
             Invoke("On_PlayerSpawned", player, evt);
+        }
+
+        public void OnResearch(ResearchEvent evt)
+        {
+            Invoke("On_Research", evt);
         }
 
         public void OnResourceSpawned(ResourceTarget t)

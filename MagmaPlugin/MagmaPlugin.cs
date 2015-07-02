@@ -121,6 +121,7 @@ namespace MagmaPlugin
                     case "On_Airdrop": Hooks.OnAirdropCalled += OnAirdrop; break;
                     case "On_SteamDeny": Hooks.OnSteamDeny += OnSteamDeny; break;
                     case "On_PlayerApproval": Hooks.OnPlayerApproval += OnPlayerApproval; break;
+                    case "On_Research": Hooks.OnResearch += OnResearch; break;
                 }
             }
         }
@@ -162,6 +163,7 @@ namespace MagmaPlugin
                     case "On_Airdrop": Hooks.OnAirdropCalled -= OnAirdrop; break;
                     case "On_SteamDeny": Hooks.OnSteamDeny -= OnSteamDeny; break;
                     case "On_PlayerApproval": Hooks.OnPlayerApproval -= OnPlayerApproval; break;
+                    case "On_Research": Hooks.OnResearch -= OnResearch; break;
                 }
             }
         }
@@ -501,6 +503,11 @@ namespace MagmaPlugin
         public void OnPlayerSpawned(Player player, SpawnEvent evt)
         {
             Invoke("On_PlayerSpawned", player, evt);
+        }
+
+        public void OnResearch(ResearchEvent evt)
+        {
+            Invoke("On_Research", evt);
         }
 
         public void OnResourceSpawned(ResourceTarget t)

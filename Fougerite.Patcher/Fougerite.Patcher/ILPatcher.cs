@@ -81,7 +81,13 @@ namespace Fougerite.Patcher
         {
             TypeDefinition type = rustAssembly.MainModule.GetType("ResearchToolItem`1");
             MethodDefinition TryCombine = type.GetMethod("TryCombine");
+            MethodDefinition method = hooksClass.GetMethod("ResearchItem");
+            int Position = TryCombine.Body.Instructions.Count - 13;
 
+            ILProcessor iLProcessor = TryCombine.Body.GetILProcessor();
+            iLProcessor.InsertBefore(TryCombine.Body.Instructions[Position],
+                Instruction.Create(OpCodes.Callvirt, this.rustAssembly.MainModule.Import(method)));
+            iLProcessor.InsertBefore(TryCombine.Body.Instructions[Position], Instruction.Create(OpCodes.Ldarg_1));
         }
 
         private void AntiDecay()
@@ -125,6 +131,9 @@ namespace Fougerite.Patcher
             InventoryHolder.GetField("isPlayerInventory").SetPublic(true);
             MethodDefinition m = InventoryHolder.GetMethod("GetPlayerInventory");
             m.SetPublic(true);
+
+            TypeDefinition PlayerInventory = rustAssembly.MainModule.GetType("PlayerInventory");
+            PlayerInventory.GetField("_boundBPs").SetPublic(true);
 
             TypeDefinition BasicDoor = rustAssembly.MainModule.GetType("BasicDoor");
             BasicDoor.GetField("state").SetPublic(true);
@@ -818,6 +827,7 @@ namespace Fougerite.Patcher
                     this.SupplyCratePatch();
                     this.LatePostInTryCatch2();
                     //this.RayCastPatch();
+                    this.ResearchPatch();
                 }
                 catch (Exception ex)
                 {

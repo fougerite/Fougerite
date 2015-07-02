@@ -89,6 +89,7 @@ namespace MoonSharpModule
             MoonSharp.Interpreter.UserData.RegisterType<Fougerite.World>();
             MoonSharp.Interpreter.UserData.RegisterType<Fougerite.Events.CraftingEvent>();
             MoonSharp.Interpreter.UserData.RegisterType<LuaPlugin>();
+            MoonSharp.Interpreter.UserData.RegisterType<MoonSharpTE>();
             plugins = new Dictionary<string, LuaPlugin>();
             ReloadPlugins();
             Hooks.OnConsoleReceived += new Hooks.ConsoleHandlerDelegate(ConsoleReceived);
@@ -266,6 +267,7 @@ namespace MoonSharpModule
                     case "On_Airdrop": Hooks.OnAirdropCalled += new Hooks.AirdropDelegate(plugin.OnAirdrop); break;
                     case "On_SteamDeny": Hooks.OnSteamDeny += new Hooks.SteamDenyDelegate(plugin.OnSteamDeny); break;
                     case "On_PlayerApproval": Hooks.OnPlayerApproval += new Hooks.PlayerApprovalDelegate(plugin.OnPlayerApproval); break;
+                    case "On_Research": Hooks.OnResearch += new Hooks.ResearchDelegate(plugin.OnResearch); break;
                     //TODO: Oxide Hook Names
                     /*case "Init": plugin.Invoke("Init", new object[0]); break;
                     //case "ModifyDamage": Hooks.OnDoorUse += new Hooks.DoorOpenHandlerDelegate(plugin); break;
@@ -334,6 +336,7 @@ namespace MoonSharpModule
                     case "On_Airdrop": Hooks.OnAirdropCalled -= new Hooks.AirdropDelegate(plugin.OnAirdrop); break;
                     case "On_SteamDeny": Hooks.OnSteamDeny -= new Hooks.SteamDenyDelegate(plugin.OnSteamDeny); break;
                     case "On_PlayerApproval": Hooks.OnPlayerApproval -= new Hooks.PlayerApprovalDelegate(plugin.OnPlayerApproval); break;
+                    case "On_Research": Hooks.OnResearch -= new Hooks.ResearchDelegate(plugin.OnResearch); break;
                 }
             }
         }

@@ -1,5 +1,7 @@
 # Fougerite project
 
+Active Development Page: https://github.com/Notulp/Fougerite
+
 Fougerite a fully compatible with Magma server mod, featuring better performance with Python and C# plugins.   
 
 ## Compilation
